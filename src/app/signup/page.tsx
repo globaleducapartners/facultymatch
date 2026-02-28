@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { signUp, signInWithSSO } from "@/app/auth/actions";
 import { School, UserCircle, Loader2, Globe, CheckCircle2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
-export default function SignupPage() {
+function SignupContent() {
   const searchParams = useSearchParams();
   const initialRole = searchParams.get("role") || "faculty";
   const isSSO = searchParams.get("new_sso") === "true";
@@ -228,6 +228,18 @@ export default function SignupPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+        <Loader2 className="animate-spin text-talentia-blue" size={32} />
+      </div>
+    }>
+      <SignupContent />
+    </Suspense>
   );
 }
 
