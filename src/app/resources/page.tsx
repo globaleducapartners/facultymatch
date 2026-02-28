@@ -17,7 +17,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Recursos Académicos | Talentia - Elevando el Estándar de Educación Superior",
+  title: "Recursos Académicos | FacultyMatch - Elevando el Estándar de Educación Superior",
   description: "Guías, estándares y mejores prácticas para el reclutamiento docente y el desarrollo de carrera académica en el entorno global.",
   keywords: "recursos académicos, guías docentes, reclutamiento universitario, estándares académicos, educación superior",
 };
@@ -196,13 +196,7 @@ export default function ResourcesPage() {
           </div>
         </section>
       </main>
-
-      <footer className="bg-navy text-white py-16 px-6 text-center border-t border-white/5">
-        <p className="text-gray-500 font-bold text-xs uppercase tracking-[0.2em] mb-4">Progress through knowledge</p>
-        <p className="text-gray-400 font-medium text-sm">
-          &copy; 2026 Talentia Faculty Network. Todos los derechos reservados.
-        </p>
-      </footer>
     </div>
   );
 }
+

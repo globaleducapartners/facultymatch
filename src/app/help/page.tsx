@@ -15,7 +15,8 @@ export default function HelpPage() {
             <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Centro de ayuda</span>
           </div>
         </Link>
-        <Link href="/dashboard/educator" className="text-sm font-bold text-talentia-blue flex items-center gap-2">
+          <Link href="/app/faculty" className="text-sm font-bold text-talentia-blue flex items-center gap-2">
+
           <ArrowLeft size={16} /> Volver al dashboard
         </Link>
       </nav>

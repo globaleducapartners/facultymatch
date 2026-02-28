@@ -4,17 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export default async function SpecialtiesPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) return null;
+  if (!user) {
+    redirect("/login");
+  }
 
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
-    .select("*")
-    .eq("user_id", user.id)
+    .select("id")
+    .eq("id", user.id)
     .single();
 
   const { data: expertise } = await supabase
@@ -29,13 +32,15 @@ export default async function SpecialtiesPage() {
     const area = formData.get("area") as string;
     const subarea = formData.get("subarea") as string;
     const topicsStr = formData.get("topics") as string;
-    const topics = topicsStr ? topicsStr.split(',').map(s => s.trim()) : [];
+    const topics = topicsStr ? topicsStr.split(',').map(s => s.trim()).filter(Boolean) : [];
     
     if (!area) return;
     
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    const { data: faculty } = await supabase.from("faculty_profiles").select("id").eq("user_id", user!.id).single();
+    if (!user) return;
+
+    const { data: faculty } = await supabase.from("faculty_profiles").select("id").eq("id", user.id).single();
     
     await supabase.from("faculty_expertise").insert({ 
       faculty_id: faculty?.id,
@@ -43,14 +48,14 @@ export default async function SpecialtiesPage() {
       subarea,
       topics
     });
-    revalidatePath("/dashboard/educator/specialties");
+    revalidatePath("/app/faculty/specialties");
   }
 
   async function removeExpertise(id: string) {
     "use server";
     const supabase = await createClient();
     await supabase.from("faculty_expertise").delete().eq("id", id);
-    revalidatePath("/dashboard/educator/specialties");
+    revalidatePath("/app/faculty/specialties");
   }
 
   return (
@@ -197,32 +202,7 @@ export default async function SpecialtiesPage() {
             <p className="text-xs text-gray-300 font-medium leading-relaxed">
               Las instituciones buscan perfiles con al menos 3-5 especialidades bien definidas. Sé específico: en lugar de &quot;Derecho&quot;, usa &quot;Derecho Administrativo&quot; o &quot;Derecho Digital&quot;.
             </p>
-            <div className="space-y-4 pt-4 border-t border-white/5">
-              <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-white/30">
-                <span>Deseabilidad del perfil</span>
-                <span className="text-tech-cyan">85%</span>
-              </div>
-              <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-tech-cyan w-[85%]" />
-              </div>
-            </div>
           </div>
-
-          <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-bold text-navy">Filtros inteligentes</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 flex items-center justify-between">
-                <span className="text-xs font-bold text-gray-600">Nivel académico</span>
-                <Badge variant="outline" className="bg-white text-[9px] font-bold border-gray-200">PhD</Badge>
-              </div>
-              <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-100 flex items-center justify-between">
-                <span className="text-xs font-bold text-gray-600">Investigación</span>
-                <Badge variant="outline" className="bg-white text-[9px] font-bold border-gray-200">Publicado</Badge>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

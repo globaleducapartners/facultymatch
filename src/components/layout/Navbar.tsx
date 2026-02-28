@@ -42,7 +42,7 @@ export function Navbar() {
     getUser();
   }, []);
 
-  const dashboardHref = role === 'faculty' ? '/dashboard/educator' : '/dashboard/institution';
+  const dashboardHref = role === 'faculty' ? '/app/faculty' : '/app/institution';
 
   return (
     <nav className="flex items-center justify-between px-6 lg:px-12 py-6 bg-white border-b border-gray-100 sticky top-0 z-50">
@@ -51,10 +51,11 @@ export function Navbar() {
           <div className="bg-talentia-blue p-2 rounded-xl text-white shadow-lg shadow-blue-100 group-hover:scale-110 transition-transform">
             <Globe size={24} />
           </div>
-          <div className="flex flex-col">
-            <span className="text-2xl font-black tracking-tight text-navy leading-none">Talentia</span>
-            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Faculty Network</span>
-          </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-black tracking-tight text-navy leading-none">FacultyMatch</span>
+              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Network</span>
+            </div>
+
         </Link>
       </div>
       

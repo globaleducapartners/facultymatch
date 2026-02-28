@@ -26,30 +26,30 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 const educatorItems = [
-  { label: "Inicio", href: "/dashboard/educator", icon: Home },
-  { label: "Mi perfil", href: "/dashboard/educator/profile", icon: User },
-  { label: "Especialidades", href: "/dashboard/educator/specialties", icon: Award },
-  { label: "Visibilidad & Privacidad", href: "/dashboard/educator/privacy", icon: ShieldCheck },
-  { label: "Solicitudes", href: "/dashboard/educator/requests", icon: Mail },
-  { label: "Verificación", href: "/dashboard/educator/verification", icon: CheckCircle2 },
-  { label: "Ajustes", href: "/dashboard/educator/settings", icon: Settings },
+  { label: "Inicio", href: "/app/faculty", icon: Home },
+  { label: "Mi perfil", href: "/app/faculty/profile", icon: User },
+  { label: "Especialidades", href: "/app/faculty/specialties", icon: Award },
+  { label: "Visibilidad & Privacidad", href: "/app/faculty/privacy", icon: ShieldCheck },
+  { label: "Solicitudes", href: "/app/faculty/requests", icon: Mail },
+  { label: "Verificación", href: "/app/faculty/verification", icon: CheckCircle2 },
+  { label: "Ajustes", href: "/app/faculty/settings", icon: Settings },
 ];
 
 const institutionItems = [
-  { label: "Buscar docentes", href: "/dashboard/institution", icon: Search },
-  { label: "Shortlists", href: "/dashboard/institution/shortlists", icon: Star },
-  { label: "Contactos", href: "/dashboard/institution/contacts", icon: Mail },
-  { label: "Mi institución", href: "/dashboard/institution/profile", icon: Building2 },
-  { label: "Plan & facturación", href: "/dashboard/institution/billing", icon: CreditCard },
+  { label: "Buscar docentes", href: "/app/institution", icon: Search },
+  { label: "Shortlists", href: "/app/institution/shortlists", icon: Star },
+  { label: "Contactos", href: "/app/institution/contacts", icon: Mail },
+  { label: "Mi institución", href: "/app/institution/profile", icon: Building2 },
+  { label: "Plan & facturación", href: "/app/institution/billing", icon: CreditCard },
 ];
 
 const adminItems = [
-  { label: "Dashboard", href: "/dashboard/admin", icon: LayoutDashboard },
-  { label: "Verificaciones", href: "/dashboard/admin/verifications", icon: FileCheck },
-  { label: "Docentes", href: "/dashboard/admin/educators", icon: Users },
-  { label: "Instituciones", href: "/dashboard/admin/institutions", icon: Building2 },
-  { label: "Taxonomía", href: "/dashboard/admin/taxonomy", icon: Tags },
-  { label: "Ajustes", href: "/dashboard/admin/settings", icon: Settings },
+  { label: "Dashboard", href: "/app/admin", icon: LayoutDashboard },
+  { label: "Verificaciones", href: "/app/admin/verifications", icon: FileCheck },
+  { label: "Docentes", href: "/app/admin/educators", icon: Users },
+  { label: "Instituciones", href: "/app/admin/institutions", icon: Building2 },
+  { label: "Taxonomía", href: "/app/admin/taxonomy", icon: Tags },
+  { label: "Ajustes", href: "/app/admin/settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -58,9 +58,9 @@ export function Sidebar() {
 
   // Determine which menu to show based on URL
   let navItems = educatorItems;
-  if (pathname?.startsWith("/dashboard/institution")) {
+  if (pathname?.startsWith("/app/institution")) {
     navItems = institutionItems;
-  } else if (pathname?.startsWith("/dashboard/admin")) {
+  } else if (pathname?.startsWith("/app/admin")) {
     navItems = adminItems;
   }
 

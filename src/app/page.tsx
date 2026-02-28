@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
-  title: "Talentia | La Red Global de Talento Académico",
+  title: "FacultyMatch | La Red Global de Talento Académico",
   description: "Conecta universidades y docentes a través de perfiles verificados y experiencia real. La plataforma líder en educación superior.",
   keywords: "talento académico, docentes, universidades, educación superior, red profesional académica, marketplace académico",
 };

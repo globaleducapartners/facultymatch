@@ -61,7 +61,7 @@ export default async function AdminDashboard() {
               <CardDescription className="font-medium">Perfiles esperando revisión documental.</CardDescription>
             </div>
             <Button variant="link" asChild className="text-talentia-blue font-bold text-sm">
-              <Link href="/dashboard/admin/verifications">Ver todas</Link>
+              <Link href="/app/admin/verifications">Ver todas</Link>
             </Button>
           </CardHeader>
             <CardContent className="p-0">

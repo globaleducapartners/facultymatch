@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase-server";
 import { sendWelcomeEmail } from "@/lib/emails/service";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export async function signUp(formData: FormData, isSSO: boolean = false) {
   const email = formData.get("email") as string;
@@ -133,11 +134,11 @@ export async function signIn(formData: FormData) {
     .single();
 
   if (profile?.role === "faculty") {
-    redirect("/dashboard/educator");
+    redirect("/app/faculty");
   } else if (profile?.role === "institution") {
-    redirect("/dashboard/institution");
+    redirect("/app/institution");
   } else if (profile?.role === "admin" || profile?.role === "super_admin") {
-    redirect("/dashboard/admin");
+    redirect("/app/admin");
   } else {
     redirect("/");
   }
@@ -173,15 +174,47 @@ export async function contactFaculty(formData: FormData) {
     .eq("id", facultyId)
     .single();
 
-  if (faculty) {
-    // Create notification for faculty
-    await supabase.from("notifications").insert({
-      user_id: faculty.user_id,
-      type: 'request',
-      title: 'Nueva solicitud de contacto',
-      content: `Has recibido una nueva propuesta de colaboración.`
-    });
+    if (faculty) {
+      // Create notification for faculty
+      await supabase.from("notifications").insert({
+        user_id: faculty.user_id,
+        type: 'request',
+        title: 'Nueva solicitud de contacto',
+        content: `Has recibido una nueva propuesta de colaboración.`
+      });
+    }
+  
+    revalidatePath("/app/institution/contacts");
+    return { success: true };
   }
 
-  return { success: true };
+export async function toggleFavorite(facultyId: string, institutionId: string) {
+  const supabase = await createClient();
+
+  const { data: existing } = await supabase
+    .from("favorites")
+    .select("id")
+    .eq("faculty_id", facultyId)
+    .eq("institution_id", institutionId)
+    .maybeSingle();
+
+  if (existing) {
+    const { error } = await supabase
+      .from("favorites")
+      .delete()
+      .eq("id", existing.id);
+    if (error) return { error: error.message };
+    revalidatePath("/app/institution/favorites");
+    return { success: true, action: 'removed' };
+  } else {
+    const { error } = await supabase
+      .from("favorites")
+      .insert({
+        faculty_id: facultyId,
+        institution_id: institutionId
+      });
+    if (error) return { error: error.message };
+    revalidatePath("/app/institution/favorites");
+    return { success: true, action: 'added' };
+  }
 }

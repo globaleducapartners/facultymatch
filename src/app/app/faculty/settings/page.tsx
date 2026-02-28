@@ -23,7 +23,7 @@ export default async function SettingsPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     await supabase.from("educator_profiles").update({ notifications_enabled: enabled }).eq("id", user!.id);
-    revalidatePath("/dashboard/educator/settings");
+    revalidatePath("/app/faculty/settings");
   }
 
   return (

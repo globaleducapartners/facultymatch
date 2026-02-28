@@ -3,17 +3,33 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, ChevronRight, CheckCircle2, MapPin, Globe, Award } from "lucide-react";
+import { Star, ChevronRight, CheckCircle2, MapPin, Globe, Award, Mail } from "lucide-react";
 import Link from "next/link";
 import { ContactModal } from "./ContactModal";
+import { toggleFavorite } from "@/app/auth/actions";
+import { toast } from "sonner";
 
 interface EducatorCardProps {
   educator: any;
   institutionId: string;
+  isFavorite?: boolean;
 }
 
-export function EducatorCard({ educator, institutionId }: EducatorCardProps) {
+export function EducatorCard({ educator, institutionId, isFavorite: initialIsFavorite }: EducatorCardProps) {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(initialIsFavorite || false);
+
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const result = await toggleFavorite(educator.id, institutionId);
+    if (result.success) {
+      setIsFavorite(result.action === 'added');
+      toast.success(result.action === 'added' ? "Añadido a favoritos" : "Eliminado de favoritos");
+    } else {
+      toast.error("Error al actualizar favoritos");
+    }
+  };
 
   return (
     <div key={educator.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group relative">
@@ -51,7 +67,7 @@ export function EducatorCard({ educator, institutionId }: EducatorCardProps) {
               <div className="flex flex-wrap items-center gap-4 mt-3">
                 <span className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-widest">
                   <MapPin size={14} className="text-gray-300" />
-                  {educator.country || "Global"}
+                  {educator.country || "España"}
                 </span>
                 <span className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-widest">
                   <Globe size={14} className="text-gray-300" />
@@ -60,8 +76,12 @@ export function EducatorCard({ educator, institutionId }: EducatorCardProps) {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="ghost" className="text-gray-300 hover:text-energy-orange hover:bg-orange-50 p-2 h-10 w-10 rounded-xl">
-                <Star size={20} />
+              <Button 
+                variant="ghost" 
+                onClick={handleToggleFavorite}
+                className={`p-2 h-10 w-10 rounded-xl transition-all ${isFavorite ? "text-energy-orange bg-orange-50" : "text-gray-300 hover:text-energy-orange hover:bg-orange-50"}`}
+              >
+                <Star size={20} className={isFavorite ? "fill-current" : ""} />
               </Button>
               <Button 
                 onClick={() => setIsContactModalOpen(true)}
@@ -101,7 +121,7 @@ export function EducatorCard({ educator, institutionId }: EducatorCardProps) {
       
       <div className="mt-6 pt-6 border-t border-gray-50 flex items-center justify-end">
         <Button variant="link" asChild className="text-talentia-blue font-bold text-sm hover:no-underline group/btn">
-          <Link href={`/dashboard/institution/educator/${educator.id}`} className="flex items-center gap-2">
+          <Link href={`/app/faculty/${educator.id}`} className="flex items-center gap-2">
             Ver perfil completo
             <ChevronRight size={18} className="group-hover/btn:translate-x-1 transition-all" />
           </Link>

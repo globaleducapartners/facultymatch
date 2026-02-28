@@ -43,11 +43,11 @@ function SignupContent() {
           </div>
           <h1 className="text-3xl font-black text-navy">¡Perfil creado!</h1>
           <p className="text-gray-500 font-medium">Tu cuenta ha sido configurada con éxito. Ya puedes acceder a tu panel.</p>
-          <Link href={role === 'faculty' ? '/dashboard/educator' : '/dashboard/institution'}>
-            <Button className="w-full bg-talentia-blue hover:bg-blue-700 text-white py-6 rounded-xl font-bold mt-4">
-              Ir al Dashboard
-            </Button>
-          </Link>
+            <Link href={role === 'faculty' ? '/app/faculty' : '/app/institution'}>
+              <Button className="w-full bg-talentia-blue hover:bg-blue-700 text-white py-6 rounded-xl font-bold mt-4">
+                Ir al Dashboard
+              </Button>
+            </Link>
         </div>
       </div>
     );
@@ -62,8 +62,8 @@ function SignupContent() {
                 <Globe size={28} />
               </div>
               <div className="flex flex-col items-start">
-                <span className="text-3xl font-black tracking-tight text-navy leading-none">Talentia</span>
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Red Global de Talento Académico</span>
+                <span className="text-3xl font-black tracking-tight text-navy leading-none">FacultyMatch</span>
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Global Academic Network</span>
               </div>
             </Link>
             <h1 className="text-3xl font-black text-navy tracking-tight">{isSSO ? "Completa tu perfil" : "Crea tu cuenta"}</h1>

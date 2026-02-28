@@ -72,12 +72,12 @@ export function Topbar({ user, profile }: TopbarProps) {
 
               <ChevronDown size={16} className="text-gray-400 hidden md:block" />
             </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 p-2 rounded-xl">
-                <DropdownMenuItem className="rounded-lg p-2.5">
-                  <Link href={`/dashboard/${profile?.role === 'faculty' ? 'educator' : profile?.role === 'institution' ? 'institution' : 'admin'}/settings`} className="flex items-center gap-2 w-full">
-                    Configuración
-                  </Link>
-                </DropdownMenuItem>
+                <DropdownMenuContent align="end" className="w-56 p-2 rounded-xl">
+                  <DropdownMenuItem className="rounded-lg p-2.5">
+                    <Link href={`/app/${profile?.role === 'faculty' ? 'faculty' : profile?.role === 'institution' ? 'institution' : 'admin'}/settings`} className="flex items-center gap-2 w-full">
+                      Configuración
+                    </Link>
+                  </DropdownMenuItem>
 
               <DropdownMenuSeparator className="my-1" />
                 <DropdownMenuItem className="rounded-lg p-2.5 text-red-600 focus:text-red-600 focus:bg-red-50">

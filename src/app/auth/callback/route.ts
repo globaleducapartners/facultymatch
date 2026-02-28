@@ -23,9 +23,9 @@ export async function GET(request: Request) {
       }
 
       if (profile.role === 'faculty') {
-        return NextResponse.redirect(`${origin}/dashboard/educator`);
+        return NextResponse.redirect(`${origin}/app/faculty`);
       } else if (profile.role === 'institution') {
-        return NextResponse.redirect(`${origin}/dashboard/institution`);
+        return NextResponse.redirect(`${origin}/app/institution`);
       }
       
       return NextResponse.redirect(`${origin}${next}`);

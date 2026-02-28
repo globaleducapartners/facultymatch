@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
-  title: "Soluciones para Instituciones | Talentia - La Red Global de Educación Superior",
+  title: "Soluciones para Instituciones | FacultyMatch - La Red Global de Educación Superior",
   description: "Encuentra y conecta con el mejor talento docente global. Perfiles verificados, búsqueda avanzada y gestión de claustros.",
   keywords: "reclutamiento docente, universidades, educación superior, talento académico, búsqueda de profesores",
 };

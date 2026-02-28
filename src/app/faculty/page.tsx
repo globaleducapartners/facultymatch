@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
-  title: "Talento Docente | Talentia - La Red Global de Educación Superior",
+  title: "Talento Docente | FacultyMatch - La Red Global de Educación Superior",
     description: "Crea tu perfil docente profesional, verifica tus credenciales y conecta con universidades e instituciones de todo el mundo. Potencia tu carrera académica.",
 
   keywords: "perfil docente, carrera académica, educación superior, red de profesores, talento académico",

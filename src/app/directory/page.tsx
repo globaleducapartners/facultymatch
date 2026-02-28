@@ -4,7 +4,7 @@ import { Globe, ArrowRight, Book, Briefcase, Cpu, HeartPulse, Scale, GraduationC
 import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
-  title: "Directorio Académico | Talentia",
+  title: "Directorio Académico | FacultyMatch",
   description: "Explora nuestra red global de talento docente por áreas de conocimiento y especialidades.",
 };
 
@@ -88,13 +88,10 @@ export default function DirectoryPage() {
           </div>
         </section>
       </main>
-
-      <footer className="bg-navy text-white py-12 px-6 text-center border-t border-white/5">
-        <p className="text-gray-400 font-medium">&copy; 2026 Talentia. Red Global de Talento Académico.</p>
-      </footer>
     </div>
   );
 }
+
 
 function Card({ category }: { category: any }) {
   return (

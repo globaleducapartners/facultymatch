@@ -35,7 +35,7 @@ export default async function VerificationPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     await supabase.from("educator_profiles").update({ verification_status: 'pending' }).eq("id", user!.id);
-    revalidatePath("/dashboard/educator/verification");
+    revalidatePath("/app/faculty/verification");
   }
 
   return (

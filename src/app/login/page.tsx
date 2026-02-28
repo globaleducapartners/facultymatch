@@ -35,10 +35,11 @@ function LoginContent() {
             <div className="bg-talentia-blue p-2 rounded-xl text-white shadow-lg shadow-blue-100">
               <Globe size={28} />
             </div>
-            <div className="flex flex-col items-start">
-              <span className="text-3xl font-black tracking-tight text-navy leading-none">Talentia</span>
-              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Red Global de Talento Académico</span>
-            </div>
+              <div className="flex flex-col items-start">
+                <span className="text-3xl font-black tracking-tight text-navy leading-none">FacultyMatch</span>
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Global Academic Network</span>
+              </div>
+
           </Link>
           <h1 className="text-3xl font-black text-navy tracking-tight">Bienvenido</h1>
           <p className="text-gray-500 font-medium mt-2">Accede a tu cuenta de Talentia</p>

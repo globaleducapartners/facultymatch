@@ -31,7 +31,7 @@ export default async function EducatorDashboard() {
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("id", user.id)
     .single();
 
   const { data: expertise } = await supabase
@@ -59,15 +59,16 @@ export default async function EducatorDashboard() {
 
   const profileScore = facultyProfile?.profile_score || 0;
   
-  // Checklist logic
-    const checklist = [
-      { label: "Añadir áreas de conocimiento", completed: (expertise?.length || 0) > 0 },
-      { label: "Subir curriculum", completed: (documents?.length || 0) > 0 },
-      { label: "Añadir disponibilidad", completed: facultyProfile?.availability !== 'open' }, 
-      { label: "Configurar visibilidad", completed: facultyProfile?.visibility !== 'public' },
-      { label: "Acreditación ANECA", completed: !!facultyProfile?.aneca_accreditation },
-      { label: "Publicaciones & ORCID", completed: !!facultyProfile?.research_publications },
-    ];
+// Checklist logic
+const checklist = [
+{ label: "Añadir áreas de conocimiento", completed: (expertise?.length || 0) > 0 },
+{ label: "Subir curriculum (CV)", completed: (documents?.length || 0) > 0 },
+{ label: "Completar perfil académico", completed: !!facultyProfile?.headline && !!facultyProfile?.bio },
+{ label: "Acreditación ANECA / Otros", completed: !!facultyProfile?.aneca_accreditation },
+{ label: "Publicaciones & ORCID", completed: !!facultyProfile?.research_publications },
+{ label: "Presencia en Redes (LinkedIn)", completed: !!facultyProfile?.linkedin_url },
+];
+
 
 
   const completedCount = checklist.filter(i => i.completed).length;
@@ -78,7 +79,7 @@ export default async function EducatorDashboard() {
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-navy">Bienvenido de nuevo, {facultyProfile?.full_name?.split(' ')[0]}</h1>
+          <h1 className="text-3xl font-bold text-navy">Bienvenido de nuevo, {profile?.full_name?.split(' ')[0]}</h1>
           <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500 font-medium">
             <span className="flex items-center gap-1.5"><Building2 size={16} /> 50,000+</span>
             <span className="flex items-center gap-1.5"><Building2 size={16} /> 1,200+ Instituciones</span>
@@ -141,7 +142,7 @@ export default async function EducatorDashboard() {
             
             <div className="flex flex-col md:flex-row items-center gap-4 pt-4">
               <Button asChild className="w-full md:w-auto bg-energy-orange hover:bg-orange-600 text-white font-bold rounded-xl h-12 px-8 transition-all hover:scale-[1.02]">
-                <Link href="/dashboard/educator/profile">Completar perfil</Link>
+                <Link href="/app/faculty/profile">Completar perfil</Link>
               </Button>
               <p className="text-xs text-gray-400 font-medium">
                 Tú decides qué instituciones pueden verte.
@@ -175,7 +176,7 @@ export default async function EducatorDashboard() {
 
               <div className="space-y-3 pt-2">
                 <Button asChild variant="default" className="w-full bg-talentia-blue hover:bg-blue-700 text-white font-bold rounded-xl h-11">
-                  <Link href="/dashboard/educator/privacy">Gestionar visibilidad</Link>
+                  <Link href="/app/faculty/privacy">Gestionar visibilidad</Link>
                 </Button>
                 <Button variant="outline" className="w-full border-gray-200 text-gray-600 font-bold rounded-xl h-11 hover:bg-gray-50">
                   <Plus size={18} className="mr-2" />
@@ -194,7 +195,7 @@ export default async function EducatorDashboard() {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-lg font-bold text-navy">Solicitudes recientes</CardTitle>
             <Button variant="link" asChild className="text-talentia-blue font-bold text-sm h-auto p-0 hover:no-underline">
-              <Link href="/dashboard/educator/requests" className="flex items-center gap-1">
+              <Link href="/app/faculty/requests" className="flex items-center gap-1">
                 Ver todas <ChevronRight size={16} />
               </Link>
             </Button>
@@ -270,7 +271,7 @@ export default async function EducatorDashboard() {
 
             <div className="pt-2 mt-auto">
               <Button asChild className="w-full bg-talentia-blue hover:bg-blue-700 text-white font-bold rounded-xl h-11 mb-3">
-                <Link href="/dashboard/educator/verification">Solicitar verificación</Link>
+                <Link href="/app/faculty/verification">Solicitar verificación</Link>
               </Button>
               <p className="text-[10px] text-gray-400 font-medium text-center">
                 Aumenta la visibilidad y confianza institucional.
