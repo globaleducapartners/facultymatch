@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Globe, ArrowRight, Book, Briefcase, Cpu, HeartPulse, Scale, GraduationCap, Palette } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 

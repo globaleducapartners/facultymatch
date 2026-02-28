@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { 
   CheckCircle2, 
   Globe, 
