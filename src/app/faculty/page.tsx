@@ -82,7 +82,7 @@ export default function FacultyPage() {
           <div className="max-w-7xl mx-auto">
             <div className="text-center space-y-4 mb-20">
               <h2 className="text-4xl lg:text-5xl font-black text-navy tracking-tight">Diseñado para el académico moderno</h2>
-              <p className="text-lg text-gray-500 font-medium max-w-2xl mx-auto">Más que un CV online, Talentia es tu centro de operaciones para gestionar tu presencia institucional.</p>
+              <p className="text-lg text-gray-500 font-medium max-w-2xl mx-auto">Más que un CV online, FacultyMatch es tu centro de operaciones para gestionar tu presencia institucional.</p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">

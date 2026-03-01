@@ -224,7 +224,7 @@ function SignupContent() {
         </div>
         
         <p className="text-center text-[10px] text-gray-400 font-medium px-8">
-          Al crear una cuenta, aceptas nuestros Términos de Servicio y Política de Privacidad. Talentia protege tus datos académicos.
+          Al crear una cuenta, aceptas nuestros Términos de Servicio y Política de Privacidad. FacultyMatch protege tus datos académicos.
         </p>
       </div>
     </div>

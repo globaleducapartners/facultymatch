@@ -1,12 +1,8 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
+  let response = NextResponse.next({ request: { headers: request.headers } });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,57 +10,39 @@ export async function middleware(request: NextRequest) {
     {
       cookies: {
         get(name: string) {
-          return request.cookies.get(name)?.value
+          return request.cookies.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
+          request.cookies.set({ name, value, ...options });
+          response = NextResponse.next({ request: { headers: request.headers } });
+          response.cookies.set({ name, value, ...options });
         },
         remove(name: string, options: CookieOptions) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
+          request.cookies.set({ name, value: "", ...options });
+          response = NextResponse.next({ request: { headers: request.headers } });
+          response.cookies.set({ name, value: "", ...options });
         },
       },
     }
-  )
+  );
 
-  const { data: { user } } = await supabase.auth.getUser()
-  
-  const isProtectedRoute = request.nextUrl.pathname.startsWith('/app') || request.nextUrl.pathname.startsWith('/dashboard')
+  const { data: { user } } = await supabase.auth.getUser();
+  const pathname = request.nextUrl.pathname;
 
-  if (!user && isProtectedRoute) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Rutas protegidas: SOLO app/admin
+  const isProtected = pathname.startsWith("/app") || pathname.startsWith("/admin");
+
+  // ✅ Si NO hay usuario y entra a protegido → /login?next=/ruta
+  if (!user && isProtected) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("next", pathname);
+    return NextResponse.redirect(url);
   }
 
-  return response
+  return response;
 }
 
 export const config = {
-  matcher: ['/app/:path*', '/dashboard/:path*'],
-}
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+};

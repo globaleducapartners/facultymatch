@@ -94,12 +94,18 @@ export const signOut = async () => {
   return redirect("/");
 };
 
-export async function signInWithSSO(provider: 'google' | 'azure') {
+export async function signInWithSSO(provider: 'google' | 'azure', next?: string) {
   const supabase = await createClient();
+  
+  const redirectTo = new URL(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`);
+  if (next) {
+    redirectTo.searchParams.set("next", next);
+  }
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+      redirectTo: redirectTo.toString(),
     },
   });
 
@@ -115,6 +121,7 @@ export async function signInWithSSO(provider: 'google' | 'azure') {
 export async function signIn(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const next = formData.get("next") as string;
 
   const supabase = await createClient();
 
@@ -125,6 +132,11 @@ export async function signIn(formData: FormData) {
 
   if (error) {
     return { error: error.message };
+  }
+
+  // Si existe el parámetro next, redirigimos directamente allí
+  if (next && next.startsWith("/")) {
+    redirect(next);
   }
 
   // Get user role to redirect

@@ -113,7 +113,7 @@ export default function Home() {
             <div className="max-w-7xl mx-auto flex flex-col items-center text-center space-y-12">
               <div className="space-y-4">
                 <h2 className="text-3xl lg:text-4xl font-black text-navy uppercase tracking-tighter">Confianza de Grado Universitario</h2>
-                <p className="text-lg text-gray-500 font-medium max-w-2xl">Talentia cumple con los estándares internacionales de verificación académica.</p>
+                <p className="text-lg text-gray-500 font-medium max-w-2xl">FacultyMatch cumple con los estándares internacionales de verificación académica.</p>
               </div>
               <div className="flex flex-wrap justify-center items-center gap-12 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all">
                 <div className="flex items-center gap-2">
@@ -167,7 +167,7 @@ export default function Home() {
           <section className="py-24 px-6 lg:px-12 bg-white">
             <div className="max-w-7xl mx-auto space-y-16">
               <div className="text-center space-y-4">
-                <h2 className="text-3xl lg:text-4xl font-black text-navy uppercase tracking-tighter">Cómo funciona Talentia</h2>
+                <h2 className="text-3xl lg:text-4xl font-black text-navy uppercase tracking-tighter">Cómo funciona FacultyMatch</h2>
                 <p className="text-lg text-gray-500 font-medium max-w-2xl mx-auto italic">Estandarizando el talento académico para la educación del futuro.</p>
               </div>
               
@@ -205,7 +205,7 @@ export default function Home() {
                 Comparte tu conocimiento con instituciones de todo el mundo
               </h2>
               <p className="text-lg text-gray-500 font-medium">
-                Talentia permite a profesores, expertos y profesionales ampliar su actividad docente, colaborar con universidades internacionales y generar nuevas oportunidades académicas.
+                FacultyMatch permite a profesores, expertos y profesionales ampliar su actividad docente, colaborar con universidades internacionales y generar nuevas oportunidades académicas.
               </p>
                 <ul className="space-y-4">
                   {[
@@ -281,7 +281,7 @@ export default function Home() {
               Diseñado específicamente para educación superior
             </h2>
             <p className="text-xl text-gray-400 font-medium">
-              A diferencia de redes profesionales genéricas, Talentia está estructurado en torno a disciplinas académicas, experiencia docente y requisitos institucionales.
+              A diferencia de redes profesionales genéricas, FacultyMatch está estructurado en torno a disciplinas académicas, experiencia docente y requisitos institucionales.
             </p>
           </div>
         </section>

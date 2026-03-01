@@ -38,10 +38,11 @@ export function Topbar({ user, profile }: TopbarProps) {
   return (
     <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
       <div className="flex items-center gap-4">
-        <Link href="/" className="flex flex-col">
-          <span className="text-2xl font-bold tracking-tight text-navy">Talentia</span>
-          <span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest leading-none">Red Global de Talento Académico</span>
-        </Link>
+          <Link href="/" className="flex flex-col">
+            <span className="text-2xl font-bold tracking-tight text-navy">FacultyMatch</span>
+            <span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest leading-none">Red Global de Talento Académico</span>
+          </Link>
+
       </div>
 
       <div className="flex items-center gap-4 md:gap-8">

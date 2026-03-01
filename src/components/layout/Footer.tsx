@@ -46,7 +46,7 @@ export function Footer() {
       </div>
       <div className="max-w-7xl mx-auto pt-12 mt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
         <p className="text-gray-500 text-sm font-medium">
-          &copy; {new Date().getFullYear()} Talentia. Todos los derechos reservados.
+          &copy; {new Date().getFullYear()} FacultyMatch by Talentia. Todos los derechos reservados.
         </p>
         <div className="flex gap-6 text-gray-500">
           <Link href="#" className="hover:text-white transition-colors">LinkedIn</Link>
