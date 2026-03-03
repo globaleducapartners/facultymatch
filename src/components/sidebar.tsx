@@ -37,7 +37,7 @@ const educatorItems = [
 
 const institutionItems = [
   { label: "Buscar docentes", href: "/app/institution", icon: Search },
-  { label: "Shortlists", href: "/app/institution/shortlists", icon: Star },
+  { label: "Shortlists", href: "/app/institution/favorites", icon: Star },
   { label: "Contactos", href: "/app/institution/contacts", icon: Mail },
   { label: "Mi institución", href: "/app/institution/profile", icon: Building2 },
   { label: "Plan & facturación", href: "/app/institution/billing", icon: CreditCard },

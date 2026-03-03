@@ -39,9 +39,10 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
   }
 
   // Create profile entry
-  const { error: profileError } = await supabase.from("user_profiles").insert({
+  const { error: profileError } = await supabase.from("user_profiles").upsert({
     id: userId,
     role: role as any,
+    full_name: fullName,
   });
 
   if (profileError) {
