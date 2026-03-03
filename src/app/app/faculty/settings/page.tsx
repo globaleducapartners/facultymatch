@@ -12,91 +12,91 @@ export default async function SettingsPage() {
 
   if (!user) return null;
 
-  const { data: educatorProfile } = await supabase
-    .from("educator_profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  async function updateNotifications(enabled: boolean) {
-    "use server";
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    await supabase.from("educator_profiles").update({ notifications_enabled: enabled }).eq("id", user!.id);
-    revalidatePath("/app/faculty/settings");
-  }
-
-  return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div>
-        <h1 className="text-3xl font-bold text-navy">Ajustes de cuenta</h1>
-        <p className="text-gray-500 font-medium">Gestiona tu seguridad, notificaciones y datos privados.</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 space-y-8">
-          {/* Sección 1: Cuenta & Seguridad */}
-          <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-                <ShieldCheck size={22} className="text-talentia-blue" />
-                Seguridad & Acceso
-              </CardTitle>
-              <CardDescription className="font-medium">Gestiona cómo accedes a tu cuenta académica.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl border border-gray-100 bg-gray-50/50">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-white p-2.5 rounded-xl shadow-sm text-gray-400">
-                      <Mail size={20} />
+    const { data: facultyProfile } = await supabase
+      .from("faculty_profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+  
+    async function updateNotifications(enabled: boolean) {
+      "use server";
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from("faculty_profiles").update({ is_active: enabled }).eq("id", user!.id);
+      revalidatePath("/app/faculty/settings");
+    }
+  
+    return (
+      <div className="space-y-8 animate-in fade-in duration-500">
+        <div>
+          <h1 className="text-3xl font-bold text-navy">Ajustes de cuenta</h1>
+          <p className="text-gray-500 font-medium">Gestiona tu seguridad, notificaciones y datos privados.</p>
+        </div>
+  
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8 space-y-8">
+            {/* Sección 1: Cuenta & Seguridad */}
+            <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
+                  <ShieldCheck size={22} className="text-talentia-blue" />
+                  Seguridad & Acceso
+                </CardTitle>
+                <CardDescription className="font-medium">Gestiona cómo accedes a tu cuenta académica.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl border border-gray-100 bg-gray-50/50">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-white p-2.5 rounded-xl shadow-sm text-gray-400">
+                        <Mail size={20} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Correo electrónico</p>
+                        <p className="text-sm font-bold text-navy">{user.email}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Correo electrónico</p>
-                      <p className="text-sm font-bold text-navy">{user.email}</p>
-                    </div>
+                    <Button variant="outline" className="border-gray-200 text-navy font-bold rounded-xl h-10 px-6 hover:bg-gray-50 transition-colors">
+                      Cambiar email
+                    </Button>
                   </div>
-                  <Button variant="outline" className="border-gray-200 text-navy font-bold rounded-xl h-10 px-6 hover:bg-gray-50 transition-colors">
-                    Cambiar email
-                  </Button>
-                </div>
-
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl border border-gray-100 bg-gray-50/50">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-white p-2.5 rounded-xl shadow-sm text-gray-400">
-                      <Lock size={20} />
+  
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl border border-gray-100 bg-gray-50/50">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-white p-2.5 rounded-xl shadow-sm text-gray-400">
+                        <Lock size={20} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Contraseña</p>
+                        <p className="text-sm font-bold text-navy">••••••••••••</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Contraseña</p>
-                      <p className="text-sm font-bold text-navy">••••••••••••</p>
+                    <Button variant="outline" className="border-gray-200 text-navy font-bold rounded-xl h-10 px-6 hover:bg-gray-50 transition-colors">
+                      Actualizar
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+  
+            {/* Sección 2: Notificaciones */}
+            <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
+                  <Bell size={22} className="text-energy-orange" />
+                  Preferencias de Notificaciones
+                </CardTitle>
+                <CardDescription className="font-medium">Elige qué avisos quieres recibir en tu email.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="divide-y divide-gray-50">
+                  <div className="py-4 flex items-center justify-between gap-8">
+                    <div className="space-y-1">
+                      <h4 className="text-sm font-bold text-navy">Solicitudes de contacto</h4>
+                      <p className="text-xs text-gray-500 font-medium">Recibe un aviso cuando una institución quiera contactarte.</p>
                     </div>
+                    <Switch checked={facultyProfile?.is_active} className="bg-talentia-blue data-[state=checked]:bg-talentia-blue" />
                   </div>
-                  <Button variant="outline" className="border-gray-200 text-navy font-bold rounded-xl h-10 px-6 hover:bg-gray-50 transition-colors">
-                    Actualizar
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Sección 2: Notificaciones */}
-          <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-                <Bell size={22} className="text-energy-orange" />
-                Preferencias de Notificaciones
-              </CardTitle>
-              <CardDescription className="font-medium">Elige qué avisos quieres recibir en tu email.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="divide-y divide-gray-50">
-                <div className="py-4 flex items-center justify-between gap-8">
-                  <div className="space-y-1">
-                    <h4 className="text-sm font-bold text-navy">Solicitudes de contacto</h4>
-                    <p className="text-xs text-gray-500 font-medium">Recibe un aviso cuando una institución quiera contactarte.</p>
-                  </div>
-                  <Switch checked={educatorProfile?.notifications_enabled} className="bg-talentia-blue data-[state=checked]:bg-talentia-blue" />
-                </div>
 
                 <div className="py-4 flex items-center justify-between gap-8">
                   <div className="space-y-1">

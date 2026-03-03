@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase-server";
+import { createAdminClient } from "@/lib/supabase-admin";
 import { sendWelcomeEmail } from "@/lib/emails/service";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -13,6 +14,7 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
   const institutionName = formData.get("institutionName") as string;
 
   const supabase = await createClient();
+  const admin = createAdminClient();
   let userId: string;
 
   if (isSSO) {
@@ -38,38 +40,38 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
     userId = data.user.id;
   }
 
-  // 1. Create user_profiles entry (Always)
-  const { error: profileError } = await supabase.from("user_profiles").upsert({
+  // 1. Create user_profiles entry (Always using admin client to bypass RLS)
+  const { error: profileError } = await admin.from("user_profiles").upsert({
     id: userId,
     role: role as any,
     full_name: fullName,
   });
 
   if (profileError) {
-    console.error("Profile Error:", profileError);
-    return { error: profileError.message };
+    console.error("Profile Error:", profileError.message);
+    return { error: `Error al crear el perfil: ${profileError.message}` };
   }
 
-  // 2. Create role-specific profile
+  // 2. Create role-specific profile (Always using admin client)
   if (role === "faculty") {
-    const { error: edError } = await supabase.from("faculty_profiles").upsert({
+    const { error: edError } = await admin.from("faculty_profiles").upsert({
       id: userId,
       visibility: 'public',
       is_active: true,
       is_verified: false,
     });
     if (edError) {
-      console.error("Faculty Profile Error:", edError);
-      return { error: edError.message };
+      console.error("Faculty Profile Error:", edError.message);
+      return { error: `Error al crear perfil docente: ${edError.message}` };
     }
   } else {
-    const { error: instError } = await supabase.from("institutions").upsert({
+    const { error: instError } = await admin.from("institutions").upsert({
       id: userId,
       name: institutionName || fullName,
     });
     if (instError) {
-      console.error("Institution Error:", instError);
-      return { error: instError.message };
+      console.error("Institution Error:", instError.message);
+      return { error: `Error al crear perfil de institución: ${instError.message}` };
     }
   }
 
@@ -137,11 +139,22 @@ export async function signIn(formData: FormData) {
     redirect(next);
   }
 
-  // Get user role to redirect
-  const { data: profile } = await supabase
+  // 1. Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "No authenticated user found after login" };
+
+  // 2. Get user role to redirect (filtering by ID)
+  const { data: profile, error: pErr } = await supabase
     .from("user_profiles")
     .select("role")
+    .eq("id", user.id)
     .single();
+
+  if (pErr) {
+    console.error("Error fetching user profile:", pErr.message);
+    // If profile is missing but user is authenticated, we might need a default or fallback
+    return redirect("/");
+  }
 
   if (profile?.role === "faculty") {
     redirect("/app/faculty");
@@ -170,39 +183,16 @@ export async function contactFaculty(formData: FormData) {
     subject: reason,
     modality,
     dates,
-    status: 'pending' // Corrected from 'sent'
+    status: 'pending' 
   });
 
   if (error) {
     return { error: error.message };
   }
 
-  // Get faculty user_id (it's actually 'id' in the schema)
-  const { data: faculty } = await supabase
-    .from("faculty_profiles")
-    .select("id")
-    .eq("id", facultyId)
-    .single();
-
-    if (faculty) {
-      // Create notification for faculty (Note: Ensure 'notifications' table exists or remove)
-      // For now, keeping it but being cautious. 
-      // The schema doesn't have it, so I'll wrap in try-catch or skip if not essential.
-      try {
-        await supabase.from("notifications").insert({
-          user_id: faculty.id,
-          type: 'request',
-          title: 'Nueva solicitud de contacto',
-          content: `Has recibido una nueva propuesta de colaboración.`
-        });
-      } catch (e) {
-        console.warn("Notifications table might be missing", e);
-      }
-    }
-  
-    revalidatePath("/app/institution/contacts");
-    return { success: true };
-  }
+  revalidatePath("/app/institution/contacts");
+  return { success: true };
+}
 
 export async function toggleFavorite(facultyId: string, institutionId: string) {
   const supabase = await createClient();
