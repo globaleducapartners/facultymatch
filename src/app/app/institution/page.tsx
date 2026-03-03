@@ -83,14 +83,14 @@ export default async function InstitutionDashboard({
     );
   }
 
-  // Transform for UI expectations if necessary
-  const transformedEducators = filteredEducators.map(ed => ({
-    ...ed,
-    full_name: (ed as any).user?.full_name,
-    avatar_url: (ed as any).user?.avatar_url,
-    country: ed.location, // Map location to country for UI
-    experience_years: ed.years_experience // Map years_experience to experience_years for UI
-  }));
+    // Transform for UI expectations if necessary
+    const transformedEducators = filteredEducators.map(ed => ({
+      ...ed,
+      full_name: (ed as any).user?.full_name || "Docente",
+      avatar_url: (ed as any).user?.avatar_url,
+      country: ed.location, // Map location to country for UI
+      experience_years: ed.years_experience // Map years_experience to experience_years for UI
+    }));
 
   return (
     <InstitutionSearchPage 

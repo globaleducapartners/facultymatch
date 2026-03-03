@@ -2,12 +2,9 @@
 -- Instruction: Create users manually in Supabase Dashboard (Authentication > Users) 
 -- and replace the placeholders below with their real UUIDs.
 
--- CONFIG: Replace these UUIDs with real ones from auth.users
--- 10 Faculty IDs
--- f1: '00000000-0000-0000-0000-000000000001'
--- f2: '00000000-0000-0000-0000-000000000002'
--- ...
--- 1 Institution ID
+-- CONFIG: Replace these UUIDs with real ones from auth.users if testing with real accounts.
+-- Default placeholders for SQL Editor execution:
+-- f1-f10: '00000000-0000-0000-0000-000000000001' to '00000000-0000-0000-0000-000000000010'
 -- i1: '00000000-0000-0000-0000-000000000100'
 
 BEGIN;
@@ -30,20 +27,21 @@ ON CONFLICT (id) DO UPDATE
 SET full_name = EXCLUDED.full_name, role = EXCLUDED.role, avatar_url = EXCLUDED.avatar_url;
 
 -- 2. Insert Faculty Profiles
-INSERT INTO public.faculty_profiles (id, headline, bio, location, years_experience, visibility)
+-- Use 'id' column (NOT user_id which doesn't exist)
+INSERT INTO public.faculty_profiles (id, headline, bio, location, years_experience, visibility, is_active, is_verified)
 VALUES 
-    ('00000000-0000-0000-0000-000000000001', 'Experta en Inteligencia Artificial y Ética', 'Más de 15 años investigando el impacto de la IA en la sociedad.', 'Madrid, España', 15, 'public'),
-    ('00000000-0000-0000-0000-000000000002', 'Especialista en Finanzas Corporativas', 'Consultor y profesor con enfoque en mercados emergentes.', 'Ciudad de México, México', 10, 'public'),
-    ('00000000-0000-0000-0000-000000000003', 'Psicóloga Organizacional', 'Enfoque en bienestar laboral y retención de talento.', 'Bogotá, Colombia', 12, 'public'),
-    ('00000000-0000-0000-0000-000000000004', 'Ingeniero de Datos Senior', 'Experto en arquitecturas escalables y Big Data.', 'Barcelona, España', 8, 'public'),
-    ('00000000-0000-0000-0000-000000000005', 'Dra. en Marketing Digital', 'Investigadora de comportamiento del consumidor online.', 'Buenos Aires, Argentina', 14, 'public'),
-    ('00000000-0000-0000-0000-000000000006', 'Profesor de Derecho Internacional', 'Especialista en tratados comerciales y derechos humanos.', 'Santiago, Chile', 20, 'public'),
-    ('00000000-0000-0000-0000-000000000007', 'Experta en Logística y Supply Chain', 'Optimizando cadenas de suministro globales.', 'Valencia, España', 11, 'public'),
-    ('00000000-0000-0000-0000-000000000008', 'Data Scientist / ML Engineer', 'Apasionado por el deep learning y visión computacional.', 'Lima, Perú', 6, 'public'),
-    ('00000000-0000-0000-0000-000000000009', 'Investigadora en Bioquímica', 'Liderando proyectos de innovación en biotecnología.', 'Sevilla, España', 18, 'public'),
-    ('00000000-0000-0000-0000-000000000010', 'Arquitecto de Software', 'Promotor de clean code y metodologías ágiles.', 'Medellín, Colombia', 9, 'public')
+    ('00000000-0000-0000-0000-000000000001', 'Experta en Inteligencia Artificial y Ética', 'Más de 15 años investigando el impacto de la IA en la sociedad.', 'Madrid, España', 15, 'public', true, true),
+    ('00000000-0000-0000-0000-000000000002', 'Especialista en Finanzas Corporativas', 'Consultor y profesor con enfoque en mercados emergentes.', 'Ciudad de México, México', 10, 'public', true, true),
+    ('00000000-0000-0000-0000-000000000003', 'Psicóloga Organizacional', 'Enfoque en bienestar laboral y retención de talento.', 'Bogotá, Colombia', 12, 'public', true, true),
+    ('00000000-0000-0000-0000-000000000004', 'Ingeniero de Datos Senior', 'Experto en arquitecturas escalables y Big Data.', 'Barcelona, España', 8, 'public', true, true),
+    ('00000000-0000-0000-0000-000000000005', 'Dra. en Marketing Digital', 'Investigadora de comportamiento del consumidor online.', 'Buenos Aires, Argentina', 14, 'public', true, true),
+    ('00000000-0000-0000-0000-000000000006', 'Profesor de Derecho Internacional', 'Especialista en tratados comerciales y derechos humanos.', 'Santiago, Chile', 20, 'public', true, true),
+    ('00000000-0000-0000-0000-000000000007', 'Experta en Logística y Supply Chain', 'Optimizando cadenas de suministro globales.', 'Valencia, España', 11, 'public', true, true),
+    ('00000000-0000-0000-0000-000000000008', 'Data Scientist / ML Engineer', 'Apasionado por el deep learning y visión computacional.', 'Lima, Perú', 6, 'public', true, true),
+    ('00000000-0000-0000-0000-000000000009', 'Investigadora en Bioquímica', 'Liderando proyectos de innovación en biotecnología.', 'Sevilla, España', 18, 'public', true, true),
+    ('00000000-0000-0000-0000-000000000010', 'Arquitecto de Software', 'Promotor de clean code y metodologías ágiles.', 'Medellín, Colombia', 9, 'public', true, true)
 ON CONFLICT (id) DO UPDATE 
-SET headline = EXCLUDED.headline, bio = EXCLUDED.bio, location = EXCLUDED.location, years_experience = EXCLUDED.years_experience;
+SET headline = EXCLUDED.headline, bio = EXCLUDED.bio, location = EXCLUDED.location, years_experience = EXCLUDED.years_experience, visibility = EXCLUDED.visibility;
 
 -- 3. Insert Faculty Expertise
 INSERT INTO public.faculty_expertise (faculty_id, area, level)
@@ -59,7 +57,7 @@ VALUES
     ('00000000-0000-0000-0000-000000000008', 'IA', 'Intermediate'),
     ('00000000-0000-0000-0000-000000000009', 'Salud', 'Expert'),
     ('00000000-0000-0000-0000-000000000010', 'Tecnología', 'Senior')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT DO NOTHING;
 
 -- 4. Insert Institution
 INSERT INTO public.institutions (id, name, location, website)
@@ -74,8 +72,8 @@ VALUES ('00000000-0000-0000-0000-000000000100', '00000000-0000-0000-0000-0000000
 ON CONFLICT (institution_id, faculty_id) DO NOTHING;
 
 -- 6. Contacts Example
-INSERT INTO public.contacts (institution_id, faculty_id, message, subject, program, modality)
-VALUES ('00000000-0000-0000-0000-000000000100', '00000000-0000-0000-0000-000000000002', 'Nos gustaría invitarle a dar una charla sobre finanzas corporativas.', 'Conferencia Anual', 'Master en ADE', 'Presencial')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO public.contacts (institution_id, faculty_id, message, subject, program, dates, modality)
+VALUES ('00000000-0000-0000-0000-000000000100', '00000000-0000-0000-0000-000000000002', 'Nos gustaría invitarle a dar una charla sobre finanzas corporativas.', 'Conferencia Anual', 'Master en ADE', 'Abril 2026', 'Presencial')
+ON CONFLICT DO NOTHING;
 
 COMMIT;
