@@ -11,18 +11,14 @@ export default async function InstitutionDashboard({
   const query = (params.query as string) || "";
   const area = (params.area as string) || "";
   const subarea = (params.subarea as string) || "";
-  const language = (params.language as string) || "";
   const country = (params.country as string) || "";
-  const aneca = (params.aneca as string) || "";
-  const phd = (params.phd as string) || "";
-  const modality = params.modality; // Can be string or array
 
   const { data: { user } } = await supabase.auth.getUser();
 
   const { data: institution } = await supabase
     .from("institutions")
     .select("*")
-    .eq("user_id", user!.id)
+    .eq("id", user!.id)
     .single();
 
   // Fetch favorites to show in the UI
@@ -33,84 +29,72 @@ export default async function InstitutionDashboard({
   
   const favorites = favoritesData?.map(f => f.faculty_id) || [];
 
-  // Search logic
+  // Search logic (JOIN with user_profiles to get full_name)
   let educatorQuery = supabase
     .from("faculty_profiles")
     .select(`
       *,
+      user:user_profiles(full_name, avatar_url),
       expertise:faculty_expertise(*)
     `)
-    .in('visibility', ['public', 'institutions_only']); // Allow both public and institution-only profiles
-
-  // Visibility filter: Exclude profiles that have blocked this institution
-  // This is also handled by RLS, but keeping it for explicit filtering if needed
-  if (institution?.id) {
-    educatorQuery = educatorQuery.not('hidden_from_institutions', 'cs', `{${institution.id}}`);
-  }
+    .eq('visibility', 'public'); 
 
   if (query) {
-    educatorQuery = educatorQuery.or(`full_name.ilike.%${query}%,headline.ilike.%${query}%,bio.ilike.%${query}%`);
+    // Note: We can filter by bio/headline in faculty_profiles, 
+    // and ideally we would filter by full_name in joined user_profiles,
+    // but PostgREST filtering on joined tables can be tricky.
+    // For now, let's filter what we can on the main table.
+    educatorQuery = educatorQuery.or(`headline.ilike.%${query}%,bio.ilike.%${query}%`);
   }
 
   if (country) {
-    educatorQuery = educatorQuery.eq('country', country);
-  }
-
-  if (aneca) {
-    educatorQuery = educatorQuery.eq('aneca_accreditation', aneca);
+    // Assuming 'location' contains country or we use a partial match
+    educatorQuery = educatorQuery.ilike('location', `%${country}%`);
   }
 
   const { data: educators } = await educatorQuery.limit(100);
 
-  // Client-side filtering for complex cases or many-to-many relations
+  // Client-side filtering for complex cases
   let filteredEducators = educators || [];
+
+  // If query was provided, let's also filter by full_name client-side if needed
+  if (query) {
+    filteredEducators = filteredEducators.filter(ed => 
+      (ed as any).user?.full_name?.toLowerCase().includes(query.toLowerCase()) ||
+      ed.headline?.toLowerCase().includes(query.toLowerCase()) ||
+      ed.bio?.toLowerCase().includes(query.toLowerCase())
+    );
+  }
   
   if (area) {
     filteredEducators = filteredEducators.filter(ed => 
-      ed.expertise?.some((exp: any) => exp.area.includes(area))
+      (ed as any).expertise?.some((exp: any) => 
+        exp.area.toLowerCase().includes(area.toLowerCase())
+      )
     );
   }
 
   if (subarea) {
     filteredEducators = filteredEducators.filter(ed => 
-      ed.expertise?.some((exp: any) => 
-        exp.subarea.toLowerCase().includes(subarea.toLowerCase()) ||
-        exp.topics?.some((t: string) => t.toLowerCase().includes(subarea.toLowerCase()))
+      (ed as any).expertise?.some((exp: any) => 
+        exp.level?.toLowerCase().includes(subarea.toLowerCase()) || // Level as subarea fallback
+        exp.area.toLowerCase().includes(subarea.toLowerCase())
       )
     );
   }
 
-  if (language) {
-    filteredEducators = filteredEducators.filter(ed => 
-      ed.languages?.includes(language)
-    );
-  }
-
-    if (phd === "true") {
-      filteredEducators = filteredEducators.filter(ed => 
-        ed.degree_level?.toLowerCase().includes('phd') || 
-        ed.degree_level?.toLowerCase().includes('doctor') ||
-        ed.headline?.toLowerCase().includes('phd') || 
-        ed.headline?.toLowerCase().includes('doctor') ||
-        ed.bio?.toLowerCase().includes('doctorado') ||
-        ed.bio?.toLowerCase().includes('phd')
-      );
-    }
-
-  if (modality) {
-    const modalities = Array.isArray(modality) ? modality : [modality];
-    filteredEducators = filteredEducators.filter(ed => 
-      modalities.some(m => 
-        ed.modalities?.includes(m) || 
-        ed.bio?.toLowerCase().includes(m.toLowerCase()) || 
-        ed.headline?.toLowerCase().includes(m.toLowerCase())
-      )
-    );
-  }
+  // Transform for UI expectations if necessary
+  const transformedEducators = filteredEducators.map(ed => ({
+    ...ed,
+    full_name: (ed as any).user?.full_name,
+    avatar_url: (ed as any).user?.avatar_url,
+    country: ed.location, // Map location to country for UI
+    experience_years: ed.years_experience // Map years_experience to experience_years for UI
+  }));
 
   return (
     <InstitutionSearchPage 
-      initialEducators={filteredEducators} 
+      initialEducators={transformedEducators} 
       institutionId={institution?.id || ""} 
       searchParams={params}
       initialFavorites={favorites}
