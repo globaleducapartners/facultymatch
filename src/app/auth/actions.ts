@@ -18,6 +18,14 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: "No se encontró sesión de SSO activa." };
   } else {
+    const termsAccepted = formData.get("terms_accepted") === "on";
+    const privacyAccepted = formData.get("privacy_accepted") === "on";
+    const marketingOptIn = formData.get("marketing_opt_in") === "on";
+
+    if (!termsAccepted || !privacyAccepted) {
+      return { error: "Debes aceptar los términos y la política de privacidad." };
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -26,6 +34,10 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
           full_name: fullName,
           role: role,
           institution_name: institutionName,
+          terms_accepted: true,
+          privacy_accepted: true,
+          marketing_opt_in: marketingOptIn,
+          consent_version: 'v1'
         },
       },
     });
@@ -34,12 +46,6 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
       return { error: error.message };
     }
   }
-
-    // El trigger en la base de datos (handle_new_user) se encarga de crear:
-    // 1. user_profiles
-    // 2. faculty_profiles o institutions según el rol
-
-    // Send Welcome Email (Corporate Identity)
 
   if (!isSSO) {
     try {
@@ -99,47 +105,25 @@ export async function signIn(formData: FormData) {
     return { error: error.message };
   }
 
-  // Si existe el parámetro next, redirigimos directamente allí
   if (next && next.startsWith("/")) {
     redirect(next);
   }
 
-  // 1. Get current user
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "No authenticated user found after login" };
+  if (!user) return { error: "No se encontró sesión." };
 
-  // 2. Get user role to redirect (filtering by ID)
-  const { data: profile, error: pErr } = await supabase
+  const { data: profile, error: profileErr } = await supabase
     .from("user_profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (pErr) {
-    console.error("Error fetching user profile:", pErr.message);
-    // If profile is missing but user is authenticated, we might need a default or fallback
-    return redirect("/");
-  }
+  if (profileErr) return { error: profileErr.message };
 
-  if (profile?.role === "faculty") {
-    // Check if onboarding is completed
-    const { data: facultyProfile } = await supabase
-      .from("faculty_profiles")
-      .select("headline")
-      .eq("id", user.id)
-      .single();
-    
-    if (!facultyProfile?.headline) {
-      redirect("/onboarding");
-    }
-    redirect("/app/faculty");
-  } else if (profile?.role === "institution") {
-    redirect("/app/institution");
-  } else if (profile?.role === "admin" || profile?.role === "super_admin") {
-    redirect("/app/admin");
-  } else {
-    redirect("/");
-  }
+  if (profile?.role === "faculty") redirect("/app/faculty");
+  if (profile?.role === "institution") redirect("/app/institution");
+  if (profile?.role === "admin" || profile?.role === "super_admin") redirect("/app/admin");
+  redirect("/");
 }
 
 export async function contactFaculty(formData: FormData) {
@@ -209,81 +193,118 @@ export async function saveOnboarding(formData: FormData) {
   const location = formData.get("location") as string;
   const bio = formData.get("bio") as string;
   const visibility = formData.get("visibility") as 'public' | 'hidden' | 'institutions_only';
+  const fullName = formData.get("full_name") as string;
+  const termsAccepted = formData.get("terms_accepted") === "on";
+  const privacyAccepted = formData.get("privacy_accepted") === "on";
   
-  // New fields
-  const areas = formData.getAll("areas") as string[];
+  const areas = formData.getAll("faculty_areas") as string[]; 
   const levels = formData.getAll("levels") as string[];
-  const languagesStr = formData.get("languages") as string; // JSON string from client
-  const historyStr = formData.get("history") as string; // JSON string from client
+  const degrees = formData.getAll("degrees") as string[];
+  const modalities = formData.getAll("modalities") as string[];
+  const availability = formData.get("availability") as string;
+  const linkedinUrl = formData.get("linkedin_url") as string;
+  const languagesStr = formData.get("languages") as string;
+  const historyStr = formData.get("history") as string;
 
-  let languages: { language: string, level: string }[] = [];
-  try { languages = JSON.parse(languagesStr || "[]"); } catch (e) { console.error("Error parsing languages:", e); }
+  let languages: any[] = [];
+  try { languages = JSON.parse(languagesStr || "[]"); } catch (e) {}
 
-  let history: { institution: string, role: string, from: string, to: string }[] = [];
-  try { history = JSON.parse(historyStr || "[]"); } catch (e) { console.error("Error parsing history:", e); }
+  let history: any[] = [];
+  try { history = JSON.parse(historyStr || "[]"); } catch (e) {}
 
-  // Update faculty_profiles
-  const { error: profileError } = await supabase
+  // Update user_profiles
+  const profileUpdate: any = {};
+  if (fullName) profileUpdate.full_name = fullName;
+  if (termsAccepted) profileUpdate.terms_accepted_at = new Date().toISOString();
+  if (privacyAccepted) profileUpdate.privacy_accepted_at = new Date().toISOString();
+  
+  if (Object.keys(profileUpdate).length > 0) {
+    await supabase.from("user_profiles").update(profileUpdate).eq("id", user.id);
+  }
+
+  const { error } = await supabase
     .from("faculty_profiles")
-    .update({
+    .upsert({
+      id: user.id,
       headline,
       location,
       bio,
       visibility,
       is_active: true,
-    })
-    .eq("id", user.id);
+      languages,
+      modalities,
+      degrees,
+      institutions_taught: history,
+      faculty_areas: areas,
+      levels,
+      availability,
+      linkedin_url: linkedinUrl,
+      updated_at: new Date().toISOString()
+    });
 
-  if (profileError) {
-    console.error("Profile error:", profileError);
-    return { error: profileError.message };
-  }
-
-  // Handle Areas (using faculty_areas table as requested)
-  await supabase.from("faculty_areas").delete().eq("faculty_id", user.id);
-  if (areas && areas.length > 0) {
-    const areaData = areas.map(area => ({ faculty_id: user.id, area }));
-    await supabase.from("faculty_areas").insert(areaData);
-  }
-
-  // Handle Levels
-  await supabase.from("faculty_levels").delete().eq("faculty_id", user.id);
-  if (levels && levels.length > 0) {
-    const levelData = levels.map(level => ({ faculty_id: user.id, level }));
-    await supabase.from("faculty_levels").insert(levelData);
-  }
-
-  // Handle Languages
-  await supabase.from("faculty_languages").delete().eq("faculty_id", user.id);
-  if (languages && languages.length > 0) {
-    const langData = languages.map(l => ({ 
-      faculty_id: user.id, 
-      language: l.language, 
-      level: l.level 
-    }));
-    await supabase.from("faculty_languages").insert(langData);
-  }
-
-  // Handle History
-  await supabase.from("faculty_teaching_history").delete().eq("faculty_id", user.id);
-  if (history && history.length > 0) {
-    const historyData = history.map(h => ({
-      faculty_id: user.id,
-      institution_name: h.institution,
-      role: h.role,
-      year_from: parseInt(h.from) || null,
-      year_to: parseInt(h.to) || null
-    }));
-    await supabase.from("faculty_teaching_history").insert(historyData);
-  }
-
-  // Keep faculty_expertise in sync if it exists (legacy/parallel)
-  await supabase.from("faculty_expertise").delete().eq("faculty_id", user.id);
-  if (areas && areas.length > 0) {
-    const expertiseData = areas.map(area => ({ faculty_id: user.id, area }));
-    await supabase.from("faculty_expertise").insert(expertiseData);
-  }
-
+  if (error) return { error: error.message };
+  
   revalidatePath("/app/faculty");
-  redirect("/app/faculty");
+  return { success: true };
+}
+
+export async function autosaveOnboarding(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "No se encontró usuario autenticado." };
+
+  const headline = formData.get("headline") as string;
+  const location = formData.get("location") as string;
+  const bio = formData.get("bio") as string;
+  const visibility = formData.get("visibility") as 'public' | 'hidden';
+  const fullName = formData.get("full_name") as string;
+  const termsAccepted = formData.get("terms_accepted") === "on";
+  const privacyAccepted = formData.get("privacy_accepted") === "on";
+  
+  const areas = formData.getAll("faculty_areas") as string[];
+  const levels = formData.getAll("levels") as string[];
+  const degrees = formData.getAll("degrees") as string[];
+  const modalities = formData.getAll("modalities") as string[];
+  const availability = formData.get("availability") as string;
+  const linkedinUrl = formData.get("linkedin_url") as string;
+  const languagesStr = formData.get("languages") as string;
+  const historyStr = formData.get("history") as string;
+
+  let languages: any[] = [];
+  try { languages = JSON.parse(languagesStr || "[]"); } catch (e) {}
+
+  let history: any[] = [];
+  try { history = JSON.parse(historyStr || "[]"); } catch (e) {}
+
+  // Update user_profiles
+  const profileUpdate: any = {};
+  if (fullName) profileUpdate.full_name = fullName;
+  if (termsAccepted) profileUpdate.terms_accepted_at = new Date().toISOString();
+  if (privacyAccepted) profileUpdate.privacy_accepted_at = new Date().toISOString();
+  
+  if (Object.keys(profileUpdate).length > 0) {
+    await supabase.from("user_profiles").update(profileUpdate).eq("id", user.id);
+  }
+
+  const { error } = await supabase
+    .from("faculty_profiles")
+    .upsert({
+      id: user.id,
+      headline,
+      location,
+      bio,
+      visibility,
+      languages,
+      modalities,
+      degrees,
+      institutions_taught: history,
+      faculty_areas: areas,
+      levels,
+      availability,
+      linkedin_url: linkedinUrl,
+      updated_at: new Date().toISOString()
+    });
+
+  if (error) return { error: error.message };
+  return { success: true };
 }

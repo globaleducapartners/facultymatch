@@ -43,7 +43,8 @@ export function Navbar() {
     getUser();
   }, []);
 
-  const dashboardHref = role === 'faculty' ? '/app/faculty' : '/app/institution';
+    const dashboardHref = "/dashboard";
+
 
   return (
     <nav className="flex items-center justify-between px-6 lg:px-12 py-6 bg-white border-b border-gray-100 sticky top-0 z-50">

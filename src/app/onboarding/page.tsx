@@ -10,6 +10,17 @@ export default async function OnboardingPage() {
     redirect("/login?next=/onboarding");
   }
 
+  // Role check
+  const { data: userProfile } = await supabase
+    .from("user_profiles")
+    .select("role, full_name")
+    .eq("id", user.id)
+    .single();
+
+  if (userProfile?.role !== "faculty") {
+    redirect("/dashboard");
+  }
+
   // Fetch all profile data for pre-filling
   const { data: profile } = await supabase
     .from("faculty_profiles")
@@ -17,22 +28,20 @@ export default async function OnboardingPage() {
     .eq("id", user.id)
     .single();
 
-  const { data: languages } = await supabase.from("faculty_languages").select("language, level").eq("faculty_id", user.id);
-  const { data: history } = await supabase.from("faculty_teaching_history").select("institution_name, role, year_from, year_to").eq("faculty_id", user.id);
-  const { data: areas } = await supabase.from("faculty_areas").select("area").eq("faculty_id", user.id);
-  const { data: levels } = await supabase.from("faculty_levels").select("level").eq("faculty_id", user.id);
-
   const initialData = {
-    profile: profile || {},
-    languages: (languages || []).map(l => ({ language: l.language, level: l.level || "" })),
-    history: (history || []).map(h => ({ 
-      institution: h.institution_name, 
+    profile: {
+      ...profile,
+      full_name: userProfile.full_name
+    } || {},
+    languages: profile?.languages || [],
+    history: (profile?.institutions_taught || []).map((h: any) => ({ 
+      institution: h.institution || h.institution_name, 
       role: h.role || "", 
-      from: h.year_from?.toString() || "", 
-      to: h.year_to?.toString() || "" 
+      from: (h.from || h.year_from)?.toString() || "", 
+      to: (h.to || h.year_to)?.toString() || "" 
     })),
-    areas: (areas || []).map(a => a.area),
-    levels: (levels || []).map(l => l.level)
+    areas: profile?.faculty_areas || [],
+    levels: profile?.levels || []
   };
 
   return <OnboardingClient initialData={initialData} />;

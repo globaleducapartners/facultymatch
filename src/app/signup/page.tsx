@@ -147,13 +147,55 @@ function SignupContent() {
                   )}
                 </div>
 
-                {error && (
-                  <div className="p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-bold animate-in shake-100 duration-500">
-                    {error}
-                  </div>
-                )}
+                  {error && (
+                    <div className="p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-bold animate-in shake-100 duration-500">
+                      {error}
+                    </div>
+                  )}
 
-                <Button
+                  <div className="space-y-4 px-1">
+                    <label className="flex items-start gap-3 cursor-pointer group">
+                      <div className="pt-0.5">
+                        <input 
+                          type="checkbox" 
+                          name="terms_accepted" 
+                          required 
+                          className="w-4 h-4 rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue cursor-pointer transition-all"
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-gray-500 leading-tight group-hover:text-navy transition-colors">
+                        Acepto los <Link href="/terms" className="text-talentia-blue hover:underline">Términos y Condiciones</Link>
+                      </span>
+                    </label>
+                    <label className="flex items-start gap-3 cursor-pointer group">
+                      <div className="pt-0.5">
+                        <input 
+                          type="checkbox" 
+                          name="privacy_accepted" 
+                          required 
+                          className="w-4 h-4 rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue cursor-pointer transition-all"
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-gray-500 leading-tight group-hover:text-navy transition-colors">
+                        Acepto la <Link href="/privacy" className="text-talentia-blue hover:underline">Política de Privacidad</Link> (GDPR)
+                      </span>
+                    </label>
+                    <label className="flex items-start gap-3 cursor-pointer group">
+                      <div className="pt-0.5">
+                        <input 
+                          type="checkbox" 
+                          name="marketing_opt_in" 
+                          className="w-4 h-4 rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue cursor-pointer transition-all"
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-gray-500 leading-tight group-hover:text-navy transition-colors">
+                        Deseo recibir comunicaciones académicas y actualizaciones.
+                      </span>
+                    </label>
+                  </div>
+
+                  <Button
+
                   type="submit"
                   disabled={loading}
                   className="w-full bg-talentia-blue hover:bg-blue-700 text-white py-7 rounded-xl font-bold transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2 group"

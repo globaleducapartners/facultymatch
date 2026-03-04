@@ -44,10 +44,11 @@ const institutionItems = [
 ];
 
 const adminItems = [
-  { label: "Dashboard", href: "/app/admin", icon: LayoutDashboard },
-  { label: "Verificaciones", href: "/app/admin/verifications", icon: FileCheck },
-  { label: "Docentes", href: "/app/admin/educators", icon: Users },
-  { label: "Instituciones", href: "/app/admin/institutions", icon: Building2 },
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { label: "Verificaciones", href: "/app/admin/verifications", icon: FileCheck },
+    { label: "Docentes", href: "/app/admin/faculty", icon: Users },
+    { label: "Instituciones", href: "/app/admin/institutions", icon: Building2 },
+
   { label: "Taxonomía", href: "/app/admin/taxonomy", icon: Tags },
   { label: "Ajustes", href: "/app/admin/settings", icon: Settings },
 ];
