@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase-server";
-import { createAdminClient } from "@/lib/supabase-admin";
 import { sendWelcomeEmail } from "@/lib/emails/service";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -14,13 +13,10 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
   const institutionName = formData.get("institutionName") as string;
 
   const supabase = await createClient();
-  const admin = createAdminClient();
-  let userId: string;
 
   if (isSSO) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { error: "No se encontró sesión de SSO activa." };
-    userId = user.id;
   } else {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -29,6 +25,7 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
         data: {
           full_name: fullName,
           role: role,
+          institution_name: institutionName,
         },
       },
     });
@@ -36,46 +33,14 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
     if (error) {
       return { error: error.message };
     }
-    if (!data.user) return { error: "Error al crear el usuario." };
-    userId = data.user.id;
   }
 
-  // 1. Create user_profiles entry (Always using admin client to bypass RLS)
-  const { error: profileError } = await admin.from("user_profiles").upsert({
-    id: userId,
-    role: role as any,
-    full_name: fullName,
-  });
+    // El trigger en la base de datos (handle_new_user) se encarga de crear:
+    // 1. user_profiles
+    // 2. faculty_profiles o institutions según el rol
 
-  if (profileError) {
-    console.error("Profile Error:", profileError.message);
-    return { error: `Error al crear el perfil: ${profileError.message}` };
-  }
+    // Send Welcome Email (Corporate Identity)
 
-  // 2. Create role-specific profile (Always using admin client)
-  if (role === "faculty") {
-    const { error: edError } = await admin.from("faculty_profiles").upsert({
-      id: userId,
-      visibility: 'public',
-      is_active: true,
-      is_verified: false,
-    });
-    if (edError) {
-      console.error("Faculty Profile Error:", edError.message);
-      return { error: `Error al crear perfil docente: ${edError.message}` };
-    }
-  } else {
-    const { error: instError } = await admin.from("institutions").upsert({
-      id: userId,
-      name: institutionName || fullName,
-    });
-    if (instError) {
-      console.error("Institution Error:", instError.message);
-      return { error: `Error al crear perfil de institución: ${instError.message}` };
-    }
-  }
-
-  // Send Welcome Email (Corporate Identity)
   if (!isSSO) {
     try {
       await sendWelcomeEmail(email, fullName, role, institutionName || fullName);
