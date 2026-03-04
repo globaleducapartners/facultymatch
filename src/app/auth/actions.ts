@@ -189,63 +189,78 @@ export async function saveOnboarding(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "No se encontró usuario autenticado." };
 
-  const headline = formData.get("headline") as string;
-  const location = formData.get("location") as string;
-  const bio = formData.get("bio") as string;
-  const visibility = formData.get("visibility") as 'public' | 'hidden' | 'institutions_only';
-  const fullName = formData.get("full_name") as string;
-  const termsAccepted = formData.get("terms_accepted") === "on";
-  const privacyAccepted = formData.get("privacy_accepted") === "on";
-  
-  const areas = formData.getAll("faculty_areas") as string[]; 
-  const levels = formData.getAll("levels") as string[];
-  const degrees = formData.getAll("degrees") as string[];
-  const modalities = formData.getAll("modalities") as string[];
-  const availability = formData.get("availability") as string;
-  const linkedinUrl = formData.get("linkedin_url") as string;
-  const languagesStr = formData.get("languages") as string;
-  const historyStr = formData.get("history") as string;
+  try {
+    const headline = formData.get("headline") as string;
+    const location = formData.get("location") as string;
+    const bio = formData.get("bio") as string;
+    const visibility = formData.get("visibility") as 'public' | 'hidden' | 'institutions_only';
+    const fullName = formData.get("full_name") as string;
+    const termsAccepted = formData.get("terms_accepted") === "on";
+    const privacyAccepted = formData.get("privacy_accepted") === "on";
+    
+    const areas = formData.getAll("faculty_areas") as string[]; 
+    const levels = formData.getAll("levels") as string[];
+    const degrees = formData.getAll("degrees") as string[];
+    const modalities = formData.getAll("modalities") as string[];
+    const availability = formData.get("availability") as string;
+    const linkedinUrl = formData.get("linkedin_url") as string;
+    const languagesStr = formData.get("languages") as string;
+    const historyStr = formData.get("history") as string;
 
-  let languages: any[] = [];
-  try { languages = JSON.parse(languagesStr || "[]"); } catch (e) {}
+    let languages: any[] = [];
+    try { languages = JSON.parse(languagesStr || "[]"); } catch (e) {}
 
-  let history: any[] = [];
-  try { history = JSON.parse(historyStr || "[]"); } catch (e) {}
+    let history: any[] = [];
+    try { history = JSON.parse(historyStr || "[]"); } catch (e) {}
 
-  // Update user_profiles
-  const profileUpdate: any = {};
-  if (fullName) profileUpdate.full_name = fullName;
-  if (termsAccepted) profileUpdate.terms_accepted_at = new Date().toISOString();
-  if (privacyAccepted) profileUpdate.privacy_accepted_at = new Date().toISOString();
-  
-  if (Object.keys(profileUpdate).length > 0) {
-    await supabase.from("user_profiles").update(profileUpdate).eq("id", user.id);
+    // Update user_profiles
+    const profileUpdate: any = {};
+    if (fullName) profileUpdate.full_name = fullName;
+    if (termsAccepted) profileUpdate.terms_accepted_at = new Date().toISOString();
+    if (privacyAccepted) profileUpdate.privacy_accepted_at = new Date().toISOString();
+    
+    if (Object.keys(profileUpdate).length > 0) {
+      const { error: userError } = await supabase.from("user_profiles").update(profileUpdate).eq("id", user.id);
+      if (userError) {
+        console.error("[Onboarding] Error updating user_profile:", userError);
+      }
+    }
+
+    const { error: facultyError } = await supabase
+      .from("faculty_profiles")
+      .upsert({
+        id: user.id,
+        headline,
+        location,
+        bio,
+        visibility,
+        is_active: true,
+        languages,
+        modalities,
+        degrees,
+        institutions_taught: history,
+        faculty_areas: areas,
+        levels,
+        availability,
+        linkedin_url: linkedinUrl,
+        updated_at: new Date().toISOString()
+      });
+
+    if (facultyError) {
+      console.error("[Onboarding] Error upserting faculty_profile:", facultyError);
+      // Better error message for schema cache issues
+      if (facultyError.message.includes("schema cache")) {
+        return { error: "Error de configuración en el servidor (schema cache). Por favor, intenta de nuevo en unos segundos." };
+      }
+      return { error: facultyError.message };
+    }
+    
+    revalidatePath("/app/faculty");
+    return { success: true };
+  } catch (err: any) {
+    console.error("[Onboarding] Unexpected error during saveOnboarding:", err);
+    return { error: "Ocurrió un error inesperado al guardar tu perfil." };
   }
-
-  const { error } = await supabase
-    .from("faculty_profiles")
-    .upsert({
-      id: user.id,
-      headline,
-      location,
-      bio,
-      visibility,
-      is_active: true,
-      languages,
-      modalities,
-      degrees,
-      institutions_taught: history,
-      faculty_areas: areas,
-      levels,
-      availability,
-      linkedin_url: linkedinUrl,
-      updated_at: new Date().toISOString()
-    });
-
-  if (error) return { error: error.message };
-  
-  revalidatePath("/app/faculty");
-  return { success: true };
 }
 
 export async function autosaveOnboarding(formData: FormData) {
@@ -253,58 +268,66 @@ export async function autosaveOnboarding(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "No se encontró usuario autenticado." };
 
-  const headline = formData.get("headline") as string;
-  const location = formData.get("location") as string;
-  const bio = formData.get("bio") as string;
-  const visibility = formData.get("visibility") as 'public' | 'hidden';
-  const fullName = formData.get("full_name") as string;
-  const termsAccepted = formData.get("terms_accepted") === "on";
-  const privacyAccepted = formData.get("privacy_accepted") === "on";
-  
-  const areas = formData.getAll("faculty_areas") as string[];
-  const levels = formData.getAll("levels") as string[];
-  const degrees = formData.getAll("degrees") as string[];
-  const modalities = formData.getAll("modalities") as string[];
-  const availability = formData.get("availability") as string;
-  const linkedinUrl = formData.get("linkedin_url") as string;
-  const languagesStr = formData.get("languages") as string;
-  const historyStr = formData.get("history") as string;
+  try {
+    const headline = formData.get("headline") as string;
+    const location = formData.get("location") as string;
+    const bio = formData.get("bio") as string;
+    const visibility = formData.get("visibility") as 'public' | 'hidden';
+    const fullName = formData.get("full_name") as string;
+    const termsAccepted = formData.get("terms_accepted") === "on";
+    const privacyAccepted = formData.get("privacy_accepted") === "on";
+    
+    const areas = formData.getAll("faculty_areas") as string[];
+    const levels = formData.getAll("levels") as string[];
+    const degrees = formData.getAll("degrees") as string[];
+    const modalities = formData.getAll("modalities") as string[];
+    const availability = formData.get("availability") as string;
+    const linkedinUrl = formData.get("linkedin_url") as string;
+    const languagesStr = formData.get("languages") as string;
+    const historyStr = formData.get("history") as string;
 
-  let languages: any[] = [];
-  try { languages = JSON.parse(languagesStr || "[]"); } catch (e) {}
+    let languages: any[] = [];
+    try { languages = JSON.parse(languagesStr || "[]"); } catch (e) {}
 
-  let history: any[] = [];
-  try { history = JSON.parse(historyStr || "[]"); } catch (e) {}
+    let history: any[] = [];
+    try { history = JSON.parse(historyStr || "[]"); } catch (e) {}
 
-  // Update user_profiles
-  const profileUpdate: any = {};
-  if (fullName) profileUpdate.full_name = fullName;
-  if (termsAccepted) profileUpdate.terms_accepted_at = new Date().toISOString();
-  if (privacyAccepted) profileUpdate.privacy_accepted_at = new Date().toISOString();
-  
-  if (Object.keys(profileUpdate).length > 0) {
-    await supabase.from("user_profiles").update(profileUpdate).eq("id", user.id);
+    // Update user_profiles
+    const profileUpdate: any = {};
+    if (fullName) profileUpdate.full_name = fullName;
+    if (termsAccepted) profileUpdate.terms_accepted_at = new Date().toISOString();
+    if (privacyAccepted) profileUpdate.privacy_accepted_at = new Date().toISOString();
+    
+    if (Object.keys(profileUpdate).length > 0) {
+      await supabase.from("user_profiles").update(profileUpdate).eq("id", user.id);
+    }
+
+    const { error: facultyError } = await supabase
+      .from("faculty_profiles")
+      .upsert({
+        id: user.id,
+        headline,
+        location,
+        bio,
+        visibility,
+        languages,
+        modalities,
+        degrees,
+        institutions_taught: history,
+        faculty_areas: areas,
+        levels,
+        availability,
+        linkedin_url: linkedinUrl,
+        updated_at: new Date().toISOString()
+      });
+
+    if (facultyError) {
+      console.error("[Onboarding] Error during autosave:", facultyError);
+      return { error: facultyError.message };
+    }
+    return { success: true };
+  } catch (err: any) {
+    console.error("[Onboarding] Unexpected error during autosaveOnboarding:", err);
+    return { error: err.message };
   }
-
-  const { error } = await supabase
-    .from("faculty_profiles")
-    .upsert({
-      id: user.id,
-      headline,
-      location,
-      bio,
-      visibility,
-      languages,
-      modalities,
-      degrees,
-      institutions_taught: history,
-      faculty_areas: areas,
-      levels,
-      availability,
-      linkedin_url: linkedinUrl,
-      updated_at: new Date().toISOString()
-    });
-
-  if (error) return { error: error.message };
-  return { success: true };
 }

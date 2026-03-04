@@ -26,44 +26,52 @@ const baseTemplate = (content: string) => `
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">TALENTIA</div>
-      <div class="tagline">Faculty Network</div>
-    </div>
-    <div class="content">
-      ${content}
-    </div>
-    <div class="footer">
-      &copy; 2026 Talentia Faculty Network. <br>
-      Elevando los estándares de la educación superior global.
-    </div>
+<div class="logo">FACULTY<span style="color: ${COLORS.blue}">MATCH</span></div>
+<div class="tagline">Conectando Talento Académico</div>
+</div>
+<div class="content">
+${content}
+</div>
+<div class="footer">
+&copy; 2026 FacultyMatch Network. <br>
+Elevando los estándares de la educación superior global.
+</div>
   </div>
 </body>
 </html>
 `;
 
 export const getFacultyWelcomeEmail = (name: string) => baseTemplate(`
-  <h1 style="color: ${COLORS.navy}; font-size: 28px; margin-bottom: 20px;">¡Bienvenido a Talentia, ${name}!</h1>
+  <h1 style="color: ${COLORS.navy}; font-size: 28px; margin-bottom: 20px;">¡Bienvenido a FacultyMatch, ${name}!</h1>
   <p>Tu perfil docente ha sido creado con éxito. Ahora formas parte de la red global de talento académico más exclusiva.</p>
   <p>Para empezar a recibir oportunidades de instituciones líderes, te recomendamos:</p>
   <ul>
-    <li>Completar tu dossier académico con áreas y subáreas.</li>
-    <li>Subir tu CV y evidencias de investigación.</li>
-    <li>Configurar tus reglas de visibilidad y bloqueos.</li>
+    <li>Completar tu perfil profesional y ubicación.</li>
+    <li>Añadir tus áreas de especialidad y experiencia.</li>
+    <li>Configurar tu visibilidad para ser encontrado.</li>
   </ul>
-  <a href="https://talentia.education/login" class="button" style="background: ${COLORS.blue}">Completar mi perfil</a>
+  <a href="https://facultymatch.vercel.app/login" class="button" style="background: ${COLORS.blue}">Completar mi perfil</a>
   <p style="margin-top: 30px; font-size: 14px;">Si tienes alguna duda, nuestro equipo de soporte académico está a tu disposición.</p>
 `);
 
+export const getConfirmEmail = (link: string) => baseTemplate(`
+  <h1 style="color: ${COLORS.navy}; font-size: 28px; margin-bottom: 20px;">Confirma tu cuenta</h1>
+  <p>Gracias por unirte a FacultyMatch. Por favor, confirma tu dirección de correo electrónico para activar tu cuenta y empezar a configurar tu perfil.</p>
+  <a href="${link}" class="button">Confirmar cuenta</a>
+  <p style="margin-top: 30px; font-size: 14px; color: #94a3b8;">Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:</p>
+  <p style="font-size: 12px; color: ${COLORS.blue}; word-break: break-all;">${link}</p>
+`);
+
 export const getInstitutionWelcomeEmail = (name: string, institution: string) => baseTemplate(`
-  <h1 style="color: ${COLORS.navy}; font-size: 28px; margin-bottom: 20px;">Bienvenido a Talentia, ${name}</h1>
+  <h1 style="color: ${COLORS.navy}; font-size: 28px; margin-bottom: 20px;">Bienvenido a FacultyMatch, ${name}</h1>
   <p>Hemos activado la cuenta institucional para <strong>${institution}</strong>.</p>
   <p>Ya puedes empezar a explorar nuestro repositorio de talento verificado y construir claustros de excelencia para tus programas.</p>
   <p>Tu cuenta incluye:</p>
   <ul>
     <li>Acceso al directorio global de docentes.</li>
     <li>Búsqueda avanzada por áreas y especialidades.</li>
-    <li>Creación de shortlists para nuevos programas.</li>
+    <li>Conexión directa con perfiles de alto nivel.</li>
   </ul>
-  <a href="https://talentia.education/login" class="button" style="background: ${COLORS.orange}">Buscar Docentes</a>
-  <p style="margin-top: 30px; font-size: 14px;">Has iniciado tu periodo de prueba Essential de 30 días.</p>
+  <a href="https://facultymatch.vercel.app/login" class="button" style="background: ${COLORS.orange}">Buscar Docentes</a>
+  <p style="margin-top: 30px; font-size: 14px;">Gracias por confiar en FacultyMatch.</p>
 `);
