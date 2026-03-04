@@ -11,7 +11,16 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "FacultyMatch | Red Global de Talento Académico",
-  description: "Conectamos universidades y docentes expertos de todo el mundo.",
+  description: "Conectamos universidades y docentes expertos de todo el mundo. La red de confianza académica líder.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
+  openGraph: {
+    title: "FacultyMatch | Red Global de Talento Académico",
+    description: "Conectamos universidades y docentes expertos de todo el mundo.",
+    images: ["/logo.png"],
+  }
 };
 
 export default function RootLayout({

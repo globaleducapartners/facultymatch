@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { 
   CheckCircle2, 
@@ -44,9 +45,9 @@ export default function FacultyPage() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/signup?role=faculty">
+                  <Link href="/login?next=/onboarding">
                     <Button className="w-full sm:w-auto bg-talentia-blue hover:bg-blue-700 text-white font-bold h-14 px-10 rounded-xl shadow-xl shadow-blue-100 transition-all text-lg">
-                      Empezar ahora
+                      Crear perfil gratis
                     </Button>
                   </Link>
                 </div>
@@ -56,14 +57,16 @@ export default function FacultyPage() {
                 </div>
 
             </div>
-            <div className="relative">
-              <div className="rounded-[3rem] overflow-hidden shadow-2xl shadow-blue-900/10 border-8 border-white">
-                <img 
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1200&auto=format&fit=crop" 
-                  alt="Docente trabajando" 
-                  className="w-full h-auto object-cover aspect-[4/3]"
-                />
-              </div>
+              <div className="relative">
+                <div className="rounded-[3rem] overflow-hidden shadow-2xl shadow-blue-900/10 border-8 border-white relative aspect-[4/3]">
+                  <Image 
+                    src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop" 
+                    alt="Docente trabajando" 
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+
               <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-3xl shadow-xl border border-gray-100 max-w-[240px] animate-bounce-slow">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="bg-green-100 text-green-600 p-2 rounded-lg">

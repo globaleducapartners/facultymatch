@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
+import Image from "next/image";
 import { Users, Building2, FileCheck, Tags, AlertCircle, TrendingUp, ArrowUpRight, CheckCircle2, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -69,14 +70,14 @@ export default async function AdminDashboard() {
                 {recentFaculty && recentFaculty.length > 0 ? (
                   recentFaculty.map((f: any) => (
                     <div key={f.id} className="p-6 flex items-center justify-between hover:bg-gray-50/50 transition-colors group">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl bg-talentia-blue/10 flex items-center justify-center text-talentia-blue overflow-hidden border border-blue-50 font-black">
-                            {f.avatar_url ? (
-                              <img src={f.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
-                            ) : (
-                              f.full_name?.substring(0, 2).toUpperCase()
-                            )}
-                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-talentia-blue/10 flex items-center justify-center text-talentia-blue overflow-hidden border border-blue-50 font-black relative">
+                              {f.avatar_url ? (
+                                <Image src={f.avatar_url} alt="Avatar" fill className="object-cover" />
+                              ) : (
+                                f.full_name?.substring(0, 2).toUpperCase()
+                              )}
+                            </div>
                           <div>
                             <p className="text-sm font-bold text-navy">{f.full_name}</p>
                             <p className="text-xs text-gray-500 font-medium">{f.headline || 'Docente'} · {new Date(f.updated_at).toLocaleDateString()}</p>

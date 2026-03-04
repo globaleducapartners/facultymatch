@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { 
   Globe, 
   ArrowRight, 
@@ -153,14 +154,16 @@ export default function ResourcesPage() {
               Saber más sobre nosotros
             </Button>
           </div>
-          <div className="relative">
-            <div className="aspect-[4/3] bg-gray-50 rounded-[2.5rem] overflow-hidden">
-                <img 
-                    src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop" 
-                    alt="Knowledge Center" 
-                    className="w-full h-full object-cover"
-                />
-            </div>
+              <div className="relative">
+                <div className="aspect-[4/3] bg-gray-50 rounded-[2.5rem] overflow-hidden relative">
+                    <Image 
+                        src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop" 
+                        alt="Knowledge Center" 
+                        fill
+                        className="object-cover"
+                    />
+                </div>
+
             <div className="absolute -bottom-6 -right-6 bg-energy-orange p-8 rounded-3xl text-white shadow-xl max-w-[240px]">
                 <p className="text-sm font-black uppercase tracking-widest mb-2 opacity-80">Próximo Webinar</p>
                 <p className="font-bold leading-tight">Reclutamiento de perfiles Tech en Educación Superior</p>

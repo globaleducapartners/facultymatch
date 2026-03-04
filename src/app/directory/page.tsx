@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { Globe, ArrowRight, Book, Briefcase, Cpu, HeartPulse, Scale, GraduationCap, Palette } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
@@ -53,15 +54,29 @@ export default function DirectoryPage() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-6 py-16 lg:py-24 space-y-16">
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-navy text-tech-cyan text-[10px] font-black uppercase tracking-[0.2em] mb-4">
-            <GraduationCap size={14} /> Categoría Universitario
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-navy text-tech-cyan text-[10px] font-black uppercase tracking-[0.2em] mb-4">
+              <GraduationCap size={14} /> Categoría Universitario
+            </div>
+            <h1 className="text-4xl lg:text-6xl font-black text-navy tracking-tight">Directorio de Talento Académico</h1>
+            <p className="text-xl text-gray-500 font-medium leading-relaxed">
+              Explora nuestra infraestructura de conocimiento conectada globalmente con estándares de educación superior.
+            </p>
           </div>
-          <h1 className="text-4xl lg:text-6xl font-black text-navy tracking-tight">Directorio de Talento Académico</h1>
-          <p className="text-xl text-gray-500 font-medium leading-relaxed">
-            Explora nuestra infraestructura de conocimiento conectada globalmente con estándares de educación superior.
-          </p>
-        </div>
+
+          <div className="relative h-64 lg:h-96 rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white">
+            <Image 
+              src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1600&auto=format&fit=crop" 
+              alt="Comunidad Académica" 
+              fill
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy/60 to-transparent"></div>
+            <div className="absolute bottom-8 left-12">
+              <p className="text-white text-2xl font-black">Conectando Facultades en 45 países</p>
+            </div>
+          </div>
+
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((cat, idx) => (

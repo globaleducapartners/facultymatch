@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Globe, Menu, X, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
+import { Logo } from "@/components/ui/Logo";
 
 const navLinks = [
   { name: "Inicio", href: "/" },
@@ -48,14 +49,7 @@ export function Navbar() {
     <nav className="flex items-center justify-between px-6 lg:px-12 py-6 bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="flex items-center gap-3">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="bg-talentia-blue p-2 rounded-xl text-white shadow-lg shadow-blue-100 group-hover:scale-110 transition-transform">
-            <Globe size={24} />
-          </div>
-            <div className="flex flex-col">
-              <span className="text-2xl font-black tracking-tight text-navy leading-none">FacultyMatch</span>
-              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Network</span>
-            </div>
-
+          <Logo />
         </Link>
       </div>
       

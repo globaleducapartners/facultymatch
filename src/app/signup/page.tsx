@@ -6,6 +6,7 @@ import { signUp, signInWithSSO } from "@/app/auth/actions";
 import { School, UserCircle, Loader2, Globe, CheckCircle2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/Logo";
 
 function SignupContent() {
   const searchParams = useSearchParams();
@@ -43,9 +44,9 @@ function SignupContent() {
           </div>
           <h1 className="text-3xl font-black text-navy">¡Perfil creado!</h1>
           <p className="text-gray-500 font-medium">Tu cuenta ha sido configurada con éxito. Ya puedes acceder a tu panel.</p>
-            <Link href={role === 'faculty' ? '/app/faculty' : '/app/institution'}>
+            <Link href={role === 'faculty' ? '/onboarding' : '/app/institution'}>
               <Button className="w-full bg-talentia-blue hover:bg-blue-700 text-white py-6 rounded-xl font-bold mt-4">
-                Ir al Dashboard
+                Completar Perfil
               </Button>
             </Link>
         </div>
@@ -56,19 +57,13 @@ function SignupContent() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8FAFC] px-6 py-12">
       <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <Link href="/" className="inline-flex items-center gap-3 mb-8">
-              <div className="bg-talentia-blue p-2 rounded-xl text-white shadow-lg shadow-blue-100">
-                <Globe size={28} />
-              </div>
-              <div className="flex flex-col items-start">
-                <span className="text-3xl font-black tracking-tight text-navy leading-none">FacultyMatch</span>
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Global Academic Network</span>
-              </div>
-            </Link>
-            <h1 className="text-3xl font-black text-navy tracking-tight">{isSSO ? "Completa tu perfil" : "Crea tu cuenta"}</h1>
-            <p className="text-gray-500 font-medium mt-2">{isSSO ? "Solo un paso más para acceder a la red" : "Únete a la red líder en educación superior"}</p>
-          </div>
+            <div className="text-center">
+              <Link href="/" className="inline-flex items-center gap-3 mb-8">
+                <Logo />
+              </Link>
+              <h1 className="text-3xl font-black text-navy tracking-tight">{isSSO ? "Completa tu perfil" : "Crea tu cuenta"}</h1>
+              <p className="text-gray-500 font-medium mt-2">{isSSO ? "Solo un paso más para acceder a la red" : "Únete a la red líder en educación superior"}</p>
+            </div>
 
           <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-blue-900/5 border border-gray-100">
               <form onSubmit={handleSubmit} className="space-y-6">

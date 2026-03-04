@@ -8,7 +8,16 @@ import {
   Plus, 
   Building2,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Languages,
+  History,
+  Target,
+  GraduationCap,
+  Eye,
+  EyeOff,
+  User,
+  MapPin,
+  ExternalLink
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -34,259 +43,212 @@ export default async function EducatorDashboard() {
     .eq("id", user.id)
     .single();
 
-  const { data: expertise } = await supabase
-    .from("faculty_expertise")
-    .select("*")
-    .eq("faculty_id", facultyProfile?.id);
-
-  const { data: documents } = await supabase
-    .from("faculty_documents")
-    .select("*")
-    .eq("faculty_id", facultyProfile?.id);
-
-  const { data: blockedCount } = await supabase
-    .from("visibility_rules")
-    .select("*", { count: "exact", head: true })
-    .eq("faculty_id", facultyProfile?.id)
-    .eq("rule", "block");
-
+  const { data: languages } = await supabase.from("faculty_languages").select("*").eq("faculty_id", user.id);
+  const { data: history } = await supabase.from("faculty_teaching_history").select("*").eq("faculty_id", user.id);
+  const { data: areas } = await supabase.from("faculty_areas").select("*").eq("faculty_id", user.id);
+  const { data: levels } = await supabase.from("faculty_levels").select("*").eq("faculty_id", user.id);
+  
   const { data: recentRequests } = await supabase
     .from("contacts")
     .select("*, institution:institutions(name, country)")
-    .eq("faculty_id", facultyProfile?.id)
+    .eq("faculty_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(3);
 
-  const profileScore = facultyProfile?.profile_score || 0;
-  
-// Checklist logic
-const checklist = [
-{ label: "Añadir áreas de conocimiento", completed: (expertise?.length || 0) > 0 },
-{ label: "Subir curriculum (CV)", completed: (documents?.length || 0) > 0 },
-{ label: "Completar perfil académico", completed: !!facultyProfile?.headline && !!facultyProfile?.bio },
-{ label: "Acreditación ANECA / Otros", completed: !!facultyProfile?.aneca_accreditation },
-{ label: "Publicaciones & ORCID", completed: !!facultyProfile?.research_publications },
-{ label: "Presencia en Redes (LinkedIn)", completed: !!facultyProfile?.linkedin_url },
-];
-
-
+  // Checklist logic enriched
+  const checklist = [
+    { id: 'info', label: "Titular y Ubicación", completed: !!facultyProfile?.headline && !!facultyProfile?.location },
+    { id: 'areas', label: "Áreas / Facultades", completed: (areas?.length || 0) > 0 },
+    { id: 'levels', label: "Niveles Docentes", completed: (levels?.length || 0) > 0 },
+    { id: 'langs', label: "Idiomas", completed: (languages?.length || 0) > 0 },
+    { id: 'history', label: "Historial Docente", completed: (history?.length || 0) > 0 },
+    { id: 'bio', label: "Biografía Profesional", completed: !!facultyProfile?.bio },
+  ];
 
   const completedCount = checklist.filter(i => i.completed).length;
   const calculatedProgress = Math.round((completedCount / checklist.length) * 100);
+  const isPublished = calculatedProgress >= 80;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-10 animate-in fade-in duration-500 pb-12">
       {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-navy">Bienvenido de nuevo, {profile?.full_name?.split(' ')[0]}</h1>
-          <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500 font-medium">
-            <span className="flex items-center gap-1.5"><Building2 size={16} /> 50,000+</span>
-            <span className="flex items-center gap-1.5"><Building2 size={16} /> 1,200+ Instituciones</span>
-            <span className="flex items-center gap-1.5"><Globe size={16} /> 90+ Países</span>
-            <span className="flex items-center gap-1.5"><Award size={16} /> 15,000+ Programas</span>
-          </div>
+          <h1 className="text-4xl font-black text-navy tracking-tight">
+            Hola, {profile?.full_name?.split(' ')[0]}
+          </h1>
+          <p className="text-gray-500 font-medium mt-1">Gestiona tu presencia académica y recibe oportunidades.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button asChild className="bg-talentia-blue hover:bg-navy text-white font-black rounded-2xl h-14 px-8 shadow-xl shadow-blue-100 transition-all">
+            <Link href="/onboarding" className="flex items-center gap-2">
+              <User size={20} />
+              Editar Perfil
+            </Link>
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Bloque A - Estado del perfil */}
-        <Card className="lg:col-span-8 border-none shadow-sm rounded-2xl overflow-hidden">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl font-bold text-navy">
-                Estado del perfil
-              </CardTitle>
-              <div className="relative w-16 h-16 flex items-center justify-center">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle
-                    cx="32"
-                    cy="32"
-                    r="28"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="transparent"
-                    className="text-gray-100"
-                  />
-                  <circle
-                    cx="32"
-                    cy="32"
-                    r="28"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="transparent"
-                    strokeDasharray={175.9}
-                    strokeDashoffset={175.9 - (175.9 * calculatedProgress) / 100}
-                    className="text-talentia-blue transition-all duration-1000"
-                  />
-                </svg>
-                <span className="absolute text-sm font-bold text-navy">{calculatedProgress}%</span>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-3">
-              {checklist.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3 text-sm font-medium">
-                  {item.completed ? (
-                    <CheckCircle2 size={18} className="text-tech-cyan" />
-                  ) : (
-                    <div className="w-[18px] h-[18px] rounded-full border-2 border-gray-200" />
-                  )}
-                  <span className={item.completed ? "text-gray-900" : "text-gray-500"}>
-                    {item.label}
-                  </span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Profile Status & Preview Card */}
+        <div className="lg:col-span-8 space-y-8">
+          <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
+            <CardHeader className="pb-4 bg-gray-50/50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl font-black text-navy">Estado de Completitud</CardTitle>
+                  <CardDescription className="font-medium">Completa el 100% para maximizar visibilidad.</CardDescription>
                 </div>
-              ))}
-            </div>
-            
-            <div className="flex flex-col md:flex-row items-center gap-4 pt-4">
-              <Button asChild className="w-full md:w-auto bg-energy-orange hover:bg-orange-600 text-white font-bold rounded-xl h-12 px-8 transition-all hover:scale-[1.02]">
-                <Link href="/app/faculty/profile">Completar perfil</Link>
-              </Button>
-              <p className="text-xs text-gray-400 font-medium">
-                Tú decides qué instituciones pueden verte.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Bloque B - Visibilidad & Protección */}
-        <Card className="lg:col-span-4 border-none shadow-sm rounded-2xl bg-white">
-          <CardHeader>
-            <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-              <ShieldCheck className="text-talentia-blue" size={20} />
-              Visibilidad & Protección
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-blue-50/50 rounded-xl border border-blue-100">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-talentia-blue" />
-                  <span className="text-sm font-bold text-navy capitalize">{facultyProfile?.visibility?.replace('_', ' ') || 'Público'}</span>
+                <div className="flex flex-col items-end">
+                  <Badge className={`font-black px-4 py-1.5 rounded-full border-none ${isPublished ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                    {isPublished ? 'PERFIL PUBLICADO' : 'PERFIL EN BORRADOR'}
+                  </Badge>
                 </div>
-                <Badge variant="outline" className="bg-white text-[10px] font-bold uppercase tracking-wider border-blue-200 text-talentia-blue">Activo</Badge>
               </div>
-
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500 font-medium">Instituciones bloqueadas:</span>
-                <span className="font-bold text-navy">{blockedCount || 0}</span>
-              </div>
-
-              <div className="space-y-3 pt-2">
-                <Button asChild variant="default" className="w-full bg-talentia-blue hover:bg-blue-700 text-white font-bold rounded-xl h-11">
-                  <Link href="/app/faculty/privacy">Gestionar visibilidad</Link>
-                </Button>
-                <Button variant="outline" className="w-full border-gray-200 text-gray-600 font-bold rounded-xl h-11 hover:bg-gray-50">
-                  <Plus size={18} className="mr-2" />
-                  Añadir
-                </Button>
-              </div>
-            </div>
-            <p className="text-[10px] text-gray-400 font-medium text-center italic">
-              Tú decides qué instituciones pueden verte.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Bloque C - Solicitudes recientes */}
-        <Card className="lg:col-span-8 border-none shadow-sm rounded-2xl">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-lg font-bold text-navy">Solicitudes recientes</CardTitle>
-            <Button variant="link" asChild className="text-talentia-blue font-bold text-sm h-auto p-0 hover:no-underline">
-              <Link href="/app/faculty/requests" className="flex items-center gap-1">
-                Ver todas <ChevronRight size={16} />
-              </Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {recentRequests && recentRequests.length > 0 ? (
-              <div className="divide-y divide-gray-50">
-                  {recentRequests.map((req: { 
-                    id: string; 
-                    created_at: string; 
-                    message?: string; 
-                    status?: string;
-                    institution?: { 
-                      name?: string; 
-                      country?: string;
-                    } 
-                  }) => (
-                    <div key={req.id} className="py-4 flex items-center justify-between group cursor-pointer hover:bg-gray-50/50 -mx-6 px-6 transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className="bg-gray-100 p-2.5 rounded-xl group-hover:bg-white transition-colors">
-                          <Building2 size={20} className="text-gray-400" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-navy">{req.institution?.name}</h4>
-                          <p className="text-xs text-gray-500 font-medium">{req.message?.substring(0, 30)}... · {new Date(req.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</p>
-                        </div>
-                      </div>
-                      <Badge variant="secondary" className="bg-orange-50 text-orange-600 font-bold text-[10px] uppercase tracking-wider px-2 py-0.5 border-orange-100">
-                        {req.status === 'sent' ? 'Pendiente' : req.status}
-                      </Badge>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="flex flex-col md:flex-row gap-8 items-start">
+                <div className="flex-1 w-full space-y-6">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm font-black text-navy uppercase tracking-widest">
+                      <span>Progreso Total</span>
+                      <span>{calculatedProgress}%</span>
                     </div>
-                  ))}
-
-              </div>
-            ) : (
-              <div className="py-12 text-center">
-                <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Mail size={24} className="text-gray-300" />
+                    <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-talentia-blue transition-all duration-1000 ease-out"
+                        style={{ width: `${calculatedProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {checklist.map((item) => (
+                      <div key={item.id} className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${item.completed ? 'bg-white border-gray-100' : 'bg-gray-50/50 border-transparent opacity-60'}`}>
+                        {item.completed ? (
+                          <div className="bg-green-100 p-1 rounded-full"><CheckCircle2 size={16} className="text-green-600" /></div>
+                        ) : (
+                          <div className="bg-gray-200 p-1 rounded-full"><Plus size={16} className="text-gray-400" /></div>
+                        )}
+                        <span className={`text-sm font-bold ${item.completed ? 'text-navy' : 'text-gray-400'}`}>{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-gray-500 text-sm font-medium">No has recibido solicitudes todavía.</p>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Bloque D - Estado de verificación */}
-        <Card className="lg:col-span-4 border-none shadow-sm rounded-2xl overflow-hidden flex flex-col">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between mb-2">
-              <CardTitle className="text-lg font-bold text-navy">Estado de verificación</CardTitle>
-              <Badge className="bg-gray-100 text-gray-500 font-bold border-none capitalize">{facultyProfile?.verified || 'Básico'}</Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6 flex-1 flex flex-col">
-            <div className="space-y-3 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
-              <div className="flex items-center gap-3 text-sm font-medium">
-                <CheckCircle2 size={18} className="text-tech-cyan" />
-                <span className="text-gray-900">Básico</span>
+          {/* Profile Preview Mockup */}
+          <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
+            <CardHeader>
+              <CardTitle className="text-xl font-black text-navy flex items-center gap-2">
+                <Eye size={22} className="text-talentia-blue" />
+                Vista previa de tarjeta
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pb-8">
+              <div className="max-w-md mx-auto p-6 rounded-3xl border-2 border-gray-100 bg-white shadow-lg space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl bg-talentia-blue/10 flex items-center justify-center">
+                    <User size={32} className="text-talentia-blue" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-navy text-lg leading-tight">{profile?.full_name}</h3>
+                    <p className="text-sm font-bold text-talentia-blue truncate max-w-[200px]">{facultyProfile?.headline || 'PhD en Especialidad Académica'}</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {areas?.slice(0, 2).map(a => (
+                    <Badge key={a.id} variant="secondary" className="bg-blue-50 text-talentia-blue font-bold text-[10px] uppercase border-none">{a.area}</Badge>
+                  ))}
+                  {areas && areas.length > 2 && <span className="text-[10px] font-bold text-gray-400">+{areas.length - 2} más</span>}
+                </div>
+                <div className="flex items-center gap-4 text-xs font-bold text-gray-500">
+                  <span className="flex items-center gap-1"><MapPin size={12} /> {facultyProfile?.location || 'Mundo'}</span>
+                  <span className="flex items-center gap-1"><GraduationCap size={12} /> {levels?.[0]?.level || 'Nivel...'}</span>
+                </div>
+                <Button variant="ghost" className="w-full justify-between text-talentia-blue font-black hover:bg-blue-50 rounded-xl group">
+                  Ver Perfil Completo
+                  <ExternalLink size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                </Button>
               </div>
-              <div className="flex items-center gap-3 text-sm font-medium">
-                {(documents?.length || 0) > 0 ? (
-                  <CheckCircle2 size={18} className="text-tech-cyan" />
-                ) : (
-                  <ArrowRight size={18} className="text-talentia-blue" />
-                )}
-                <span className={(documents?.length || 0) > 0 ? "text-gray-900" : "text-gray-500"}>Subir CV</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm font-medium">
-                <Plus size={18} className="text-gray-300" />
-                <span className="text-gray-400 italic">Añadir prueba de doctorado (si aplica)</span>
-              </div>
-            </div>
+            </CardContent>
+          </Card>
+        </div>
 
-            <div className="pt-2 mt-auto">
-              <Button asChild className="w-full bg-talentia-blue hover:bg-blue-700 text-white font-bold rounded-xl h-11 mb-3">
-                <Link href="/app/faculty/verification">Solicitar verificación</Link>
+        {/* Sidebar Blocks */}
+        <div className="lg:col-span-4 space-y-8">
+          {/* Visibilidad Card */}
+          <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-black text-navy flex items-center gap-2">
+                <ShieldCheck className="text-talentia-blue" size={20} />
+                Privacidad
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className={`p-4 rounded-2xl border transition-all flex items-center justify-between ${facultyProfile?.visibility === 'public' ? 'bg-blue-50 border-blue-100' : 'bg-gray-50 border-gray-100'}`}>
+                <div className="flex items-center gap-3">
+                  {facultyProfile?.visibility === 'public' ? (
+                    <Eye size={20} className="text-talentia-blue" />
+                  ) : (
+                    <EyeOff size={20} className="text-gray-400" />
+                  )}
+                  <div>
+                    <p className="text-sm font-black text-navy capitalize">{facultyProfile?.visibility === 'public' ? 'Pública' : 'Privada'}</p>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Visibilidad actual</p>
+                  </div>
+                </div>
+                <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg" asChild>
+                  <Link href="/onboarding"><Plus size={16} /></Link>
+                </Button>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                <h4 className="text-xs font-black text-navy uppercase tracking-widest">Resumen de Datos</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50/50 rounded-xl border border-transparent">
+                    <p className="text-xl font-black text-navy">{languages?.length || 0}</p>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Idiomas</p>
+                  </div>
+                  <div className="p-3 bg-gray-50/50 rounded-xl border border-transparent">
+                    <p className="text-xl font-black text-navy">{history?.length || 0}</p>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Cargos</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Requests Card */}
+          <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden">
+            <CardHeader>
+              <CardTitle className="text-lg font-black text-navy">Oportunidades</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {recentRequests && recentRequests.length > 0 ? (
+                recentRequests.map(req => (
+                  <div key={req.id} className="p-4 bg-gray-50/50 rounded-2xl border border-transparent hover:border-gray-100 transition-all cursor-pointer group">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-black text-talentia-blue uppercase tracking-widest">Nueva Solicitud</span>
+                      <span className="text-[10px] font-bold text-gray-400">{new Date(req.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <h5 className="font-black text-navy text-sm leading-tight group-hover:text-talentia-blue transition-colors">{req.institution?.name}</h5>
+                    <p className="text-xs text-gray-500 font-medium mt-1 truncate">{req.message}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="py-8 text-center bg-gray-50/30 rounded-2xl border border-dashed border-gray-100">
+                  <Mail className="mx-auto text-gray-300 mb-2" size={24} />
+                  <p className="text-xs font-bold text-gray-400 px-4">Recibirás notificaciones cuando una institución quiera contactarte.</p>
+                </div>
+              )}
+              <Button variant="outline" className="w-full border-gray-200 text-gray-600 font-black rounded-2xl h-12" asChild>
+                <Link href="/app/faculty/requests">Ver Todo</Link>
               </Button>
-              <p className="text-[10px] text-gray-400 font-medium text-center">
-                Aumenta la visibilidad y confianza institucional.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Logos footer placeholder */}
-      <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12 py-8 opacity-20 grayscale filter pointer-events-none">
-        <span className="font-bold text-xl text-navy">Universidad Global</span>
-        <span className="font-bold text-xl text-navy">Tech University</span>
-        <span className="font-bold text-xl text-navy">Business School</span>
-        <span className="font-bold text-xl text-navy">European University</span>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

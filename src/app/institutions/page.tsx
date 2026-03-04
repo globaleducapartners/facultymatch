@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { 
   Building2, 
@@ -109,13 +110,16 @@ export default function InstitutionsPage() {
               </div>
             </div>
             <div className="relative">
-              <div className="rounded-[3rem] overflow-hidden shadow-2xl shadow-orange-900/10 border-8 border-white bg-gray-100">
-                  <img 
-                    src="https://images.unsplash.com/photo-1541339907198-e08756eaa589?q=80&w=1200&auto=format&fit=crop" 
-                    alt="Infraestructura Universitaria" 
-                    className="w-full h-auto object-cover aspect-[4/3] block"
-                  />
-              </div>
+                <div className="rounded-[3rem] overflow-hidden shadow-2xl shadow-orange-900/10 border-8 border-white bg-gray-100 relative aspect-[4/3] group">
+                    <Image 
+                      src="https://images.unsplash.com/photo-1523050853064-8521a3998af5?q=80&w=1200&auto=format&fit=crop" 
+                      alt="Infraestructura Universitaria" 
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy/30 to-transparent"></div>
+                </div>
+
               <div className="absolute -bottom-10 -right-6 bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-100 max-w-[280px]">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="bg-orange-100 text-energy-orange p-2.5 rounded-xl">

@@ -7,35 +7,43 @@ export async function GET(request: Request) {
 
   if (code) {
 
-      const supabase = await createClient();
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
-      if (!error) {
-        // if "next" is in search params, use it as the redirection URL
-        const next = searchParams.get('next');
-        
-        if (next && next !== '/') {
-          return NextResponse.redirect(`${origin}${next}`);
-        }
+        const supabase = await createClient();
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!error) {
+          const next = searchParams.get('next');
+          
+          if (next && next !== '/') {
+            return NextResponse.redirect(`${origin}${next}`);
+          }
 
-        // Check if user has a profile, if not redirect to role selection/complete profile
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('role')
-          .single();
-        
-        if (!profile) {
-          // New SSO user, redirect to role selection
-          return NextResponse.redirect(`${origin}/signup?new_sso=true`);
-        }
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('role')
+            .single();
+          
+          if (!profile) {
+            // New SSO user, role should be created by trigger, but if not:
+            return NextResponse.redirect(`${origin}/onboarding`);
+          }
 
-        if (profile.role === 'faculty') {
-          return NextResponse.redirect(`${origin}/app/faculty`);
-        } else if (profile.role === 'institution') {
-          return NextResponse.redirect(`${origin}/app/institution`);
+          if (profile.role === 'faculty') {
+            // Check if faculty profile is already completed (e.g., has headline)
+            const { data: facultyProfile } = await supabase
+              .from('faculty_profiles')
+              .select('headline')
+              .eq('id', (await supabase.auth.getUser()).data.user?.id)
+              .single();
+            
+            if (!facultyProfile?.headline) {
+              return NextResponse.redirect(`${origin}/onboarding`);
+            }
+            return NextResponse.redirect(`${origin}/app/faculty`);
+          } else if (profile.role === 'institution') {
+            return NextResponse.redirect(`${origin}/app/institution`);
+          }
+          
+          return NextResponse.redirect(`${origin}/`);
         }
-        
-        return NextResponse.redirect(`${origin}/`);
-      }
     }
 
 

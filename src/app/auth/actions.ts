@@ -122,6 +122,16 @@ export async function signIn(formData: FormData) {
   }
 
   if (profile?.role === "faculty") {
+    // Check if onboarding is completed
+    const { data: facultyProfile } = await supabase
+      .from("faculty_profiles")
+      .select("headline")
+      .eq("id", user.id)
+      .single();
+    
+    if (!facultyProfile?.headline) {
+      redirect("/onboarding");
+    }
     redirect("/app/faculty");
   } else if (profile?.role === "institution") {
     redirect("/app/institution");
@@ -188,4 +198,92 @@ export async function toggleFavorite(facultyId: string, institutionId: string) {
     revalidatePath("/app/institution/favorites");
     return { success: true, action: 'added' };
   }
+}
+
+export async function saveOnboarding(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "No se encontró usuario autenticado." };
+
+  const headline = formData.get("headline") as string;
+  const location = formData.get("location") as string;
+  const bio = formData.get("bio") as string;
+  const visibility = formData.get("visibility") as 'public' | 'hidden' | 'institutions_only';
+  
+  // New fields
+  const areas = formData.getAll("areas") as string[];
+  const levels = formData.getAll("levels") as string[];
+  const languagesStr = formData.get("languages") as string; // JSON string from client
+  const historyStr = formData.get("history") as string; // JSON string from client
+
+  let languages: { language: string, level: string }[] = [];
+  try { languages = JSON.parse(languagesStr || "[]"); } catch (e) { console.error("Error parsing languages:", e); }
+
+  let history: { institution: string, role: string, from: string, to: string }[] = [];
+  try { history = JSON.parse(historyStr || "[]"); } catch (e) { console.error("Error parsing history:", e); }
+
+  // Update faculty_profiles
+  const { error: profileError } = await supabase
+    .from("faculty_profiles")
+    .update({
+      headline,
+      location,
+      bio,
+      visibility,
+      is_active: true,
+    })
+    .eq("id", user.id);
+
+  if (profileError) {
+    console.error("Profile error:", profileError);
+    return { error: profileError.message };
+  }
+
+  // Handle Areas (using faculty_areas table as requested)
+  await supabase.from("faculty_areas").delete().eq("faculty_id", user.id);
+  if (areas && areas.length > 0) {
+    const areaData = areas.map(area => ({ faculty_id: user.id, area }));
+    await supabase.from("faculty_areas").insert(areaData);
+  }
+
+  // Handle Levels
+  await supabase.from("faculty_levels").delete().eq("faculty_id", user.id);
+  if (levels && levels.length > 0) {
+    const levelData = levels.map(level => ({ faculty_id: user.id, level }));
+    await supabase.from("faculty_levels").insert(levelData);
+  }
+
+  // Handle Languages
+  await supabase.from("faculty_languages").delete().eq("faculty_id", user.id);
+  if (languages && languages.length > 0) {
+    const langData = languages.map(l => ({ 
+      faculty_id: user.id, 
+      language: l.language, 
+      level: l.level 
+    }));
+    await supabase.from("faculty_languages").insert(langData);
+  }
+
+  // Handle History
+  await supabase.from("faculty_teaching_history").delete().eq("faculty_id", user.id);
+  if (history && history.length > 0) {
+    const historyData = history.map(h => ({
+      faculty_id: user.id,
+      institution_name: h.institution,
+      role: h.role,
+      year_from: parseInt(h.from) || null,
+      year_to: parseInt(h.to) || null
+    }));
+    await supabase.from("faculty_teaching_history").insert(historyData);
+  }
+
+  // Keep faculty_expertise in sync if it exists (legacy/parallel)
+  await supabase.from("faculty_expertise").delete().eq("faculty_id", user.id);
+  if (areas && areas.length > 0) {
+    const expertiseData = areas.map(area => ({ faculty_id: user.id, area }));
+    await supabase.from("faculty_expertise").insert(expertiseData);
+  }
+
+  revalidatePath("/app/faculty");
+  redirect("/app/faculty");
 }

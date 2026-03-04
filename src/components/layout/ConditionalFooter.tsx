@@ -7,11 +7,12 @@ export function ConditionalFooter() {
   const pathname = usePathname();
   
   // Do not show global footer on app/dashboard or auth pages
-  const hideFooter = 
-    pathname?.startsWith("/app") || 
-    pathname?.startsWith("/login") || 
-    pathname?.startsWith("/signup") ||
-    pathname?.startsWith("/auth");
+    const hideFooter = 
+      pathname?.startsWith("/app") || 
+      pathname?.startsWith("/login") || 
+      pathname?.startsWith("/signup") ||
+      pathname?.startsWith("/auth") ||
+      pathname?.startsWith("/onboarding");
 
   if (hideFooter) return null;
 

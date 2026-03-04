@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, ChevronRight, CheckCircle2, MapPin, Globe, Award, Mail } from "lucide-react";
@@ -33,16 +34,16 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
 
   return (
     <div key={educator.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group relative">
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="w-24 h-24 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-200 shrink-0 border border-gray-100 overflow-hidden">
-          {educator.avatar_url ? (
-            <img src={educator.avatar_url} alt={educator.full_name} className="w-full h-full object-cover" />
-          ) : (
-            <div className="bg-talentia-blue/10 text-talentia-blue w-full h-full flex items-center justify-center">
-              <span className="text-2xl font-black">{educator.full_name?.substring(0, 2).toUpperCase()}</span>
-            </div>
-          )}
-        </div>
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="w-24 h-24 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-200 shrink-0 border border-gray-100 overflow-hidden relative">
+            {educator.avatar_url ? (
+              <Image src={educator.avatar_url} alt={educator.full_name} fill className="object-cover" />
+            ) : (
+              <div className="bg-talentia-blue/10 text-talentia-blue w-full h-full flex items-center justify-center">
+                <span className="text-2xl font-black">{educator.full_name?.substring(0, 2).toUpperCase()}</span>
+              </div>
+            )}
+          </div>
         
         <div className="flex-1 space-y-4">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">

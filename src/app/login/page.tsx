@@ -6,6 +6,7 @@ import { signIn, signInWithSSO } from "@/app/auth/actions";
 import { School, Loader2, Globe, ArrowRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/Logo";
 
 function LoginContent() {
   const [loading, setLoading] = useState(false);
@@ -31,20 +32,13 @@ function LoginContent() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8FAFC] px-6 py-12">
       <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <Link href="/" className="inline-flex items-center gap-3 mb-8">
-            <div className="bg-talentia-blue p-2 rounded-xl text-white shadow-lg shadow-blue-100">
-              <Globe size={28} />
+          <div className="text-center">
+            <Link href="/" className="inline-flex items-center gap-3 mb-8">
+              <Logo />
+            </Link>
+              <h1 className="text-3xl font-black text-navy tracking-tight">Bienvenido</h1>
+              <p className="text-gray-500 font-medium mt-2">Accede a tu cuenta de FacultyMatch</p>
             </div>
-              <div className="flex flex-col items-start">
-                <span className="text-3xl font-black tracking-tight text-navy leading-none">FacultyMatch</span>
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">Global Academic Network</span>
-              </div>
-
-          </Link>
-            <h1 className="text-3xl font-black text-navy tracking-tight">Bienvenido</h1>
-            <p className="text-gray-500 font-medium mt-2">Accede a tu cuenta de FacultyMatch</p>
-          </div>
 
           <div className="bg-white p-8 rounded-[2rem] shadow-xl shadow-blue-900/5 border border-gray-100">
             {message && (

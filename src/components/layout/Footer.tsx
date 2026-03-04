@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Globe } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 
 export function Footer() {
   return (
@@ -7,13 +7,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12">
         <div className="col-span-2 space-y-6">
             <div className="flex items-center gap-3">
-              <div className="bg-white p-1.5 rounded-lg text-navy">
-                <Globe size={24} />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-2xl font-black tracking-tight">FacultyMatch</span>
-                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">by Talentia</span>
-              </div>
+              <Logo className="brightness-0 invert" />
             </div>
 
           <p className="text-gray-400 max-w-sm font-medium">

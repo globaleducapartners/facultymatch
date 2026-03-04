@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { 
   Search, 
@@ -34,41 +35,42 @@ export default function Home() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative px-6 lg:px-12 pt-16 pb-24 lg:pt-24 lg:pb-32 overflow-hidden">
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="space-y-4">
-                  <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-navy leading-[1.1]">
-                    La red global de <span className="text-talentia-blue">talento académico.</span>
+            <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-8 lg:pr-8">
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-talentia-blue text-xs font-black uppercase tracking-widest mb-4">
+                    <GraduationCap size={14} /> La red global de talento académico
+                  </div>
+                  <h1 className="text-6xl lg:text-8xl font-black tracking-tight text-navy leading-[0.95]">
+                    Eleva tu <span className="text-talentia-blue">carrera académica.</span>
                   </h1>
-                  <p className="text-xl text-gray-500 font-medium max-w-lg leading-relaxed">
-                    Conecta universidades y docentes a través de perfiles verificados y experiencia real. **Construye tus titulaciones en pocos minutos** y asegura la máxima calidad institucional.
+                  <p className="text-xl text-gray-500 font-medium max-w-lg leading-relaxed pt-4">
+                    Conecta con las mejores instituciones universitarias del mundo. Perfiles verificados, acreditaciones y visibilidad global.
                   </p>
                 </div>
 
-                  <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <Link href="/signup?role=faculty" className="w-full sm:w-auto bg-energy-orange text-white px-8 py-4 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-xl shadow-orange-100 group">
-                      Eleva tu carrera académica
-                      <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                    <Link href="/signup?role=institution" className="w-full sm:w-auto bg-white border border-gray-200 text-navy px-8 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2 shadow-sm">
-                      Registrar mi centro
-                    </Link>
-                  </div>
 
-                  <div className="flex flex-wrap items-center gap-6 pt-4">
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-tech-cyan">
-                      <CheckCircle2 size={16} />
-                      Acreditación ANECA / Calidad
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      <Link href="/login?next=/onboarding" className="w-full sm:w-auto bg-energy-orange text-white px-8 py-4 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-xl shadow-orange-100 group">
+                        Crear perfil gratis
+                        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                      </Link>
+                      <Link href="/signup?role=institution" className="w-full sm:w-auto bg-white border border-gray-200 text-navy px-8 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2 shadow-sm">
+                        Instituciones
+                      </Link>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-tech-cyan">
-                      <ShieldCheck size={16} />
-                      Perfiles verificados
+
+                    <div className="flex flex-wrap items-center gap-6 pt-4">
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-tech-cyan">
+                        <CheckCircle2 size={16} />
+                        Acreditación ANECA / Calidad
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-tech-cyan">
+                        <ShieldCheck size={16} />
+                        Perfiles verificados
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-tech-cyan">
-                      <Globe size={16} />
-                      Investigación & ORCID
-                    </div>
-                  </div>
+
 
 
             </div>
@@ -76,10 +78,12 @@ export default function Home() {
             <div className="relative hidden lg:block">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4 pt-12">
-                  <div className="bg-white p-3 rounded-2xl shadow-xl border border-gray-100 transform rotate-[-2deg]">
-                    <div className="aspect-[4/5] bg-gray-50 rounded-xl mb-3 overflow-hidden">
-                      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800" alt="Educador Verificado" className="w-full h-full object-cover block" />
-                    </div>
+                    <div className="bg-white p-3 rounded-2xl shadow-xl border border-gray-100 transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
+                        <div className="aspect-[4/5] bg-gray-50 rounded-xl mb-3 overflow-hidden relative">
+                          <Image src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=800" alt="Educador Verificado" fill className="object-cover" />
+                        </div>
+
+
                     <div className="space-y-1 px-1">
                       <p className="text-sm font-bold text-navy">Maria González</p>
                       <p className="text-[10px] font-medium text-gray-500">PhD · Economía · Online</p>
@@ -90,10 +94,12 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div className="bg-white p-3 rounded-2xl shadow-xl border border-gray-100 transform rotate-[3deg]">
-                    <div className="aspect-[4/5] bg-gray-50 rounded-xl mb-3 overflow-hidden">
-                      <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=800" alt="Profesor Académico" className="w-full h-full object-cover block" />
-                    </div>
+                      <div className="bg-white p-3 rounded-2xl shadow-xl border border-gray-100 transform rotate-[3deg] hover:rotate-0 transition-transform duration-500">
+                        <div className="aspect-[4/5] bg-gray-50 rounded-xl mb-3 overflow-hidden relative">
+                          <Image src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=800" alt="Profesor Académico" fill className="object-cover" />
+                        </div>
+
+
                     <div className="space-y-1 px-1">
                       <p className="text-sm font-bold text-navy">Ricardo Sánchez</p>
                       <p className="text-[10px] font-medium text-gray-500">Strategic Management</p>
@@ -227,17 +233,31 @@ export default function Home() {
                 </Button>
               </Link>
             </div>
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-gray-100 bg-gray-50">
-              <img src="https://images.unsplash.com/photo-1544717297-fa95b33979d7?auto=format&fit=crop&q=80&w=1200" alt="Docente impartiendo clase" className="rounded-3xl w-full h-auto object-cover block" />
-            </div>
+                <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-gray-100 relative h-[500px] group overflow-hidden">
+                  <Image 
+                    src="https://images.unsplash.com/photo-1523050853064-8521a3998af5?auto=format&fit=crop&q=80&w=1200" 
+                    alt="Docente impartiendo clase" 
+                    fill
+                    className="rounded-3xl object-cover group-hover:scale-105 transition-transform duration-700" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent"></div>
+                </div>
+
+
           </div>
         </section>
 
         {/* Features for Institutions */}
         <section className="py-24 px-6 lg:px-12 bg-white">
           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-            <div className="order-2 lg:order-1 bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-gray-100 bg-gray-50">
-              <img src="https://images.unsplash.com/photo-1541339907198-e08756eaa589?auto=format&fit=crop&q=80&w=1200" alt="Campus universitario moderno" className="rounded-3xl w-full h-auto object-cover block" />
+            <div className="order-2 lg:order-1 bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-gray-100 relative h-[500px] group overflow-hidden">
+                <Image 
+                  src="https://images.unsplash.com/photo-1541339907198-e08756ebafe3?auto=format&fit=crop&q=80&w=1200" 
+                  alt="Campus universitario moderno" 
+                  fill
+                  className="rounded-3xl object-cover group-hover:scale-105 transition-transform duration-700" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent"></div>
             </div>
             <div className="order-1 lg:order-2 space-y-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-energy-orange text-xs font-black uppercase tracking-widest">

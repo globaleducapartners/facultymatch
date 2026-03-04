@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Mail, Calendar, MapPin, ChevronLeft, Search, Clock, CheckCircle2 } from "lucide-react";
@@ -45,14 +46,14 @@ export default async function ContactsPage() {
         <div className="grid gap-4">
           {contacts.map((contact) => (
             <div key={contact.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-              <div className="flex flex-col md:flex-row gap-6 items-start">
-                <div className="w-16 h-16 bg-talentia-blue/10 text-talentia-blue rounded-xl flex items-center justify-center shrink-0">
-                  {contact.faculty_profiles?.avatar_url ? (
-                    <img src={contact.faculty_profiles.avatar_url} className="w-full h-full object-cover rounded-xl" />
-                  ) : (
-                    <span className="text-xl font-black">{contact.faculty_profiles?.full_name?.substring(0, 2).toUpperCase()}</span>
-                  )}
-                </div>
+                <div className="flex flex-col md:flex-row gap-6 items-start">
+                  <div className="w-16 h-16 bg-talentia-blue/10 text-talentia-blue rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden">
+                    {contact.faculty_profiles?.avatar_url ? (
+                      <Image src={contact.faculty_profiles.avatar_url} alt="Avatar" fill className="object-cover" />
+                    ) : (
+                      <span className="text-xl font-black">{contact.faculty_profiles?.full_name?.substring(0, 2).toUpperCase()}</span>
+                    )}
+                  </div>
 
                 <div className="flex-1 space-y-4">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
