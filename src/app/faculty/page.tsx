@@ -40,12 +40,13 @@ export default function FacultyPage() {
                 <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-navy leading-tight">
                   Tu carrera académica <br /> <span className="text-talentia-blue">global y acreditada.</span>
                 </h1>
+                <div className="absolute top-0 right-0 w-96 h-96 bg-blue-50 rounded-full opacity-40 blur-3xl -z-10" />
                 <p className="text-xl text-gray-500 font-medium max-w-lg leading-relaxed">
                   Conecta con instituciones que buscan perfiles acreditados ANECA, investigadores con ORCID y expertos en educación superior.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/login?next=/onboarding">
+                  <Link href="/apply">
                     <Button className="w-full sm:w-auto bg-talentia-blue hover:bg-blue-700 text-white font-bold h-14 px-10 rounded-xl shadow-xl shadow-blue-100 transition-all text-lg">
                       Crear perfil gratis
                     </Button>
@@ -56,15 +57,29 @@ export default function FacultyPage() {
                   <span className="flex items-center gap-1.5"><ShieldCheck size={14} /> Privacidad Avanzada</span>
                 </div>
 
+                <div className="flex flex-wrap gap-8 pt-4">
+                  {[
+                    { num: "500+", label: "Docentes registrados" },
+                    { num: "40+", label: "Países representados" },
+                    { num: "98%", label: "Tasa de satisfacción" },
+                  ].map((s) => (
+                    <div key={s.label}>
+                      <p className="text-2xl font-black text-navy">{s.num}</p>
+                      <p className="text-xs font-bold text-gray-400">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+
             </div>
               <div className="relative">
-                <div className="rounded-[3rem] overflow-hidden shadow-2xl shadow-blue-900/10 border-8 border-white relative aspect-[4/3]">
-                  <Image 
-                    src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop" 
-                    alt="Docente trabajando" 
-                    fill
-                    className="object-cover"
-                  />
+              <div className="rounded-[3rem] overflow-hidden shadow-2xl shadow-blue-900/10 border-8 border-white relative aspect-[4/3]">
+                <Image 
+                  src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=1200" 
+                  alt="Docente impartiendo clase"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover"
+                />
                 </div>
 
               <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-3xl shadow-xl border border-gray-100 max-w-[240px] animate-bounce-slow">
@@ -187,41 +202,115 @@ export default function FacultyPage() {
                 <div className="bg-white p-10 rounded-[2.5rem] border-4 border-talentia-blue shadow-2xl relative overflow-hidden">
                   <div className="absolute top-4 right-4 bg-talentia-blue text-white text-[10px] font-black px-3 py-1 rounded-full">RECOMENDADO</div>
                   <h3 className="text-2xl font-black text-navy mb-4">Plan Professional</h3>
-                  <p className="text-4xl font-black text-navy mb-6">9,99€ <span className="text-lg text-gray-400 font-bold">/ mes</span></p>
-                  <ul className="space-y-4 mb-8">
-                    <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Todo lo del plan Basic</li>
-                    <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Bloqueo de instituciones específicas</li>
-                    <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Oculto para tu centro actual</li>
-                    <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Posicionamiento prioritario</li>
-                  </ul>
-                  <Link href="/signup?role=faculty">
-                    <Button className="w-full bg-talentia-blue hover:bg-blue-700 text-white h-14 rounded-xl font-bold shadow-lg shadow-blue-100">Upgrade Profesional</Button>
-                  </Link>
+                    <div className="mb-6">
+                      <p className="text-4xl font-black text-navy">9,99€ <span className="text-lg text-gray-400 font-bold">/ año</span></p>
+                      <p className="text-xs font-bold text-energy-orange mt-1 uppercase tracking-widest">Promoción primer año · Después 99€/año</p>
+                    </div>
+                    <ul className="space-y-4 mb-8">
+                      <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Todo lo del plan Basic</li>
+                      <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Bloqueo de instituciones específicas</li>
+                      <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Oculto para tu centro actual</li>
+                      <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Posicionamiento prioritario</li>
+                    </ul>
+                    <Link href="/checkout?plan=faculty-pro">
+                      <Button className="w-full bg-talentia-blue hover:bg-blue-700 text-white h-14 rounded-xl font-bold shadow-lg shadow-blue-100">Upgrade Profesional</Button>
+                    </Link>
                 </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Social Proof */}
+          <section className="py-16 px-6 bg-white border-t border-gray-100">
+            <div className="max-w-5xl mx-auto">
+              <p className="text-center text-xs font-black uppercase tracking-widest text-gray-400 mb-10">
+                Por qué los docentes eligen FacultyMatch
+              </p>
+              <div className="grid md:grid-cols-3 gap-6">
+                {[
+                  {
+                    quote: "En 3 semanas conseguí dos colaboraciones nuevas con universidades que nunca habría conocido de otra forma.",
+                    name: "Dra. Carmen R.",
+                    role: "Profesora de Marketing Digital",
+                    avatar: "CR"
+                  },
+                  {
+                    quote: "Lo que más valoro es el control de privacidad. Puedo decidir exactamente quién ve mi perfil.",
+                    name: "Prof. Javier M.",
+                    role: "Doctor en Economía",
+                    avatar: "JM"
+                  },
+                  {
+                    quote: "FacultyMatch entiende el mundo académico. No es LinkedIn. Es una herramienta específica para nosotros.",
+                    name: "Dra. Laura S.",
+                    role: "Investigadora y Docente",
+                    avatar: "LS"
+                  }
+                ].map((t, i) => (
+                  <div key={i} className="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-6 space-y-4">
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, j) => (
+                        <span key={j} className="text-energy-orange text-sm">★</span>
+                      ))}
+                    </div>
+                    <p className="text-gray-600 font-medium text-sm leading-relaxed">
+                      "{t.quote}"
+                    </p>
+                    <div className="flex items-center gap-3 pt-2">
+                      <div className="w-9 h-9 rounded-full bg-talentia-blue text-white text-xs font-black flex items-center justify-center">
+                        {t.avatar}
+                      </div>
+                      <div>
+                        <p className="text-xs font-black text-navy">{t.name}</p>
+                        <p className="text-xs text-gray-400">{t.role}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </section>
 
           {/* CTA */}
           <section className="py-24 px-6 lg:px-12 bg-[#F8FAFC]">
-          <div className="max-w-5xl mx-auto bg-navy rounded-[3.5rem] p-12 lg:p-24 text-center text-white relative overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-talentia-blue/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-            <div className="relative z-10 space-y-8">
-              <h2 className="text-4xl lg:text-6xl font-black tracking-tight leading-tight">
-                El futuro de la docencia <br /> es <span className="text-tech-cyan">global y verificado.</span>
-              </h2>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <Link href="/signup?role=faculty">
-                  <Button className="bg-white text-navy hover:bg-gray-100 font-black h-16 px-12 rounded-2xl text-lg shadow-xl hover:scale-105 transition-all">
-                    Registrarme ahora
-                  </Button>
-                </Link>
-                <Link href="/login" className="text-gray-400 font-bold hover:text-white transition-colors">
-                  Ya tengo cuenta
-                </Link>
+            <div className="max-w-6xl mx-auto">
+              <div className="relative rounded-[3rem] overflow-hidden shadow-2xl shadow-blue-900/20 min-h-[420px] flex items-center">
+                <div className="absolute inset-0">
+                  <Image
+                    src="https://images.unsplash.com/photo-1544531585-9847b68c8c86?auto=format&fit=crop&q=80&w=1800"
+                    alt="Docentes colaborando globalmente"
+                    fill
+                    sizes="100vw"
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-talentia-blue/85"></div>
+                </div>
+                <div className="relative z-10 w-full px-10 py-16 lg:px-20 flex flex-col lg:flex-row items-center justify-between gap-10">
+                  <div className="space-y-4 max-w-xl">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-tech-cyan text-xs font-black uppercase tracking-widest">
+                      <GraduationCap size={14} /> Tu siguiente paso académico
+                    </div>
+                    <h2 className="text-4xl lg:text-5xl font-black text-white leading-tight">
+                      Empieza a generar ingresos con tu conocimiento.
+                    </h2>
+                    <p className="text-lg text-white/70 font-medium">
+                      Miles de instituciones buscan docentes como tú. Crea tu perfil y empieza a recibir propuestas académicas hoy mismo.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-4 min-w-[240px]">
+                    <Link href="/apply">
+                      <Button className="w-full bg-energy-orange hover:bg-orange-500 text-white font-black h-16 px-10 rounded-2xl text-lg shadow-xl shadow-orange-900/30 transition-all hover:scale-105">
+                        Crear mi perfil gratis
+                        <ArrowRight size={20} className="ml-2" />
+                      </Button>
+                    </Link>
+                    <Link href="/login" className="text-center text-white/60 font-bold hover:text-white transition-colors text-sm py-2">
+                      Ya tengo cuenta →
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
           </section>
         </main>
       </div>

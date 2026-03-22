@@ -49,7 +49,7 @@ export default async function ContactsPage() {
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="w-16 h-16 bg-talentia-blue/10 text-talentia-blue rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden">
                     {contact.faculty_profiles?.avatar_url ? (
-                      <Image src={contact.faculty_profiles.avatar_url} alt="Avatar" fill className="object-cover" />
+                      <Image src={contact.faculty_profiles.avatar_url} alt="Avatar" fill sizes="64px" className="object-cover" />
                     ) : (
                       <span className="text-xl font-black">{contact.faculty_profiles?.full_name?.substring(0, 2).toUpperCase()}</span>
                     )}

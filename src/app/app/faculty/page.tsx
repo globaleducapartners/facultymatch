@@ -3,23 +3,16 @@ import {
   CheckCircle2, 
   ShieldCheck, 
   Mail, 
-  Award, 
-  ChevronRight, 
   Plus, 
   Building2,
-  Clock,
   ArrowRight,
-  Languages,
-  History,
   Target,
   GraduationCap,
   Eye,
   EyeOff,
   User,
   MapPin,
-  ExternalLink
 } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -38,30 +31,31 @@ export default async function EducatorDashboard() {
     .single();
 
   const { data: facultyProfile } = await supabase
-    .from("faculty_profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+      .from("faculty_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
 
-  const { data: languages } = await supabase.from("faculty_languages").select("*").eq("faculty_id", user.id);
-  const { data: history } = await supabase.from("faculty_teaching_history").select("*").eq("faculty_id", user.id);
-  const { data: areas } = await supabase.from("faculty_areas").select("*").eq("faculty_id", user.id);
-  const { data: levels } = await supabase.from("faculty_levels").select("*").eq("faculty_id", user.id);
+  // Data lives in JSONB columns on faculty_profiles (set by onboarding)
+  const languages: any[] = facultyProfile?.languages || [];
+  const history: any[] = facultyProfile?.institutions_taught || [];
+  const areas: any[] = (facultyProfile?.faculty_areas || []).map((a: string) => ({ id: a, area: a }));
+  const levels: any[] = (facultyProfile?.levels || []).map((l: string) => ({ id: l, level: l }));
   
   const { data: recentRequests } = await supabase
     .from("contacts")
     .select("*, institution:institutions(name, country)")
-    .eq("faculty_id", user.id)
+    .eq("faculty_id", facultyProfile?.id ?? "")
     .order("created_at", { ascending: false })
     .limit(3);
 
   // Checklist logic enriched
   const checklist = [
     { id: 'info', label: "Titular y Ubicación", completed: !!facultyProfile?.headline && !!facultyProfile?.location },
-    { id: 'areas', label: "Áreas / Facultades", completed: (areas?.length || 0) > 0 },
-    { id: 'levels', label: "Niveles Docentes", completed: (levels?.length || 0) > 0 },
-    { id: 'langs', label: "Idiomas", completed: (languages?.length || 0) > 0 },
-    { id: 'history', label: "Historial Docente", completed: (history?.length || 0) > 0 },
+    { id: 'areas', label: "Áreas / Facultades", completed: areas.length > 0 },
+    { id: 'levels', label: "Niveles Docentes", completed: levels.length > 0 },
+    { id: 'langs', label: "Idiomas", completed: languages.length > 0 },
+    { id: 'history', label: "Historial Docente", completed: history.length > 0 },
     { id: 'bio', label: "Biografía Profesional", completed: !!facultyProfile?.bio },
   ];
 
@@ -88,6 +82,32 @@ export default async function EducatorDashboard() {
           </Button>
         </div>
       </div>
+
+      {facultyProfile?.is_verified ? (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3 mb-6">
+          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <ShieldCheck size={18} className="text-green-600" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-green-800">Perfil verificado</p>
+            <p className="text-xs text-green-600 mt-0.5">
+              Tu perfil ha sido revisado y aprobado. Ya eres visible para instituciones verificadas.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3 mb-6">
+          <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <ShieldCheck size={18} className="text-amber-600" />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-amber-800">Perfil pendiente de verificación</p>
+            <p className="text-xs text-amber-600 mt-0.5">
+              Nuestro equipo revisará tu perfil en 48-72h. Te avisaremos cuando esté aprobado.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Profile Status & Preview Card */}
@@ -121,6 +141,11 @@ export default async function EducatorDashboard() {
                       />
                     </div>
                   </div>
+                  <div className="text-center py-4">
+                    <span className="text-5xl font-black text-talentia-blue">{calculatedProgress}%</span>
+                    <p className="text-sm font-bold text-gray-400 mt-1">Perfil completado</p>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {checklist.map((item) => (
                       <div key={item.id} className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${item.completed ? 'bg-white border-gray-100' : 'bg-gray-50/50 border-transparent opacity-60'}`}>
@@ -141,36 +166,87 @@ export default async function EducatorDashboard() {
           {/* Profile Preview Mockup */}
           <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
             <CardHeader>
-              <CardTitle className="text-xl font-black text-navy flex items-center gap-2">
-                <Eye size={22} className="text-talentia-blue" />
-                Vista previa de tarjeta
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xl font-black text-navy flex items-center gap-2">
+                  <Eye size={22} className="text-talentia-blue" />
+                  Tu perfil, bajo tu control
+                </CardTitle>
+                <Button size="sm" variant="ghost" className="text-talentia-blue font-black text-xs rounded-xl hover:bg-blue-50" asChild>
+                  <Link href="/onboarding">Editar →</Link>
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="pb-8">
-              <div className="max-w-md mx-auto p-6 rounded-3xl border-2 border-gray-100 bg-white shadow-lg space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-talentia-blue/10 flex items-center justify-center">
-                    <User size={32} className="text-talentia-blue" />
+              {/* Card preview */}
+              <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-navy via-[#0f2c5a] to-talentia-blue p-8 shadow-2xl shadow-blue-900/20">
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-bl-[5rem]"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-tech-cyan/10 rounded-tr-[4rem]"></div>
+
+                {/* Top row */}
+                <div className="relative z-10 flex items-start justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0">
+                      <User size={28} className="text-white/80" />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-white text-base leading-tight">{profile?.full_name || 'Tu Nombre'}</h3>
+                      <p className="text-tech-cyan text-xs font-bold mt-0.5 truncate max-w-[180px]">{facultyProfile?.headline || 'Añade tu titulación'}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-black text-navy text-lg leading-tight">{profile?.full_name}</h3>
-                    <p className="text-sm font-bold text-talentia-blue truncate max-w-[200px]">{facultyProfile?.headline || 'PhD en Especialidad Académica'}</p>
+                  <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${isPublished ? 'bg-green-400/20 border-green-400/30 text-green-300' : 'bg-orange-400/20 border-orange-400/30 text-orange-300'}`}>
+                    {isPublished ? 'Publicado' : 'Borrador'}
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {areas?.slice(0, 2).map(a => (
-                    <Badge key={a.id} variant="secondary" className="bg-blue-50 text-talentia-blue font-bold text-[10px] uppercase border-none">{a.area}</Badge>
+
+                {/* Areas */}
+                <div className="relative z-10 flex flex-wrap gap-2 mb-6">
+                  {areas?.slice(0, 3).map(a => (
+                    <span key={a.id} className="bg-white/10 border border-white/20 text-white/80 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">{a.area}</span>
                   ))}
-                  {areas && areas.length > 2 && <span className="text-[10px] font-bold text-gray-400">+{areas.length - 2} más</span>}
+                  {(!areas || areas.length === 0) && (
+                    <span className="bg-white/5 border border-dashed border-white/20 text-white/30 text-[10px] font-bold px-3 py-1 rounded-full">Añade tus áreas →</span>
+                  )}
                 </div>
-                <div className="flex items-center gap-4 text-xs font-bold text-gray-500">
-                  <span className="flex items-center gap-1"><MapPin size={12} /> {facultyProfile?.location || 'Mundo'}</span>
-                  <span className="flex items-center gap-1"><GraduationCap size={12} /> {levels?.[0]?.level || 'Nivel...'}</span>
+
+                {/* Stats row */}
+                <div className="relative z-10 grid grid-cols-3 gap-3 mb-6">
+                  {[
+                    { label: "Idiomas", value: languages.length || "—" },
+                    { label: "Cargos", value: history.length || "—" },
+                    { label: "Áreas", value: areas.length || "—" },
+                  ].map(stat => (
+                    <div key={stat.label} className="bg-white/5 border border-white/10 rounded-2xl p-3 text-center">
+                      <p className="text-xl font-black text-white">{stat.value}</p>
+                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{stat.label}</p>
+                    </div>
+                  ))}
                 </div>
-                <Button variant="ghost" className="w-full justify-between text-talentia-blue font-black hover:bg-blue-50 rounded-xl group">
-                  Ver Perfil Completo
-                  <ExternalLink size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                </Button>
+
+                {/* Location & Level */}
+                <div className="relative z-10 flex items-center justify-between text-xs font-bold text-white/50">
+                  <span className="flex items-center gap-1.5"><MapPin size={12} /> {facultyProfile?.location || 'Sin ubicación'}</span>
+                  <span className="flex items-center gap-1.5"><GraduationCap size={12} /> {levels?.[0]?.level || 'Nivel pendiente'}</span>
+                </div>
+              </div>
+
+              {/* Progress bar below card */}
+              <div className="mt-5 space-y-2">
+                <div className="flex justify-between text-xs font-black text-navy uppercase tracking-widest">
+                  <span>Completitud del perfil</span>
+                  <span className={calculatedProgress === 100 ? 'text-green-600' : 'text-talentia-blue'}>{calculatedProgress}%</span>
+                </div>
+                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-1000 ease-out ${calculatedProgress === 100 ? 'bg-green-500' : 'bg-talentia-blue'}`}
+                    style={{ width: `${calculatedProgress}%` }}
+                  />
+                </div>
+                {calculatedProgress < 100 && (
+                  <p className="text-xs text-gray-400 font-medium">
+                    Completa {checklist.filter(i => !i.completed).length} sección{checklist.filter(i => !i.completed).length !== 1 ? 'es' : ''} más para maximizar tu visibilidad.
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -208,11 +284,11 @@ export default async function EducatorDashboard() {
                 <h4 className="text-xs font-black text-navy uppercase tracking-widest">Resumen de Datos</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 bg-gray-50/50 rounded-xl border border-transparent">
-                    <p className="text-xl font-black text-navy">{languages?.length || 0}</p>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Idiomas</p>
-                  </div>
-                  <div className="p-3 bg-gray-50/50 rounded-xl border border-transparent">
-                    <p className="text-xl font-black text-navy">{history?.length || 0}</p>
+                      <p className="text-xl font-black text-navy">{languages.length}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Idiomas</p>
+                    </div>
+                    <div className="p-3 bg-gray-50/50 rounded-xl border border-transparent">
+                      <p className="text-xl font-black text-navy">{history.length}</p>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Cargos</p>
                   </div>
                 </div>
@@ -238,9 +314,15 @@ export default async function EducatorDashboard() {
                   </div>
                 ))
               ) : (
-                <div className="py-8 text-center bg-gray-50/30 rounded-2xl border border-dashed border-gray-100">
-                  <Mail className="mx-auto text-gray-300 mb-2" size={24} />
-                  <p className="text-xs font-bold text-gray-400 px-4">Recibirás notificaciones cuando una institución quiera contactarte.</p>
+                <div className="text-center py-10 border border-dashed border-gray-200 rounded-2xl">
+                  <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <Mail size={20} className="text-talentia-blue" />
+                  </div>
+                  <p className="font-bold text-navy text-sm">Aún no tienes contactos</p>
+                  <p className="text-gray-400 text-xs mt-1 max-w-xs mx-auto">
+                    Cuando una institución quiera contactarte, aparecerá aquí.
+                    Completa tu perfil al 100% para aparecer primero.
+                  </p>
                 </div>
               )}
               <Button variant="outline" className="w-full border-gray-200 text-gray-600 font-black rounded-2xl h-12" asChild>

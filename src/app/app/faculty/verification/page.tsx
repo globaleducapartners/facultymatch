@@ -13,13 +13,14 @@ export default async function VerificationPage() {
   if (!user) return null;
 
     const { data: facultyProfile } = await supabase
-      .from("faculty_profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+        .from("faculty_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
   
-    const isVerified = facultyProfile?.is_verified;
-    const status = isVerified ? 'verified' : 'none';
+  const isVerified = facultyProfile?.is_verified;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const status = (isVerified ? 'verified' : 'none') as 'verified' | 'pending' | 'none';
     
     const steps = [
       { id: 1, label: "Perfil básico completo", completed: !!facultyProfile?.headline, icon: CheckCircle2 },
@@ -35,7 +36,7 @@ export default async function VerificationPage() {
       "use server";
       const supabase = await createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      await supabase.from("faculty_profiles").update({ is_verified: true }).eq("id", user!.id);
+        await supabase.from("faculty_profiles").update({ is_verified: true }).eq("user_id", user!.id);
       revalidatePath("/app/faculty/verification");
     }
   

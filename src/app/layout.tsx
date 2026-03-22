@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { VisualEditsMessenger } from "orchids-visual-edits";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
+import { CookieConsent } from "@/components/layout/CookieConsent";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -10,6 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.facultymatch.app'),
   title: "FacultyMatch | Red Global de Talento Académico",
   description: "Conectamos universidades y docentes expertos de todo el mundo. La red de confianza académica líder.",
   icons: {
@@ -37,6 +39,7 @@ export default function RootLayout({
             {children}
           </div>
           <ConditionalFooter />
+          <CookieConsent />
           <VisualEditsMessenger />
 
       </body>

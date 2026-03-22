@@ -21,6 +21,17 @@ export default async function DashboardLayout({
     .eq("id", user.id)
     .single();
 
+  if (!profile) {
+    redirect("/onboarding");
+  }
+
+  if (!profile.onboarding_completed) {
+    if (profile.role === "institution") {
+      redirect("/onboarding/institution");
+    }
+    redirect("/onboarding");
+  }
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
       <Topbar user={user} profile={profile} />

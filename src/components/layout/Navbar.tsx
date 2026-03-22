@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Globe, Menu, X, User } from "lucide-react";
+import { Menu, X, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { Logo } from "@/components/ui/Logo";
@@ -11,9 +11,10 @@ const navLinks = [
   { name: "Inicio", href: "/" },
   { name: "Docentes", href: "/faculty" },
   { name: "Instituciones", href: "/institutions" },
-  { name: "Directorio", href: "/directory" },
   { name: "Recursos", href: "/resources" },
 ];
+
+const APPLY_HREF = "/apply";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -43,7 +44,14 @@ export function Navbar() {
     getUser();
   }, []);
 
-    const dashboardHref = "/dashboard";
+    const dashboardHref =
+      role === "faculty"
+        ? "/app/faculty"
+        : role === "institution"
+        ? "/app/institution"
+        : role === "admin" || role === "super_admin"
+        ? "/app/admin"
+        : "/dashboard";
 
 
   return (
@@ -82,13 +90,19 @@ export function Navbar() {
           </Link>
         ) : (
           <>
-            <Link href="/login" className="hidden sm:block text-sm font-bold text-navy px-6 py-2.5 hover:bg-gray-50 rounded-xl transition-colors">
-              Acceder
-            </Link>
-            <Link href="/signup" className="bg-talentia-blue text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
-              Crear perfil
-            </Link>
-          </>
+              <Link href="/login" className="hidden sm:block text-sm font-bold text-navy px-6 py-2.5 hover:bg-gray-50 rounded-xl transition-colors">
+                Acceder
+              </Link>
+              <Link
+                href="/signup?role=institution"
+                className="hidden lg:block text-xs font-bold text-gray-400 hover:text-navy transition-colors whitespace-nowrap"
+              >
+                Soy institución →
+              </Link>
+              <Link href={APPLY_HREF} className="bg-energy-orange text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-100">
+                Unirse
+              </Link>
+            </>
         )}
         
         {/* Mobile Menu Toggle */}
@@ -122,15 +136,24 @@ export function Navbar() {
             >
               Dashboard
             </Link>
-          ) : (
-            <Link 
-              href="/login" 
-              className="text-lg font-bold text-navy py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Acceder
-            </Link>
-          )}
+            ) : (
+              <>
+                <Link 
+                  href="/login" 
+                  className="text-lg font-bold text-navy py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Acceder
+                </Link>
+                <Link 
+                  href={APPLY_HREF} 
+                  className="text-lg font-bold text-energy-orange py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Unirse a FacultyMatch
+                </Link>
+              </>
+            )}
         </div>
       )}
     </nav>

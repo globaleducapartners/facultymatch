@@ -12,7 +12,8 @@ import {
   Zap, 
   Building, 
   Sparkles,
-  Award
+  Award,
+  GraduationCap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/Navbar";
@@ -26,14 +27,13 @@ export const metadata: Metadata = {
 const pricingPlans = [
     {
       name: "Essential",
-      price: "0",
-      period: "/ mes",
-      desc: "Inicia la transformación digital de tu búsqueda de talento.",
+      price: "Gratis",
+      period: "",
+      desc: "Empieza a explorar la red de docentes verificados.",
       features: [
-        "Búsqueda con filtros básicos",
-        "Visualización de perfiles",
-        "Hasta 3 contactos mensuales",
-        "Shortlist (1 lista)",
+        "Registro gratuito",
+        "2 búsquedas al mes",
+        "Visualización básica de perfiles",
         "Soporte por email"
       ],
       buttonText: "Registrar mi centro",
@@ -42,10 +42,11 @@ const pricingPlans = [
 
   {
     name: "Professional",
-    price: "199",
-    period: "/ mes",
+    price: "99€",
+    period: "/mes",
     desc: "Para facultades y centros que buscan la máxima agilidad.",
     features: [
+      "Búsquedas ilimitadas",
       "Filtros avanzados (Doctorado, Idioma, Disponibilidad)",
       "Contactos ilimitados",
       "Shortlists ilimitadas",
@@ -110,15 +111,16 @@ export default function InstitutionsPage() {
               </div>
             </div>
             <div className="relative">
-                <div className="rounded-[3rem] overflow-hidden shadow-2xl shadow-orange-900/10 border-8 border-white bg-gray-100 relative aspect-[4/3] group">
-                    <Image 
-                      src="https://images.unsplash.com/photo-1523050853064-8521a3998af5?q=80&w=1200&auto=format&fit=crop" 
-                      alt="Infraestructura Universitaria" 
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-navy/30 to-transparent"></div>
-                </div>
+                  <div className="rounded-[3rem] overflow-hidden shadow-2xl shadow-orange-900/10 border-8 border-white bg-gray-100 relative aspect-[4/3] group">
+                      <Image 
+                        src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1200" 
+                        alt="Campus universitario moderno"
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-navy/30 to-transparent"></div>
+                  </div>
 
               <div className="absolute -bottom-10 -right-6 bg-white p-8 rounded-[2.5rem] shadow-xl border border-gray-100 max-w-[280px]">
                 <div className="flex items-center gap-3 mb-4">
@@ -213,8 +215,7 @@ export default function InstitutionsPage() {
                     <h3 className="text-2xl font-black text-navy tracking-tight">{plan.name}</h3>
                       <div className="flex items-baseline gap-1">
                         <span className="text-5xl font-black text-navy">
-                          {plan.price !== 'Custom' && plan.price !== 'Trial' && '$'}
-                          {plan.price}
+                            {plan.price}
                         </span>
                         <span className="text-gray-400 font-bold">{plan.period}</span>
                       </div>
@@ -229,15 +230,18 @@ export default function InstitutionsPage() {
                         </li>
                       ))}
                     </ul>
-                    <Button 
-                        className={`w-full h-14 rounded-2xl font-black text-lg shadow-xl transition-all ${
-                            plan.highlight 
-                            ? 'bg-energy-orange hover:bg-orange-600 text-white' 
-                            : 'bg-white border-2 border-gray-200 text-navy hover:bg-gray-50'
-                        }`}
-                    >
-                      {plan.buttonText}
-                    </Button>
+                      <Button 
+                          asChild
+                          className={`w-full h-14 rounded-2xl font-black text-lg shadow-xl transition-all ${
+                              plan.highlight 
+                              ? 'bg-energy-orange hover:bg-orange-600 text-white' 
+                              : 'bg-white border-2 border-gray-200 text-navy hover:bg-gray-50'
+                          }`}
+                      >
+                        <Link href={plan.highlight ? '/checkout?plan=institution-pro' : '/signup?role=institution'}>
+                          {plan.buttonText}
+                        </Link>
+                      </Button>
                   </div>
                 </div>
               ))}
@@ -245,27 +249,73 @@ export default function InstitutionsPage() {
           </div>
         </section>
 
+        {/* Early Access Section */}
+        <section className="bg-navy py-20 px-6">
+          <div className="max-w-2xl mx-auto text-center space-y-6">
+            <span className="inline-block px-4 py-2 bg-white/10 text-white/60 text-xs font-black uppercase tracking-widest rounded-full">
+              Acceso anticipado
+            </span>
+            <h2 className="text-3xl font-black text-white leading-tight">
+              Sé de los primeros en acceder al directorio completo
+            </h2>
+            <p className="text-white/60 font-medium text-lg">
+              Los primeros 20 centros registrados obtienen 3 meses de acceso
+              Professional gratuito. Sin tarjeta de crédito.
+            </p>
+            <Link
+              href="/signup?role=institution"
+              className="inline-flex items-center gap-2 bg-energy-orange text-white px-10 py-5 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-xl shadow-orange-900/20"
+            >
+              Registrar mi institución gratis
+              <ArrowRight size={20} />
+            </Link>
+            <p className="text-white/30 text-sm">
+              Ya hay 12 instituciones en lista de espera
+            </p>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-24 px-6 lg:px-12 bg-white">
-          <div className="max-w-5xl mx-auto bg-talentia-blue rounded-[3.5rem] p-12 lg:p-24 text-center text-white relative overflow-hidden shadow-2xl shadow-blue-900/20">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
-            <div className="relative z-10 space-y-8">
-              <h2 className="text-4xl lg:text-6xl font-black tracking-tight leading-tight">
-                Empieza hoy tu transformación <br /> <span className="text-tech-cyan">hacia el talento global.</span>
-              </h2>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <Link href="/signup?role=institution">
-                  <Button className="bg-white text-talentia-blue hover:bg-gray-50 font-black h-16 px-12 rounded-2xl text-lg shadow-xl hover:scale-105 transition-all">
-                    Registrar mi centro
-                  </Button>
-                </Link>
-                <Link href="#" className="text-white/80 font-bold hover:text-white transition-colors">
-                  Hablar con un asesor
-                </Link>
+          <div className="max-w-6xl mx-auto">
+            <div className="relative rounded-[3rem] overflow-hidden shadow-2xl shadow-orange-900/20 min-h-[420px] flex items-center">
+              <div className="absolute inset-0">
+                <Image
+                  src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1800"
+                  alt="Institución universitaria moderna"
+                  fill
+                  sizes="100vw"
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-navy/85"></div>
+              </div>
+              <div className="relative z-10 w-full px-10 py-16 lg:px-20 flex flex-col lg:flex-row items-center justify-between gap-10">
+                <div className="space-y-4 max-w-xl">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-tech-cyan text-xs font-black uppercase tracking-widest">
+                    <Building2 size={14} /> Para Instituciones
+                  </div>
+                  <h2 className="text-4xl lg:text-5xl font-black text-white leading-tight">
+                    Encuentra al docente perfecto para tus programas.
+                  </h2>
+                  <p className="text-lg text-white/70 font-medium">
+                    Accede a la red de talento académico más completa de Europa. Perfiles verificados, búsqueda avanzada y contacto directo.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-4 min-w-[240px]">
+                  <Link href="/signup?role=institution">
+                    <Button className="w-full bg-energy-orange hover:bg-orange-500 text-white font-black h-16 px-10 rounded-2xl text-lg shadow-xl shadow-orange-900/30 transition-all hover:scale-105">
+                      Registrar mi centro
+                      <ArrowRight size={20} className="ml-2" />
+                    </Button>
+                  </Link>
+                  <a href="https://wa.me/34616684214?text=Hola%2C%20me%20interesa%20FacultyMatch%20para%20mi%20instituci%C3%B3n" target="_blank" rel="noopener noreferrer" className="text-center text-white/60 font-bold hover:text-white transition-colors text-sm py-2">
+                    Hablar con un asesor →
+                  </a>
+                </div>
               </div>
             </div>
           </div>
-          </section>
+        </section>
         </main>
       </div>
     );

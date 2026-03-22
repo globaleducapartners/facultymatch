@@ -17,22 +17,29 @@ export default async function OnboardingPage() {
     .eq("id", user.id)
     .single();
 
-  if (userProfile?.role !== "faculty") {
-    redirect("/dashboard");
+  if (!userProfile) {
+    redirect("/onboarding/role");
+  }
+
+  if (userProfile.role === "institution") {
+    redirect("/app/institution");
+  }
+  if (userProfile.role === "admin" || userProfile.role === "super_admin") {
+    redirect("/app/admin");
   }
 
   // Fetch all profile data for pre-filling
   const { data: profile } = await supabase
     .from("faculty_profiles")
     .select("*")
-    .eq("id", user.id)
+    .eq("user_id", user.id)
     .single();
 
   const initialData = {
     profile: {
-      ...profile,
+      ...(profile ?? {}),
       full_name: userProfile.full_name
-    } || {},
+    },
     languages: profile?.languages || [],
     history: (profile?.institutions_taught || []).map((h: any) => ({ 
       institution: h.institution || h.institution_name, 

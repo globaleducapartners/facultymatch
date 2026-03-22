@@ -11,7 +11,7 @@ import {
   FileText, 
   Users, 
   Lightbulb,
-  Search
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/Navbar";
@@ -29,42 +29,48 @@ const resources = [
     desc: "Guía práctica para instituciones sobre selección, diversificación y fidelización de talento académico global. Aprende a equilibrar perfiles investigadores con expertos profesionales.",
     icon: Building2,
     tag: "Instituciones",
-    readTime: "8 min"
+    readTime: "8 min",
+    href: "/resources/claustro-docente"
   },
   { 
-    title: "Estándares de verificación Talentia", 
+    title: "Estándares de verificación FacultyMatch", 
     desc: "Conoce en detalle los criterios y el proceso de auditoría que aplicamos para validar credenciales académicas, títulos de doctorado y experiencia profesional verificada.",
     icon: ShieldCheck,
     tag: "Calidad",
-    readTime: "5 min"
+    readTime: "5 min",
+    href: "/resources/estandares-verificacion"
   },
   { 
     title: "El futuro de la docencia online y microcredenciales", 
     desc: "Análisis de las tendencias pedagógicas en entornos virtuales y cómo los docentes expertos pueden posicionarse en el mercado de las microcredenciales internacionales.",
     icon: GraduationCap,
     tag: "Tendencias",
-    readTime: "12 min"
+    readTime: "12 min",
+    href: "/resources/docencia-online-microcredenciales"
   },
   { 
-    title: "Guía: Optimiza tu Perfil Docente en Talentia", 
+    title: "Guía: Optimiza tu Perfil Docente en FacultyMatch", 
     desc: "Mejores prácticas para destacar tu trayectoria académica. Cómo estructurar tus áreas de conocimiento y subir evidencias que generen confianza en las universidades.",
     icon: FileText,
     tag: "Docentes",
-    readTime: "6 min"
+    readTime: "6 min",
+    href: "/resources/optimiza-perfil-docente"
   },
   { 
     title: "Taxonomía Académica Global", 
     desc: "Descubre cómo clasificamos las disciplinas y sub-áreas siguiendo los estándares internacionales. Una herramienta clave para el matching preciso entre oferta y demanda.",
     icon: BookOpen,
     tag: "Estructura",
-    readTime: "10 min"
+    readTime: "10 min",
+    href: "/resources/taxonomia-academica"
   },
   { 
     title: "Estrategias de Reclutamiento en 90 días", 
     desc: "Plan de acción para directores académicos: desde la identificación de necesidades hasta la firma de la colaboración docente mediante nuestra infraestructura conectada.",
     icon: Lightbulb,
     tag: "Gestión",
-    readTime: "15 min"
+    readTime: "15 min",
+    href: "/resources/reclutamiento-90-dias"
   },
 ];
 
@@ -98,7 +104,7 @@ export default function ResourcesPage() {
         {/* Resources Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {resources.map((res, idx) => (
-            <div key={idx} className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm hover:shadow-xl transition-all group flex flex-col relative overflow-hidden">
+              <Link key={idx} href={res.href} className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm hover:shadow-xl transition-all group flex flex-col relative overflow-hidden cursor-pointer">
               <div className="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-bl-[4rem] -z-10 transition-colors group-hover:bg-blue-50/50"></div>
               <div className="bg-white shadow-lg shadow-blue-900/5 text-talentia-blue w-14 h-14 rounded-2xl flex items-center justify-center mb-8 border border-gray-50 group-hover:scale-110 transition-transform">
                 <res.icon size={28} strokeWidth={1.5} />
@@ -117,10 +123,10 @@ export default function ResourcesPage() {
               <p className="text-gray-500 font-medium leading-relaxed mb-8 flex-1">
                 {res.desc}
               </p>
-              <Link href="#" className="inline-flex items-center gap-2 text-talentia-blue font-black text-xs uppercase tracking-widest hover:gap-3 transition-all">
-                Explorar recurso <ArrowRight size={16} />
+                <span className="inline-flex items-center gap-2 text-talentia-blue font-black text-xs uppercase tracking-widest hover:gap-3 transition-all">
+                  Leer artículo <ArrowRight size={16} />
+                </span>
               </Link>
-            </div>
           ))}
         </div>
 
@@ -156,10 +162,11 @@ export default function ResourcesPage() {
           </div>
               <div className="relative">
                 <div className="aspect-[4/3] bg-gray-50 rounded-[2.5rem] overflow-hidden relative">
-                    <Image 
-                        src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop" 
-                        alt="Knowledge Center" 
+                    <Image
+                        src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop"
+                        alt="Knowledge Center"
                         fill
+                        sizes="(max-width: 1024px) 100vw, 50vw"
                         className="object-cover"
                     />
                 </div>
@@ -172,30 +179,59 @@ export default function ResourcesPage() {
         </section>
 
         {/* Newsletter / CTA */}
-        <section className="bg-talentia-blue rounded-[4rem] p-12 lg:p-24 text-center text-white space-y-8 relative overflow-hidden shadow-2xl shadow-blue-900/20">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-tech-cyan/20 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl"></div>
-          
-          <div className="relative z-10 space-y-10 max-w-4xl mx-auto">
-            <h2 className="text-4xl lg:text-6xl font-black tracking-tight leading-tight">
-              Recibe el Reporte <span className="text-tech-cyan">Talentia Monthly.</span>
-            </h2>
-            <p className="text-xl text-white/80 font-medium max-w-2xl mx-auto">
-              Únete a más de 10,000 académicos e instituciones suscritos a las últimas tendencias en educación superior global.
-            </p>
-            <form className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-2xl mx-auto bg-white/10 p-2 rounded-[2.5rem] backdrop-blur-md border border-white/20">
-              <input 
-                type="email" 
-                placeholder="tu@email-universitario.edu" 
-                className="w-full px-8 py-4 rounded-[2rem] bg-transparent text-white placeholder:text-white/50 focus:outline-none font-bold"
-              />
-              <Button className="w-full sm:w-auto bg-white text-talentia-blue hover:bg-gray-100 font-black h-14 px-10 rounded-[2rem] text-lg transition-all shadow-xl">
-                Suscribirme
-              </Button>
-            </form>
-            <p className="text-xs font-bold uppercase tracking-widest text-white/40">
-              Sin spam. Solo conocimiento de alto impacto académico.
-            </p>
+        <section className="relative rounded-[4rem] overflow-hidden shadow-2xl shadow-blue-900/20 min-h-[500px] flex items-center">
+          <div className="absolute inset-0">
+            <Image
+              src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1800"
+              alt="Biblioteca universitaria"
+              fill
+              sizes="100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-navy/88"></div>
+          </div>
+          <div className="relative z-10 w-full px-10 py-20 lg:px-24 grid lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-tech-cyan text-xs font-black uppercase tracking-widest">
+                <BookOpen size={14} /> FacultyMatch Monthly
+              </div>
+              <h2 className="text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
+                El reporte mensual de la educación superior global.
+              </h2>
+              <p className="text-lg text-white/70 font-medium leading-relaxed">
+                Tendencias de reclutamiento, cambios regulatorios, nuevas oportunidades docentes y análisis del mercado académico internacional. Directo a tu correo, una vez al mes.
+              </p>
+              <div className="flex flex-wrap gap-4 text-xs font-black uppercase tracking-widest text-white/50">
+                <span className="flex items-center gap-1.5"><CheckCircle2 size={12} /> Cero spam</span>
+                <span className="flex items-center gap-1.5"><CheckCircle2 size={12} /> Cancelable siempre</span>
+                <span className="flex items-center gap-1.5"><CheckCircle2 size={12} /> Solo lo relevante</span>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <form className="bg-white/10 backdrop-blur-md border border-white/20 rounded-[2rem] p-6 space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-white/60">Nombre</label>
+                  <input
+                    type="text"
+                    placeholder="Dr. María González"
+                    className="w-full px-5 py-3.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-tech-cyan font-medium"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-white/60">Correo institucional</label>
+                  <input
+                    type="email"
+                    placeholder="nombre@universidad.edu"
+                    className="w-full px-5 py-3.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-tech-cyan font-medium"
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-energy-orange hover:bg-orange-500 text-white font-black h-14 rounded-xl text-base shadow-xl transition-all hover:scale-[1.02]">
+                  Suscribirme al Reporte Mensual
+                  <ArrowRight size={18} className="ml-2" />
+                </Button>
+              </form>
+              <p className="text-center text-xs font-bold text-white/30 uppercase tracking-widest">Más de 8.000 académicos ya suscritos</p>
+            </div>
           </div>
         </section>
       </main>

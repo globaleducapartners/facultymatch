@@ -37,7 +37,7 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
         <div className="flex flex-col md:flex-row gap-6">
           <div className="w-24 h-24 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-200 shrink-0 border border-gray-100 overflow-hidden relative">
             {educator.avatar_url ? (
-              <Image src={educator.avatar_url} alt={educator.full_name} fill className="object-cover" />
+              <Image src={educator.avatar_url} alt={educator.full_name} fill sizes="96px" className="object-cover" />
             ) : (
               <div className="bg-talentia-blue/10 text-talentia-blue w-full h-full flex items-center justify-center">
                 <span className="text-2xl font-black">{educator.full_name?.substring(0, 2).toUpperCase()}</span>

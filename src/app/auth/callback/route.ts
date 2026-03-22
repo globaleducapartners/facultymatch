@@ -1,52 +1,99 @@
 import { createClient } from '@/lib/supabase-server';
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
+// Admin client to read faculty_leads (bypasses RLS — leads have no SELECT policy)
+const supabaseAdmin = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);
+
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
+  // Always redirect to canonical production domain
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://facultymatch.app';
   const code = searchParams.get('code');
+  const next = searchParams.get('next') ?? '/dashboard';
 
   if (code) {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-        const supabase = await createClient();
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-        if (!error) {
-          const next = searchParams.get('next');
-          
-          if (next && next !== '/') {
-            return NextResponse.redirect(`${origin}${next}`);
-          }
+    if (!error) {
+      const { data: { user } } = await supabase.auth.getUser();
 
-          const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('role')
-            .single();
-          
-          if (!profile) {
-            // New SSO user, role should be created by trigger, but if not:
-            return NextResponse.redirect(`${origin}/onboarding`);
-          }
+      if (user) {
+        // Try to pre-populate faculty_profiles from faculty_leads if this is
+        // a fresh magic-link login from the /apply form
+        try {
+          const { data: lead } = await supabaseAdmin
+            .from('faculty_leads')
+            .select('*')
+            .eq('email', user.email)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
-          if (profile.role === 'faculty') {
-            // Check if faculty profile is already completed (e.g., has headline)
-            const { data: facultyProfile } = await supabase
+          if (lead) {
+            // Upsert faculty_profiles with data from the apply form
+            await supabaseAdmin
               .from('faculty_profiles')
-              .select('headline')
-              .eq('id', (await supabase.auth.getUser()).data.user?.id)
-              .single();
-            
-            if (!facultyProfile?.headline) {
-              return NextResponse.redirect(`${origin}/onboarding`);
+              .upsert({
+                user_id: user.id,
+                bio: lead.bio ?? undefined,
+                location: lead.city
+                  ? [lead.city, lead.country].filter(Boolean).join(', ')
+                  : lead.country ?? undefined,
+                linkedin_url: lead.linkedin_url ?? undefined,
+                modalities: lead.modalities ?? undefined,
+                visibility: 'public',
+                is_active: true,
+                updated_at: new Date().toISOString(),
+              }, { onConflict: 'user_id' });
+
+            // Update user_profiles with full_name from lead
+            if (lead.full_name) {
+              await supabaseAdmin
+                .from('user_profiles')
+                .update({ full_name: lead.full_name })
+                .eq('id', user.id);
             }
-            return NextResponse.redirect(`${origin}/app/faculty`);
-          } else if (profile.role === 'institution') {
-            return NextResponse.redirect(`${origin}/app/institution`);
           }
-          
-          return NextResponse.redirect(`${origin}/`);
+        } catch (e) {
+          // Non-fatal — just skip pre-population
+          console.warn('[callback] lead pre-population failed:', e);
         }
+
+        // Determine where to send the user
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('role, onboarding_completed')
+          .eq('id', user.id)
+          .single();
+
+        let destination = next;
+        if (next === '/dashboard' || next.startsWith('/dashboard')) {
+          if (!profile?.role) {
+            destination = '/onboarding/role';
+          } else if (profile.role === 'faculty' && !profile.onboarding_completed) {
+            destination = '/onboarding';
+          } else if (profile.role === 'faculty') {
+            destination = '/app/faculty';
+          } else if (profile.role === 'institution') {
+            destination = '/app/institution';
+          } else if (profile.role === 'admin' || profile.role === 'super_admin') {
+              destination = '/control';
+            }
+        }
+
+        const redirectUrl = new URL(destination, origin);
+        return NextResponse.redirect(redirectUrl.toString());
+      }
     }
+  }
 
-
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/login?error=Could not authenticate user`);
+  // Authentication failed
+  const errorUrl = new URL('/login?error=Could not authenticate user', origin);
+  return NextResponse.redirect(errorUrl.toString());
 }

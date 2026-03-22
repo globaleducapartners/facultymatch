@@ -3,3 +3,85 @@
 2026-03-04T00:55:31.136Z [console][warn] Image with src "/logo.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
 2026-03-04T00:55:31.136Z [console][warn] Image with src "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=800" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
 2026-03-04T00:55:31.136Z [console][warn] Image with src "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+2026-03-05T17:46:32.896Z [console][error] %c%s%c  [33m[1m⚠[22m[39m metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase background: #e6e6e6;background: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.25));color: #000000;color: light-dark(#000000, #ffffff);border-radius: 2px  Server  
+2026-03-06T21:24:59.561Z [console][log] [Fast Refresh] rebuilding
+2026-03-06T21:24:59.670Z [console][log] [Fast Refresh] done in 59ms
+2026-03-06T21:24:59.746Z [console][debug] __ORCHIDS_NAVIGATE__ http://localhost:3000/resources
+2026-03-06T21:25:44.345Z [console][log] [Fast Refresh] rebuilding
+2026-03-06T21:25:44.406Z [console][log] [Fast Refresh] done in 104ms
+2026-03-06T21:26:15.667Z [console][log] [Fast Refresh] rebuilding
+2026-03-06T21:26:15.695Z [console][log] [Fast Refresh] done in 92ms
+2026-03-06T21:26:15.821Z [console][log] [Fast Refresh] rebuilding
+2026-03-06T21:26:15.835Z [console][log] [Fast Refresh] done in 115ms
+2026-03-06T21:26:15.927Z [console][debug] __ORCHIDS_NAVIGATE__ http://localhost:3000/resources
+2026-03-06T21:26:42.651Z [console][log] [Fast Refresh] rebuilding
+2026-03-06T21:26:42.763Z [console][log] [Fast Refresh] done in 11ms
+2026-03-06T21:26:42.838Z [console][debug] __ORCHIDS_NAVIGATE__ http://localhost:3000/resources
+2026-03-06T21:27:08.770Z [console][log] [Fast Refresh] rebuilding
+2026-03-06T21:27:08.772Z [console][log] [Fast Refresh] done in 104ms
+2026-03-06T21:24:59.686Z [network][GET 200] 
+  response: 2:I["[project]/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"SegmentViewNode"]
+4:"$Sreact.fragment"
+17:I["[project]/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+19:I["[project]/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+32:"$Sreact.forward_ref"
+3a:I["[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js","/_next/static/chunks/node_modules_5a5272a6._.js","/_next/static/chunks/src_components_layout_Navbar_tsx_f4db4674._.js","/_next/static/chunks/src_app_resources_page_tsx_d3bf64e3._.js"],"default"]
+45:"$Sreact.forward_ref"
+59:I["[project]/src/components/layout/ConditionalFooter.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"ConditionalFooter"]
+5b:I["[project]/src/components/layout/CookieConsent.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"CookieConsent"]
+5d:I["[project]/node_modules/orchids-visual-edits/dist/index.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chu... [truncated]
+2026-03-06T21:24:59.743Z [network][GET 200] 
+  response: 2:I["[project]/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"SegmentViewNode"]
+4:"$Sreact.fragment"
+17:I["[project]/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+19:I["[project]/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+32:"$Sreact.forward_ref"
+3a:I["[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js","/_next/static/chunks/node_modules_5a5272a6._.js","/_next/static/chunks/src_components_layout_Navbar_tsx_f4db4674._.js","/_next/static/chunks/src_app_resources_page_tsx_d3bf64e3._.js"],"default"]
+45:"$Sreact.forward_ref"
+59:I["[project]/src/components/layout/ConditionalFooter.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"ConditionalFooter"]
+5b:I["[project]/src/components/layout/CookieConsent.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"CookieConsent"]
+5d:I["[project]/node_modules/orchids-visual-edits/dist/index.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chu... [truncated]
+2026-03-06T21:26:15.873Z [network][GET 200] 
+  response: 2:I["[project]/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"SegmentViewNode"]
+4:"$Sreact.fragment"
+17:I["[project]/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+19:I["[project]/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+32:"$Sreact.forward_ref"
+3a:I["[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js","/_next/static/chunks/node_modules_5a5272a6._.js","/_next/static/chunks/src_components_layout_Navbar_tsx_f4db4674._.js","/_next/static/chunks/src_app_resources_page_tsx_d3bf64e3._.js"],"default"]
+45:"$Sreact.forward_ref"
+59:I["[project]/src/components/layout/ConditionalFooter.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"ConditionalFooter"]
+5b:I["[project]/src/components/layout/CookieConsent.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"CookieConsent"]
+5d:I["[project]/node_modules/orchids-visual-edits/dist/index.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chu... [truncated]
+2026-03-06T21:26:15.924Z [network][GET 200] 
+  response: 2:I["[project]/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"SegmentViewNode"]
+4:"$Sreact.fragment"
+17:I["[project]/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+19:I["[project]/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+32:"$Sreact.forward_ref"
+3a:I["[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js","/_next/static/chunks/node_modules_5a5272a6._.js","/_next/static/chunks/src_components_layout_Navbar_tsx_f4db4674._.js","/_next/static/chunks/src_app_resources_page_tsx_d3bf64e3._.js"],"default"]
+45:"$Sreact.forward_ref"
+59:I["[project]/src/components/layout/ConditionalFooter.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"ConditionalFooter"]
+5b:I["[project]/src/components/layout/CookieConsent.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"CookieConsent"]
+5d:I["[project]/node_modules/orchids-visual-edits/dist/index.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chu... [truncated]
+2026-03-06T21:26:42.777Z [network][GET 200] 
+  response: 2:I["[project]/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"SegmentViewNode"]
+4:"$Sreact.fragment"
+17:I["[project]/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+19:I["[project]/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+32:"$Sreact.forward_ref"
+3a:I["[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js","/_next/static/chunks/node_modules_5a5272a6._.js","/_next/static/chunks/src_components_layout_Navbar_tsx_f4db4674._.js","/_next/static/chunks/src_app_resources_page_tsx_d3bf64e3._.js"],"default"]
+45:"$Sreact.forward_ref"
+59:I["[project]/src/components/layout/ConditionalFooter.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"ConditionalFooter"]
+5b:I["[project]/src/components/layout/CookieConsent.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"CookieConsent"]
+5d:I["[project]/node_modules/orchids-visual-edits/dist/index.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chu... [truncated]
+2026-03-06T21:26:42.839Z [network][GET 200] 
+  response: 2:I["[project]/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"SegmentViewNode"]
+4:"$Sreact.fragment"
+17:I["[project]/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+19:I["[project]/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_next_dist_8db7fb1f._.js","/_next/static/chunks/src_app_favicon_ico_mjs_243aa161._.js"],"default"]
+32:"$Sreact.forward_ref"
+3a:I["[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js","/_next/static/chunks/node_modules_5a5272a6._.js","/_next/static/chunks/src_components_layout_Navbar_tsx_f4db4674._.js","/_next/static/chunks/src_app_resources_page_tsx_d3bf64e3._.js"],"default"]
+45:"$Sreact.forward_ref"
+59:I["[project]/src/components/layout/ConditionalFooter.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"ConditionalFooter"]
+5b:I["[project]/src/components/layout/CookieConsent.tsx [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chunks/src_app_layout_tsx_0a548d63._.js"],"CookieConsent"]
+5d:I["[project]/node_modules/orchids-visual-edits/dist/index.js [app-client] (ecmascript)",["/_next/static/chunks/node_modules_aaa7990f._.js","/_next/static/chunks/src_components_5ca30164._.js","/_next/static/chu... [truncated]

@@ -61,7 +61,7 @@ export function Sidebar() {
   let navItems = educatorItems;
   if (pathname?.startsWith("/app/institution")) {
     navItems = institutionItems;
-  } else if (pathname?.startsWith("/app/admin")) {
+  } else if (pathname?.startsWith("/app/admin") || pathname?.startsWith("/control")) {
     navItems = adminItems;
   }
 

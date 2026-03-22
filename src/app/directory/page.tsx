@@ -1,131 +1,100 @@
 import Link from "next/link";
-import Image from "next/image";
-import type { Metadata } from "next";
-import { Globe, ArrowRight, Book, Briefcase, Cpu, HeartPulse, Scale, GraduationCap, Palette } from "lucide-react";
+import { createClient } from "@/lib/supabase-server";
+import { redirect } from "next/navigation";
+import { Building2, Search, ArrowRight } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 
-export const metadata: Metadata = {
-  title: "Directorio Académico | FacultyMatch",
-  description: "Explora nuestra red global de talento docente por áreas de conocimiento y especialidades.",
-};
+export default async function DirectoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ area?: string }>;
+}) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const params = await searchParams;
+  const area = params.area;
 
-const categories = [
-  { 
-    name: "Business & Management", 
-    icon: Briefcase, 
-    subareas: ["Marketing", "Finanzas", "RRHH", "Estrategia", "Emprendimiento"],
-    color: "bg-navy"
-  },
-  { 
-    name: "Ingeniería & Tech", 
-    icon: Cpu, 
-    subareas: ["IA & Data Science", "Software", "Ciberseguridad", "Robótica", "Energía"],
-    color: "bg-tech-cyan"
-  },
-  { 
-    name: "Salud & Ciencias", 
-    icon: HeartPulse, 
-    subareas: ["Medicina", "Enfermería", "Biotecnología", "Psicología", "Farmacia"],
-    color: "bg-talentia-blue"
-  },
-  { 
-    name: "Derecho & Política", 
-    icon: Scale, 
-    subareas: ["Derecho Digital", "Relaciones Internacionales", "Derecho Civil", "Administración Pública"],
-    color: "bg-energy-orange"
-  },
-  { 
-    name: "Educación", 
-    icon: GraduationCap, 
-    subareas: ["Innovación Educativa", "E-learning", "Pedagogía", "Gestión Académica"],
-    color: "bg-navy"
-  },
-  { 
-    name: "Artes & Humanidades", 
-    icon: Palette, 
-    subareas: ["Diseño", "Historia", "Filosofía", "Literatura", "Comunicación"],
-    color: "bg-energy-orange"
-  },
-];
+  if (user) {
+    const { data: profile } = await supabase
+      .from("user_profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
 
-export default function DirectoryPage() {
+    if (profile?.role === "institution") {
+      redirect("/app/institution");
+    }
+
+    if (profile?.role === "faculty") {
+      return (
+        <>
+          <Navbar />
+          <main className="min-h-screen bg-[#F8FAFC] flex items-center justify-center px-6">
+            <div className="max-w-md text-center space-y-6">
+              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto">
+                <Search size={28} className="text-talentia-blue" />
+              </div>
+              <h1 className="text-2xl font-black text-navy">
+                El directorio es exclusivo para instituciones
+              </h1>
+              <p className="text-gray-500 font-medium">
+                Como docente, accede a tu perfil para gestionar tu visibilidad.
+              </p>
+              <Link
+                href="/app/faculty"
+                className="inline-flex items-center gap-2 bg-talentia-blue text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition-all"
+              >
+                Mi perfil <ArrowRight size={18} />
+              </Link>
+            </div>
+          </main>
+        </>
+      );
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <>
       <Navbar />
-
-      <main className="max-w-7xl mx-auto px-6 py-16 lg:py-24 space-y-16">
-          <div className="text-center space-y-4 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-navy text-tech-cyan text-[10px] font-black uppercase tracking-[0.2em] mb-4">
-              <GraduationCap size={14} /> Categoría Universitario
-            </div>
-            <h1 className="text-4xl lg:text-6xl font-black text-navy tracking-tight">Directorio de Talento Académico</h1>
-            <p className="text-xl text-gray-500 font-medium leading-relaxed">
-              Explora nuestra infraestructura de conocimiento conectada globalmente con estándares de educación superior.
-            </p>
+      <main className="min-h-screen bg-[#F8FAFC] flex items-center justify-center px-6 py-20">
+        <div className="max-w-lg text-center space-y-8">
+          <div className="w-16 h-16 bg-navy rounded-2xl flex items-center justify-center mx-auto">
+            <Building2 size={28} className="text-white" />
           </div>
-
-          <div className="relative h-64 lg:h-96 rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white">
-            <Image 
-              src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1600&auto=format&fit=crop" 
-              alt="Comunidad Académica" 
-              fill
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-navy/60 to-transparent"></div>
-            <div className="absolute bottom-8 left-12">
-              <p className="text-white text-2xl font-black">Conectando Facultades en 45 países</p>
-            </div>
+          {area && (
+            <span className="inline-block px-4 py-2 bg-blue-50 text-talentia-blue text-sm font-bold rounded-full border border-blue-100">
+              Área: {decodeURIComponent(area).replace(/-/g, " & ")}
+            </span>
+          )}
+          <h1 className="text-3xl font-black text-navy leading-tight">
+            Directorio de Docentes Verificados
+          </h1>
+          <p className="text-gray-500 font-medium text-lg leading-relaxed">
+            Accede con tu cuenta institucional para explorar perfiles verificados
+            y encontrar el profesorado adecuado para tus programas.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/signup?role=institution"
+              className="flex items-center justify-center gap-2 bg-navy text-white px-8 py-4 rounded-xl font-bold hover:bg-navy/90 transition-all"
+            >
+              Registrar mi institución <ArrowRight size={18} />
+            </Link>
+            <Link
+              href="/login"
+              className="flex items-center justify-center gap-2 border-2 border-gray-200 text-navy px-8 py-4 rounded-xl font-bold hover:border-navy transition-all"
+            >
+              Ya tengo cuenta
+            </Link>
           </div>
-
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {categories.map((cat, idx) => (
-            <Card key={idx} category={cat} />
-          ))}
+          <p className="text-sm text-gray-400">
+            ¿Eres docente?{" "}
+            <Link href="/apply" className="text-talentia-blue font-bold hover:underline">
+              Crea tu perfil aquí
+            </Link>
+          </p>
         </div>
-
-        {/* SEO Content Section */}
-        <section className="bg-white rounded-[3rem] p-12 border border-gray-100 shadow-sm space-y-8">
-          <h2 className="text-3xl font-black text-navy">¿Por qué usar el directorio de Talentia?</h2>
-          <div className="grid md:grid-cols-2 gap-12">
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold text-talentia-blue">Acceso a perfiles verificados</h3>
-              <p className="text-gray-500 font-medium leading-relaxed">
-                A diferencia de otras plataformas, Talentia verifica la identidad y las credenciales académicas de cada docente, asegurando la máxima calidad para las instituciones.
-              </p>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold text-talentia-blue">Estructura académica real</h3>
-              <p className="text-gray-500 font-medium leading-relaxed">
-                Nuestra taxonomía está diseñada siguiendo los estándares internacionales de educación superior, facilitando el matching entre necesidades curriculares y expertos.
-              </p>
-            </div>
-          </div>
-        </section>
       </main>
-    </div>
-  );
-}
-
-
-function Card({ category }: { category: any }) {
-  return (
-    <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all group">
-      <div className={`${category.color} w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform shadow-lg`}>
-        <category.icon size={28} />
-      </div>
-      <h3 className="text-2xl font-black text-navy mb-6 leading-tight">{category.name}</h3>
-      <ul className="space-y-3 mb-8">
-        {category.subareas.map((sub: string, i: number) => (
-          <li key={i} className="flex items-center gap-3 text-gray-500 font-medium text-sm group/item cursor-pointer hover:text-talentia-blue transition-colors">
-            <div className="w-1 h-1 rounded-full bg-gray-200 group-hover/item:bg-talentia-blue group-hover/item:scale-150 transition-all" />
-            {sub}
-          </li>
-        ))}
-      </ul>
-      <Link href="#" className="inline-flex items-center gap-2 text-talentia-blue font-black text-xs uppercase tracking-widest hover:gap-3 transition-all">
-        Explorar área <ArrowRight size={16} />
-      </Link>
-    </div>
+    </>
   );
 }

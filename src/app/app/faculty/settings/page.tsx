@@ -13,16 +13,16 @@ export default async function SettingsPage() {
   if (!user) return null;
 
     const { data: facultyProfile } = await supabase
-      .from("faculty_profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+        .from("faculty_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
   
     async function updateNotifications(enabled: boolean) {
       "use server";
       const supabase = await createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      await supabase.from("faculty_profiles").update({ is_active: enabled }).eq("id", user!.id);
+      await supabase.from("faculty_profiles").update({ is_active: enabled }).eq("user_id", user!.id);
       revalidatePath("/app/faculty/settings");
     }
   

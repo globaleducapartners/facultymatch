@@ -18,7 +18,7 @@ export default async function InstitutionDashboard({
   const { data: institution } = await supabase
     .from("institutions")
     .select("*")
-    .eq("id", user!.id)
+    .eq("user_id", user!.id)
     .single();
 
   // Fetch favorites to show in the UI

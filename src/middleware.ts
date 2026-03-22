@@ -29,10 +29,19 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const pathname = request.nextUrl.pathname;
 
-  // Rutas protegidas: SOLO app/admin
-  const isProtected = pathname.startsWith("/app") || pathname.startsWith("/admin");
+  // /control is guarded by its own layout — middleware only checks auth
+  const isControlRoute = pathname === "/control" || pathname.startsWith("/control/");
 
-  // ✅ Si NO hay usuario y entra a protegido → /login?next=/ruta
+  // Rutas protegidas: SOLO /app/* y /admin/*
+  const isAppRoute =
+    pathname === "/app" ||
+    pathname.startsWith("/app/") ||
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/");
+
+  const isProtected = isAppRoute || isControlRoute;
+
+  // Si NO hay usuario y entra a protegido → /login?next=/ruta
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
@@ -40,9 +49,39 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Solo para rutas /app/* comprobamos rol (no para /control — su layout lo gestiona)
+  if (user && isAppRoute && !pathname.startsWith("/onboarding") && !pathname.startsWith("/auth")) {
+    const { data: profile } = await supabase
+      .from("user_profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile?.role) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/onboarding/role";
+      return NextResponse.redirect(url);
+    }
+
+    // Evitar que un faculty acceda a /app/institution y viceversa
+    const role = profile.role;
+    if (role === "faculty" && pathname.startsWith("/app/institution")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/app/faculty";
+      return NextResponse.redirect(url);
+    }
+    if (role === "institution" && pathname.startsWith("/app/faculty")) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/app/institution";
+      return NextResponse.redirect(url);
+    }
+  }
+
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api/).*)",
+  ],
 };

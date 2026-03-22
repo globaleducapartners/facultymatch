@@ -17,10 +17,10 @@ export default async function PrivacyPage() {
   }
 
   const { data: facultyProfile } = await supabase
-    .from("faculty_profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+      .from("faculty_profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
 
   const { data: visibilityRules } = await supabase
     .from("visibility_rules")
@@ -36,10 +36,10 @@ export default async function PrivacyPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     
-    await supabase
-      .from("faculty_profiles")
-      .update({ visibility: mode })
-      .eq("id", user.id);
+      await supabase
+        .from("faculty_profiles")
+        .update({ visibility: mode })
+        .eq("user_id", user.id);
       
     revalidatePath("/app/faculty/privacy");
   }
@@ -60,7 +60,7 @@ export default async function PrivacyPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data: faculty } = await supabase.from("faculty_profiles").select("id").eq("id", user.id).single();
+    const { data: faculty } = await supabase.from("faculty_profiles").select("id").eq("user_id", user.id).single();
     
     // Search for institution
     const { data: inst } = await supabase.from("institutions").select("id").ilike("name", `%${name}%`).limit(1).single();

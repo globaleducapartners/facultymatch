@@ -1,11 +1,11 @@
 import { createClient } from "@/lib/supabase-server";
 import { notFound, redirect } from "next/navigation";
 import { 
-  GraduationCap, Globe, MapPin, Award, Star, Mail, 
-  Briefcase, BookOpen, ExternalLink, FileText, 
-  Calendar, CheckCircle2, ShieldCheck, ChevronRight,
-  Languages, Building2, Search
-} from "lucide-react";
+    GraduationCap, Globe, MapPin, Award, Star, Mail, 
+    Briefcase, BookOpen, ExternalLink, FileText, 
+    Calendar, CheckCircle2, ShieldCheck, ChevronRight,
+    Languages, Building2, Search, Sparkles
+  } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
