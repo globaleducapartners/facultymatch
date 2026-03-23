@@ -25,7 +25,7 @@ export default function ResetPasswordPage() {
     setError(null);
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.facultymatch.app'}/update-password`,
+      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.facultymatch.app'}/auth/callback?next=/update-password`,
     });
 
     if (error) {

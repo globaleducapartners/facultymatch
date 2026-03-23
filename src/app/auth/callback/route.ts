@@ -21,6 +21,13 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      // Detectar si es un flujo de recovery (reset de contraseña)
+      // En este caso next viene como /update-password desde el email
+      if (next && next.startsWith('/update-password')) {
+        const redirectUrl = new URL('/update-password', origin);
+        return NextResponse.redirect(redirectUrl.toString());
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user) {
