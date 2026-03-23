@@ -168,7 +168,7 @@ function LoginContent() {
             <div className="space-y-1.5">
               <div className="flex justify-between items-center ml-1">
                 <label className="text-xs font-black uppercase tracking-widest text-gray-500">Contraseña</label>
-                <Link href="#" className="text-[11px] font-bold text-talentia-blue hover:underline">¿Olvidaste tu contraseña?</Link>
+                <Link href="/reset-password" className="text-[11px] font-bold text-talentia-blue hover:underline">¿Olvidaste tu contraseña?</Link>
               </div>
               <input
                 name="password"

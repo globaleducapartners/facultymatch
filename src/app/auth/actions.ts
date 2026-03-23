@@ -4,6 +4,10 @@ import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { sendWelcomeEmail } from "@/lib/emails/service";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = process.env.RESEND_FROM_EMAIL || 'FacultyMatch <noreply@facultymatch.app>';
 
 export async function signUp(formData: FormData, isSSO: boolean = false) {
   const email = formData.get("email") as string;
@@ -209,6 +213,85 @@ export async function contactFaculty(formData: FormData) {
 
   if (error) {
     return { error: error.message };
+  }
+
+  // Obtener datos del docente y la institución para el email
+  const supabaseAdmin = createAdminClient();
+
+  const { data: facultyUser } = await supabaseAdmin
+    .from('user_profiles')
+    .select('full_name')
+    .eq('id', facultyId)
+    .single();
+
+  const { data: institutionData } = await supabaseAdmin
+    .from('institutions')
+    .select('name')
+    .eq('id', institutionId)
+    .single();
+
+  // Email al docente notificándole del contacto
+  if (facultyUser) {
+    const { data: facultyAuth } = await supabaseAdmin.auth.admin.getUserById(facultyId);
+    if (facultyAuth?.user?.email) {
+      try {
+        await resend.emails.send({
+          from: FROM,
+          to: [facultyAuth.user.email],
+          subject: `📬 ${institutionData?.name || 'Una institución'} quiere contactarte en FacultyMatch`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:40px 16px;">
+              <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:40px;">
+                <h1 style="color:#0B1220;font-size:24px;margin:0 0 8px;">
+                  Tienes un nuevo contacto
+                </h1>
+                <p style="color:#64748b;font-size:16px;margin:0 0 24px;">
+                  Hola ${facultyUser.full_name || 'docente'},
+                  <strong style="color:#0B1220;">${institutionData?.name || 'Una institución'}</strong>
+                  quiere ponerse en contacto contigo a través de FacultyMatch.
+                </p>
+                <div style="background:#f1f5f9;border-radius:8px;padding:20px;margin-bottom:24px;">
+                  <p style="margin:0 0 8px;font-size:14px;color:#64748b;">
+                    <strong>Motivo:</strong> ${reason || 'No especificado'}
+                  </p>
+                  <p style="margin:0 0 8px;font-size:14px;color:#64748b;">
+                    <strong>Modalidad:</strong> ${modality || 'No especificada'}
+                  </p>
+                  ${message ? `<p style="margin:0;font-size:14px;color:#64748b;"><strong>Mensaje:</strong> ${message}</p>` : ''}
+                </div>
+                <a href="https://www.facultymatch.app/app/faculty"
+                   style="display:inline-block;background:#2563EB;color:#fff;
+                          padding:14px 28px;border-radius:8px;font-weight:700;
+                          text-decoration:none;font-size:16px;">
+                  Ver el contacto en mi dashboard →
+                </a>
+                <p style="margin:24px 0 0;font-size:12px;color:#94a3b8;">
+                  FacultyMatch · <a href="https://www.facultymatch.app" style="color:#94a3b8;">www.facultymatch.app</a>
+                </p>
+              </div>
+            </div>
+          `,
+        });
+      } catch (emailErr) {
+        console.warn('[contactFaculty] Email to faculty failed:', emailErr);
+      }
+    }
+  }
+
+  // Email interno de alerta al equipo
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: ['info@facultymatch.app'],
+      subject: `🔔 Nuevo contacto: ${institutionData?.name} → ${facultyUser?.full_name}`,
+      html: `<p>Nueva solicitud de contacto.<br>
+             Institución: ${institutionData?.name}<br>
+             Docente ID: ${facultyId}<br>
+             Motivo: ${reason}<br>
+             Mensaje: ${message}</p>`,
+    });
+  } catch (e) {
+    console.warn('[contactFaculty] Internal alert email failed:', e);
   }
 
   revalidatePath("/app/institution/contacts");
