@@ -203,8 +203,8 @@ export default function FacultyPage() {
                   <div className="absolute top-4 right-4 bg-talentia-blue text-white text-[10px] font-black px-3 py-1 rounded-full">RECOMENDADO</div>
                   <h3 className="text-2xl font-black text-navy mb-4">Plan Professional</h3>
                     <div className="mb-6">
-                      <p className="text-4xl font-black text-navy">9,99€ <span className="text-lg text-gray-400 font-bold">/ año</span></p>
-                      <p className="text-xs font-bold text-energy-orange mt-1 uppercase tracking-widest">Promoción primer año · Después 99€/año</p>
+                      <p className="text-4xl font-black text-navy">29€ <span className="text-lg text-gray-400 font-bold">/ año</span></p>
+                      <p className="text-xs font-bold text-energy-orange mt-1 uppercase tracking-widest">Acceso completo · Sin permanencia</p>
                     </div>
                     <ul className="space-y-4 mb-8">
                       <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Todo lo del plan Basic</li>
@@ -213,7 +213,7 @@ export default function FacultyPage() {
                       <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Posicionamiento prioritario</li>
                     </ul>
                     <Link href="/checkout?plan=faculty-pro">
-                      <Button className="w-full bg-talentia-blue hover:bg-blue-700 text-white h-14 rounded-xl font-bold shadow-lg shadow-blue-100">Upgrade Profesional</Button>
+                      <Button className="w-full bg-talentia-blue hover:bg-blue-700 text-white h-14 rounded-xl font-bold shadow-lg shadow-blue-100 hover:scale-105 transition-transform duration-200">Upgrade Profesional</Button>
                     </Link>
                 </div>
               </div>

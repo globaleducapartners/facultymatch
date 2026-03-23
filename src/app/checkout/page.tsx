@@ -1,18 +1,47 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Lock, CreditCard, Smartphone, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, Lock, CreditCard, ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react";
 import type { PlanConfig } from "./plans";
 import { PLANS } from "./plans";
+import { createClient } from "@/lib/supabase-client";
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const planId = searchParams.get("plan") || "faculty-pro";
   const plan: PlanConfig = PLANS[planId] || PLANS["faculty-pro"];
+
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      setUserEmail(data.user?.email ?? null);
+    });
+  }, []);
+
+  const handleCheckout = async () => {
+    setLoading(true);
+    setError(null);
+    const res = await fetch('/api/stripe/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: planId, userEmail }),
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      setError(data.error || 'Error al procesar el pago. Inténtalo de nuevo.');
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -83,61 +112,44 @@ function CheckoutContent() {
           </div>
         </div>
 
-        {/* Right: Payment form placeholder */}
+        {/* Right: Stripe checkout */}
         <div className="space-y-6">
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 space-y-6">
             <h3 className="text-xl font-black text-navy">Método de pago</h3>
 
-            {/* Payment method tabs */}
-            <div className="grid grid-cols-2 gap-3">
-              <button className="flex items-center justify-center gap-2 h-12 rounded-xl border-2 border-talentia-blue bg-blue-50 text-talentia-blue font-black text-sm">
-                <CreditCard size={18} /> Tarjeta
-              </button>
-              <button className="flex items-center justify-center gap-2 h-12 rounded-xl border border-gray-200 text-gray-500 font-bold text-sm hover:border-gray-300 transition-colors">
-                <Smartphone size={18} /> Apple / Google Pay
-              </button>
-            </div>
-
-            {/* Card fields placeholder */}
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-500">Número de tarjeta</label>
-                <div className="w-full px-5 py-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-300 font-mono flex items-center justify-between">
-                  <span>•••• •••• •••• ••••</span>
-                  <CreditCard size={18} className="text-gray-300" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-widest text-gray-500">Caducidad</label>
-                  <div className="w-full px-5 py-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-300 font-mono">MM / AA</div>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-widest text-gray-500">CVC</label>
-                  <div className="w-full px-5 py-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-300 font-mono">•••</div>
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-500">Nombre en la tarjeta</label>
-                <div className="w-full px-5 py-4 rounded-xl border border-gray-200 bg-gray-50 text-gray-300 font-medium">NOMBRE APELLIDO</div>
-              </div>
-            </div>
-
-            {/* Coming soon notice */}
             <div className="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-4 flex items-start gap-3">
               <ShieldCheck size={18} className="text-talentia-blue flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-black text-navy">Pasarela en configuración</p>
-                <p className="text-xs font-medium text-gray-500 mt-0.5">La integración de pagos estará disponible muy pronto. Puedes ponerte en contacto con nosotros para acceso anticipado.</p>
+                <p className="text-sm font-black text-navy">Pago procesado por Stripe</p>
+                <p className="text-xs font-medium text-gray-500 mt-0.5">
+                  Serás redirigido a la pasarela segura de Stripe para completar el pago con tarjeta, Apple Pay o Google Pay.
+                </p>
               </div>
             </div>
 
-            <Button 
-              disabled
-              className="w-full bg-talentia-blue hover:bg-blue-700 text-white font-black h-14 rounded-xl text-base shadow-lg shadow-blue-100 opacity-50 cursor-not-allowed"
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-start gap-3">
+                <AlertCircle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
+                <p className="text-sm font-medium text-red-700">{error}</p>
+              </div>
+            )}
+
+            <Button
+              onClick={handleCheckout}
+              disabled={loading}
+              className="w-full bg-energy-orange hover:bg-orange-600 text-white font-black h-14 rounded-xl text-base shadow-lg shadow-orange-100 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <Lock size={18} className="mr-2" />
-              Pagar {plan.price} de forma segura
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  Redirigiendo a Stripe...
+                </span>
+              ) : (
+                <>
+                  <Lock size={18} className="mr-2" />
+                  Pagar {plan.price} de forma segura
+                </>
+              )}
             </Button>
 
             <p className="text-center text-xs text-gray-400 font-medium">

@@ -12,7 +12,7 @@ const supabaseAdmin = createAdminClient(
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   // Always redirect to canonical production domain
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://facultymatch.app';
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.facultymatch.app';
   const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/dashboard';
 

@@ -51,6 +51,39 @@ const LANGUAGE_OPTIONS = [
   "Otro",
 ];
 
+const DEGREE_TYPES_OPTIONS = [
+  "Grado",
+  "Máster",
+  "Doctorado",
+  "MBA",
+  "Posgrado Propio",
+  "FP Superior",
+  "Certificación Profesional",
+  "Formación Continua",
+];
+
+const ACADEMIC_LEVEL_OPTIONS = [
+  "Graduado/Licenciado",
+  "Máster",
+  "Doctorado (PhD)",
+  "Catedrático/Titular de Universidad",
+];
+
+const HONORARIUM_OPTIONS = [
+  "Menos de 30€/h",
+  "Entre 30 y 60€/h",
+  "Entre 60 y 100€/h",
+  "Más de 100€/h",
+  "Negociable / A consultar",
+];
+
+const WEEKLY_HOURS_OPTIONS = [
+  "Menos de 5h",
+  "Entre 5 y 10h",
+  "Entre 10 y 20h",
+  "Más de 20h",
+];
+
 type FormData = {
   full_name: string;
   email: string;
@@ -59,16 +92,21 @@ type FormData = {
   city: string;
   languages: string[];
   primary_fields: string[];
-  subjects: string;
-  degrees: string;
+  subjects: string[];
+  degree_types: string[];
   current_institution: string;
   is_currently_teaching: boolean;
-  institutions_taught: string;
+  past_institutions: string[];
   years_experience: string;
   linkedin_url: string;
   bio: string;
   modalities: string[];
   availability: string;
+  academic_level: string;
+  aneca_accreditation: boolean;
+  aneca_number: string;
+  honorarium_range: string;
+  weekly_hours: string;
   consent_terms: boolean;
   consent_privacy: boolean;
   consent_marketing: boolean;
@@ -82,16 +120,21 @@ const INITIAL_FORM: FormData = {
   city: "",
   languages: [],
   primary_fields: [],
-  subjects: "",
-  degrees: "",
+  subjects: [],
+  degree_types: [],
   current_institution: "",
   is_currently_teaching: false,
-  institutions_taught: "",
+  past_institutions: [],
   years_experience: "",
   linkedin_url: "",
   bio: "",
   modalities: [],
   availability: "",
+  academic_level: "",
+  aneca_accreditation: false,
+  aneca_number: "",
+  honorarium_range: "",
+  weekly_hours: "",
   consent_terms: false,
   consent_privacy: false,
   consent_marketing: false,
@@ -140,6 +183,78 @@ function TagToggle({
   );
 }
 
+function TagInput({
+  value,
+  onChange,
+  placeholder,
+  maxItems = 20,
+}: {
+  value: string[];
+  onChange: (val: string[]) => void;
+  placeholder?: string;
+  maxItems?: number;
+}) {
+  const [input, setInput] = useState("");
+
+  const add = () => {
+    const trimmed = input.trim();
+    if (trimmed && !value.includes(trimmed) && value.length < maxItems) {
+      onChange([...value, trimmed]);
+    }
+    setInput("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      add();
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          className="flex-1 h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all"
+        />
+        <button
+          type="button"
+          onClick={add}
+          disabled={!input.trim() || value.length >= maxItems}
+          className="h-11 px-4 rounded-xl bg-talentia-blue text-white text-sm font-bold hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1"
+        >
+          <Plus size={16} /> Añadir
+        </button>
+      </div>
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {value.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-blue-50 border border-blue-200 text-navy"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={() => onChange(value.filter((t) => t !== tag))}
+                className="text-gray-400 hover:text-red-500 transition-colors"
+              >
+                <X size={12} />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      <p className="text-xs text-gray-400">{value.length}/{maxItems}</p>
+    </div>
+  );
+}
+
 export default function ApplyPage() {
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>(
@@ -154,19 +269,19 @@ export default function ApplyPage() {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
-    const validate = () => {
-      const newErrors: Partial<Record<keyof FormData, string>> = {};
-      if (!form.full_name.trim()) newErrors.full_name = "El nombre es obligatorio.";
-      if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-        newErrors.email = "Introduce un email válido.";
-      if (!form.phone.trim()) newErrors.phone = "El teléfono es obligatorio.";
-      if (!form.country.trim()) newErrors.country = "El país es obligatorio.";
-      if (!form.consent_terms)
-        newErrors.consent_terms = "Debes aceptar los términos y condiciones.";
-      if (!form.consent_privacy)
-        newErrors.consent_privacy = "Debes aceptar la política de privacidad.";
-      return newErrors;
-    };
+  const validate = () => {
+    const newErrors: Partial<Record<keyof FormData, string>> = {};
+    if (!form.full_name.trim()) newErrors.full_name = "El nombre es obligatorio.";
+    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+      newErrors.email = "Introduce un email válido.";
+    if (!form.phone.trim()) newErrors.phone = "El teléfono es obligatorio.";
+    if (!form.country.trim()) newErrors.country = "El país es obligatorio.";
+    if (!form.consent_terms)
+      newErrors.consent_terms = "Debes aceptar los términos y condiciones.";
+    if (!form.consent_privacy)
+      newErrors.consent_privacy = "Debes aceptar la política de privacidad.";
+    return newErrors;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,41 +296,39 @@ export default function ApplyPage() {
 
     setLoading(true);
     try {
-        const payload = {
-          full_name: form.full_name.trim(),
-          email: form.email.trim().toLowerCase(),
-          phone: form.phone.trim() || null,
-          country: form.country.trim() || null,
-          city: form.city.trim() || null,
-          languages: form.languages.length > 0 ? form.languages : null,
-          primary_fields: form.primary_fields.length > 0 ? form.primary_fields : null,
-          subjects: form.subjects
-            ? form.subjects.split(",").map((s) => s.trim()).filter(Boolean)
-            : null,
-          degrees: form.degrees
-            ? form.degrees.split(",").map((s) => s.trim()).filter(Boolean)
-            : null,
-          current_institution: form.current_institution.trim() || null,
-          is_currently_teaching: form.is_currently_teaching,
-          institutions_taught: form.institutions_taught
-            ? form.institutions_taught.split(",").map((s) => s.trim()).filter(Boolean)
-            : null,
-          years_experience: form.years_experience
-            ? parseInt(form.years_experience, 10)
-            : null,
-          linkedin_url: form.linkedin_url.trim() || null,
-          bio: form.bio.trim() || null,
-          modalities: form.modalities.length > 0 ? form.modalities : null,
-          availability: form.availability || null,
-          consent_terms: form.consent_terms,
-          consent_terms_at: new Date().toISOString(),
-          consent_privacy: form.consent_privacy,
-          consent_privacy_at: new Date().toISOString(),
-          consent_marketing: form.consent_marketing,
-          consent_marketing_at: form.consent_marketing ? new Date().toISOString() : null,
-        };
+      const payload = {
+        full_name: form.full_name.trim(),
+        email: form.email.trim().toLowerCase(),
+        phone: form.phone.trim() || null,
+        country: form.country.trim() || null,
+        city: form.city.trim() || null,
+        languages: form.languages.length > 0 ? form.languages : null,
+        primary_fields: form.primary_fields.length > 0 ? form.primary_fields : null,
+        subjects: form.subjects.length > 0 ? form.subjects : null,
+        degree_types: form.degree_types.length > 0 ? form.degree_types : null,
+        current_institution: form.current_institution.trim() || null,
+        is_currently_teaching: form.is_currently_teaching,
+        past_institutions: form.past_institutions.length > 0 ? form.past_institutions : null,
+        years_experience: form.years_experience
+          ? parseInt(form.years_experience, 10)
+          : null,
+        linkedin_url: form.linkedin_url.trim() || null,
+        bio: form.bio.trim() || null,
+        modalities: form.modalities.length > 0 ? form.modalities : null,
+        availability: form.availability || null,
+        academic_level: form.academic_level || null,
+        aneca_accreditation: form.aneca_accreditation,
+        aneca_number: form.aneca_number.trim() || null,
+        honorarium_range: form.honorarium_range || null,
+        weekly_hours: form.weekly_hours || null,
+        consent_terms: form.consent_terms,
+        consent_terms_at: new Date().toISOString(),
+        consent_privacy: form.consent_privacy,
+        consent_privacy_at: new Date().toISOString(),
+        consent_marketing: form.consent_marketing,
+        consent_marketing_at: form.consent_marketing ? new Date().toISOString() : null,
+      };
 
-      // Submit via API route (handles DB insert + magic link email server-side)
       const res = await fetch("/api/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -243,43 +356,42 @@ export default function ApplyPage() {
             <div className="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto">
               <CheckCircle2 className="text-green-500" size={48} />
             </div>
-              <div className="space-y-3">
-                <h1 className="text-4xl font-black text-navy">
-                  ¡Perfil recibido!
-                </h1>
-                <p className="text-lg text-gray-500 font-medium">
-                  Gracias, <span className="text-navy font-bold">{form.full_name}</span>. Tu solicitud ha sido registrada correctamente.
+            <div className="space-y-3">
+              <h1 className="text-4xl font-black text-navy">
+                ¡Perfil recibido!
+              </h1>
+              <p className="text-lg text-gray-500 font-medium">
+                Gracias, <span className="text-navy font-bold">{form.full_name}</span>. Tu solicitud ha sido registrada correctamente.
+              </p>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-talentia-blue flex items-center justify-center flex-shrink-0">
+                <Mail className="text-white" size={20} />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-navy">Confirma tu correo electrónico</p>
+                <p className="text-sm text-gray-600 font-medium mt-1">
+                  Hemos enviado un enlace de acceso a <span className="font-bold text-talentia-blue">{form.email}</span>. Haz clic en el enlace para acceder a tu perfil y empezar a recibir ofertas de instituciones.
                 </p>
+                <p className="text-xs text-gray-400 font-medium mt-2">Si no lo ves, revisa tu carpeta de spam.</p>
               </div>
+            </div>
 
-              {/* Email confirmation notice */}
-              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-talentia-blue flex items-center justify-center flex-shrink-0">
-                  <Mail className="text-white" size={20} />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-navy">Confirma tu correo electrónico</p>
-                  <p className="text-sm text-gray-600 font-medium mt-1">
-                    Hemos enviado un enlace de acceso a <span className="font-bold text-talentia-blue">{form.email}</span>. Haz clic en el enlace para acceder a tu perfil y empezar a recibir ofertas de instituciones.
-                  </p>
-                  <p className="text-xs text-gray-400 font-medium mt-2">Si no lo ves, revisa tu carpeta de spam.</p>
-                </div>
-              </div>
-
-              <div className="bg-white border border-gray-100 rounded-2xl p-6 text-left space-y-3 shadow-sm">
-                <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Próximos pasos</p>
-                {[
-                  "Confirma tu email haciendo clic en el enlace que te hemos enviado.",
-                  "Revisaremos tu perfil y verificaremos tu experiencia en 48h.",
-                  "Tu perfil estará visible para instituciones universitarias verificadas.",
-                ].map((step, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-talentia-blue text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                      {i + 1}
-                    </div>
-                    <p className="text-sm text-gray-600 font-medium">{step}</p>
+            <div className="bg-white border border-gray-100 rounded-2xl p-6 text-left space-y-3 shadow-sm">
+              <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">Próximos pasos</p>
+              {[
+                "Confirma tu email haciendo clic en el enlace que te hemos enviado.",
+                "Revisaremos tu perfil y verificaremos tu experiencia en 48h.",
+                "Tu perfil estará visible para instituciones universitarias verificadas.",
+              ].map((step, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-talentia-blue text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                    {i + 1}
                   </div>
-                ))}
+                  <p className="text-sm text-gray-600 font-medium">{step}</p>
+                </div>
+              ))}
             </div>
             <Link href="/">
               <Button className="bg-talentia-blue text-white font-bold h-12 px-8 rounded-xl">
@@ -308,6 +420,13 @@ export default function ApplyPage() {
             </h1>
             <p className="text-lg text-gray-500 font-medium max-w-xl">
               Completa tu perfil y conecta con instituciones universitarias de todo el mundo. Es gratis.
+            </p>
+            <p className="text-sm text-gray-400 font-medium mb-6">
+              ¿Ya tienes cuenta?{" "}
+              <Link href="/login" className="text-talentia-blue font-bold hover:underline">
+                Accede aquí
+              </Link>
+              {" "}· Este formulario es para nuevos docentes que quieren unirse a la red.
             </p>
           </div>
 
@@ -380,22 +499,22 @@ export default function ApplyPage() {
                 </div>
 
                 <div className="space-y-1.5" data-error={errors.phone}>
-                    <label className="text-sm font-bold text-navy">
-                      Teléfono <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      value={form.phone}
-                      onChange={(e) => set("phone", e.target.value)}
-                      placeholder="+34 600 000 000"
-                      className={`w-full h-11 px-4 rounded-xl border text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all ${
-                        errors.phone ? "border-red-400 ring-1 ring-red-300" : "border-gray-200"
-                      }`}
-                    />
-                    {errors.phone && (
-                      <p className="text-xs text-red-500 font-medium">{errors.phone}</p>
-                    )}
-                  </div>
+                  <label className="text-sm font-bold text-navy">
+                    Teléfono <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(e) => set("phone", e.target.value)}
+                    placeholder="+34 600 000 000"
+                    className={`w-full h-11 px-4 rounded-xl border text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all ${
+                      errors.phone ? "border-red-400 ring-1 ring-red-300" : "border-gray-200"
+                    }`}
+                  />
+                  {errors.phone && (
+                    <p className="text-xs text-red-500 font-medium">{errors.phone}</p>
+                  )}
+                </div>
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-navy">LinkedIn</label>
@@ -409,20 +528,20 @@ export default function ApplyPage() {
                 </div>
 
                 <div className="space-y-1.5" data-error={errors.country}>
-                    <label className="text-sm font-bold text-navy">País <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      value={form.country}
-                      onChange={(e) => set("country", e.target.value)}
-                      placeholder="España"
-                      className={`w-full h-11 px-4 rounded-xl border text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all ${
-                        errors.country ? "border-red-400 ring-1 ring-red-300" : "border-gray-200"
-                      }`}
-                    />
-                    {errors.country && (
-                      <p className="text-xs text-red-500 font-medium">{errors.country}</p>
-                    )}
-                  </div>
+                  <label className="text-sm font-bold text-navy">País <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    value={form.country}
+                    onChange={(e) => set("country", e.target.value)}
+                    placeholder="España"
+                    className={`w-full h-11 px-4 rounded-xl border text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all ${
+                      errors.country ? "border-red-400 ring-1 ring-red-300" : "border-gray-200"
+                    }`}
+                  />
+                  {errors.country && (
+                    <p className="text-xs text-red-500 font-medium">{errors.country}</p>
+                  )}
+                </div>
 
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-navy">Ciudad</label>
@@ -443,6 +562,46 @@ export default function ApplyPage() {
                 2. Perfil académico
               </h2>
 
+              {/* CAMPO 5: Nivel académico */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-navy">
+                  Nivel académico más alto <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={form.academic_level}
+                  onChange={(e) => set("academic_level", e.target.value)}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all appearance-none"
+                >
+                  <option value="">Selecciona tu nivel…</option>
+                  {ACADEMIC_LEVEL_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* CAMPO 6: Acreditación ANECA */}
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <div
+                    onClick={() => set("aneca_accreditation", !form.aneca_accreditation)}
+                    className={`w-11 h-6 rounded-full flex items-center transition-colors flex-shrink-0 ${form.aneca_accreditation ? "bg-talentia-blue" : "bg-gray-200"}`}
+                  >
+                    <div className={`w-5 h-5 bg-white rounded-full shadow-sm transition-transform mx-0.5 ${form.aneca_accreditation ? "translate-x-5" : "translate-x-0"}`} />
+                  </div>
+                  <span className="text-sm font-bold text-navy">¿Tienes acreditación ANECA?</span>
+                </label>
+                {form.aneca_accreditation && (
+                  <input
+                    type="text"
+                    value={form.aneca_number}
+                    onChange={(e) => set("aneca_number", e.target.value)}
+                    placeholder="Número de acreditación ANECA (opcional)"
+                    className="w-full h-11 px-4 rounded-xl border border-blue-200 text-sm font-medium bg-blue-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all"
+                  />
+                )}
+              </div>
+
+              {/* Áreas de conocimiento */}
               <div className="space-y-1.5">
                 <label className="text-sm font-bold text-navy">Áreas de conocimiento principales</label>
                 <TagToggle
@@ -452,19 +611,28 @@ export default function ApplyPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-navy">Asignaturas / Materias</label>
-                  <input
-                    type="text"
-                    value={form.subjects}
-                    onChange={(e) => set("subjects", e.target.value)}
-                    placeholder="Estrategia, Finanzas, Marketing (separadas por coma)"
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all"
-                  />
-                  <p className="text-xs text-gray-400">Separar con comas</p>
-                </div>
+              {/* CAMPO 2: Asignaturas — TagInput */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-navy">Asignaturas / Materias que imparte</label>
+                <TagInput
+                  value={form.subjects}
+                  onChange={(v) => set("subjects", v)}
+                  placeholder="Ej: Macroeconomía · Enter para añadir"
+                  maxItems={20}
+                />
+              </div>
 
+              {/* CAMPO 3: Titulaciones donde puede impartir — chip multi-select */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-navy">Titulaciones / Grados donde puede impartir</label>
+                <TagToggle
+                  options={DEGREE_TYPES_OPTIONS}
+                  selected={form.degree_types}
+                  onChange={(v) => set("degree_types", v)}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-navy">Años de experiencia docente</label>
                   <input
@@ -477,52 +645,39 @@ export default function ApplyPage() {
                     className="w-full h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all"
                   />
                 </div>
+              </div>
 
-                <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-sm font-bold text-navy">Titulaciones / Grados</label>
+              {/* CAMPO 4: Instituciones donde ha impartido — TagInput */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-navy">Instituciones donde has impartido docencia</label>
+                <TagInput
+                  value={form.past_institutions}
+                  onChange={(v) => set("past_institutions", v)}
+                  placeholder="Ej: Universidad Complutense · Enter para añadir"
+                  maxItems={10}
+                />
+              </div>
+
+              {/* Current institution */}
+              <div className="space-y-3 pt-2">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div
+                    onClick={() => set("is_currently_teaching", !form.is_currently_teaching)}
+                    className={`w-11 h-6 rounded-full flex items-center transition-colors flex-shrink-0 ${form.is_currently_teaching ? "bg-talentia-blue" : "bg-gray-200"}`}
+                  >
+                    <div className={`w-5 h-5 bg-white rounded-full shadow-sm transition-transform mx-0.5 ${form.is_currently_teaching ? "translate-x-5" : "translate-x-0"}`} />
+                  </div>
+                  <span className="text-sm font-bold text-navy">Actualmente soy docente en una institución</span>
+                </label>
+                {form.is_currently_teaching && (
                   <input
                     type="text"
-                    value={form.degrees}
-                    onChange={(e) => set("degrees", e.target.value)}
-                    placeholder="PhD Economía (UC3M), MBA (IE Business School)"
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all"
+                    value={form.current_institution}
+                    onChange={(e) => set("current_institution", e.target.value)}
+                    placeholder="Nombre de la institución actual"
+                    className="w-full h-11 px-4 rounded-xl border border-blue-200 text-sm font-medium bg-blue-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all"
                   />
-                  <p className="text-xs text-gray-400">Separar con comas</p>
-                </div>
-
-                <div className="space-y-1.5 sm:col-span-2">
-                    <label className="text-sm font-bold text-navy">Instituciones donde has impartido docencia</label>
-                    <input
-                      type="text"
-                      value={form.institutions_taught}
-                      onChange={(e) => set("institutions_taught", e.target.value)}
-                      placeholder="Universidad Complutense, ESADE, UAM"
-                      className="w-full h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all"
-                    />
-                    <p className="text-xs text-gray-400">Separar con comas</p>
-                  </div>
-
-                  {/* Current institution */}
-                  <div className="sm:col-span-2 space-y-3 pt-2">
-                    <label className="flex items-center gap-3 cursor-pointer group">
-                      <div
-                        onClick={() => set("is_currently_teaching", !form.is_currently_teaching)}
-                        className={`w-11 h-6 rounded-full flex items-center transition-colors flex-shrink-0 ${form.is_currently_teaching ? 'bg-talentia-blue' : 'bg-gray-200'}`}
-                      >
-                        <div className={`w-5 h-5 bg-white rounded-full shadow-sm transition-transform mx-0.5 ${form.is_currently_teaching ? 'translate-x-5' : 'translate-x-0'}`} />
-                      </div>
-                      <span className="text-sm font-bold text-navy">Actualmente soy docente en una institución</span>
-                    </label>
-                    {form.is_currently_teaching && (
-                      <input
-                        type="text"
-                        value={form.current_institution}
-                        onChange={(e) => set("current_institution", e.target.value)}
-                        placeholder="Nombre de la institución actual"
-                        className="w-full h-11 px-4 rounded-xl border border-blue-200 text-sm font-medium bg-blue-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all"
-                      />
-                    )}
-                  </div>
+                )}
               </div>
 
               <div className="space-y-1.5">
@@ -563,18 +718,49 @@ export default function ApplyPage() {
               </div>
 
               <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-navy">Disponibilidad</label>
-                  <select
-                    value={form.availability}
-                    onChange={(e) => set("availability", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all appearance-none"
-                  >
-                    <option value="">Selecciona tu disponibilidad…</option>
-                    {AVAILABILITY_OPTIONS.map((opt) => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                </div>
+                <label className="text-sm font-bold text-navy">Disponibilidad</label>
+                <select
+                  value={form.availability}
+                  onChange={(e) => set("availability", e.target.value)}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all appearance-none"
+                >
+                  <option value="">Selecciona tu disponibilidad…</option>
+                  {AVAILABILITY_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* CAMPO 8: Horas disponibles por semana */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-navy">Horas disponibles por semana</label>
+                <select
+                  value={form.weekly_hours}
+                  onChange={(e) => set("weekly_hours", e.target.value)}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all appearance-none"
+                >
+                  <option value="">Selecciona un rango…</option>
+                  {WEEKLY_HOURS_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* CAMPO 7: Honorario orientativo */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-navy">Honorario orientativo por hora</label>
+                <select
+                  value={form.honorarium_range}
+                  onChange={(e) => set("honorarium_range", e.target.value)}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all appearance-none"
+                >
+                  <option value="">Selecciona un rango…</option>
+                  {HONORARIUM_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-400">Dato privado. Solo se usa para el filtro de compatibilidad.</p>
+              </div>
             </section>
 
             {/* Consent */}

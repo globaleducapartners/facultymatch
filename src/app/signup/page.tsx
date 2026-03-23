@@ -189,7 +189,7 @@ function SignupContent() {
               </div>
               <div className="text-center">
                 <p className={`font-black text-sm ${role === "faculty" ? "text-talentia-blue" : "text-navy"}`}>Soy docente</p>
-                <p className="text-[10px] text-gray-400 font-medium mt-0.5">Crear perfil académico</p>
+                <p className="text-[10px] text-gray-400 font-medium mt-0.5">Crea tu cuenta y completa tu perfil académico para aparecer en el directorio.</p>
               </div>
             </button>
 
@@ -216,6 +216,15 @@ function SignupContent() {
               </div>
             </button>
           </div>
+
+          {role === "faculty" && (
+            <p className="text-xs text-center text-gray-400 mt-3">
+              ¿Prefieres registrarte sin crear cuenta?{" "}
+              <Link href="/apply" className="text-talentia-blue hover:underline font-bold">
+                Envía tu perfil aquí
+              </Link>
+            </p>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <input type="hidden" name="role" value={role} />

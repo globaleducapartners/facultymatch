@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/Navbar";
+import { NewsletterForm } from "@/components/NewsletterForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -208,28 +209,7 @@ export default function ResourcesPage() {
               </div>
             </div>
             <div className="space-y-4">
-              <form className="bg-white/10 backdrop-blur-md border border-white/20 rounded-[2rem] p-6 space-y-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-white/60">Nombre</label>
-                  <input
-                    type="text"
-                    placeholder="Dr. María González"
-                    className="w-full px-5 py-3.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-tech-cyan font-medium"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-white/60">Correo institucional</label>
-                  <input
-                    type="email"
-                    placeholder="nombre@universidad.edu"
-                    className="w-full px-5 py-3.5 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-tech-cyan font-medium"
-                  />
-                </div>
-                <Button type="submit" className="w-full bg-energy-orange hover:bg-orange-500 text-white font-black h-14 rounded-xl text-base shadow-xl transition-all hover:scale-[1.02]">
-                  Suscribirme al Reporte Mensual
-                  <ArrowRight size={18} className="ml-2" />
-                </Button>
-              </form>
+              <NewsletterForm />
               <p className="text-center text-xs font-bold text-white/30 uppercase tracking-widest">Más de 8.000 académicos ya suscritos</p>
             </div>
           </div>

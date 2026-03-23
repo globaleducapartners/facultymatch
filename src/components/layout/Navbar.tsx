@@ -97,10 +97,11 @@ export function Navbar() {
                 href="/signup?role=institution"
                 className="hidden lg:block text-xs font-bold text-gray-400 hover:text-navy transition-colors whitespace-nowrap"
               >
-                Soy institución →
+                Instituciones
               </Link>
+              <span className="hidden lg:block w-px h-5 bg-gray-200" />
               <Link href={APPLY_HREF} className="bg-energy-orange text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-100">
-                Unirse
+                Soy docente
               </Link>
             </>
         )}

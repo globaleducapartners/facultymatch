@@ -14,9 +14,9 @@ export const PLANS: Record<string, PlanConfig> = {
     name: "Plan Professional Docente",
     badge: "Para Docentes · Recomendado",
     description: "Visibilidad prioritaria, control de privacidad avanzado y acceso a todas las oportunidades.",
-    price: "9,99€",
-    period: "/ año (primer año)",
-    promo: "Promoción primer año · Después 99€/año",
+    price: "29€",
+    period: "/ año",
+    promo: "Acceso completo · Sin permanencia",
     features: [
       "Todo lo del plan Basic",
       "Bloqueo de instituciones específicas",

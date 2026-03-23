@@ -78,7 +78,8 @@ export default function Home() {
             <div className="relative hidden lg:block">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-4 pt-12">
-                  <div className="bg-white p-3 rounded-2xl shadow-xl border border-gray-100 transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
+                  <div className="relative bg-white p-3 rounded-2xl shadow-xl border border-gray-100 transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
+                    <span className="absolute top-2 right-2 text-[10px] font-black bg-white/80 text-gray-400 px-2 py-0.5 rounded-full z-10">Ejemplo</span>
                     <div className="aspect-[4/5] bg-gray-50 rounded-xl mb-3 overflow-hidden relative">
                       <Image
                         src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800"
@@ -98,7 +99,8 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <div className="bg-white p-3 rounded-2xl shadow-xl border border-gray-100 transform rotate-[3deg] hover:rotate-0 transition-transform duration-500">
+                  <div className="relative bg-white p-3 rounded-2xl shadow-xl border border-gray-100 transform rotate-[3deg] hover:rotate-0 transition-transform duration-500">
+                    <span className="absolute top-2 right-2 text-[10px] font-black bg-white/80 text-gray-400 px-2 py-0.5 rounded-full z-10">Ejemplo</span>
                     <div className="aspect-[4/5] bg-gray-50 rounded-xl mb-3 overflow-hidden relative">
                       <Image
                         src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800"
@@ -386,7 +388,7 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-4 min-w-[240px]">
-                  <Link href="/signup">
+                  <Link href="/apply">
                     <Button className="w-full bg-energy-orange hover:bg-orange-500 text-white font-black h-16 px-10 rounded-2xl text-lg shadow-xl shadow-orange-900/30 transition-all hover:scale-105">
                       Crear mi perfil gratis
                       <ArrowRight size={20} className="ml-2" />
