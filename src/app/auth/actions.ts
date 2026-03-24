@@ -118,7 +118,8 @@ export async function signInWithSSO(provider: 'google' | 'azure', next?: string)
   const supabase = await createClient();
   
   // Always use the canonical production URL to avoid vercel.app redirect mismatches
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.facultymatch.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '')
+    || 'https://www.facultymatch.app';
   const redirectTo = new URL(`${siteUrl}/auth/callback`);
   
   if (next) {

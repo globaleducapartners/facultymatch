@@ -54,16 +54,19 @@ export default async function ProfilePage() {
     if (!user) return;
 
     await supabase.from("user_profiles").update({ full_name: fullName }).eq("id", user.id);
-    await supabase.from("faculty_profiles").update({
+    await supabase.from("faculty_profiles").upsert({
+      user_id: user.id,
       headline, bio, country, city, phone, website,
+      location: [city, country].filter(Boolean).join(', ') || undefined,
       linkedin_url: linkedinUrl,
       current_institution: currentInstitution,
       years_experience: yearsExperience,
       availability,
       aneca_accreditation: anecaAccreditation,
       research_publications: researchPublications,
-      google_scholar_id: googleScholarId
-    }).eq("user_id", user.id);
+      google_scholar_id: googleScholarId,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' });
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");

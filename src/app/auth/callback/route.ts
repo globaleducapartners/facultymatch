@@ -12,7 +12,8 @@ const supabaseAdmin = createAdminClient(
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   // Always redirect to canonical production domain
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.facultymatch.app';
+  const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '')
+    || 'https://www.facultymatch.app';
   const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/dashboard';
 
@@ -48,12 +49,23 @@ export async function GET(request: Request) {
               .from('faculty_profiles')
               .upsert({
                 user_id: user.id,
+                // Campos básicos
                 bio: lead.bio ?? undefined,
                 location: lead.city
                   ? [lead.city, lead.country].filter(Boolean).join(', ')
                   : lead.country ?? undefined,
+                city: lead.city ?? undefined,
+                country: lead.country ?? undefined,
                 linkedin_url: lead.linkedin_url ?? undefined,
                 modalities: lead.modalities ?? undefined,
+                // Campos enriquecidos
+                faculty_areas: lead.fields ?? lead.faculty_areas ?? undefined,
+                languages: lead.languages ?? undefined,
+                availability: lead.availability ?? undefined,
+                headline: lead.academic_level
+                  ? `Docente · ${lead.academic_level}`
+                  : undefined,
+                // Metadatos
                 visibility: 'public',
                 is_active: true,
                 updated_at: new Date().toISOString(),
@@ -63,7 +75,10 @@ export async function GET(request: Request) {
             if (lead.full_name) {
               await supabaseAdmin
                 .from('user_profiles')
-                .update({ full_name: lead.full_name })
+                .update({
+                  full_name: lead.full_name,
+                  onboarding_completed: false,
+                })
                 .eq('id', user.id);
             }
           }
