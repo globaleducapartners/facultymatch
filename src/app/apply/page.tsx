@@ -4,11 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
+import { UniversityAutocomplete } from "@/components/ui/UniversityAutocomplete";
+import { TagInput } from "@/components/ui/TagInput";
 import {
   CheckCircle2,
   GraduationCap,
   ArrowRight,
-  Plus,
   X,
   Mail,
 } from "lucide-react";
@@ -82,6 +83,13 @@ const WEEKLY_HOURS_OPTIONS = [
   "Entre 5 y 10h",
   "Entre 10 y 20h",
   "Más de 20h",
+];
+
+const SUBJECTS_SUGGESTIONS = [
+  "Macroeconomía", "Microeconomía", "Contabilidad", "Marketing Digital",
+  "Inteligencia Artificial", "Machine Learning", "Derecho Mercantil",
+  "Gestión de Empresas", "Finanzas Corporativas", "Estadística",
+  "Programación", "Bases de Datos", "Inglés Jurídico", "Historia del Arte",
 ];
 
 type FormData = {
@@ -183,77 +191,6 @@ function TagToggle({
   );
 }
 
-function TagInput({
-  value,
-  onChange,
-  placeholder,
-  maxItems = 20,
-}: {
-  value: string[];
-  onChange: (val: string[]) => void;
-  placeholder?: string;
-  maxItems?: number;
-}) {
-  const [input, setInput] = useState("");
-
-  const add = () => {
-    const trimmed = input.trim();
-    if (trimmed && !value.includes(trimmed) && value.length < maxItems) {
-      onChange([...value, trimmed]);
-    }
-    setInput("");
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      add();
-    }
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          className="flex-1 h-11 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all"
-        />
-        <button
-          type="button"
-          onClick={add}
-          disabled={!input.trim() || value.length >= maxItems}
-          className="h-11 px-4 rounded-xl bg-talentia-blue text-white text-sm font-bold hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1"
-        >
-          <Plus size={16} /> Añadir
-        </button>
-      </div>
-      {value.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {value.map((tag) => (
-            <span
-              key={tag}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-blue-50 border border-blue-200 text-navy"
-            >
-              {tag}
-              <button
-                type="button"
-                onClick={() => onChange(value.filter((t) => t !== tag))}
-                className="text-gray-400 hover:text-red-500 transition-colors"
-              >
-                <X size={12} />
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-      <p className="text-xs text-gray-400">{value.length}/{maxItems}</p>
-    </div>
-  );
-}
 
 export default function ApplyPage() {
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
@@ -611,7 +548,7 @@ export default function ApplyPage() {
                 />
               </div>
 
-              {/* CAMPO 2: Asignaturas — TagInput */}
+              {/* CAMPO 2: Asignaturas — TagInput con sugerencias */}
               <div className="space-y-1.5">
                 <label className="text-sm font-bold text-navy">Asignaturas / Materias que imparte</label>
                 <TagInput
@@ -619,6 +556,7 @@ export default function ApplyPage() {
                   onChange={(v) => set("subjects", v)}
                   placeholder="Ej: Macroeconomía · Enter para añadir"
                   maxItems={20}
+                  suggestions={SUBJECTS_SUGGESTIONS}
                 />
               </div>
 
@@ -647,14 +585,13 @@ export default function ApplyPage() {
                 </div>
               </div>
 
-              {/* CAMPO 4: Instituciones donde ha impartido — TagInput */}
+              {/* CAMPO 4: Instituciones donde ha impartido — autocompletado con universities_es */}
               <div className="space-y-1.5">
                 <label className="text-sm font-bold text-navy">Instituciones donde has impartido docencia</label>
-                <TagInput
+                <UniversityAutocomplete
                   value={form.past_institutions}
-                  onChange={(v) => set("past_institutions", v)}
-                  placeholder="Ej: Universidad Complutense · Enter para añadir"
-                  maxItems={10}
+                  onChange={(val) => set("past_institutions", val)}
+                  placeholder="Ej: Universidad Complutense de Madrid..."
                 />
               </div>
 
