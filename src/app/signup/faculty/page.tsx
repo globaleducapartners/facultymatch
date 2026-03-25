@@ -148,6 +148,7 @@ export default function SignupFacultyPage() {
             first_name: firstName.trim(),
             last_name: lastName.trim(),
             role: "faculty",
+            onboarding_completed: true,
             academic_level: academicLevel,
             knowledge_areas: selectedAreas,
             country,

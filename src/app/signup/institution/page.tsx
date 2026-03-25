@@ -138,6 +138,7 @@ export default function SignupInstitutionPage() {
             first_name: firstName.trim(),
             last_name: lastName.trim(),
             role: "institution",
+            onboarding_completed: true,
             institution_name: institutionName.trim(),
             institution_type: institutionType,
             country,

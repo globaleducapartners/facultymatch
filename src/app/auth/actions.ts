@@ -177,17 +177,13 @@ export async function signIn(formData: FormData) {
 
     if (!profile?.role) {
       redirect("/onboarding/role");
-    } else if (profile.role === "faculty" && !profile.onboarding_completed) {
-      redirect("/onboarding");
     } else if (profile.role === "faculty") {
       redirect("/app/faculty");
-    } else if (profile.role === "institution" && !profile.onboarding_completed) {
-      redirect("/onboarding/institution");
     } else if (profile.role === "institution") {
       redirect("/app/institution");
     } else if (profile.role === "admin" || profile.role === "super_admin") {
-        redirect("/app/admin");
-      }
+      redirect("/app/admin");
+    }
   }
 
   redirect("/onboarding/role");
