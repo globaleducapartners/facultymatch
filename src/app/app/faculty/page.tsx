@@ -62,12 +62,12 @@ export default async function EducatorDashboard() {
 
   // Checklist logic enriched
   const checklist = [
-    { id: 'info', label: "Titular y Ubicación", completed: !!facultyProfile?.headline && !!facultyProfile?.location },
-    { id: 'areas', label: "Áreas / Facultades", completed: areas.length > 0 },
-    { id: 'levels', label: "Niveles Docentes", completed: levels.length > 0 },
-    { id: 'langs', label: "Idiomas", completed: languages.length > 0 },
-    { id: 'history', label: "Historial Docente", completed: history.length > 0 },
-    { id: 'bio', label: "Biografía Profesional", completed: !!facultyProfile?.bio },
+    { id: 'headline', label: "Titular académico", completed: !!facultyProfile?.headline },
+    { id: 'bio', label: "Biografía profesional", completed: !!facultyProfile?.bio },
+    { id: 'location', label: "Ubicación", completed: !!facultyProfile?.location },
+    { id: 'langs', label: "Idiomas", completed: (facultyProfile?.languages || []).length > 0 },
+    { id: 'areas', label: "Áreas / Facultades", completed: (facultyProfile?.faculty_areas || []).length > 0 },
+    { id: 'availability', label: "Disponibilidad", completed: !!facultyProfile?.availability },
   ];
 
   const completedCount = checklist.filter(i => i.completed).length;
