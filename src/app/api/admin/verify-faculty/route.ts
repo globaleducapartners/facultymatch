@@ -47,6 +47,7 @@ export async function POST(request: Request) {
       verified_at: new Date().toISOString(),
       verified_by: adminProfile.email || user.email,
       verification_notes: notes || null,
+      onboarding_completed: true,
     }).eq("id", facultyId);
 
     // Update faculty_profiles
@@ -107,6 +108,16 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, action: "requires_info" });
+  }
+
+  if (action === "reactivate") {
+    await admin.from("user_profiles").update({
+      verification_status: "pending",
+      verified_at: null,
+      verified_by: null,
+      verification_notes: null,
+    }).eq("id", facultyId);
+    return NextResponse.json({ success: true, action: "reactivated" });
   }
 
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });

@@ -39,7 +39,7 @@ export default async function ControlLayout({ children }: { children: React.Reac
     .from('user_profiles')
     .select('*', { count: 'exact', head: true })
     .eq('role', 'faculty')
-    .eq('verification_status', 'pending');
+    .or('verification_status.eq.pending,verification_status.is.null');
 
   return (
     <div className="min-h-screen flex bg-[#F8FAFC]">
