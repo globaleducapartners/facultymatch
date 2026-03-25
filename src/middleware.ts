@@ -79,8 +79,16 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    // Evitar que un faculty acceda a /app/institution y viceversa
+    // Redirigir admins a /control cuando intentan acceder a /app/*
     const role = profile.role;
+    if (role === "admin" || role === "super_admin") {
+      if (!pathname.startsWith("/control") && !pathname.startsWith("/app/admin")) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/control";
+        return NextResponse.redirect(url);
+      }
+    }
+    // Evitar que un faculty acceda a /app/institution y viceversa
     if (role === "faculty" && pathname.startsWith("/app/institution")) {
       const url = request.nextUrl.clone();
       url.pathname = "/app/faculty";

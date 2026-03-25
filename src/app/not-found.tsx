@@ -32,9 +32,9 @@ export default function NotFound() {
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="border-2 border-gray-200 hover:border-talentia-blue hover:bg-talentia-blue/5 text-navy font-bold h-14 rounded-2xl px-8 w-full sm:w-auto transition-all">
-            <Link href="/app/faculty" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <ArrowLeft size={20} />
-              Volver a mi panel
+              Volver al inicio
             </Link>
           </Button>
         </div>
