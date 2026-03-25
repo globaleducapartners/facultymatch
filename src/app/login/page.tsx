@@ -123,9 +123,11 @@ function LoginContent() {
 
             {(error || urlError) && (
               <div className="p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-bold animate-in fade-in duration-500">
-                {error || (urlErrorCode === 'unexpected_failure'
-                  ? 'El inicio de sesión con Google falló. Por favor, inténtalo de nuevo.'
-                  : 'Error de autenticación. Por favor, inténtalo de nuevo.')}
+                {error?.toLowerCase().includes("email not confirmed")
+                  ? "Debes confirmar tu email antes de acceder. Revisa tu bandeja de entrada."
+                  : error || (urlErrorCode === 'unexpected_failure'
+                      ? 'El inicio de sesión con Google falló. Por favor, inténtalo de nuevo.'
+                      : 'Error de autenticación. Por favor, inténtalo de nuevo.')}
               </div>
             )}
 

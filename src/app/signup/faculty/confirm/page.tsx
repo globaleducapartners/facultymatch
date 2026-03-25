@@ -50,6 +50,16 @@ function ConfirmContent() {
             </p>
           </div>
 
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <p className="text-sm font-bold text-amber-800">
+              ⚠️ Antes de acceder, confirma tu email
+            </p>
+            <p className="text-xs text-amber-600 mt-1">
+              Hemos enviado un enlace de verificación a tu correo.
+              Debes hacer click en él antes de poder acceder con tu contraseña.
+            </p>
+          </div>
+
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
             <p className="text-sm font-medium text-navy leading-relaxed">
               Una vez confirmado, tus datos ya estarán en tu dashboard.

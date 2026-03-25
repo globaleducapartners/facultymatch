@@ -175,30 +175,6 @@ export default function SignupFacultyPage() {
         return;
       }
 
-      // Non-blocking: insert in faculty_leads for captación
-      fetch("/api/apply", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          full_name: fullName,
-          email: email.trim().toLowerCase(),
-          phone: phoneFormatted,
-          country,
-          primary_fields: selectedAreas,
-          modalities: selectedModalities,
-          availability: availability || null,
-          academic_level: academicLevel,
-          aneca_accreditation: anecaAccreditation,
-          linkedin_url: linkedinUrl.trim() || null,
-          consent_terms: true,
-          consent_terms_at: new Date().toISOString(),
-          consent_privacy: true,
-          consent_privacy_at: new Date().toISOString(),
-          consent_marketing: marketingOptIn,
-          consent_marketing_at: marketingOptIn ? new Date().toISOString() : null,
-        }),
-      }).catch(() => {});
-
       router.push(`/signup/faculty/confirm?email=${encodeURIComponent(email.trim().toLowerCase())}`);
     } catch (err: unknown) {
       setServerError(err instanceof Error ? err.message : "Error inesperado. Inténtalo de nuevo.");
@@ -215,7 +191,7 @@ export default function SignupFacultyPage() {
     <div className="min-h-screen flex">
       {/* Left decorative panel */}
       <div
-        className="hidden lg:flex flex-col justify-between w-[40%] shrink-0 p-10 relative overflow-hidden"
+        className="hidden lg:flex flex-col justify-between w-[40%] shrink-0 p-10 relative overflow-hidden sticky top-0 h-screen"
         style={{ background: "#0B1220" }}
       >
         <div
