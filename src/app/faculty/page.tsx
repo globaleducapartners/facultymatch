@@ -46,7 +46,7 @@ export default function FacultyPage() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/apply">
+                  <Link href="/signup/faculty">
                     <Button className="w-full sm:w-auto bg-talentia-blue hover:bg-blue-700 text-white font-bold h-14 px-10 rounded-xl shadow-xl shadow-blue-100 transition-all text-lg">
                       Crear perfil gratis
                     </Button>
@@ -298,7 +298,7 @@ export default function FacultyPage() {
                     </p>
                   </div>
                   <div className="flex flex-col gap-4 min-w-[240px]">
-                    <Link href="/apply">
+                    <Link href="/signup/faculty">
                       <Button className="w-full bg-energy-orange hover:bg-orange-500 text-white font-black h-16 px-10 rounded-2xl text-lg shadow-xl shadow-orange-900/30 transition-all hover:scale-105">
                         Crear mi perfil gratis
                         <ArrowRight size={20} className="ml-2" />

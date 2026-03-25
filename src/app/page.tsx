@@ -54,11 +54,11 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col sm:flex-row items-center gap-4">
-                <Link href="/apply" className="w-full sm:w-auto bg-energy-orange text-white px-8 py-4 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-xl shadow-orange-100 group">
+                <Link href="/signup/faculty" className="w-full sm:w-auto bg-energy-orange text-white px-8 py-4 rounded-xl font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-xl shadow-orange-100 group">
                   Crear perfil gratis
                   <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
-                <Link href="/signup?role=institution" className="w-full sm:w-auto bg-white border border-gray-200 text-navy px-8 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2 shadow-sm">
+                <Link href="/signup/institution" className="w-full sm:w-auto bg-white border border-gray-200 text-navy px-8 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2 shadow-sm">
                   Soy institución
                 </Link>
               </div>
@@ -388,7 +388,7 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-4 min-w-[240px]">
-                  <Link href="/apply">
+                  <Link href="/signup/faculty">
                     <Button className="w-full bg-energy-orange hover:bg-orange-500 text-white font-black h-16 px-10 rounded-2xl text-lg shadow-xl shadow-orange-900/30 transition-all hover:scale-105">
                       Crear mi perfil gratis
                       <ArrowRight size={20} className="ml-2" />

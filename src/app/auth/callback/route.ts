@@ -98,15 +98,13 @@ export async function GET(request: Request) {
         if (next === '/dashboard' || next.startsWith('/dashboard')) {
           if (!profile?.role) {
             destination = '/onboarding/role';
-          } else if (profile.role === 'faculty' && !profile.onboarding_completed) {
-            destination = '/onboarding';
           } else if (profile.role === 'faculty') {
             destination = '/app/faculty';
           } else if (profile.role === 'institution') {
             destination = '/app/institution';
           } else if (profile.role === 'admin' || profile.role === 'super_admin') {
-              destination = '/control';
-            }
+            destination = '/control';
+          }
         }
 
         const redirectUrl = new URL(destination, origin);

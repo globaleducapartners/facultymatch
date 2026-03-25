@@ -172,7 +172,7 @@ function SignupContent() {
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => setRole("faculty")}
+              onClick={() => { window.location.href = "/signup/faculty"; }}
               className={`relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all ${
                 role === "faculty"
                   ? "border-talentia-blue bg-blue-50"
@@ -195,7 +195,7 @@ function SignupContent() {
 
             <button
               type="button"
-              onClick={() => setRole("institution")}
+              onClick={() => { window.location.href = "/signup/institution"; }}
               className={`relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all ${
                 role === "institution"
                   ? "border-energy-orange bg-orange-50"

@@ -97,7 +97,7 @@ export default function InstitutionsPage() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/signup?role=institution">
+                  <Link href="/signup/institution">
                     <Button className="w-full sm:w-auto bg-energy-orange hover:bg-orange-600 text-white font-bold h-14 px-10 rounded-xl shadow-xl shadow-orange-100 transition-all text-lg">
                       Registrar mi centro
                     </Button>
@@ -238,7 +238,7 @@ export default function InstitutionsPage() {
                               : 'bg-white border-2 border-gray-200 text-navy hover:bg-gray-50'
                           }`}
                       >
-                        <Link href={plan.highlight ? '/checkout?plan=institution-pro' : '/signup?role=institution'}>
+                        <Link href={plan.highlight ? '/checkout?plan=institution-pro' : '/signup/institution'}>
                           {plan.buttonText}
                         </Link>
                       </Button>
@@ -263,7 +263,7 @@ export default function InstitutionsPage() {
               Professional gratuito. Sin tarjeta de crédito.
             </p>
             <Link
-              href="/signup?role=institution"
+              href="/signup/institution"
               className="inline-flex items-center gap-2 bg-energy-orange text-white px-10 py-5 rounded-xl font-bold text-lg hover:bg-orange-600 transition-all shadow-xl shadow-orange-900/20"
             >
               Registrar mi institución gratis
@@ -302,7 +302,7 @@ export default function InstitutionsPage() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-4 min-w-[240px]">
-                  <Link href="/signup?role=institution">
+                  <Link href="/signup/institution">
                     <Button className="w-full bg-energy-orange hover:bg-orange-500 text-white font-black h-16 px-10 rounded-2xl text-lg shadow-xl shadow-orange-900/30 transition-all hover:scale-105">
                       Registrar mi centro
                       <ArrowRight size={20} className="ml-2" />
