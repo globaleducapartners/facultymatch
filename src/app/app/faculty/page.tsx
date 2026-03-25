@@ -214,7 +214,7 @@ export default async function EducatorDashboard() {
                   Tu perfil, bajo tu control
                 </CardTitle>
                 <Button size="sm" variant="ghost" className="text-talentia-blue font-black text-xs rounded-xl hover:bg-blue-50" asChild>
-                  <Link href="/onboarding">Editar →</Link>
+                  <Link href="/app/faculty/profile">Editar →</Link>
                 </Button>
               </div>
             </CardHeader>
@@ -318,7 +318,7 @@ export default async function EducatorDashboard() {
                   </div>
                 </div>
                 <Button size="icon" variant="ghost" className="h-8 w-8 rounded-lg" asChild>
-                  <Link href="/onboarding"><Plus size={16} /></Link>
+                  <Link href="/app/faculty/privacy"><Plus size={16} /></Link>
                 </Button>
               </div>
 
