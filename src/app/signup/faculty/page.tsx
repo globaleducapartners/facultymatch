@@ -142,7 +142,7 @@ export default function SignupFacultyPage() {
         email: email.trim().toLowerCase(),
         password,
         options: {
-          emailRedirectTo: `${siteUrl}/auth/callback?next=/app/faculty`,
+          emailRedirectTo: `${siteUrl}/auth/callback`,
           data: {
             full_name: fullName,
             first_name: firstName.trim(),

@@ -100,23 +100,73 @@ export async function GET(request: Request) {
   }
 
   // Step 5: Determine destination
-  const { data: profile } = await supabase
+  let { data: profile } = await supabase
     .from('user_profiles')
     .select('role, onboarding_completed')
     .eq('id', user.id)
     .single();
 
-  let destination = next;
-  if (next === '/dashboard' || next.startsWith('/dashboard')) {
-    if (!profile?.role) {
-      destination = '/onboarding/role';
-    } else if (profile.role === 'faculty') {
-      destination = '/app/faculty';
-    } else if (profile.role === 'institution') {
-      destination = '/app/institution';
-    } else if (profile.role === 'admin' || profile.role === 'super_admin') {
-      destination = '/control';
+  // Recovery: if the DB trigger failed silently, rebuild profile from user metadata
+  if (!profile?.role && user.user_metadata?.role) {
+    try {
+      await supabaseAdmin.from('user_profiles').upsert({
+        id: user.id,
+        role: user.user_metadata.role,
+        full_name: user.user_metadata.full_name || user.email?.split('@')[0],
+        onboarding_completed: user.user_metadata.onboarding_completed === true,
+        terms_accepted_at: user.user_metadata.terms_accepted ? new Date().toISOString() : null,
+        privacy_accepted_at: user.user_metadata.privacy_accepted ? new Date().toISOString() : null,
+        marketing_opt_in: user.user_metadata.marketing_opt_in ?? false,
+        consent_version: user.user_metadata.consent_version ?? 'v1',
+      }, { onConflict: 'id' });
+
+      // Also ensure faculty_profiles row exists for faculty users
+      if (user.user_metadata.role === 'faculty') {
+        await supabaseAdmin.from('faculty_profiles').upsert({
+          user_id: user.id,
+          visibility: 'public',
+          is_active: true,
+          is_verified: false,
+          faculty_areas: user.user_metadata.knowledge_areas ?? [],
+          availability: user.user_metadata.availability ?? null,
+          modalities: user.user_metadata.modalities ?? [],
+          linkedin_url: user.user_metadata.linkedin_url ?? null,
+        }, { onConflict: 'user_id' });
+      } else if (user.user_metadata.role === 'institution') {
+        await supabaseAdmin.from('institutions').upsert({
+          id: user.id,
+          user_id: user.id,
+          name: user.user_metadata.institution_name || user.user_metadata.full_name || user.email?.split('@')[0],
+          type: user.user_metadata.institution_type ?? null,
+          country: user.user_metadata.country ?? null,
+        }, { onConflict: 'id' });
+      }
+
+      // Refetch profile with recovered data
+      const { data: recovered } = await supabase
+        .from('user_profiles')
+        .select('role, onboarding_completed')
+        .eq('id', user.id)
+        .single();
+      profile = recovered;
+    } catch (e) {
+      console.warn('[callback] profile recovery failed:', e);
     }
+  }
+
+  // Always use role-based routing — send users to the right dashboard
+  let destination: string;
+  if (!profile?.role) {
+    destination = '/onboarding/role';
+  } else if (profile.role === 'faculty') {
+    destination = '/app/faculty';
+  } else if (profile.role === 'institution') {
+    destination = '/app/institution';
+  } else if (profile.role === 'admin' || profile.role === 'super_admin') {
+    destination = '/control';
+  } else {
+    // Explicit next param for special cases (e.g. /update-password already handled above)
+    destination = next !== '/dashboard' ? next : '/onboarding/role';
   }
 
   return NextResponse.redirect(new URL(destination, origin).toString());
