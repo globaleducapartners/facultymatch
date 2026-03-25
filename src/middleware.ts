@@ -15,7 +15,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(callbackUrl);
   }
 
-  let response = NextResponse.next({ request: { headers: request.headers } });
+  // Forward search params so server layouts can read them via headers()
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-url-search', request.nextUrl.search || '');
+
+  let response = NextResponse.next({ request: { headers: requestHeaders } });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

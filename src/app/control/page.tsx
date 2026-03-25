@@ -1,204 +1,115 @@
-import { createClient } from "@/lib/supabase-server";
-import { Users, Building2, FileCheck, TrendingUp, ArrowUpRight, UserCheck } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { createAdminClient } from "@/lib/supabase-server";
+import PendingFacultyPanel from "./PendingFacultyPanel";
 
 export default async function ControlPage() {
-  const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { count: facultyCount } = await supabase
-    .from("faculty_profiles")
-    .select("*", { count: "exact", head: true });
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-  const { count: institutionCount } = await supabase
-    .from("institutions")
-    .select("*", { count: "exact", head: true });
+  const [
+    { count: pendingCount },
+    { count: approvedToday },
+    { count: approvedMonth },
+    { count: totalFaculty },
+    { data: pendingRaw },
+  ] = await Promise.all([
+    admin.from('user_profiles').select('*', { count: 'exact', head: true })
+      .eq('role', 'faculty').eq('verification_status', 'pending'),
+    admin.from('user_profiles').select('*', { count: 'exact', head: true })
+      .eq('role', 'faculty').eq('verification_status', 'approved')
+      .gte('verified_at', today.toISOString()),
+    admin.from('user_profiles').select('*', { count: 'exact', head: true })
+      .eq('role', 'faculty').eq('verification_status', 'approved')
+      .gte('verified_at', startOfMonth.toISOString()),
+    admin.from('user_profiles').select('*', { count: 'exact', head: true })
+      .eq('role', 'faculty'),
+    admin.from('user_profiles')
+      .select(`
+        id, full_name, email, created_at, verification_status, verification_notes,
+        faculty_profiles!left(
+          faculty_areas, availability, modalities, linkedin_url,
+          bio, location, city, country, headline
+        )
+      `)
+      .eq('role', 'faculty')
+      .eq('verification_status', 'pending')
+      .order('created_at', { ascending: true })
+      .limit(100),
+  ]);
 
-  const { count: verifiedCount } = await supabase
-    .from("faculty_profiles")
-    .select("*", { count: "exact", head: true })
-    .eq("is_verified", true);
+  // Fetch user metadata (academic_level, phone, aneca) from auth
+  let metaMap: Record<string, { email?: string; academic_level?: string; phone?: string; aneca_accreditation?: boolean }> = {};
+  if (pendingRaw && pendingRaw.length > 0) {
+    const { data: authData } = await admin.auth.admin.listUsers({ perPage: 1000 });
+    if (authData?.users) {
+      const ids = new Set(pendingRaw.map(p => p.id));
+      authData.users.forEach(u => {
+        if (ids.has(u.id)) {
+          metaMap[u.id] = {
+            email: u.email,
+            academic_level: u.user_metadata?.academic_level,
+            phone: u.user_metadata?.phone,
+            aneca_accreditation: u.user_metadata?.aneca_accreditation,
+          };
+        }
+      });
+    }
+  }
 
-  const { count: activeCount } = await supabase
-    .from("faculty_profiles")
-    .select("*", { count: "exact", head: true })
-    .eq("is_active", true);
+  const pendingFaculty = (pendingRaw ?? []).map((p: any) => {
+    const fp = Array.isArray(p.faculty_profiles) ? p.faculty_profiles[0] : p.faculty_profiles;
+    const meta = metaMap[p.id] || {};
+    return {
+      id: p.id,
+      full_name: p.full_name,
+      email: p.email || meta.email || null,
+      created_at: p.created_at,
+      verification_status: p.verification_status,
+      verification_notes: p.verification_notes,
+      faculty_areas: fp?.faculty_areas ?? [],
+      availability: fp?.availability ?? null,
+      modalities: fp?.modalities ?? [],
+      linkedin_url: fp?.linkedin_url ?? null,
+      bio: fp?.bio ?? null,
+      location: fp?.location ?? null,
+      city: fp?.city ?? null,
+      country: fp?.country ?? null,
+      headline: fp?.headline ?? null,
+      academic_level: meta.academic_level ?? null,
+      phone: meta.phone ?? null,
+      aneca_accreditation: meta.aneca_accreditation ?? false,
+    };
+  });
 
-  const { data: recentFaculty } = await supabase
-    .from("faculty_profiles")
-    .select("*, user_profiles(full_name, avatar_url, role, created_at)")
-    .order("updated_at", { ascending: false })
-    .limit(5);
-
-  const { data: institutionUsers } = await supabase
-    .from("user_profiles")
-    .select("*")
-    .eq("role", "institution")
-    .order("created_at", { ascending: false })
-    .limit(5);
-
-  const stats = [
-    { label: "Docentes Registrados", value: facultyCount ?? 0, icon: Users, color: "text-blue-600", bg: "bg-blue-50", href: "/app/admin/educators" },
-    { label: "Instituciones", value: institutionCount ?? 0, icon: Building2, color: "text-orange-600", bg: "bg-orange-50", href: "/app/admin/institutions" },
-    { label: "Perfiles Verificados", value: verifiedCount ?? 0, icon: UserCheck, color: "text-green-600", bg: "bg-green-50", href: "/app/admin/verifications" },
-    { label: "Perfiles Activos", value: activeCount ?? 0, icon: TrendingUp, color: "text-cyan-600", bg: "bg-cyan-50", href: "/control" },
+  const metrics = [
+    { label: "Pendientes de revisión", value: pendingCount ?? 0, color: "bg-amber-50 text-amber-700 border-amber-100" },
+    { label: "Aprobados hoy", value: approvedToday ?? 0, color: "bg-green-50 text-green-700 border-green-100" },
+    { label: "Aprobados este mes", value: approvedMonth ?? 0, color: "bg-blue-50 text-blue-700 border-blue-100" },
+    { label: "Total en la plataforma", value: totalFaculty ?? 0, color: "bg-gray-50 text-gray-700 border-gray-200" },
   ];
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-3xl font-bold text-navy">Panel de Administración</h1>
-        <p className="text-gray-500 font-medium">Gestión global de la red FacultyMatch.</p>
+        <h1 className="text-3xl font-black text-navy tracking-tight">Verificación de Docentes</h1>
+        <p className="text-gray-500 font-medium mt-1">
+          Revisa y aprueba los perfiles pendientes de verificación.
+        </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, idx) => (
-          <Link key={idx} href={stat.href}>
-            <Card className="border-none shadow-sm rounded-2xl overflow-hidden group hover:shadow-md transition-all cursor-pointer">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className={`${stat.bg} ${stat.color} p-3 rounded-xl group-hover:scale-110 transition-transform`}>
-                    <stat.icon size={24} />
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <p className="text-2xl font-black text-navy">{stat.value}</p>
-                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">{stat.label}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+      {/* Metrics */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {metrics.map((m) => (
+          <div key={m.label} className={`rounded-2xl border p-5 ${m.color}`}>
+            <p className="text-3xl font-black">{m.value}</p>
+            <p className="text-xs font-bold uppercase tracking-widest mt-1 opacity-70">{m.label}</p>
+          </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Recent Faculty */}
-        <Card className="lg:col-span-7 border-none shadow-sm rounded-2xl overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <div>
-              <CardTitle className="text-xl font-bold text-navy">Docentes Recientes</CardTitle>
-              <CardDescription className="font-medium">Últimas altas de docentes en la plataforma.</CardDescription>
-            </div>
-            <Button variant="link" asChild className="text-talentia-blue font-bold text-sm">
-              <Link href="/app/admin/educators">Ver todos</Link>
-            </Button>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="divide-y divide-gray-50">
-              {recentFaculty && recentFaculty.length > 0 ? (
-                recentFaculty.map((f: any) => {
-                  const profile = f.user_profiles;
-                  const initials = profile?.full_name?.substring(0, 2).toUpperCase() ?? "??";
-                  return (
-                    <div key={f.id} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-700 font-black text-sm flex-shrink-0">
-                          {initials}
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-navy">{profile?.full_name ?? "Sin nombre"}</p>
-                          <p className="text-xs text-gray-400 font-medium">
-                            {f.headline ?? "Docente"} · {f.location ?? "—"} · {new Date(f.updated_at).toLocaleDateString("es-ES")}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <Badge className={`${f.is_verified ? "bg-green-50 text-green-600" : "bg-orange-50 text-orange-600"} border-none text-[10px] font-black uppercase`}>
-                          {f.is_verified ? "Verificado" : "Pendiente"}
-                        </Badge>
-                        <Badge className={`${f.is_active ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-400"} border-none text-[10px] font-black uppercase`}>
-                          {f.is_active ? "Activo" : "Inactivo"}
-                        </Badge>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="p-12 text-center text-gray-400 font-medium italic">
-                  No hay docentes registrados aún.
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Right column */}
-        <div className="lg:col-span-5 space-y-6">
-          {/* Recent Institution Users */}
-          <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div>
-                <CardTitle className="text-lg font-bold text-navy">Centros Recientes</CardTitle>
-                <CardDescription className="font-medium text-xs">Últimas instituciones registradas.</CardDescription>
-              </div>
-              <Button variant="link" asChild className="text-talentia-blue font-bold text-sm">
-                <Link href="/app/admin/institutions">Ver todas</Link>
-              </Button>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="divide-y divide-gray-50">
-                {institutionUsers && institutionUsers.length > 0 ? (
-                  institutionUsers.map((u: any) => (
-                    <div key={u.id} className="px-5 py-3 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-orange-700 font-black text-xs flex-shrink-0">
-                          {u.full_name?.substring(0, 2).toUpperCase() ?? "??"}
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-navy">{u.full_name ?? "Sin nombre"}</p>
-                          <p className="text-[10px] text-gray-400 font-medium">
-                            {new Date(u.created_at).toLocaleDateString("es-ES")}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge className="bg-orange-50 text-orange-600 border-none text-[10px] font-black uppercase">
-                        Institución
-                      </Badge>
-                    </div>
-                  ))
-                ) : (
-                  <div className="p-8 text-center text-gray-400 font-medium italic text-sm">
-                    No hay instituciones registradas aún.
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-navy text-white">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold">Acciones Rápidas</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button asChild className="w-full justify-start bg-white/5 hover:bg-white/10 text-white border-none rounded-xl h-11 font-bold group">
-                <Link href="/app/admin/educators">
-                  <Users size={16} className="mr-3 text-tech-cyan" />
-                  Ver todos los docentes
-                  <ArrowUpRight size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-all" />
-                </Link>
-              </Button>
-              <Button asChild className="w-full justify-start bg-white/5 hover:bg-white/10 text-white border-none rounded-xl h-11 font-bold group">
-                <Link href="/app/admin/institutions">
-                  <Building2 size={16} className="mr-3 text-energy-orange" />
-                  Ver todos los centros
-                  <ArrowUpRight size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-all" />
-                </Link>
-              </Button>
-              <Button asChild className="w-full justify-start bg-white/5 hover:bg-white/10 text-white border-none rounded-xl h-11 font-bold group">
-                <Link href="/app/admin/verifications">
-                  <FileCheck size={16} className="mr-3 text-cyan-400" />
-                  Cola de verificación
-                  <ArrowUpRight size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-all" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      <PendingFacultyPanel faculty={pendingFaculty} />
     </div>
   );
 }

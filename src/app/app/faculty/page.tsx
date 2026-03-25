@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase-server";
-import { 
-  CheckCircle2, 
-  ShieldCheck, 
-  Mail, 
-  Plus, 
+import {
+  CheckCircle2,
+  ShieldCheck,
+  Mail,
+  Plus,
   Building2,
   ArrowRight,
   Target,
@@ -12,6 +12,9 @@ import {
   EyeOff,
   User,
   MapPin,
+  Clock,
+  AlertCircle,
+  XCircle,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,10 +39,18 @@ export default async function EducatorDashboard() {
         .eq("user_id", user.id)
         .single();
 
-  // Data lives in JSONB columns on faculty_profiles (set by onboarding)
+  // Merge faculty_profiles with user_metadata as fallback
+  const userMeta = user.user_metadata || {};
+  const verificationStatus: string = profile?.verification_status || "pending";
+  const verificationNotes: string | null = profile?.verification_notes || null;
+
+  // Data lives in JSONB columns on faculty_profiles; fall back to user_metadata from signup form
   const languages: any[] = facultyProfile?.languages || [];
   const history: any[] = facultyProfile?.institutions_taught || [];
-  const areas: any[] = (facultyProfile?.faculty_areas || []).map((a: string) => ({ id: a, area: a }));
+  const rawAreas: string[] = facultyProfile?.faculty_areas?.length > 0
+    ? facultyProfile.faculty_areas
+    : (userMeta.knowledge_areas || []);
+  const areas: any[] = rawAreas.map((a: string) => ({ id: a, area: a }));
   const levels: any[] = (facultyProfile?.levels || []).map((l: string) => ({ id: l, level: l }));
   
   const { data: recentRequests } = await supabase
@@ -83,28 +94,59 @@ export default async function EducatorDashboard() {
         </div>
       </div>
 
-      {facultyProfile?.is_verified ? (
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <ShieldCheck size={18} className="text-green-600" />
+      {verificationStatus === "approved" && (
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-5 mb-6 flex items-start gap-4">
+          <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <CheckCircle2 size={20} className="text-green-600" />
           </div>
           <div>
-            <p className="text-sm font-bold text-green-800">Perfil verificado</p>
-            <p className="text-xs text-green-600 mt-0.5">
-              Tu perfil ha sido revisado y aprobado. Ya eres visible para instituciones verificadas.
+            <p className="font-black text-green-800">✓ Perfil verificado</p>
+            <p className="text-sm text-green-600 mt-0.5">Tu perfil es visible para instituciones de todo el mundo.</p>
+          </div>
+        </div>
+      )}
+      {verificationStatus === "pending" && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6 flex items-start gap-4">
+          <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Clock size={20} className="text-amber-600" />
+          </div>
+          <div>
+            <p className="font-black text-amber-800">Perfil en revisión</p>
+            <p className="text-sm text-amber-600 mt-0.5">
+              Nuestro equipo está revisando tu perfil. Recibirás un email de confirmación en 24-48 horas laborables.
             </p>
           </div>
         </div>
-      ) : (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <ShieldCheck size={18} className="text-amber-600" />
+      )}
+      {verificationStatus === "requires_info" && (
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-6 flex items-start gap-4">
+          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <AlertCircle size={20} className="text-blue-600" />
           </div>
           <div>
-            <p className="text-sm font-bold text-amber-800">Perfil pendiente de verificación</p>
-            <p className="text-xs text-amber-600 mt-0.5">
-              Nuestro equipo revisará tu perfil en 48-72h. Te avisaremos cuando esté aprobado.
-            </p>
+            <p className="font-black text-blue-800">Necesitamos más información</p>
+            {verificationNotes && (
+              <p className="text-sm text-blue-600 mt-0.5">{verificationNotes}</p>
+            )}
+            <Link href="/app/faculty/profile" className="inline-flex items-center gap-1 text-sm font-bold text-blue-700 hover:underline mt-2">
+              Completar mi perfil →
+            </Link>
+          </div>
+        </div>
+      )}
+      {verificationStatus === "rejected" && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-5 mb-6 flex items-start gap-4">
+          <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <XCircle size={20} className="text-red-600" />
+          </div>
+          <div>
+            <p className="font-black text-red-800">Perfil no verificado</p>
+            {verificationNotes && (
+              <p className="text-sm text-red-600 mt-0.5">{verificationNotes}</p>
+            )}
+            <Link href="/app/faculty/profile" className="inline-flex items-center gap-1 text-sm font-bold text-red-700 hover:underline mt-2">
+              Mejorar mi perfil →
+            </Link>
           </div>
         </div>
       )}
