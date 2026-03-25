@@ -17,10 +17,8 @@ import {
   Star,
   Building2,
   CreditCard,
-  LayoutDashboard,
   Users,
-  FileCheck,
-  Tags
+  FileCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -44,13 +42,11 @@ const institutionItems = [
 ];
 
 const adminItems = [
-    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { label: "Verificaciones", href: "/app/admin/verifications", icon: FileCheck },
-    { label: "Docentes", href: "/app/admin/faculty", icon: Users },
-    { label: "Instituciones", href: "/app/admin/institutions", icon: Building2 },
-
-  { label: "Taxonomía", href: "/app/admin/taxonomy", icon: Tags },
-  { label: "Ajustes", href: "/app/admin/settings", icon: Settings },
+  { label: "Verificaciones pendientes", href: "/control", icon: FileCheck },
+  { label: "Aprobados", href: "/control/approved", icon: Users },
+  { label: "Rechazados", href: "/control/rejected", icon: X },
+  { label: "Instituciones", href: "/control/institutions", icon: Building2 },
+  { label: "Ajustes", href: "/control/settings", icon: Settings },
 ];
 
 export function Sidebar() {
@@ -113,13 +109,13 @@ export function Sidebar() {
         </div>
 
         <div className="p-4 border-t border-gray-100">
-          <Link
-            href="/help"
+          <a
+            href="mailto:support@facultymatch.app"
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
             <HelpCircle size={20} className="text-gray-400" />
             Centro de ayuda
-          </Link>
+          </a>
         </div>
       </aside>
     </>

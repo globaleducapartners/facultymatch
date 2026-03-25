@@ -53,9 +53,8 @@ export function Topbar({ user, profile }: TopbarProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="p-2 text-gray-400 hover:text-gray-900 transition-colors relative">
+          <button className="p-2 text-gray-400 hover:text-gray-900 transition-colors">
             <Bell size={22} />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-orange-500 rounded-full ring-2 ring-white"></span>
           </button>
           
           <DropdownMenu>

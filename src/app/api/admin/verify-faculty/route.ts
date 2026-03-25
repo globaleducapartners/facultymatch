@@ -38,7 +38,11 @@ export async function POST(request: Request) {
 
   const { data: authUser } = await admin.auth.admin.getUserById(facultyId);
   const facultyEmail = facultyProfile?.email || authUser?.user?.email;
-  const facultyName = facultyProfile?.full_name?.split(" ")[0] || "Docente";
+  const facultyName =
+    facultyProfile?.full_name?.split(" ")[0] ||
+    authUser?.user?.user_metadata?.full_name?.split(" ")[0] ||
+    authUser?.user?.email?.split("@")[0] ||
+    "Docente";
 
   if (action === "approve") {
     // Update user_profiles

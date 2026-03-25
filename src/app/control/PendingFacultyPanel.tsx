@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Eye, CheckCircle2, XCircle, Loader2, X,
   Mail, Phone, MapPin, Linkedin, GraduationCap,
@@ -97,6 +98,7 @@ export default function PendingFacultyPanel({
   const [loading, setLoading] = useState<string | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   let toastCounter = 0;
+  const router = useRouter();
 
   const checklistItems = [
     { key: "email", label: "Email válido y profesional", auto: true },
@@ -141,6 +143,7 @@ export default function PendingFacultyPanel({
     });
     if (!res.ok) throw new Error(await res.text());
     removeFaculty(facultyId);
+    router.refresh(); // Re-render layout to update sidebar pending count
     if (action === "approve") {
       setMetrics((m) => ({
         ...m,

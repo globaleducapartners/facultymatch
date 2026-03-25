@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase-server";
 import { CheckCircle2, ShieldCheck, Upload, FileText, GraduationCap, AlertCircle, ArrowRight, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,10 +24,10 @@ export default async function VerificationPage() {
   const status = (isVerified ? 'verified' : 'none') as 'verified' | 'pending' | 'none';
     
     const steps = [
-      { id: 1, label: "Perfil básico completo", completed: !!facultyProfile?.headline, icon: CheckCircle2 },
-      { id: 2, label: "Localización definida", completed: !!facultyProfile?.location, icon: FileText },
-      { id: 3, label: "Experiencia docente (años)", completed: (facultyProfile?.years_experience || 0) > 0, icon: GraduationCap },
-      { id: 4, label: "Perfil público", completed: facultyProfile?.visibility === 'public', icon: GraduationCap },
+      { id: 1, label: "Perfil básico completo", completed: !!facultyProfile?.headline, icon: CheckCircle2, href: "/app/faculty/profile" },
+      { id: 2, label: "Localización definida", completed: !!facultyProfile?.location, icon: FileText, href: "/app/faculty/profile" },
+      { id: 3, label: "Experiencia docente (años)", completed: (facultyProfile?.years_experience || 0) > 0, icon: GraduationCap, href: "/app/faculty/profile" },
+      { id: 4, label: "Perfil público", completed: facultyProfile?.visibility === 'public', icon: GraduationCap, href: "/app/faculty/privacy" },
     ];
   
     const completedCount = steps.filter(s => s.completed).length;
@@ -91,9 +92,9 @@ export default async function VerificationPage() {
                       {step.completed ? (
                         <CheckCircle2 size={20} className="text-tech-cyan" />
                       ) : (
-                        <Button variant="ghost" className="text-talentia-blue hover:text-blue-700 font-bold text-xs p-0 h-auto uppercase tracking-widest">
-                          Completar <ArrowRight size={14} className="ml-1" />
-                        </Button>
+                        <Link href={step.href} className="flex items-center gap-1 text-talentia-blue hover:text-blue-700 font-bold text-xs uppercase tracking-widest transition-colors">
+                          Completar <ArrowRight size={14} />
+                        </Link>
                       )}
                     </div>
                   ))}

@@ -80,13 +80,13 @@ export default async function EducatorDashboard() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-black text-navy tracking-tight">
-            Hola, {profile?.full_name?.split(' ')[0]}
+            Hola, {profile?.full_name?.split(' ')[0] || userMeta?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
           </h1>
           <p className="text-gray-500 font-medium mt-1">Gestiona tu presencia académica y recibe oportunidades.</p>
         </div>
         <div className="flex items-center gap-3">
           <Button asChild className="bg-talentia-blue hover:bg-navy text-white font-black rounded-2xl h-14 px-8 shadow-xl shadow-blue-100 transition-all">
-            <Link href="/onboarding" className="flex items-center gap-2">
+            <Link href="/app/faculty/profile" className="flex items-center gap-2">
               <User size={20} />
               Editar Perfil
             </Link>

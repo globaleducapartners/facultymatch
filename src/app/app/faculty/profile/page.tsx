@@ -8,11 +8,14 @@ import { redirect } from "next/navigation";
 import { CVUpload } from "@/components/profile/CVUpload";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 
-export default async function ProfilePage() {
+export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  const { saved } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect("/login");
+
+  const userMeta = user.user_metadata || {};
 
   const { data: profile } = await supabase
     .from("user_profiles")
@@ -24,7 +27,7 @@ export default async function ProfilePage() {
     .from("faculty_profiles")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   const { data: documents } = await supabase
     .from("faculty_documents")
@@ -70,6 +73,7 @@ export default async function ProfilePage() {
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
+    redirect("/app/faculty/profile?saved=1");
   }
 
   async function updateContactPreferences(formData: FormData) {
@@ -106,6 +110,12 @@ export default async function ProfilePage() {
         <p className="text-gray-500 font-medium">Gestiona tu identidad académica y profesional.</p>
       </div>
 
+      {saved === "1" && (
+        <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
+          ✓ Cambios guardados correctamente
+        </div>
+      )}
+
       {/* Avatar + name header */}
       <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
         <CardContent className="pt-6">
@@ -113,10 +123,10 @@ export default async function ProfilePage() {
             <AvatarUpload
               userId={user.id}
               currentAvatarUrl={profile?.avatar_url || facultyProfile?.avatar_url}
-              name={profile?.full_name}
+              name={profile?.full_name || userMeta.full_name}
             />
             <div className="text-center sm:text-left">
-              <h2 className="text-xl font-black text-navy">{profile?.full_name || "Tu nombre"}</h2>
+              <h2 className="text-xl font-black text-navy">{profile?.full_name || userMeta.full_name || "Tu nombre"}</h2>
               <p className="text-gray-500 font-medium text-sm mt-1">{facultyProfile?.headline || "Añade tu titular académico"}</p>
               <p className="text-xs text-gray-400 mt-2">{user.email}</p>
               <div className="flex items-center justify-center sm:justify-start gap-2 mt-3">
@@ -164,7 +174,7 @@ export default async function ProfilePage() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
                     <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Nombre completo</label>
-                    <input name="fullName" defaultValue={profile?.full_name} required
+                    <input name="fullName" defaultValue={profile?.full_name || userMeta.full_name} required
                       className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium" />
                   </div>
                   <div className="space-y-1.5">
@@ -177,13 +187,13 @@ export default async function ProfilePage() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
                     <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-1"><Globe size={12} /> País</label>
-                    <input name="country" defaultValue={facultyProfile?.country}
+                    <input name="country" defaultValue={facultyProfile?.country || userMeta.country}
                       className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium"
                       placeholder="Ej: España" />
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-1"><MapPin size={12} /> Ciudad</label>
-                    <input name="city" defaultValue={facultyProfile?.city}
+                    <input name="city" defaultValue={facultyProfile?.city || userMeta.city}
                       className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium"
                       placeholder="Ej: Madrid" />
                   </div>

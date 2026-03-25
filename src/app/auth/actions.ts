@@ -182,7 +182,7 @@ export async function signIn(formData: FormData) {
     } else if (profile.role === "institution") {
       redirect("/app/institution");
     } else if (profile.role === "admin" || profile.role === "super_admin") {
-      redirect("/app/admin");
+      redirect("/control");
     }
   }
 
@@ -279,7 +279,7 @@ export async function contactFaculty(formData: FormData) {
   try {
     await resend.emails.send({
       from: FROM,
-      to: ['info@facultymatch.app'],
+      to: ['support@facultymatch.app'],
       subject: `🔔 Nuevo contacto: ${institutionData?.name} → ${facultyUser?.full_name}`,
       html: `<p>Nueva solicitud de contacto.<br>
              Institución: ${institutionData?.name}<br>
