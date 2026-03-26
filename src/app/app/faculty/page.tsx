@@ -62,11 +62,11 @@ export default async function EducatorDashboard() {
 
   // Checklist logic enriched
   const checklist = [
-    { id: 'headline', label: "Titular académico", completed: !!facultyProfile?.headline },
-    { id: 'bio', label: "Biografía profesional", completed: !!facultyProfile?.bio },
-    { id: 'location', label: "Ubicación", completed: !!facultyProfile?.location },
+    { id: 'info', label: "Titular y ubicación", completed: !!facultyProfile?.headline && !!facultyProfile?.location },
+    { id: 'areas', label: "Áreas de conocimiento", completed: (facultyProfile?.faculty_areas || []).length > 0 },
     { id: 'langs', label: "Idiomas", completed: (facultyProfile?.languages || []).length > 0 },
-    { id: 'areas', label: "Áreas / Facultades", completed: (facultyProfile?.faculty_areas || []).length > 0 },
+    { id: 'history', label: "Historial docente", completed: (facultyProfile?.institutions_taught || []).length > 0 },
+    { id: 'bio', label: "Biografía profesional", completed: !!facultyProfile?.bio },
     { id: 'availability', label: "Disponibilidad", completed: !!facultyProfile?.availability },
   ];
 

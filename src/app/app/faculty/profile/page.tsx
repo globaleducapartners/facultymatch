@@ -121,6 +121,7 @@ export default async function ProfilePage({
       .eq("user_id", user.id);
 
     revalidatePath("/app/faculty/profile");
+    revalidatePath("/app/faculty");
     redirect("/app/faculty/profile?saved=1&tab=formacion");
   }
 
@@ -164,6 +165,7 @@ export default async function ProfilePage({
       .eq("user_id", user.id);
 
     revalidatePath("/app/faculty/profile");
+    revalidatePath("/app/faculty");
     redirect("/app/faculty/profile?saved=1&tab=research");
   }
 
@@ -187,6 +189,7 @@ export default async function ProfilePage({
       .eq("user_id", user.id);
 
     revalidatePath("/app/faculty/profile");
+    revalidatePath("/app/faculty");
     redirect("/app/faculty/profile?saved=1&tab=links");
   }
 
@@ -215,6 +218,7 @@ export default async function ProfilePage({
     }).eq("user_id", user.id);
 
     revalidatePath("/app/faculty/profile");
+    revalidatePath("/app/faculty");
     redirect("/app/faculty/profile?saved=1&tab=preferences");
   }
 
