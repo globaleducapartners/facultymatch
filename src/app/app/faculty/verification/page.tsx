@@ -38,9 +38,7 @@ export default async function VerificationPage() {
   const verificationStatus = userProfile?.verification_status || "pending";
   const verificationNotes = userProfile?.verification_notes;
 
-  const hasIdDocument = documents?.some(
-    (d) => d.doc_type === "id_document" || d.doc_type === "passport"
-  );
+  const hasIdDocument = (documents?.length ?? 0) > 0;
   const hasLanguages = (facultyProfile?.languages?.length ?? 0) > 0;
   const hasAreas = (facultyProfile?.faculty_areas?.length ?? 0) > 0;
 
