@@ -29,8 +29,8 @@ export default async function RequestsPage() {
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
     .select("id")
-    .eq("user_id", user.id)
-    .single();
+    .eq("id", user.id)
+    .maybeSingle();
 
   const { data: requests } = await supabase
     .from("contacts")

@@ -8,7 +8,12 @@ interface Props {
 }
 
 export function InstitutionsTaughtEditor({ initialInstitutions }: Props) {
-  const [institutions, setInstitutions] = useState<string[]>(initialInstitutions ?? []);
+  // Normalize: JSONB may return objects instead of plain strings
+  const normalize = (arr: string[]) =>
+    (arr ?? [])
+      .map((i: any) => (typeof i === "string" ? i : i?.name || i?.university || i?.label || ""))
+      .filter(Boolean);
+  const [institutions, setInstitutions] = useState<string[]>(normalize(initialInstitutions));
 
   return (
     <div>

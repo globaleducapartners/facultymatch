@@ -17,7 +17,7 @@ export default async function SpecialtiesPage() {
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
     .select("id")
-    .eq("user_id", user.id)
+    .eq("id", user.id)
     .single();
 
   const { data: expertise } = await supabase
@@ -43,7 +43,7 @@ export default async function SpecialtiesPage() {
     const { data: faculty } = await supabase
       .from("faculty_profiles")
       .select("id")
-      .eq("user_id", user.id)
+      .eq("id", user.id)
       .single();
 
     await supabase.from("faculty_expertise").insert({

@@ -13,6 +13,7 @@ import {
   User,
   MapPin,
   Clock,
+  Briefcase,
   AlertCircle,
   XCircle,
 } from "lucide-react";
@@ -36,8 +37,8 @@ export default async function EducatorDashboard() {
   const { data: facultyProfile } = await supabase
       .from("faculty_profiles")
         .select("*")
-        .eq("user_id", user.id)
-        .single();
+        .eq("id", user.id)
+        .maybeSingle();
 
   // Merge faculty_profiles with user_metadata as fallback
   const userMeta = user.user_metadata || {};
@@ -158,7 +159,7 @@ export default async function EducatorDashboard() {
             <CardHeader className="pb-4 bg-gray-50/50">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-xl font-black text-navy">Estado de Completitud</CardTitle>
+                  <CardTitle className="text-xl font-black text-navy">Estado del Perfil</CardTitle>
                   <CardDescription className="font-medium">Completa el 100% para maximizar visibilidad.</CardDescription>
                 </div>
                 <div className="flex flex-col items-end">
@@ -209,73 +210,98 @@ export default async function EducatorDashboard() {
           <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl font-black text-navy flex items-center gap-2">
-                  <Eye size={22} className="text-talentia-blue" />
-                  Tu perfil, bajo tu control
-                </CardTitle>
+                <div>
+                  <CardTitle className="text-xl font-black text-navy flex items-center gap-2">
+                    <Eye size={22} className="text-talentia-blue" />
+                    Vista previa del perfil
+                  </CardTitle>
+                  <p className="text-xs text-gray-400 font-medium mt-0.5">Así verán tu ficha los centros e instituciones</p>
+                </div>
                 <Button size="sm" variant="ghost" className="text-talentia-blue font-black text-xs rounded-xl hover:bg-blue-50" asChild>
                   <Link href="/app/faculty/profile">Editar →</Link>
                 </Button>
               </div>
             </CardHeader>
             <CardContent className="pb-8">
-              {/* Card preview */}
-              <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-navy via-[#0f2c5a] to-talentia-blue p-8 shadow-2xl shadow-blue-900/20">
-                {/* Background decoration */}
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-bl-[5rem]"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-tech-cyan/10 rounded-tr-[4rem]"></div>
-
-                {/* Top row */}
-                <div className="relative z-10 flex items-start justify-between mb-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center flex-shrink-0">
-                      <User size={28} className="text-white/80" />
+              {/* Simulated institution card */}
+              <div className="border border-gray-100 rounded-3xl overflow-hidden shadow-sm">
+                {/* Header band */}
+                <div className="bg-gradient-to-r from-navy to-[#0f2c5a] h-16 relative">
+                  <div className="absolute -bottom-8 left-6">
+                    <div className="w-16 h-16 rounded-2xl bg-white border-2 border-white shadow-lg flex items-center justify-center text-navy font-black text-xl">
+                      {profile?.full_name
+                        ? profile.full_name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")
+                        : "?"}
                     </div>
-                    <div>
-                      <h3 className="font-black text-white text-base leading-tight">{profile?.full_name || 'Tu Nombre'}</h3>
-                      <p className="text-tech-cyan text-xs font-bold mt-0.5 truncate max-w-[180px]">{facultyProfile?.headline || 'Añade tu titulación'}</p>
-                    </div>
-                  </div>
-                  <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${isPublished ? 'bg-green-400/20 border-green-400/30 text-green-300' : 'bg-orange-400/20 border-orange-400/30 text-orange-300'}`}>
-                    {isPublished ? 'Publicado' : 'Borrador'}
                   </div>
                 </div>
 
-                {/* Areas */}
-                <div className="relative z-10 flex flex-wrap gap-2 mb-6">
-                  {areas?.slice(0, 3).map(a => (
-                    <span key={a.id} className="bg-white/10 border border-white/20 text-white/80 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">{a.area}</span>
-                  ))}
-                  {(!areas || areas.length === 0) && (
-                    <span className="bg-white/5 border border-dashed border-white/20 text-white/30 text-[10px] font-bold px-3 py-1 rounded-full">Añade tus áreas →</span>
+                {/* Body */}
+                <div className="bg-white px-6 pt-12 pb-6 space-y-4">
+                  {/* Name + badges */}
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-black text-navy text-lg leading-tight">{profile?.full_name || 'Tu Nombre'}</h3>
+                      {facultyProfile?.is_phd && (
+                        <span className="px-2 py-0.5 bg-talentia-blue text-white text-[10px] font-black rounded-full uppercase tracking-widest">PhD</span>
+                      )}
+                      {facultyProfile?.aneca_accreditation?.includes("ANECA") && (
+                        <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-black rounded-full uppercase tracking-widest">ANECA</span>
+                      )}
+                    </div>
+                    <p className="text-talentia-blue text-sm font-bold mt-0.5">{facultyProfile?.headline || <span className="text-gray-300 italic font-normal">Sin titular — añádelo en tu perfil</span>}</p>
+                    <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400 font-medium">
+                      {facultyProfile?.location && <span className="flex items-center gap-1"><MapPin size={11} />{facultyProfile.location}</span>}
+                      {facultyProfile?.years_experience ? <span className="flex items-center gap-1"><Briefcase size={11} />{facultyProfile.years_experience} años exp.</span> : null}
+                    </div>
+                  </div>
+
+                  {/* Bio snippet */}
+                  {facultyProfile?.bio ? (
+                    <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2 border-l-2 border-gray-100 pl-3">
+                      {facultyProfile.bio}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-300 italic border-l-2 border-dashed border-gray-100 pl-3">Sin biografía — añádela para generar más confianza</p>
                   )}
-                </div>
 
-                {/* Stats row */}
-                <div className="relative z-10 grid grid-cols-3 gap-3 mb-6">
-                  {[
-                    { label: "Idiomas", value: languages.length || "—" },
-                    { label: "Cargos", value: history.length || "—" },
-                    { label: "Áreas", value: areas.length || "—" },
-                  ].map(stat => (
-                    <div key={stat.label} className="bg-white/5 border border-white/10 rounded-2xl p-3 text-center">
-                      <p className="text-xl font-black text-white">{stat.value}</p>
-                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{stat.label}</p>
+                  {/* Areas */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {areas.slice(0, 4).map(a => (
+                      <span key={a.id} className="bg-blue-50 border border-blue-100 text-talentia-blue text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider">{a.area}</span>
+                    ))}
+                    {areas.length === 0 && <span className="text-[10px] text-gray-300 italic">Sin áreas de conocimiento</span>}
+                  </div>
+
+                  {/* Footer stats */}
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-50 text-xs font-bold text-gray-400">
+                    <div className="flex items-center gap-4">
+                      <span className="flex items-center gap-1"><GraduationCap size={12} />{levels?.[0]?.level || '—'}</span>
+                      <span className="flex items-center gap-1"><Target size={12} />{languages.length} idioma{languages.length !== 1 ? 's' : ''}</span>
                     </div>
-                  ))}
-                </div>
-
-                {/* Location & Level */}
-                <div className="relative z-10 flex items-center justify-between text-xs font-bold text-white/50">
-                  <span className="flex items-center gap-1.5"><MapPin size={12} /> {facultyProfile?.location || 'Sin ubicación'}</span>
-                  <span className="flex items-center gap-1.5"><GraduationCap size={12} /> {levels?.[0]?.level || 'Nivel pendiente'}</span>
+                    <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase ${
+                      facultyProfile?.availability === 'open' ? 'bg-green-50 text-green-600' :
+                      facultyProfile?.availability === 'online_only' ? 'bg-blue-50 text-talentia-blue' :
+                      'bg-orange-50 text-orange-600'
+                    }`}>
+                      <Clock size={10} />
+                      {facultyProfile?.availability === 'open' ? 'Disponible' :
+                       facultyProfile?.availability === 'next_semester' ? 'Próx. semestre' :
+                       facultyProfile?.availability === 'occasional' ? 'Asig. puntuales' :
+                       facultyProfile?.availability === 'online_only' ? 'Solo online' :
+                       facultyProfile?.availability === 'weekends' ? 'Fines de semana' :
+                       facultyProfile?.availability === 'limited' ? 'En 6 meses' :
+                       facultyProfile?.availability === 'invite_only' ? 'Por invitación' :
+                       'Sin disponibilidad'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* Progress bar below card */}
               <div className="mt-5 space-y-2">
                 <div className="flex justify-between text-xs font-black text-navy uppercase tracking-widest">
-                  <span>Completitud del perfil</span>
+                  <span>Perfil completado</span>
                   <span className={calculatedProgress === 100 ? 'text-green-600' : 'text-talentia-blue'}>{calculatedProgress}%</span>
                 </div>
                 <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">

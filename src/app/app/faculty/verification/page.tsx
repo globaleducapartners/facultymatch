@@ -26,7 +26,7 @@ export default async function VerificationPage() {
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("id", user.id)
     .maybeSingle();
 
   const { data: documents } = await supabase

@@ -39,7 +39,7 @@ export default async function ProfilePage({
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("id", user.id)
     .maybeSingle();
 
   const { data: documents } = await supabase
@@ -64,12 +64,12 @@ export default async function ProfilePage({
 
     await supabase.from("user_profiles").update({ full_name: fullName }).eq("id", user.id);
     await supabase.from("faculty_profiles")
-      .update({
+      .upsert({
+        id: user.id, user_id: user.id,
         headline, bio, country, city,
         location: [city, country].filter(Boolean).join(", ") || null,
         updated_at: new Date().toISOString(),
-      })
-      .eq("user_id", user.id);
+      }, { onConflict: "id" });
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -91,7 +91,8 @@ export default async function ProfilePage({
     if (!user) return;
 
     await supabase.from("faculty_profiles")
-      .update({
+      .upsert({
+        id: user.id, user_id: user.id,
         current_institution: currentInstitution,
         years_experience: yearsExperience,
         availability,
@@ -99,8 +100,7 @@ export default async function ProfilePage({
         academic_level: academicLevel,
         institutions_taught: institutionsTaught,
         updated_at: new Date().toISOString(),
-      })
-      .eq("user_id", user.id);
+      }, { onConflict: "id" });
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -117,8 +117,7 @@ export default async function ProfilePage({
     if (!user) return;
 
     await supabase.from("faculty_profiles")
-      .update({ degrees, updated_at: new Date().toISOString() })
-      .eq("user_id", user.id);
+      .upsert({ id: user.id, user_id: user.id, degrees, updated_at: new Date().toISOString() }, { onConflict: "id" });
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -135,8 +134,7 @@ export default async function ProfilePage({
     if (!user) return;
 
     await supabase.from("faculty_profiles")
-      .update({ languages, updated_at: new Date().toISOString() })
-      .eq("user_id", user.id);
+      .upsert({ id: user.id, user_id: user.id, languages, updated_at: new Date().toISOString() }, { onConflict: "id" });
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -160,14 +158,14 @@ export default async function ProfilePage({
     if (!user) return;
 
     await supabase.from("faculty_profiles")
-      .update({
+      .upsert({
+        id: user.id, user_id: user.id,
         aneca_accreditation: anecaAccreditation,
         research_publications: researchPublications,
         google_scholar_id: googleScholarId,
         orcid_id: orcidId,
         updated_at: new Date().toISOString(),
-      })
-      .eq("user_id", user.id);
+      }, { onConflict: "id" });
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -185,13 +183,13 @@ export default async function ProfilePage({
     if (!user) return;
 
     await supabase.from("faculty_profiles")
-      .update({
-        linkedin_url: linkedinUrl,
-        website,
-        phone,
+      .upsert({
+        id: user.id, user_id: user.id,
+        linkedin_url: linkedinUrl || null,
+        website: website || null,
+        phone: phone || null,
         updated_at: new Date().toISOString(),
-      })
-      .eq("user_id", user.id);
+      }, { onConflict: "id" });
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -212,15 +210,16 @@ export default async function ProfilePage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase.from("faculty_profiles").update({
-      contact_email: contactEmail,
-      contact_whatsapp: contactWhatsapp,
-      contact_linkedin: contactLinkedin,
+    await supabase.from("faculty_profiles").upsert({
+      id: user.id, user_id: user.id,
+      contact_email: contactEmail || null,
+      contact_whatsapp: contactWhatsapp || null,
+      contact_linkedin: contactLinkedin || null,
       notify_new_offers: notifyNewOffers,
       notify_messages: notifyMessages,
       notify_weekly_digest: notifyWeeklyDigest,
       preferred_contact_method: preferredContact,
-    }).eq("user_id", user.id);
+    }, { onConflict: "id" });
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");

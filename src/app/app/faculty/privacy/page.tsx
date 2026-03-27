@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
-import { ShieldCheck, Eye, EyeOff, Lock, UserPlus, Search, X, AlertCircle, Sparkles } from "lucide-react";
+import { ShieldCheck, Eye, EyeOff, Lock, UserPlus, Search, X, AlertCircle, Sparkles, Star } from "lucide-react";
 import { UNIVERSITIES } from "@/data/universities";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ export default async function PrivacyPage({
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("id", user.id)
     .maybeSingle();
 
   const { data: visibilityRules } = await supabase
@@ -40,13 +40,17 @@ export default async function PrivacyPage({
   const profileToken = facultyProfile?.profile_token;
   const uniqueLink = profileToken ? `${siteUrl}/faculty/invite/${profileToken}` : null;
 
+  const preferredInstitutions: string[] =
+    (facultyProfile?.preferred_institutions as string[] | null) || [];
+
   async function updateVisibility(formData: FormData) {
     "use server";
     const mode = formData.get("visibilityMode") as "public" | "institutions_only" | "hidden";
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    await supabase.from("faculty_profiles").update({ visibility: mode }).eq("user_id", user.id);
+    await supabase.from("faculty_profiles")
+      .upsert({ id: user.id, user_id: user.id, visibility: mode }, { onConflict: "id" });
     revalidatePath("/app/faculty/privacy");
     redirect("/app/faculty/privacy?saved=1");
   }
@@ -58,8 +62,7 @@ export default async function PrivacyPage({
     if (!user) return;
     const token = crypto.randomUUID();
     await supabase.from("faculty_profiles")
-      .update({ profile_token: token })
-      .eq("user_id", user.id);
+      .upsert({ id: user.id, user_id: user.id, profile_token: token }, { onConflict: "id" });
     revalidatePath("/app/faculty/privacy");
   }
 
@@ -77,18 +80,46 @@ export default async function PrivacyPage({
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const { data: faculty } = await supabase
-      .from("faculty_profiles").select("id").eq("user_id", user.id).single();
     const { data: inst } = await supabase
       .from("institutions").select("id").ilike("name", `%${name}%`).limit(1).maybeSingle();
     if (inst) {
       await supabase.from("visibility_rules").insert({
-        faculty_id: faculty?.id,
+        faculty_id: user.id,
         institution_id: inst.id,
         rule: "block",
       });
       revalidatePath("/app/faculty/privacy");
     }
+  }
+
+  async function addPreferredInstitution(formData: FormData) {
+    "use server";
+    const name = (formData.get("preferredName") as string)?.trim();
+    if (!name) return;
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data: fp } = await supabase
+      .from("faculty_profiles").select("preferred_institutions").eq("id", user.id).maybeSingle();
+    const current = (fp?.preferred_institutions as string[] | null) || [];
+    if (!current.includes(name) && current.length < 5) current.push(name);
+    await supabase.from("faculty_profiles")
+      .upsert({ id: user.id, user_id: user.id, preferred_institutions: current }, { onConflict: "id" });
+    revalidatePath("/app/faculty/privacy");
+  }
+
+  async function removePreferredInstitution(formData: FormData) {
+    "use server";
+    const name = formData.get("preferredName") as string;
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data: fp } = await supabase
+      .from("faculty_profiles").select("preferred_institutions").eq("id", user.id).maybeSingle();
+    const updated = ((fp?.preferred_institutions as string[] | null) || []).filter(i => i !== name);
+    await supabase.from("faculty_profiles")
+      .upsert({ id: user.id, user_id: user.id, preferred_institutions: updated }, { onConflict: "id" });
+    revalidatePath("/app/faculty/privacy");
   }
 
   return (
@@ -332,6 +363,100 @@ export default async function PrivacyPage({
                   </button>
                 </form>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* ── Visibilidad Preferente (premium) ── */}
+          <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                <Star size={20} className="text-energy-orange" />
+                Visibilidad preferente
+              </CardTitle>
+              <CardDescription className="font-medium text-xs">
+                Aparece primero cuando estas instituciones busquen docentes.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {!isPremium ? (
+                <div className="rounded-2xl border-2 border-dashed border-energy-orange/30 bg-orange-50/40 p-5 space-y-3 text-center">
+                  <div className="flex items-center justify-center gap-2 text-energy-orange">
+                    <Sparkles size={18} />
+                    <span className="text-xs font-black uppercase tracking-widest">Plan Professional</span>
+                  </div>
+                  <p className="text-xs font-medium text-gray-600">
+                    Elige hasta 5 instituciones en las que quieres aparecer entre los primeros resultados.
+                  </p>
+                  <div className="text-xl font-black text-navy">29€ <span className="text-sm text-gray-400 font-bold">/ año</span></div>
+                  <a
+                    href="/checkout?plan=faculty-pro"
+                    className="inline-flex items-center gap-2 bg-energy-orange hover:bg-orange-500 text-white font-black text-xs px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-orange-100"
+                  >
+                    <Sparkles size={13} /> Activar visibilidad preferente
+                  </a>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-xs text-gray-500 font-medium">
+                    Selecciona hasta <strong>5 instituciones</strong>. Tu perfil aparecerá destacado cuando busquen docentes.
+                  </p>
+
+                  {/* Add form */}
+                  {preferredInstitutions.length < 5 && (
+                    <form action={addPreferredInstitution} className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                        <input
+                          name="preferredName"
+                          type="text"
+                          list="preferred-univ-list"
+                          placeholder="Busca una institución..."
+                          required
+                          className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-energy-orange focus:border-transparent outline-none transition-all font-medium"
+                        />
+                        <datalist id="preferred-univ-list">
+                          {UNIVERSITIES.map((u) => <option key={u} value={u} />)}
+                        </datalist>
+                      </div>
+                      <Button type="submit" size="sm" className="bg-energy-orange hover:bg-orange-500 text-white font-black rounded-xl px-4 shrink-0">
+                        +
+                      </Button>
+                    </form>
+                  )}
+
+                  {/* Current list */}
+                  <div className="space-y-2">
+                    {preferredInstitutions.length === 0 ? (
+                      <p className="text-xs text-gray-400 font-medium text-center py-4 border border-dashed border-gray-200 rounded-xl">
+                        Aún no has añadido ninguna institución.
+                      </p>
+                    ) : (
+                      preferredInstitutions.map((name) => (
+                        <div key={name} className="flex items-center justify-between p-3 bg-orange-50 border border-orange-100 rounded-xl">
+                          <div className="flex items-center gap-2">
+                            <Star size={13} className="text-energy-orange shrink-0" />
+                            <span className="text-sm font-bold text-navy truncate max-w-[180px]">{name}</span>
+                          </div>
+                          <form action={removePreferredInstitution}>
+                            <input type="hidden" name="preferredName" value={name} />
+                            <button type="submit" className="p-1 text-gray-300 hover:text-red-500 transition-colors">
+                              <X size={15} />
+                            </button>
+                          </form>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {preferredInstitutions.length >= 5 && (
+                    <p className="text-xs text-orange-500 font-bold text-center">Límite de 5 instituciones alcanzado.</p>
+                  )}
+
+                  <p className="text-[10px] text-gray-400 font-medium leading-relaxed">
+                    La visibilidad preferente es una señal de interés. No garantiza contratación ni acceso prioritario a datos de contacto.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 

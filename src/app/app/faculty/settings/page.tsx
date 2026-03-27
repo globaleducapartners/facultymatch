@@ -21,8 +21,8 @@ export default async function SettingsPage() {
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
     .select("*")
-    .eq("user_id", user.id)
-    .single();
+    .eq("id", user.id)
+    .maybeSingle();
 
   const isPro = profile?.plan === "faculty-pro";
 
