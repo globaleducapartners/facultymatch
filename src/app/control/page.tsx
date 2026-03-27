@@ -64,7 +64,7 @@ export default async function ControlPage() {
     // Faculty profiles batch (for those who completed onboarding)
     const { data: fps } = await admin
       .from('faculty_profiles')
-      .select('user_id, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline')
+      .select('user_id, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline, updated_at')
       .in('user_id', ids);
     if (fps) {
       fps.forEach((fp: any) => { fpMap[fp.user_id] = fp; });
@@ -90,6 +90,7 @@ export default async function ControlPage() {
       city: fp.city || null,
       country: fp.country || null,
       headline: fp.headline || null,
+      profile_updated_at: fp.updated_at || null,
       academic_level: meta.academic_level || null,
       phone: meta.phone || null,
       aneca_accreditation: meta.aneca_accreditation || false,

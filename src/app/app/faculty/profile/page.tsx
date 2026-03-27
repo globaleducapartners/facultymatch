@@ -474,7 +474,7 @@ export default async function ProfilePage({
                 <div className="space-y-1.5">
                   <label className={labelCls}>Instituciones donde has impartido docencia</label>
                   <InstitutionsTaughtEditor
-                    initialInstitutions={facultyProfile?.institutions_taught ?? []}
+                    initialInstitutions={(facultyProfile?.institutions_taught as string[] | null) || []}
                   />
                 </div>
 
@@ -500,7 +500,7 @@ export default async function ProfilePage({
             </CardHeader>
             <CardContent>
               <form action={saveFormacion} className="space-y-6 max-w-3xl">
-                <DegreeEditor initialDegrees={facultyProfile?.degrees ?? []} />
+                <DegreeEditor initialDegrees={(facultyProfile?.degrees as any[] | null) || []} />
                 <Button
                   type="submit"
                   className="bg-talentia-blue hover:bg-blue-700 text-white font-bold h-12 px-10 rounded-xl transition-all shadow-lg shadow-blue-100"
@@ -523,7 +523,7 @@ export default async function ProfilePage({
             </CardHeader>
             <CardContent>
               <form action={saveLanguages} className="space-y-6 max-w-3xl">
-                <LanguageEditor initialLanguages={facultyProfile?.languages ?? []} />
+                <LanguageEditor initialLanguages={(facultyProfile?.languages as any[] | null) || []} />
                 <Button
                   type="submit"
                   className="bg-talentia-blue hover:bg-blue-700 text-white font-bold h-12 px-10 rounded-xl transition-all shadow-lg shadow-blue-100"

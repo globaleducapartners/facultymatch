@@ -25,6 +25,7 @@ export type Faculty = {
   city: string | null;
   country: string | null;
   headline: string | null;
+  profile_updated_at: string | null;
   academic_level: string | null;
   phone: string | null;
   aneca_accreditation: boolean;
@@ -268,10 +269,9 @@ export default function PendingFacultyPanel({
               <thead>
                 <tr className="bg-gray-50/50 text-xs font-black uppercase tracking-widest text-gray-400">
                   <th className="px-6 py-3 text-left">Docente</th>
-                  <th className="px-6 py-3 text-left">Nivel académico</th>
                   <th className="px-6 py-3 text-left">Áreas</th>
-                  <th className="px-6 py-3 text-left">País</th>
-                  <th className="px-6 py-3 text-left">Registro</th>
+                  <th className="px-6 py-3 text-left">Disponibilidad</th>
+                  <th className="px-6 py-3 text-left">Actualización</th>
                   <th className="px-6 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
@@ -286,25 +286,29 @@ export default function PendingFacultyPanel({
                         <div>
                           <p className="font-bold text-navy text-sm">{f.full_name || "Sin nombre"}</p>
                           <p className="text-xs text-gray-400">{f.email || "—"}</p>
+                          {f.headline && (
+                            <p className="text-xs text-gray-400 font-medium mt-0.5 max-w-[200px] truncate">{f.headline}</p>
+                          )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-600 font-medium">{f.academic_level || "—"}</td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
                         {(f.faculty_areas || []).slice(0, 2).map((a) => (
                           <span key={a} className="bg-blue-50 text-talentia-blue text-[10px] font-black px-2 py-0.5 rounded-full">{a}</span>
                         ))}
                         {(f.faculty_areas || []).length > 2 && (
-                          <span className="text-[10px] text-gray-400 font-bold">+{f.faculty_areas.length - 2}</span>
+                          <span className="text-[10px] text-gray-400 font-bold">+{(f.faculty_areas || []).length - 2}</span>
                         )}
                         {(f.faculty_areas || []).length === 0 && (
                           <span className="text-[10px] text-gray-300">—</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-600 font-medium">{f.country || "—"}</td>
-                    <td className="px-6 py-4 text-gray-500 text-xs font-medium">{timeAgo(f.created_at)}</td>
+                    <td className="px-6 py-4 text-gray-600 font-medium text-xs">{f.availability || "—"}</td>
+                    <td className="px-6 py-4 text-gray-500 text-xs font-medium">
+                      {f.profile_updated_at ? fmtDate(f.profile_updated_at) : "—"}
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 justify-end">
                         <button
