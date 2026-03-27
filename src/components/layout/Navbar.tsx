@@ -81,28 +81,38 @@ export function Navbar() {
         })}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {user ? (
-          <Link href={dashboardHref} className="flex items-center gap-2 bg-talentia-blue text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+          <Link href={dashboardHref} className="flex items-center gap-2 bg-talentia-blue text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
             <User size={18} />
-            Dashboard
+            <span>Dashboard</span>
           </Link>
         ) : (
           <>
-              <Link href="/login" className="hidden sm:block text-sm font-bold text-navy px-6 py-2.5 hover:bg-gray-50 rounded-xl transition-colors">
-                Acceder
-              </Link>
-              <Link
-                href="/signup/institution"
-                className="hidden lg:block text-xs font-bold text-gray-400 hover:text-navy transition-colors whitespace-nowrap"
-              >
-                Instituciones
-              </Link>
-              <span className="hidden lg:block w-px h-5 bg-gray-200" />
-              <Link href="/signup/faculty" className="bg-energy-orange text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-100">
-                Soy docente
-              </Link>
-            </>
+            {/* Mobile only: compact Entrar link */}
+            <Link
+              href="/login"
+              className="sm:hidden text-sm font-bold text-navy border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+            >
+              Entrar
+            </Link>
+            {/* sm+: full Acceder text link */}
+            <Link href="/login" className="hidden sm:block text-sm font-bold text-navy px-5 py-2.5 hover:bg-gray-50 rounded-xl transition-colors">
+              Acceder
+            </Link>
+            {/* lg only: institution link + separator */}
+            <Link
+              href="/signup/institution"
+              className="hidden lg:block text-xs font-bold text-gray-400 hover:text-navy transition-colors whitespace-nowrap"
+            >
+              Instituciones
+            </Link>
+            <span className="hidden lg:block w-px h-5 bg-gray-200" />
+            {/* sm+: Soy docente CTA (hidden on mobile — CTA is in the hero section) */}
+            <Link href="/signup/faculty" className="hidden sm:inline-flex bg-energy-orange text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-100">
+              Soy docente
+            </Link>
+          </>
         )}
         
         {/* Mobile Menu Toggle */}

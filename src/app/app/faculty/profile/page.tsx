@@ -14,6 +14,8 @@ import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { LanguageEditor } from "@/components/profile/LanguageEditor";
 import { DegreeEditor } from "@/components/profile/DegreeEditor";
 import { InstitutionsTaughtEditor } from "@/components/profile/InstitutionsTaughtEditor";
+import { MobileTabNav } from "@/components/profile/MobileTabNav";
+import { InstitutionSelector } from "@/components/profile/InstitutionSelector";
 
 export default async function ProfilePage({
   searchParams,
@@ -286,7 +288,8 @@ export default async function ProfilePage({
       </Card>
 
       <Tabs defaultValue={tab || "basic"} className="space-y-6">
-        <TabsList className="bg-white p-1 rounded-2xl border border-gray-100 w-full overflow-x-auto justify-start flex-nowrap">
+        <MobileTabNav currentTab={tab || "basic"} />
+        <TabsList className="hidden md:flex bg-white p-1 rounded-2xl border border-gray-100 w-full overflow-x-auto justify-start flex-nowrap">
           {[
             { value: "basic", icon: User, label: "Datos básicos" },
             { value: "experience", icon: Briefcase, label: "Experiencia" },
@@ -399,11 +402,10 @@ export default async function ProfilePage({
                     <label className={`${labelCls} flex items-center gap-1`}>
                       <Building2 size={12} /> Institución actual
                     </label>
-                    <input
+                    <InstitutionSelector
                       name="currentInstitution"
-                      defaultValue={facultyProfile?.current_institution}
-                      placeholder="Ej: Universidad Autónoma de Madrid"
-                      className={inputCls}
+                      initialValue={facultyProfile?.current_institution || ""}
+                      placeholder="Buscar institución..."
                     />
                   </div>
                   <div className="space-y-1.5">

@@ -1,10 +1,11 @@
 import { createClient } from "@/lib/supabase-server";
-import { Settings, Mail, Lock, Bell, Trash2, ShieldCheck, Download, AlertTriangle, Sparkles, CheckCircle2 } from "lucide-react";
+import { Bell, Trash2, ShieldCheck, Download, AlertTriangle, Sparkles, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { StripeUpgradeButton } from "@/components/profile/StripeUpgradeButton";
+import { SecuritySettingsSection } from "@/components/settings/SecuritySettingsSection";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -47,47 +48,7 @@ export default async function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl border border-gray-100 bg-gray-50/50">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-white p-2.5 rounded-xl shadow-sm text-gray-400">
-                      <Mail size={20} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                        Correo electrónico
-                      </p>
-                      <p className="text-sm font-bold text-navy">{user.email}</p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="border-gray-200 text-navy font-bold rounded-xl h-10 px-6 hover:bg-gray-50 transition-colors"
-                  >
-                    Cambiar email
-                  </Button>
-                </div>
-
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-xl border border-gray-100 bg-gray-50/50">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-white p-2.5 rounded-xl shadow-sm text-gray-400">
-                      <Lock size={20} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
-                        Contraseña
-                      </p>
-                      <p className="text-sm font-bold text-navy">••••••••••••</p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="border-gray-200 text-navy font-bold rounded-xl h-10 px-6 hover:bg-gray-50 transition-colors"
-                  >
-                    Actualizar
-                  </Button>
-                </div>
-              </div>
+              <SecuritySettingsSection currentEmail={user.email!} />
             </CardContent>
           </Card>
 

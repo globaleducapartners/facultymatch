@@ -108,6 +108,28 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
   return { success: true };
 }
 
+export async function updateEmail(formData: FormData) {
+  const newEmail = formData.get("newEmail") as string;
+  if (!newEmail?.trim()) return { error: "Introduce un correo válido." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ email: newEmail });
+  if (error) return { error: error.message };
+  return { success: "Hemos enviado un email de confirmación a la nueva dirección." };
+}
+
+export async function updatePassword(formData: FormData) {
+  const newPassword = formData.get("newPassword") as string;
+  const confirmPassword = formData.get("confirmPassword") as string;
+  if (!newPassword || newPassword.length < 8) return { error: "La contraseña debe tener al menos 8 caracteres." };
+  if (newPassword !== confirmPassword) return { error: "Las contraseñas no coinciden." };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) return { error: error.message };
+  return { success: "Contraseña actualizada correctamente." };
+}
+
 export const signOut = async () => {
   const supabase = await createClient();
   await supabase.auth.signOut();
