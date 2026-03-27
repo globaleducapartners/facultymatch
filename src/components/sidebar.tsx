@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  Home, 
-  User, 
-  Award, 
-  ShieldCheck, 
-  Mail, 
-  CheckCircle2, 
+import {
+  Home,
+  User,
+  Award,
+  ShieldCheck,
+  Mail,
+  CheckCircle2,
   Settings,
   HelpCircle,
   Menu,
@@ -30,6 +30,14 @@ const educatorItems = [
   { label: "Visibilidad & Privacidad", href: "/app/faculty/privacy", icon: ShieldCheck },
   { label: "Solicitudes", href: "/app/faculty/requests", icon: Mail },
   { label: "Verificación", href: "/app/faculty/verification", icon: CheckCircle2 },
+  { label: "Ajustes", href: "/app/faculty/settings", icon: Settings },
+];
+
+const facultyBottomNavItems = [
+  { label: "Inicio", href: "/app/faculty", icon: Home },
+  { label: "Perfil", href: "/app/faculty/profile", icon: User },
+  { label: "Especialidades", href: "/app/faculty/specialties", icon: Award },
+  { label: "Privacidad", href: "/app/faculty/privacy", icon: ShieldCheck },
   { label: "Ajustes", href: "/app/faculty/settings", icon: Settings },
 ];
 
@@ -61,11 +69,35 @@ export function Sidebar() {
     navItems = adminItems;
   }
 
+  const isFaculty = pathname?.startsWith("/app/faculty");
+
   return (
     <>
-      {/* Mobile Menu Button */}
-      <button 
-        className="lg:hidden fixed bottom-6 right-6 z-50 bg-talentia-blue text-white p-3 rounded-full shadow-lg"
+      {/* Mobile bottom navigation bar — faculty only, visible below md */}
+      {isFaculty && (
+        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E2E8F0] flex justify-around py-2 z-50 md:hidden">
+          {facultyBottomNavItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex flex-col items-center gap-0.5 px-3 py-1 min-w-0",
+                  isActive ? "text-talentia-blue" : "text-gray-400"
+                )}
+              >
+                <item.icon size={22} />
+                <span className="text-[10px] font-bold leading-tight">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      )}
+
+      {/* Tablet hamburger button — visible only on md (not mobile, not desktop) */}
+      <button
+        className="hidden md:flex lg:hidden fixed bottom-6 right-6 z-50 bg-talentia-blue text-white p-3 rounded-full shadow-lg items-center justify-center"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -73,15 +105,16 @@ export function Sidebar() {
 
       {/* Sidebar Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Sidebar Content */}
+      {/* Sidebar Content — hidden on mobile, collapsible on tablet, static on desktop */}
       <aside className={cn(
-        "fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 transform",
+        "fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 flex-col transition-transform duration-300 transform",
+        "hidden md:flex",
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="flex-1 overflow-y-auto py-6 px-4">

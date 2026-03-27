@@ -38,11 +38,11 @@ export default function FacultyPage() {
                 <GraduationCap size={14} /> Red para Docentes
               </div>
                 <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-navy leading-tight">
-                  Tu carrera académica <br /> <span className="text-talentia-blue">global y acreditada.</span>
+                  Tu conocimiento vale <span className="text-talentia-blue">más de lo que crees.</span>
                 </h1>
                 <div className="absolute top-0 right-0 w-96 h-96 bg-blue-50 rounded-full opacity-40 blur-3xl -z-10" />
                 <p className="text-xl text-gray-500 font-medium max-w-lg leading-relaxed">
-                  Conecta con instituciones que buscan perfiles acreditados ANECA, investigadores con ORCID y expertos en educación superior.
+                  Cada año, miles de instituciones buscan docentes especializados para sus programas. Con FacultyMatch, ellas te encuentran a ti.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4">
@@ -160,9 +160,9 @@ export default function FacultyPage() {
               </div>
               <div className="space-y-8">
                 {[
-                  { title: "Registro y Datos Base", desc: "Crea tu cuenta y define tu área principal de conocimiento." },
-                  { title: "Especialización y CV", desc: "Añade tus subáreas detalladas y sube tu documentación académica." },
-                  { title: "Verificación y Lanzamiento", desc: "Nuestro equipo valida tus credenciales y tu perfil entra en la red global." }
+                  { title: "Crea tu perfil en 5 minutos", desc: "Crea tu cuenta y define tu área principal de conocimiento." },
+                  { title: "Añade tus especialidades", desc: "Añade tus subáreas detalladas y sube tu documentación académica." },
+                  { title: "Recibe propuestas reales", desc: "Nuestro equipo valida tus credenciales y tu perfil entra en la red global." }
                 ].map((step, idx) => (
                   <div key={idx} className="flex gap-6">
                     <div className="flex-shrink-0 w-12 h-12 bg-navy text-white rounded-2xl flex items-center justify-center font-black text-xl">
@@ -187,7 +187,7 @@ export default function FacultyPage() {
                 <p className="text-lg text-gray-500 font-medium max-w-2xl mx-auto">Toma el control total de tu carrera y visibilidad profesional.</p>
               </div>
   
-              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 <div className="bg-[#F8FAFC] p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">
                   <h3 className="text-2xl font-black text-navy mb-4">Plan Basic</h3>
                   <p className="text-4xl font-black text-navy mb-6">0€ <span className="text-lg text-gray-400 font-bold">/ siempre</span></p>

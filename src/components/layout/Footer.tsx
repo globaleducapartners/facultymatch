@@ -8,7 +8,7 @@ const WHATSAPP_MESSAGE = encodeURIComponent("Hola, me gustaría obtener más inf
 export function Footer() {
   return (
     <footer className="bg-navy text-white py-20 px-6 lg:px-12 border-t border-white/5">
-      <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
         <div className="col-span-2 space-y-6">
           <div className="flex items-center gap-3">
               <Logo variant="light" />

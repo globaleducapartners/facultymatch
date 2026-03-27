@@ -76,7 +76,7 @@ export default async function EducatorDashboard() {
   const isPublished = calculatedProgress >= 80;
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-500 pb-12">
+    <div className="space-y-10 animate-in fade-in duration-500 pb-20 lg:pb-0">
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
@@ -96,7 +96,7 @@ export default async function EducatorDashboard() {
       </div>
 
       {verificationStatus === "approved" && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl p-5 mb-6 flex items-start gap-4">
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-4 lg:p-6 mb-6 flex items-start gap-4">
           <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
             <CheckCircle2 size={20} className="text-green-600" />
           </div>
@@ -107,7 +107,7 @@ export default async function EducatorDashboard() {
         </div>
       )}
       {verificationStatus === "pending" && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6 flex items-start gap-4">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 lg:p-6 mb-6 flex items-start gap-4">
           <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
             <Clock size={20} className="text-amber-600" />
           </div>
@@ -120,7 +120,7 @@ export default async function EducatorDashboard() {
         </div>
       )}
       {verificationStatus === "requires_info" && (
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-6 flex items-start gap-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 lg:p-6 mb-6 flex items-start gap-4">
           <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
             <AlertCircle size={20} className="text-blue-600" />
           </div>
@@ -136,7 +136,7 @@ export default async function EducatorDashboard() {
         </div>
       )}
       {verificationStatus === "rejected" && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-5 mb-6 flex items-start gap-4">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 lg:p-6 mb-6 flex items-start gap-4">
           <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
             <XCircle size={20} className="text-red-600" />
           </div>

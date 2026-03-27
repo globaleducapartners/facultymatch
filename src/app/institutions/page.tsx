@@ -90,10 +90,10 @@ export default function InstitutionsPage() {
                 <Building2 size={14} /> Red para Instituciones
               </div>
                 <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-navy leading-tight">
-                  Construye tu <span className="text-energy-orange">titulación en minutos.</span>
+                  El profesorado que necesitas, <span className="text-energy-orange">verificado y disponible.</span>
                 </h1>
                 <p className="text-xl text-gray-500 font-medium max-w-lg leading-relaxed">
-                  Completa tus memorias de calidad universitaria y acreditaciones ANECA con el profesorado más cualificado de Europa.
+                  Accede a más de 500 docentes especializados con acreditación ANECA, ORCID y experiencia contrastada. Filtra por área, idioma y disponibilidad en segundos.
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4">
@@ -198,7 +198,7 @@ export default function InstitutionsPage() {
               <p className="text-lg text-gray-500 font-medium max-w-2xl mx-auto">Desde centros especializados hasta redes universitarias globales.</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
               {pricingPlans.map((plan, idx) => (
                 <div 
                   key={idx} 

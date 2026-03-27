@@ -43,13 +43,13 @@ export default function Home() {
             <div className="space-y-8 lg:pr-8">
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-talentia-blue text-xs font-black uppercase tracking-widest mb-4">
-                  <GraduationCap size={14} /> La red global de talento académico
+                  🎓 +500 docentes verificados · 40 países
                 </div>
-                <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-navy leading-[0.95]">
-                  Saca partido a tu <span className="text-talentia-blue">conocimiento docente.</span>
+                <h1 className="text-4xl lg:text-7xl font-black tracking-tight text-navy leading-[0.95]">
+                  Convierte tu experiencia <span className="text-talentia-blue">académica en ingresos.</span>
                 </h1>
                   <p className="text-xl text-gray-500 font-medium max-w-lg leading-relaxed pt-2">
-                    ¿Eres profesor universitario y quieres ampliar tus clases? Conecta con instituciones de todo el mundo, aumenta tu visibilidad y genera ingresos con tus contenidos.
+                    Profesores universitarios que se unen a FacultyMatch reciben propuestas de nuevas instituciones en menos de 2 semanas. Crea tu perfil gratis y empieza a generar ingresos adicionales con tu conocimiento.
                   </p>
               </div>
 
@@ -85,7 +85,7 @@ export default function Home() {
                         src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800"
                         alt="Educadora Verificada"
                         fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        sizes="(max-width:768px) 100vw, 33vw"
                         className="object-cover"
                       />
                     </div>
@@ -106,7 +106,7 @@ export default function Home() {
                         src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800"
                         alt="Profesor Académico"
                         fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        sizes="(max-width:768px) 100vw, 33vw"
                         className="object-cover"
                       />
                     </div>
@@ -129,9 +129,9 @@ export default function Home() {
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
               {[
-                { icon: Star, text: "¿Quieres sacar más partido a tus contenidos académicos?", sub: "Comparte tu conocimiento con nuevas instituciones." },
-                { icon: Globe, text: "¿Te gustaría ampliar tus clases a nivel internacional?", sub: "Accede a universidades de Europa, América y Asia." },
-                { icon: BadgeCheck, text: "Amplía tu CV y tus ingresos como docente", sub: "Colabora con nuevas instituciones sin dejar la tuya." },
+                { icon: Star, text: "Gana entre 30€ y 100€/hora impartiendo clases en nuevas instituciones", sub: "Comparte tu conocimiento con nuevas instituciones." },
+                { icon: Globe, text: "Amplía tu red académica sin dejar tu universidad actual", sub: "Accede a universidades de Europa, América y Asia." },
+                { icon: BadgeCheck, text: "Perfil verificado que genera confianza en más de 200 instituciones", sub: "Colabora con nuevas instituciones sin dejar la tuya." },
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center gap-3">
                   <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center">
@@ -152,7 +152,7 @@ export default function Home() {
               <h2 className="text-3xl lg:text-4xl font-black text-navy">Explora por Áreas de Conocimiento</h2>
               <div className="w-24 h-1.5 bg-talentia-blue mx-auto rounded-full opacity-20"></div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 { name: "Business & Management", icon: Briefcase, color: "bg-navy", slug: "business-management" },
                 { name: "Ingeniería & Tech", icon: Cpu, color: "bg-tech-cyan", slug: "ingenieria-tech" },
@@ -182,7 +182,7 @@ export default function Home() {
               <h2 className="text-3xl lg:text-4xl font-black text-navy uppercase tracking-tighter">Cómo funciona FacultyMatch</h2>
               <p className="text-lg text-gray-500 font-medium max-w-2xl mx-auto italic">Estandarizando el talento académico para la educación del futuro.</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 { step: "01", title: "Perfil Académico", desc: "Registro estructurado por áreas UNESCO y micro-especialidades.", icon: UserCircle, color: "text-talentia-blue", bg: "bg-blue-50" },
                 { step: "02", title: "Verificación", desc: "Validación documental de títulos, experiencia y publicaciones.", icon: ShieldCheck, color: "text-tech-cyan", bg: "bg-cyan-50" },
@@ -273,10 +273,10 @@ export default function Home() {
             </div>
             <div className="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-gray-100 relative h-[480px] group overflow-hidden">
               <Image
-                src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=1200"
+                src="https://images.unsplash.com/photo-1606761568499-6d2451b23c66?auto=format&fit=crop&q=80&w=1200"
                 alt="Docente impartiendo clase"
                 fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width:768px) 100vw, 50vw"
                 className="rounded-3xl object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent rounded-3xl"></div>
@@ -289,10 +289,10 @@ export default function Home() {
           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
             <div className="order-2 lg:order-1 bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-gray-100 relative h-[480px] group overflow-hidden">
               <Image
-                src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1200"
+                src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1200"
                 alt="Campus universitario moderno"
                 fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
+                sizes="(max-width:768px) 100vw, 50vw"
                 className="rounded-3xl object-cover group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-navy/40 to-transparent rounded-3xl"></div>

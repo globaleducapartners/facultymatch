@@ -233,7 +233,7 @@ export default async function ProfilePage({
   const labelCls = "text-xs font-black uppercase tracking-widest text-gray-400 ml-1";
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20 lg:pb-0">
       <div>
         <h1 className="text-3xl font-bold text-navy">Mi perfil</h1>
         <p className="text-gray-500 font-medium">Gestiona tu identidad académica y profesional.</p>
@@ -318,7 +318,7 @@ export default async function ProfilePage({
             </CardHeader>
             <CardContent>
               <form action={saveBasicInfo} className="space-y-6 max-w-3xl">
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
                     <label className={labelCls}>Nombre completo</label>
                     <input
@@ -338,7 +338,7 @@ export default async function ProfilePage({
                     />
                   </div>
                 </div>
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
                     <label className={`${labelCls} flex items-center gap-1`}>
                       <Globe size={12} /> País
@@ -394,7 +394,7 @@ export default async function ProfilePage({
             </CardHeader>
             <CardContent>
               <form action={saveExperience} className="space-y-6 max-w-3xl">
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
                     <label className={`${labelCls} flex items-center gap-1`}>
                       <Building2 size={12} /> Institución actual
@@ -420,7 +420,7 @@ export default async function ProfilePage({
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
                     <label className={`${labelCls} flex items-center gap-1`}>
                       <GraduationCap size={12} /> Nivel académico máximo
@@ -593,7 +593,7 @@ export default async function ProfilePage({
                     className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium resize-none"
                   />
                 </div>
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
                     <label className={labelCls}>Google Scholar ID</label>
                     <input
@@ -650,7 +650,7 @@ export default async function ProfilePage({
             </CardHeader>
             <CardContent>
               <form action={saveLinks} className="space-y-6 max-w-3xl">
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
                     <label className={`${labelCls} flex items-center gap-1`}>
                       <LinkIcon size={12} /> LinkedIn URL
@@ -723,7 +723,7 @@ export default async function ProfilePage({
                   </select>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
                     <label className={`${labelCls} flex items-center gap-1`}>
                       <Mail size={12} /> Email de contacto

@@ -232,7 +232,7 @@ export default function SignupFacultyPage() {
       </div>
 
       {/* Right form panel */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-[#F8FAFC] overflow-y-auto">
+      <div className="w-full lg:w-3/5 flex flex-col items-center justify-center px-6 py-12 bg-[#F8FAFC] overflow-y-auto">
         <div className="lg:hidden mb-8 self-start">
           <Link href="/"><Logo /></Link>
         </div>
