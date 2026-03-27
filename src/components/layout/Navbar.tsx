@@ -89,12 +89,13 @@ export function Navbar() {
           </Link>
         ) : (
           <>
-            {/* Mobile only: compact Entrar link */}
+            {/* Mobile only: avatar icon button */}
             <Link
               href="/login"
-              className="sm:hidden text-sm font-bold text-navy border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+              aria-label="Acceder"
+              className="sm:hidden flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-talentia-blue hover:text-white text-navy transition-all"
             >
-              Entrar
+              <User size={20} />
             </Link>
             {/* sm+: full Acceder text link */}
             <Link href="/login" className="hidden sm:block text-sm font-bold text-navy px-5 py-2.5 hover:bg-gray-50 rounded-xl transition-colors">

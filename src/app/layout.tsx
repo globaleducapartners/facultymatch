@@ -16,7 +16,10 @@ export const metadata: Metadata = {
   title: "FacultyMatch | Red Global de Talento Académico",
   description: "Conectamos universidades y docentes expertos de todo el mundo. La red de confianza académica líder.",
   icons: {
-    icon: "/logo.png",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/logo.png", type: "image/png" },
+    ],
     apple: "/logo.png",
   },
   openGraph: {

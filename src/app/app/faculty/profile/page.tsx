@@ -287,7 +287,7 @@ export default async function ProfilePage({
         </CardContent>
       </Card>
 
-      <Tabs defaultValue={tab || "basic"} className="space-y-6">
+      <Tabs key={tab || "basic"} defaultValue={tab || "basic"} className="space-y-6">
         <MobileTabNav currentTab={tab || "basic"} />
         <TabsList className="hidden md:flex bg-white p-1 rounded-2xl border border-gray-100 w-full overflow-x-auto justify-start flex-nowrap">
           {[
