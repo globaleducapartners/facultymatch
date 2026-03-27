@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase-server";
-import { ShieldCheck, Eye, EyeOff, Lock, UserPlus, Search, X, AlertCircle, Copy } from "lucide-react";
+import { ShieldCheck, Eye, EyeOff, Lock, UserPlus, Search, X, AlertCircle, Sparkles } from "lucide-react";
+import { UNIVERSITIES } from "@/data/universities";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,10 @@ export default async function PrivacyPage({
     .select("*, institution:institutions(name, country)")
     .eq("faculty_id", facultyProfile?.id)
     .eq("rule", "block");
+
+  // Premium check — field name may vary; defaults to false if not yet set
+  const isPremium = (facultyProfile as any)?.plan === "professional" ||
+    (facultyProfile as any)?.is_premium === true;
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.facultymatch.app";
   const profileToken = facultyProfile?.profile_token;
@@ -190,66 +195,96 @@ export default async function PrivacyPage({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <form action={blockInstitution} className="relative">
-                <Search
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                  size={18}
-                />
-                <input
-                  name="institutionName"
-                  type="text"
-                  placeholder="Escribe el nombre del centro a bloquear..."
-                  className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium"
-                />
-                <button type="submit" className="hidden">Bloquear</button>
-              </form>
+              {!isPremium ? (
+                /* ── Premium gate ── */
+                <div className="rounded-2xl border-2 border-dashed border-talentia-blue/30 bg-blue-50/40 p-6 space-y-4 text-center">
+                  <div className="flex items-center justify-center gap-2 text-talentia-blue">
+                    <Sparkles size={20} />
+                    <span className="text-sm font-black uppercase tracking-widest">Plan Professional</span>
+                  </div>
+                  <p className="text-sm font-medium text-gray-600 max-w-sm mx-auto">
+                    El bloqueo de instituciones específicas es exclusivo del <strong>Plan Professional</strong>.
+                    Mantén tu perfil invisible para tu centro actual o competidores directos.
+                  </p>
+                  <div className="text-2xl font-black text-navy">29€ <span className="text-base text-gray-400 font-bold">/ año</span></div>
+                  <a
+                    href="/checkout?plan=faculty-pro"
+                    className="inline-flex items-center gap-2 bg-energy-orange hover:bg-orange-500 text-white font-black text-sm px-6 py-3 rounded-xl transition-colors shadow-lg shadow-orange-100"
+                  >
+                    <Sparkles size={15} /> Desbloquear Privacidad Profesional
+                  </a>
+                </div>
+              ) : (
+                /* ── Block form (premium users) ── */
+                <>
+                  <form action={blockInstitution} className="relative">
+                    <Search
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                      size={18}
+                    />
+                    <input
+                      name="institutionName"
+                      type="text"
+                      list="block-university-list"
+                      placeholder="Escribe el nombre del centro a bloquear..."
+                      className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium"
+                    />
+                    <datalist id="block-university-list">
+                      {UNIVERSITIES.map((u) => (
+                        <option key={u} value={u} />
+                      ))}
+                    </datalist>
+                    <button type="submit" className="hidden">Bloquear</button>
+                  </form>
 
-              <div className="space-y-3">
-                <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">
-                  Instituciones bloqueadas ({visibilityRules?.length || 0})
-                </h4>
-                {visibilityRules && visibilityRules.length > 0 ? (
-                  <div className="grid gap-3">
-                    {visibilityRules.map((item: any) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-red-100 transition-colors group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-red-50 group-hover:text-red-400 transition-colors">
-                            <Lock size={18} />
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold text-navy">{item.institution?.name}</p>
-                            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
-                              {item.institution?.country}
-                            </p>
-                          </div>
-                        </div>
-                        <form
-                          action={async () => {
-                            "use server";
-                            await unblockInstitution(item.id);
-                          }}
-                        >
-                          <button
-                            type="submit"
-                            className="p-2 text-gray-300 hover:text-red-600 transition-colors"
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">
+                      Instituciones bloqueadas ({visibilityRules?.length || 0})
+                    </h4>
+                    {visibilityRules && visibilityRules.length > 0 ? (
+                      <div className="grid gap-3">
+                        {visibilityRules.map((item: any) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-red-100 transition-colors group"
                           >
-                            <X size={18} />
-                          </button>
-                        </form>
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-red-50 group-hover:text-red-400 transition-colors">
+                                <Lock size={18} />
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold text-navy">{item.institution?.name}</p>
+                                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                                  {item.institution?.country}
+                                </p>
+                              </div>
+                            </div>
+                            <form
+                              action={async () => {
+                                "use server";
+                                await unblockInstitution(item.id);
+                              }}
+                            >
+                              <button
+                                type="submit"
+                                className="p-2 text-gray-300 hover:text-red-600 transition-colors"
+                              >
+                                <X size={18} />
+                              </button>
+                            </form>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    ) : (
+                      <div className="p-8 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                        <p className="text-sm text-gray-400 font-medium">
+                          No tienes ninguna institución bloqueada.
+                        </p>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div className="p-8 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
-                    <p className="text-sm text-gray-400 font-medium">
-                      No tienes ninguna institución bloqueada.
-                    </p>
-                  </div>
-                )}
-              </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>

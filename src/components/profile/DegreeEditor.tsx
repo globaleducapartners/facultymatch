@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X, Plus } from "lucide-react";
+import { UNIVERSITIES } from "@/data/universities";
 
 interface Degree {
   type: string;
@@ -117,11 +118,17 @@ export function DegreeEditor({ initialDegrees }: Props) {
           <label className="text-xs font-bold text-gray-500">Universidad / Centro</label>
           <input
             type="text"
+            list="degree-university-list"
             value={newDegree.university}
             onChange={(e) => setNewDegree({ ...newDegree, university: e.target.value })}
             placeholder="Ej: Universidad Complutense de Madrid"
             className="w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none text-sm font-medium"
           />
+          <datalist id="degree-university-list">
+            {UNIVERSITIES.map((u) => (
+              <option key={u} value={u} />
+            ))}
+          </datalist>
         </div>
         <button
           type="button"

@@ -34,7 +34,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
-      <Topbar user={user} profile={profile} />
+      <Topbar user={{ id: user.id, email: user.email }} profile={profile} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <main className="flex-1 overflow-y-auto p-4 md:p-8">

@@ -145,7 +145,12 @@ export default async function ProfilePage({
 
   async function saveResearch(formData: FormData) {
     "use server";
-    const anecaAccreditation = formData.get("anecaAccreditation") as string;
+    const hasAneca = formData.get("hasAneca") === "on";
+    const otherAccreditation = (formData.get("otherAccreditation") as string)?.trim() || "";
+    const anecaAccreditation = [
+      hasAneca ? "Titular de Universidad (ANECA)" : null,
+      otherAccreditation || null,
+    ].filter(Boolean).join(" · ") || null;
     const researchPublications = formData.get("researchPublications") as string;
     const googleScholarId = formData.get("googleScholarId") as string;
     const orcidId = formData.get("orcidId") as string;
@@ -546,14 +551,38 @@ export default async function ProfilePage({
             </CardHeader>
             <CardContent>
               <form action={saveResearch} className="space-y-6 max-w-3xl">
-                <div className="space-y-1.5">
-                  <label className={labelCls}>Acreditación ANECA / Otros</label>
-                  <input
-                    name="anecaAccreditation"
-                    defaultValue={facultyProfile?.aneca_accreditation}
-                    placeholder="Ej: Titular de Universidad (ANECA)"
-                    className={inputCls}
-                  />
+                <div className="space-y-3">
+                  <label className={labelCls}>Acreditaciones académicas</label>
+                  {/* ANECA checkbox */}
+                  <label className="flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 cursor-pointer transition-all">
+                    <input
+                      type="checkbox"
+                      name="hasAneca"
+                      defaultChecked={!!(facultyProfile?.aneca_accreditation?.includes("ANECA"))}
+                      className="h-4 w-4 rounded accent-talentia-blue shrink-0"
+                    />
+                    <div>
+                      <p className="text-sm font-bold text-navy">Acreditación ANECA — Titular de Universidad</p>
+                      <p className="text-xs text-gray-400 font-medium">
+                        Marca si dispones de la acreditación ANECA para Titular de Universidad o Catedrático.
+                      </p>
+                    </div>
+                  </label>
+                  {/* Other accreditation */}
+                  <div className="space-y-1.5">
+                    <label className={labelCls}>Otra acreditación</label>
+                    <input
+                      name="otherAccreditation"
+                      defaultValue={
+                        facultyProfile?.aneca_accreditation
+                          ?.replace("Titular de Universidad (ANECA)", "")
+                          .replace(" · ", "")
+                          .trim() || ""
+                      }
+                      placeholder="Ej: Acreditación AQU, ANECA Ayudante Doctor..."
+                      className={inputCls}
+                    />
+                  </div>
                 </div>
                 <div className="space-y-1.5">
                   <label className={labelCls}>Publicaciones relevantes</label>
