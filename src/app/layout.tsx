@@ -17,10 +17,13 @@ export const metadata: Metadata = {
   description: "Conectamos universidades y docentes expertos de todo el mundo. La red de confianza académica líder.",
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/logo.png", type: "image/png" },
+      { url: "/favicon.ico", type: "image/x-icon" },
+    ],
+    apple: [
       { url: "/logo.png", type: "image/png" },
     ],
-    apple: "/logo.png",
+    shortcut: "/favicon.ico",
   },
   openGraph: {
     title: "FacultyMatch | Red Global de Talento Académico",
@@ -48,6 +51,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
         {/* End Google Tag Manager */}
+        <link rel="icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
       </head>
       <body
         className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen`}
