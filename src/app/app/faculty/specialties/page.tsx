@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { Award, Book, ChevronRight, X, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,7 @@ export default async function SpecialtiesPage() {
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
     .select("id")
-    .eq("id", user.id)
+    .eq("user_id", user.id)
     .single();
 
   const { data: expertise } = await supabase
@@ -40,14 +40,17 @@ export default async function SpecialtiesPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data: faculty } = await supabase
+    const admin = createAdminClient();
+    const { data: faculty } = await admin
       .from("faculty_profiles")
       .select("id")
-      .eq("id", user.id)
+      .eq("user_id", user.id)
       .single();
 
-    await supabase.from("faculty_expertise").insert({
-      faculty_id: faculty?.id,
+    if (!faculty?.id) return;
+
+    await admin.from("faculty_expertise").insert({
+      faculty_id: faculty.id,
       area,
       subarea: subarea || null,
       topics,
@@ -57,8 +60,8 @@ export default async function SpecialtiesPage() {
 
   async function removeExpertise(id: string) {
     "use server";
-    const supabase = await createClient();
-    await supabase.from("faculty_expertise").delete().eq("id", id);
+    const admin = createAdminClient();
+    await admin.from("faculty_expertise").delete().eq("id", id);
     revalidatePath("/app/faculty/specialties");
   }
 

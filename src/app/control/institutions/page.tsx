@@ -9,8 +9,23 @@ async function toggleInstitutionStatus(formData: FormData) {
   const id = formData.get("id") as string;
   const currentStatus = formData.get("currentStatus") as string;
   const newStatus = currentStatus === "active" ? "blocked" : "active";
-
   await admin.from("institutions").update({ status: newStatus }).eq("id", id);
+  revalidatePath("/control/institutions");
+}
+
+async function approveInstitution(formData: FormData) {
+  "use server";
+  const admin = createAdminClient();
+  const id = formData.get("id") as string;
+  await admin.from("institutions").update({ status: "active" }).eq("id", id);
+  revalidatePath("/control/institutions");
+}
+
+async function rejectInstitution(formData: FormData) {
+  "use server";
+  const admin = createAdminClient();
+  const id = formData.get("id") as string;
+  await admin.from("institutions").update({ status: "blocked" }).eq("id", id);
   revalidatePath("/control/institutions");
 }
 
@@ -20,7 +35,14 @@ export default async function ControlInstitutionsPage() {
   const { data: institutions, error } = await admin
     .from("institutions")
     .select("*")
+    .neq("status", "pending")
     .order("created_at", { ascending: false });
+
+  const { data: pendingInstitutions } = await admin
+    .from("institutions")
+    .select("*")
+    .eq("status", "pending")
+    .order("created_at", { ascending: true });
 
   if (error) {
     return (
@@ -36,6 +58,7 @@ export default async function ControlInstitutionsPage() {
   const total = institutions?.length ?? 0;
   const active = institutions?.filter(i => i.status === "active").length ?? 0;
   const blocked = institutions?.filter(i => i.status === "blocked").length ?? 0;
+  const pendingCount = pendingInstitutions?.length ?? 0;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -46,10 +69,11 @@ export default async function ControlInstitutionsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "Total registradas", value: total, icon: Building2, color: "text-talentia-blue bg-blue-50" },
           { label: "Activas", value: active, icon: CheckCircle2, color: "text-green-600 bg-green-50" },
+          { label: "Pendientes", value: pendingCount, icon: Clock, color: "text-amber-600 bg-amber-50" },
           { label: "Bloqueadas", value: blocked, icon: XCircle, color: "text-red-500 bg-red-50" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
@@ -61,6 +85,59 @@ export default async function ControlInstitutionsPage() {
           </div>
         ))}
       </div>
+
+      {/* Pending institutions for approval */}
+      {pendingCount > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl overflow-hidden">
+          <div className="px-6 py-4 border-b border-amber-200 flex items-center justify-between">
+            <h2 className="font-bold text-amber-800 flex items-center gap-2">
+              <Clock size={16} className="text-amber-600" />
+              Instituciones pendientes de aprobación
+            </h2>
+            <span className="bg-amber-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full">{pendingCount}</span>
+          </div>
+          <div className="divide-y divide-amber-100">
+            {(pendingInstitutions || []).map(inst => (
+              <div key={inst.id} className="px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-navy text-sm">{inst.name || "Sin nombre"}</h3>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                    {(inst.country || inst.city) && (
+                      <span className="flex items-center gap-1 text-xs text-gray-500 font-medium">
+                        <MapPin size={11} /> {[inst.city, inst.country].filter(Boolean).join(', ')}
+                      </span>
+                    )}
+                    {inst.contact_email && (
+                      <span className="flex items-center gap-1 text-xs text-gray-500 font-medium">
+                        <Mail size={11} /> {inst.contact_email}
+                      </span>
+                    )}
+                    {inst.created_at && (
+                      <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">
+                        <Calendar size={11} /> {new Date(inst.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <form action={approveInstitution}>
+                    <input type="hidden" name="id" value={inst.id} />
+                    <button type="submit" className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-colors">
+                      <CheckCircle2 size={13} /> Aprobar
+                    </button>
+                  </form>
+                  <form action={rejectInstitution}>
+                    <input type="hidden" name="id" value={inst.id} />
+                    <button type="submit" className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-white border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
+                      <XCircle size={13} /> Rechazar
+                    </button>
+                  </form>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Table */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">

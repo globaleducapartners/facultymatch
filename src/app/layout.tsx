@@ -18,18 +18,19 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", type: "image/x-icon", sizes: "any" },
-      { url: "/logo.png", type: "image/png", sizes: "512x512" },
+      { url: "/favicon.ico", type: "image/x-icon", sizes: "16x16 32x32" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
     ],
     apple: [
-      { url: "/logo.png", type: "image/png", sizes: "180x180" },
+      { url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" },
     ],
     shortcut: "/favicon.ico",
   },
   openGraph: {
     title: "FacultyMatch | Red Global de Talento Académico",
     description: "Conectamos universidades y docentes expertos de todo el mundo.",
-    images: ["/logo.png"],
+    images: ["/icon-512.png"],
   }
 };
 
@@ -53,8 +54,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         />
         {/* End Google Tag Manager */}
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
+        <link rel="icon" href="/favicon.ico" sizes="16x16 32x32" type="image/x-icon" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
       </head>
       <body
         className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen`}

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
-import { Home, Clock, CheckCircle2, XCircle, Building2, Settings, Menu, X } from "lucide-react";
+import { Home, Clock, CheckCircle2, XCircle, Building2, Settings, Menu, X, BarChart2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AdminLogoutButton } from "./AdminLogoutButton";
 import { useState } from "react";
@@ -18,11 +18,11 @@ export default function ControlSidebar({ pendingCount, adminName }: Props) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navItems = [
-    { label: "Dashboard", href: "/control", icon: Home },
-    { label: "Docentes pendientes", href: "/control", icon: Clock, badge: pendingCount > 0 ? pendingCount : null },
+    { label: "Verificación docentes", href: "/control", icon: Clock, badge: pendingCount > 0 ? pendingCount : null },
     { label: "Aprobados", href: "/control/approved", icon: CheckCircle2 },
     { label: "Rechazados", href: "/control/rejected", icon: XCircle },
     { label: "Instituciones", href: "/control/institutions", icon: Building2 },
+    { label: "Métricas", href: "/control/metrics", icon: BarChart2 },
     { label: "Configuración", href: "/control/settings", icon: Settings },
   ];
 
@@ -30,7 +30,7 @@ export default function ControlSidebar({ pendingCount, adminName }: Props) {
     <>
       {/* Logo */}
       <div className="p-6 border-b border-white/10">
-        <Link href="/control" onClick={() => setMobileOpen(false)}>
+        <Link href="/control/metrics" onClick={() => setMobileOpen(false)}>
           <Logo variant="light" />
         </Link>
         <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-2">
@@ -87,7 +87,7 @@ export default function ControlSidebar({ pendingCount, adminName }: Props) {
     <>
       {/* Mobile top bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-navy flex items-center justify-between px-4 h-14 border-b border-white/10">
-        <Link href="/control">
+        <Link href="/control/metrics">
           <Logo variant="light" />
         </Link>
         <button

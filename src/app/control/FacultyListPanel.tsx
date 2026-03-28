@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Eye, X, Mail, Phone, MapPin, Linkedin, GraduationCap,
   ShieldCheck, AlignLeft, Clock, AlertCircle, RefreshCw, Loader2,
+  XCircle, ExternalLink,
 } from "lucide-react";
 import type { Faculty } from "./PendingFacultyPanel";
 
@@ -33,6 +34,7 @@ export default function FacultyListPanel({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [rejectNotes, setRejectNotes] = useState("");
 
   function showToast(msg: string) {
     setToast(msg);
@@ -61,6 +63,24 @@ export default function FacultyListPanel({
       setFaculty((prev) => prev.filter((f) => f.id !== id));
       showToast(`${name || "Docente"} movido de nuevo a revisión`);
       if (selected?.id === id) closeDrawer();
+    } catch (e) {
+      showToast(`Error: ${e}`);
+    }
+    setLoading(null);
+  }
+
+  async function handleReject(id: string, name: string | null, notes: string) {
+    setLoading(`reject-${id}`);
+    try {
+      const res = await fetch("/api/admin/verify-faculty", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ facultyId: id, action: "reject", notes: notes || "Perfil rechazado por el administrador" }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      setFaculty((prev) => prev.filter((f) => f.id !== id));
+      showToast(`${name || "Docente"} rechazado`);
+      if (selected?.id === id) { closeDrawer(); setRejectNotes(""); }
     } catch (e) {
       showToast(`Error: ${e}`);
     }
@@ -136,8 +156,18 @@ export default function FacultyListPanel({
                           onClick={() => openDrawer(f)}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors"
                         >
-                          <Eye size={13} /> Ver perfil
+                          <Eye size={13} /> Ver
                         </button>
+                        {mode === "approved" && (
+                          <button
+                            onClick={() => { setSelected(f); setDrawerOpen(true); }}
+                            disabled={loading === `reject-${f.id}`}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 border border-red-200 text-xs font-bold text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50"
+                            title="Rechazar este perfil"
+                          >
+                            <XCircle size={13} /> Rechazar
+                          </button>
+                        )}
                         {mode === "rejected" && (
                           <button
                             onClick={() => handleReactivate(f.id, f.full_name)}
@@ -185,9 +215,20 @@ export default function FacultyListPanel({
                   </span>
                 </div>
               </div>
-              <button onClick={closeDrawer} className="text-gray-400 hover:text-gray-600 mt-1">
-                <X size={20} />
-              </button>
+              <div className="flex items-center gap-2">
+                <a
+                  href={`/app/faculty/${selected.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+                  title="Ver perfil público"
+                >
+                  <ExternalLink size={13} /> Ver perfil
+                </a>
+                <button onClick={closeDrawer} className="text-gray-400 hover:text-gray-600 p-1">
+                  <X size={20} />
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
@@ -249,6 +290,26 @@ export default function FacultyListPanel({
                 >
                   {loading === `reactivate-${selected.id}` ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
                   Mover de nuevo a revisión
+                </button>
+              </div>
+            )}
+            {mode === "approved" && (
+              <div className="px-6 py-4 border-t border-gray-100 space-y-3">
+                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Rechazar perfil aprobado</p>
+                <textarea
+                  value={rejectNotes}
+                  onChange={e => setRejectNotes(e.target.value)}
+                  placeholder="Motivo del rechazo (obligatorio)..."
+                  rows={2}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm font-medium resize-none focus:outline-none focus:ring-2 focus:ring-red-300"
+                />
+                <button
+                  onClick={() => handleReject(selected.id, selected.full_name, rejectNotes)}
+                  disabled={loading === `reject-${selected.id}` || !rejectNotes.trim()}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-red-50 border border-red-200 text-sm font-black text-red-700 hover:bg-red-100 transition-colors disabled:opacity-50"
+                >
+                  {loading === `reject-${selected.id}` ? <Loader2 size={16} className="animate-spin" /> : <XCircle size={16} />}
+                  Rechazar este perfil
                 </button>
               </div>
             )}

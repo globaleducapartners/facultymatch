@@ -191,7 +191,7 @@ export async function signUpInstitution(formData: FormData) {
     website: website || null,
     phone: phone || null,
     contact_email: email.toLowerCase(),
-    status: "active",
+    status: "pending",
   }, { onConflict: "user_id" });
 
   // Auto-login
