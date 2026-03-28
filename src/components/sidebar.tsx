@@ -42,10 +42,10 @@ const facultyBottomNavItems = [
 ];
 
 const institutionItems = [
-  { label: "Buscar docentes", href: "/app/institution", icon: Search },
+  { label: "Mi institución", href: "/app/institution", icon: Building2 },
+  { label: "Buscar docentes", href: "/app/institution/search", icon: Search },
   { label: "Shortlists", href: "/app/institution/favorites", icon: Star },
   { label: "Contactos", href: "/app/institution/contacts", icon: Mail },
-  { label: "Mi institución", href: "/app/institution/profile", icon: Building2 },
   { label: "Plan & facturación", href: "/app/institution/billing", icon: CreditCard },
 ];
 
@@ -120,7 +120,11 @@ export function Sidebar() {
         <div className="flex-1 overflow-y-auto py-6 px-4">
           <nav className="space-y-1">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              // For institution main page, only active when exactly on /app/institution
+              // For search, active when on /app/institution/search or its sub-routes
+              const isActive = item.href === "/app/institution"
+                ? pathname === "/app/institution"
+                : pathname === item.href || pathname?.startsWith(item.href + "/");
               return (
                 <Link
                   key={item.href}

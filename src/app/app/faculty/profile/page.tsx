@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
+import { Resend } from "resend";
 import {
   User, Globe, Link as LinkIcon, Briefcase, GraduationCap, Phone,
   MapPin, Building2, FileText, Clock, Bell, Mail, MessageSquare,
@@ -72,6 +73,36 @@ export default async function ProfilePage({
         location: [city, country].filter(Boolean).join(", ") || null,
         updated_at: new Date().toISOString(),
       }, { onConflict: "id" });
+
+    // Send profile update email notification
+    if (user.email) {
+      const r = new Resend(process.env.RESEND_API_KEY);
+      r.emails.send({
+        from: process.env.RESEND_FROM_EMAIL || "FacultyMatch <noreply@facultymatch.app>",
+        to: [user.email],
+        subject: "Perfil docente actualizado — FacultyMatch",
+        html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
+<tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;max-width:600px;">
+<tr><td style="background:#0B1220;padding:24px 40px;text-align:center;border-radius:16px 16px 0 0;">
+  <span style="color:#fff;font-size:20px;font-weight:900;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+</td></tr>
+<tr><td style="padding:40px;">
+  <h2 style="margin:0 0 12px;color:#0B1220;font-size:22px;font-weight:900;">Perfil actualizado</h2>
+  <p style="color:#64748b;font-size:15px;line-height:1.7;margin:0 0 24px;">
+    Hemos guardado los cambios en tu perfil docente. Tu información está actualizada en la plataforma.
+  </p>
+  <a href="https://www.facultymatch.app/app/faculty/profile" style="display:inline-block;background:#2563EB;color:#fff;padding:14px 28px;border-radius:10px;font-weight:700;text-decoration:none;">
+    Ver mi perfil →
+  </a>
+</td></tr>
+<tr><td style="background:#f8fafc;padding:16px 40px;text-align:center;border-top:1px solid #e2e8f0;border-radius:0 0 16px 16px;">
+  <p style="margin:0;font-size:11px;color:#94a3b8;">FacultyMatch · www.facultymatch.app</p>
+</td></tr>
+</table></td></tr></table>
+</body></html>`,
+      }).catch(e => console.warn("[saveBasicInfo] email failed:", e));
+    }
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");

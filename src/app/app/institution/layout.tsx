@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
-import { InstitutionPendingPage } from "./InstitutionPendingPage";
 
 export default async function InstitutionLayout({
   children,
@@ -26,16 +25,7 @@ export default async function InstitutionLayout({
     redirect("/app/faculty");
   }
 
-  // Check institution approval status
-  const { data: institution } = await supabase
-    .from("institutions")
-    .select("status")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (institution?.status === "pending") {
-    return <InstitutionPendingPage />;
-  }
-
+  // Pending institutions now see the dashboard with a pending banner (handled in page.tsx)
+  // They can still browse faculty while waiting for approval
   return <>{children}</>;
 }

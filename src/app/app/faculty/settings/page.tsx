@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { StripeUpgradeButton } from "@/components/profile/StripeUpgradeButton";
 import { SecuritySettingsSection } from "@/components/settings/SecuritySettingsSection";
+import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -110,18 +111,13 @@ export default async function SettingsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex flex-col md:flex-row items-center gap-4">
-                <Button
-                  variant="outline"
-                  className="flex-1 w-full border-gray-100 hover:bg-gray-50 text-navy font-bold rounded-xl h-12 flex items-center justify-center gap-2"
+                <a
+                  href="/api/faculty/export-data"
+                  className="flex-1 w-full border border-gray-100 hover:bg-gray-50 text-navy font-bold rounded-xl h-12 flex items-center justify-center gap-2 text-sm transition-colors"
                 >
                   <Download size={18} /> Exportar mis datos
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1 w-full border-red-100 hover:bg-red-50 text-red-600 font-bold rounded-xl h-12 flex items-center justify-center gap-2"
-                >
-                  <Trash2 size={18} /> Eliminar mi cuenta
-                </Button>
+                </a>
+                <DeleteAccountButton role="faculty" />
               </div>
             </CardContent>
           </Card>
@@ -138,12 +134,7 @@ export default async function SettingsPage() {
               Si eliminas tu cuenta, todos tus datos académicos, documentos y contactos se perderán
               permanentemente. Esta acción no se puede deshacer.
             </p>
-            <Button
-              variant="ghost"
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 font-black uppercase tracking-widest text-[10px] p-0 h-auto"
-            >
-              Entiendo los riesgos
-            </Button>
+            <DeleteAccountButton role="faculty" />
           </div>
 
           {/* Plan card */}

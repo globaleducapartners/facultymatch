@@ -99,10 +99,18 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
       return redirect("/login?message=¡Cuenta creada! Accede con tu correo y contraseña.");
     }
 
-    // Send welcome email async (don't block on it)
+    // Send welcome email to new user
     sendWelcomeEmail(email, fullName, role, institutionName || fullName).catch(e =>
       console.error("[SignUp] Welcome email failed:", e)
     );
+
+    // Notify support team of new registration
+    resend.emails.send({
+      from: FROM,
+      to: ['support@facultymatch.app'],
+      subject: `🎓 Nuevo ${role === 'faculty' ? 'docente' : 'institución'} registrado: ${fullName}`,
+      html: buildSupportNotification(role, fullName, email, role === 'institution' ? (institutionName || undefined) : undefined),
+    }).catch(e => console.warn("[SignUp] Support notification email failed:", e));
   }
 
   return { success: true };
@@ -225,6 +233,14 @@ export async function signUpInstitution(formData: FormData) {
   // Send branded welcome email via Resend (not Supabase)
   sendWelcomeEmail(email.toLowerCase(), fullName, "institution", institutionName)
     .catch(e => console.error("[signUpInstitution] Welcome email failed:", e));
+
+  // Notify support team of new institution registration
+  resend.emails.send({
+    from: FROM,
+    to: ['support@facultymatch.app'],
+    subject: `🏛️ Nueva institución registrada: ${institutionName}`,
+    html: buildSupportNotification("institution", fullName, email.toLowerCase(), institutionName, country, city, institutionType),
+  }).catch(e => console.warn("[signUpInstitution] Support notification email failed:", e));
 
   return { success: true };
 }
@@ -686,4 +702,55 @@ export async function autosaveOnboarding(formData: FormData) {
     console.error("[Onboarding] Unexpected error during autosaveOnboarding:", err);
     return null;
   }
+}
+
+// ─── Internal helper ────────────────────────────────────────────────────────
+
+function buildSupportNotification(
+  role: string,
+  name: string,
+  email: string,
+  institution?: string,
+  country?: string,
+  city?: string,
+  type?: string,
+) {
+  const roleLabel = role === "faculty" ? "Docente" : "Institución";
+  const rows = [
+    ["Tipo", roleLabel],
+    ["Nombre", name],
+    ["Email", email],
+    institution ? ["Institución", institution] : null,
+    type ? ["Tipo de institución", type] : null,
+    (city || country) ? ["Ubicación", [city, country].filter(Boolean).join(", ")] : null,
+    ["Fecha", new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })],
+  ].filter(Boolean) as [string, string][];
+
+  return `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
+<tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;max-width:600px;">
+<tr><td style="background:#0B1220;padding:24px 40px;text-align:center;border-radius:16px 16px 0 0;">
+  <span style="color:#fff;font-size:20px;font-weight:900;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+  <p style="color:#94a3b8;font-size:12px;margin:4px 0 0;">Notificación interna — Nuevo registro</p>
+</td></tr>
+<tr><td style="padding:40px;">
+  <h2 style="margin:0 0 20px;color:#0B1220;font-size:22px;font-weight:900;">Nuevo ${roleLabel} registrado</h2>
+  <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+  ${rows.map(([label, value], i) => `
+    <tr style="background:${i % 2 === 0 ? '#f8fafc' : '#fff'};">
+      <td style="padding:12px 16px;font-size:13px;color:#94a3b8;font-weight:700;width:40%;">${label}</td>
+      <td style="padding:12px 16px;font-size:13px;color:#0B1220;font-weight:600;">${value}</td>
+    </tr>`).join("")}
+  </table>
+  <div style="margin-top:24px;">
+    <a href="https://www.facultymatch.app/control" style="display:inline-block;background:#2563EB;color:#fff;padding:12px 24px;border-radius:10px;font-weight:700;text-decoration:none;font-size:14px;">
+      Ir al panel de administración →
+    </a>
+  </div>
+</td></tr>
+<tr><td style="background:#f8fafc;padding:16px 40px;text-align:center;border-top:1px solid #e2e8f0;border-radius:0 0 16px 16px;">
+  <p style="margin:0;font-size:11px;color:#94a3b8;">FacultyMatch · Notificación automática interna</p>
+</td></tr>
+</table></td></tr></table>
+</body></html>`;
 }

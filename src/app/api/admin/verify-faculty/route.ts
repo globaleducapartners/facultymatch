@@ -7,18 +7,21 @@ const FROM = process.env.RESEND_FROM_EMAIL || "FacultyMatch <noreply@facultymatc
 const SITE = "https://www.facultymatch.app";
 
 export async function POST(request: Request) {
-  // Validate admin session
+  // Validate admin session — use regular client to get the authenticated user
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: adminProfile } = await supabase
+  // Use admin client to check role (bypasses RLS — no risk as we already verified session)
+  const adminForCheck = createAdminClient();
+  const { data: adminProfile } = await adminForCheck
     .from("user_profiles")
-    .select("role, full_name, email")
+    .select("role, full_name")
     .eq("id", user.id)
     .single();
 
   if (!adminProfile || (adminProfile.role !== "admin" && adminProfile.role !== "super_admin")) {
+    console.warn("[verify-faculty] Forbidden - user role:", adminProfile?.role, "user:", user.id);
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -49,7 +52,7 @@ export async function POST(request: Request) {
     await admin.from("user_profiles").update({
       verification_status: "approved",
       verified_at: new Date().toISOString(),
-      verified_by: adminProfile.email || user.email,
+      verified_by: user.email,
       verification_notes: notes || null,
       onboarding_completed: true,
     }).eq("id", facultyId);
@@ -78,7 +81,7 @@ export async function POST(request: Request) {
     await admin.from("user_profiles").update({
       verification_status: "rejected",
       verified_at: new Date().toISOString(),
-      verified_by: adminProfile.email || user.email,
+      verified_by: user.email,
       verification_notes: notes ? `${notes}\n\nMotivo rechazo: ${reason}` : `Motivo rechazo: ${reason}`,
     }).eq("id", facultyId);
 
