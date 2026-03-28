@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
-import { Home, Clock, CheckCircle2, XCircle, Building2, Settings, LogOut } from "lucide-react";
+import { Home, Clock, CheckCircle2, XCircle, Building2, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AdminLogoutButton } from "./AdminLogoutButton";
 
 interface Props {
   pendingCount: number;
@@ -74,13 +75,7 @@ export default function ControlSidebar({ pendingCount, adminName }: Props) {
             <p className="text-[10px] text-white/30 font-medium">Super Admin</p>
           </div>
         </div>
-        <Link
-          href="/"
-          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-white/40 hover:text-white/70 hover:bg-white/5 transition-colors"
-        >
-          <LogOut size={14} />
-          Salir del panel
-        </Link>
+        <AdminLogoutButton />
       </div>
     </aside>
   );
