@@ -17,9 +17,22 @@ export default async function InstitutionDashboard({
 
   const { data: institution } = await supabase
     .from("institutions")
-    .select("*")
+    .select("id, name, type, country, location, website, description")
     .eq("user_id", user!.id)
-    .single();
+    .maybeSingle();
+
+  if (!institution) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#F8FAFC]">
+        <div className="max-w-md text-center p-8 bg-white rounded-2xl shadow-sm border border-gray-100">
+          <h2 className="text-xl font-black text-navy mb-3">Perfil institucional incompleto</h2>
+          <p className="text-gray-500 font-medium">
+            Para poder contactar docentes necesitas completar tu perfil institucional primero.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Fetch favorites to show in the UI
   const { data: favoritesData } = await supabase

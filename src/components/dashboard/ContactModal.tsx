@@ -28,8 +28,14 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+
+    if (!institutionId || institutionId === '') {
+      setError('Error: No se pudo identificar tu institución. Recarga la página.');
+      return;
+    }
+
+    setLoading(true);
     
     const formData = new FormData(e.currentTarget);
     formData.append("facultyId", facultyId);

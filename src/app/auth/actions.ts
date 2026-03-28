@@ -220,6 +220,10 @@ export async function contactFaculty(formData: FormData) {
   const modality = formData.get("modality") as string;
   const dates = formData.get("dates") as string;
 
+  if (!institutionId || !facultyId) {
+    return { error: 'Datos incompletos para crear el contacto' };
+  }
+
   const { error } = await supabase.from("contacts").insert({
     faculty_id: facultyId,
     institution_id: institutionId,
