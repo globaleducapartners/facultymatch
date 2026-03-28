@@ -47,7 +47,7 @@ export default async function ControlLayout({ children }: { children: React.Reac
         pendingCount={pendingCount ?? 0}
         adminName={profile.full_name || user.email || 'Admin'}
       />
-      <main className="flex-1 overflow-y-auto min-h-screen">
+      <main className="flex-1 overflow-y-auto min-h-screen pt-14 lg:pt-0">
         <div className="max-w-7xl mx-auto p-6 lg:p-8">
           {children}
         </div>

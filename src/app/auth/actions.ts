@@ -108,6 +108,125 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
   return { success: true };
 }
 
+// Institution-specific signup: uses admin client to auto-confirm (no Supabase email sent)
+// then auto-logs in and sends our own branded welcome email via Resend
+export async function signUpInstitution(formData: FormData) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const fullName = formData.get("fullName") as string;
+  const firstName = formData.get("firstName") as string;
+  const lastName = formData.get("lastName") as string;
+  const institutionName = formData.get("institutionName") as string;
+  const institutionType = formData.get("institutionType") as string;
+  const country = formData.get("country") as string;
+  const city = formData.get("city") as string;
+  const website = formData.get("website") as string;
+  const cif = formData.get("cif") as string;
+  const position = formData.get("position") as string;
+  const phone = formData.get("phone") as string;
+  const urgency = formData.get("urgency") as string;
+  const termsAccepted = formData.get("terms_accepted") === "true";
+  const privacyAccepted = formData.get("privacy_accepted") === "true";
+  const marketingOptIn = formData.get("marketing_opt_in") === "true";
+
+  let knowledge_areas: string[] = [];
+  try { knowledge_areas = JSON.parse((formData.get("knowledge_areas") as string) || "[]"); } catch {}
+
+  if (!email || !password || !fullName || !institutionName) {
+    return { error: "Faltan datos obligatorios." };
+  }
+
+  const admin = createAdminClient();
+
+  // Create user with email pre-confirmed — no Supabase confirmation email sent
+  const { data, error } = await admin.auth.admin.createUser({
+    email: email.toLowerCase(),
+    password,
+    email_confirm: true,
+    user_metadata: {
+      full_name: fullName,
+      first_name: firstName,
+      last_name: lastName,
+      role: "institution",
+      onboarding_completed: true,
+      institution_name: institutionName,
+      institution_type: institutionType,
+      country,
+      city,
+      website: website || null,
+      cif: cif || null,
+      position,
+      phone,
+      knowledge_areas,
+      urgency: urgency || null,
+      terms_accepted: termsAccepted,
+      privacy_accepted: privacyAccepted,
+      marketing_opt_in: marketingOptIn,
+      consent_version: "v1",
+    },
+  });
+
+  if (error) {
+    const msg = error.message.toLowerCase();
+    if (msg.includes("already registered") || msg.includes("already been registered") ||
+        msg.includes("user already") || msg.includes("email address is already") ||
+        msg.includes("email already")) {
+      return { error: "Este correo ya está registrado. Accede con tu cuenta existente." };
+    }
+    return { error: error.message };
+  }
+
+  if (!data.user) return { error: "No se pudo crear la cuenta. Inténtalo de nuevo." };
+
+  // Create institution record immediately with all signup data
+  const cityCountry = [city, country].filter(Boolean).join(', ');
+  await admin.from("institutions").upsert({
+    user_id: data.user.id,
+    name: institutionName,
+    institution_type: institutionType || null,
+    type: institutionType || null,
+    country: country || null,
+    city: city || null,
+    location: cityCountry || null,
+    website: website || null,
+    phone: phone || null,
+    contact_email: email.toLowerCase(),
+    status: "active",
+  }, { onConflict: "user_id" });
+
+  // Auto-login
+  const supabase = await createClient();
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: email.toLowerCase(),
+    password,
+  });
+  if (signInError) {
+    console.error("[signUpInstitution] Auto-login failed:", signInError.message);
+    return { error: "Cuenta creada. Por favor accede con tu email y contraseña." };
+  }
+
+  // Save to institution_applications (non-blocking)
+  admin.from("institution_applications").insert({
+    institution_name: institutionName,
+    institution_type: institutionType,
+    country,
+    city,
+    website: website || null,
+    contact_name: fullName,
+    contact_email: email.toLowerCase(),
+    contact_phone: phone,
+    contact_position: position,
+    areas_needed: knowledge_areas,
+    urgency: urgency || null,
+  }).catch(e => console.warn('[signUpInstitution] application insert failed:', e));
+
+  // Send branded welcome email via Resend (not Supabase)
+  sendWelcomeEmail(email.toLowerCase(), fullName, "institution", institutionName)
+    .catch(e => console.error("[signUpInstitution] Welcome email failed:", e));
+
+  return { success: true };
+}
+
 export async function updateEmail(formData: FormData) {
   const newEmail = formData.get("newEmail") as string;
   if (!newEmail?.trim()) return { error: "Introduce un correo válido." };
@@ -213,6 +332,9 @@ export async function signIn(formData: FormData) {
 
 export async function contactFaculty(formData: FormData) {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'No autenticado' };
+
   const facultyId = formData.get("facultyId") as string;
   const institutionId = formData.get("institutionId") as string;
   const message = formData.get("message") as string;
@@ -224,14 +346,17 @@ export async function contactFaculty(formData: FormData) {
     return { error: 'Datos incompletos para crear el contacto' };
   }
 
-  const { error } = await supabase.from("contacts").insert({
+  // Use admin client to bypass RLS — institution is authenticated and IDs are validated
+  const supabaseAdmin = createAdminClient();
+
+  const { error } = await supabaseAdmin.from("contacts").insert({
     faculty_id: facultyId,
     institution_id: institutionId,
     message,
     subject: reason,
     modality,
     dates,
-    status: 'pending' 
+    status: 'pending'
   });
 
   if (error) {
@@ -239,13 +364,18 @@ export async function contactFaculty(formData: FormData) {
   }
 
   // Obtener datos del docente y la institución para el email
-  const supabaseAdmin = createAdminClient();
+  // facultyId is faculty_profiles.id — need to look up the auth user via user_id
+  const { data: facultyProfile } = await supabaseAdmin
+    .from('faculty_profiles')
+    .select('user_id')
+    .eq('id', facultyId)
+    .maybeSingle();
 
-  const { data: facultyUser } = await supabaseAdmin
+  const { data: facultyUser } = facultyProfile ? await supabaseAdmin
     .from('user_profiles')
     .select('full_name')
-    .eq('id', facultyId)
-    .single();
+    .eq('id', facultyProfile.user_id)
+    .single() : { data: null };
 
   const { data: institutionData } = await supabaseAdmin
     .from('institutions')
@@ -254,8 +384,8 @@ export async function contactFaculty(formData: FormData) {
     .single();
 
   // Email al docente notificándole del contacto
-  if (facultyUser) {
-    const { data: facultyAuth } = await supabaseAdmin.auth.admin.getUserById(facultyId);
+  if (facultyUser && facultyProfile) {
+    const { data: facultyAuth } = await supabaseAdmin.auth.admin.getUserById(facultyProfile.user_id);
     if (facultyAuth?.user?.email) {
       try {
         await resend.emails.send({

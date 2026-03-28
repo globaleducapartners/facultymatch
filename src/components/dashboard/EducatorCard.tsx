@@ -107,12 +107,26 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
             )}
             
             <div className="flex flex-wrap gap-2 pt-2">
-
-            {educator.expertise?.slice(0, 3).map((exp: any) => (
-              <Badge key={exp.id} variant="secondary" className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-xs font-bold border-none">
-                {exp.area}: {exp.subarea}
-              </Badge>
-            ))}
+            {educator.expertise?.length > 0
+              ? educator.expertise.slice(0, 3).map((exp: any) => {
+                  const areaLabel = typeof exp.area === 'string' ? exp.area : (exp.area?.name ?? '');
+                  const subareaLabel = typeof exp.subarea === 'string' ? exp.subarea : (exp.subarea?.name ?? '');
+                  const label = [areaLabel, subareaLabel].filter(Boolean).join(': ');
+                  return label ? (
+                    <Badge key={exp.id ?? label} variant="secondary" className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-xs font-bold border-none max-w-[200px] truncate" title={label}>
+                      {label}
+                    </Badge>
+                  ) : null;
+                })
+              : educator.faculty_areas?.slice(0, 3).map((area: any) => {
+                  const label = typeof area === 'string' ? area : (area?.name ?? '');
+                  return label ? (
+                    <Badge key={label} variant="secondary" className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-xs font-bold border-none max-w-[200px] truncate" title={label}>
+                      {label}
+                    </Badge>
+                  ) : null;
+                })
+            }
             {educator.expertise?.length > 3 && (
               <Badge variant="secondary" className="bg-gray-50 text-gray-400 px-3 py-1 rounded-lg text-xs font-bold border-none">
                 +{educator.expertise.length - 3} más

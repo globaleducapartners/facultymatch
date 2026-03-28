@@ -21,7 +21,9 @@ export default async function FacultyLayout({
     redirect("/onboarding/role");
   }
 
-  if (profile.role !== "faculty") {
+  // Institution users can view individual faculty profiles (/app/faculty/[id])
+  // but not the faculty dashboard pages (profile editing, settings, etc.)
+  if (profile.role !== "faculty" && profile.role !== "institution") {
     redirect("/app/institution");
   }
 

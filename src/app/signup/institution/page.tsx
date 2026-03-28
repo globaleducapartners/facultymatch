@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createBrowserClient } from "@supabase/ssr";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Building2, ShieldCheck, Search, Users, ArrowRight, Loader2 } from "lucide-react";
+import { signUpInstitution } from "@/app/auth/actions";
 
 const AREAS_OPTIONS = [
   "Business & Management", "Ingeniería & Tecnología", "Salud & Ciencias",
@@ -121,73 +121,43 @@ export default function SignupInstitutionPage() {
 
     setLoading(true);
     try {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
       const fullName = `${firstName.trim()} ${lastName.trim()}`;
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://www.facultymatch.app";
 
-      const { error: signUpError } = await supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
-        password,
-        options: {
-          emailRedirectTo: `${siteUrl}/auth/callback`,
-          data: {
-            full_name: fullName,
-            first_name: firstName.trim(),
-            last_name: lastName.trim(),
-            role: "institution",
-            onboarding_completed: true,
-            institution_name: institutionName.trim(),
-            institution_type: institutionType,
-            country,
-            city: city.trim(),
-            website: website.trim() || null,
-            cif: cif.trim() || null,
-            position: position.trim(),
-            phone: phone.trim(),
-            knowledge_areas: selectedAreas,
-            urgency: urgency || null,
-            terms_accepted: true,
-            privacy_accepted: true,
-            marketing_opt_in: marketingOptIn,
-            consent_version: "v1",
-          },
-        },
-      });
+      const formData = new FormData();
+      formData.set("email", email.trim().toLowerCase());
+      formData.set("password", password);
+      formData.set("fullName", fullName);
+      formData.set("firstName", firstName.trim());
+      formData.set("lastName", lastName.trim());
+      formData.set("institutionName", institutionName.trim());
+      formData.set("institutionType", institutionType);
+      formData.set("country", country);
+      formData.set("city", city.trim());
+      formData.set("website", website.trim() || "");
+      formData.set("cif", cif.trim() || "");
+      formData.set("position", position.trim());
+      formData.set("phone", phone.trim());
+      formData.set("knowledge_areas", JSON.stringify(selectedAreas));
+      formData.set("urgency", urgency || "");
+      formData.set("terms_accepted", String(consentTerms));
+      formData.set("privacy_accepted", String(consentPrivacy));
+      formData.set("marketing_opt_in", String(marketingOptIn));
 
-      if (signUpError) {
-        const msg = signUpError.message.toLowerCase();
-        if (msg.includes("already registered") || msg.includes("already been registered") || signUpError.status === 400) {
+      const result = await signUpInstitution(formData);
+
+      if (result?.error) {
+        if (result.error.includes("ya está registrado") || result.error.includes("already")) {
           setServerError("duplicate_email");
         } else {
-          setServerError(signUpError.message);
+          setServerError(result.error);
         }
         setLoading(false);
         return;
       }
 
-      // Non-blocking: insert in institution_applications
-      fetch("/api/apply/institution", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          institution_name: institutionName.trim(),
-          institution_type: institutionType,
-          country,
-          city: city.trim(),
-          website: website.trim() || null,
-          contact_name: fullName,
-          contact_email: email.trim().toLowerCase(),
-          contact_phone: phone.trim(),
-          contact_position: position.trim(),
-          areas_needed: selectedAreas,
-          urgency: urgency || null,
-        }),
-      }).catch(() => {});
-
-      router.push(`/signup/institution/confirm?email=${encodeURIComponent(email.trim().toLowerCase())}`);
+      // Success — go directly to institution dashboard (no email confirmation needed)
+      router.push("/app/institution");
+      router.refresh();
     } catch (err: unknown) {
       setServerError(err instanceof Error ? err.message : "Error inesperado. Inténtalo de nuevo.");
       setLoading(false);
@@ -243,7 +213,7 @@ export default function SignupInstitutionPage() {
       </div>
 
       {/* Right form panel */}
-      <div className="w-full lg:w-3/5 flex flex-col items-center justify-center px-6 py-12 bg-[#F8FAFC] overflow-y-auto">
+      <div className="w-full lg:w-3/5 flex flex-col items-center px-6 py-10 bg-[#F8FAFC] overflow-y-auto min-h-screen">
         <div className="lg:hidden mb-8 self-start">
           <Link href="/"><Logo /></Link>
         </div>

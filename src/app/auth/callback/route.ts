@@ -52,7 +52,41 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL('/login?error=Could not authenticate user', origin).toString());
   }
 
-  // Step 4: Try to pre-populate faculty_profiles from faculty_leads
+  // Step 4: For institution users — ensure institutions record exists (from signup metadata)
+  if (user.user_metadata?.role === 'institution') {
+    try {
+      const { data: existingInst } = await supabaseAdmin
+        .from('institutions')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!existingInst) {
+        const meta = user.user_metadata;
+        const cityCountry = [meta.city, meta.country].filter(Boolean).join(', ');
+        await supabaseAdmin.from('institutions').insert({
+          user_id: user.id,
+          name: meta.institution_name
+            || `${meta.first_name || ''} ${meta.last_name || ''}`.trim()
+            || user.email?.split('@')[0]
+            || 'Mi Institución',
+          institution_type: meta.institution_type ?? null,
+          type: meta.institution_type ?? null,
+          country: meta.country ?? null,
+          city: meta.city ?? null,
+          location: cityCountry || null,
+          website: meta.website ?? null,
+          phone: meta.phone ?? null,
+          contact_email: user.email ?? null,
+          status: 'active',
+        });
+      }
+    } catch (e) {
+      console.warn('[callback] institution record creation failed:', e);
+    }
+  }
+
+  // Step 4b: Try to pre-populate faculty_profiles from faculty_leads
   // (only for old /apply magic-link users — skip for new /signup/faculty users
   //  to avoid overwriting onboarding_completed with false)
   try {
@@ -133,13 +167,21 @@ export async function GET(request: Request) {
           linkedin_url: user.user_metadata.linkedin_url ?? null,
         }, { onConflict: 'user_id' });
       } else if (user.user_metadata.role === 'institution') {
+        const meta = user.user_metadata;
+        const cityCountry = [meta.city, meta.country].filter(Boolean).join(', ');
         await supabaseAdmin.from('institutions').upsert({
-          id: user.id,
           user_id: user.id,
-          name: user.user_metadata.institution_name || user.user_metadata.full_name || user.email?.split('@')[0],
-          type: user.user_metadata.institution_type ?? null,
-          country: user.user_metadata.country ?? null,
-        }, { onConflict: 'id' });
+          name: meta.institution_name || meta.full_name || user.email?.split('@')[0],
+          institution_type: meta.institution_type ?? null,
+          type: meta.institution_type ?? null,
+          country: meta.country ?? null,
+          city: meta.city ?? null,
+          location: cityCountry || null,
+          website: meta.website ?? null,
+          phone: meta.phone ?? null,
+          contact_email: user.email ?? null,
+          status: 'active',
+        }, { onConflict: 'user_id' });
       }
 
       // Refetch profile with recovered data

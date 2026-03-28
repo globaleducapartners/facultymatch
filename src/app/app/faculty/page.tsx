@@ -34,6 +34,12 @@ export default async function EducatorDashboard() {
     .eq("id", user.id)
     .single();
 
+  // Institution users should not be on the faculty dashboard home
+  if (profile?.role === "institution") {
+    const { redirect } = await import("next/navigation");
+    redirect("/app/institution");
+  }
+
   const { data: facultyProfile } = await supabase
       .from("faculty_profiles")
         .select("*")

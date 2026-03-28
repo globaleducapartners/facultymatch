@@ -96,14 +96,21 @@ export default async function InstitutionDashboard({
     );
   }
 
-    // Transform for UI expectations if necessary
-    const transformedEducators = filteredEducators.map(ed => ({
-      ...ed,
-      full_name: (ed as any).user?.full_name || "Docente",
-      avatar_url: (ed as any).user?.avatar_url,
-      country: ed.location, // Map location to country for UI
-      experience_years: ed.years_experience // Map years_experience to experience_years for UI
-    }));
+    // Transform for UI — handle user join (may be object or array depending on FK constraint)
+    const transformedEducators = filteredEducators.map(ed => {
+      const userJoin = (ed as any).user;
+      const userObj = Array.isArray(userJoin) ? userJoin[0] : userJoin;
+      return {
+        ...ed,
+        full_name: userObj?.full_name || (ed as any).full_name || "Docente",
+        avatar_url: userObj?.avatar_url || null,
+        // Normalize location fields
+        country: (ed as any).country || ed.location || null,
+        city: (ed as any).city || null,
+        // Map experience to correct field names
+        experience_years: (ed as any).years_teaching || (ed as any).years_experience || 0,
+      };
+    });
 
   return (
     <InstitutionSearchPage 

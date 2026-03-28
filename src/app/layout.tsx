@@ -17,11 +17,12 @@ export const metadata: Metadata = {
   description: "Conectamos universidades y docentes expertos de todo el mundo. La red de confianza académica líder.",
   icons: {
     icon: [
-      { url: "/logo.png", type: "image/png" },
-      { url: "/favicon.ico", type: "image/x-icon" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", type: "image/x-icon", sizes: "any" },
+      { url: "/logo.png", type: "image/png", sizes: "512x512" },
     ],
     apple: [
-      { url: "/logo.png", type: "image/png" },
+      { url: "/logo.png", type: "image/png", sizes: "180x180" },
     ],
     shortcut: "/favicon.ico",
   },
@@ -51,8 +52,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
         {/* End Google Tag Manager */}
-        <link rel="icon" href="/logo.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/logo.png" />
       </head>
       <body
         className={`${inter.variable} font-sans antialiased flex flex-col min-h-screen`}

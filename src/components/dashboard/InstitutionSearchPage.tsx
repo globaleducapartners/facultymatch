@@ -51,7 +51,7 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
         </div>
           <div className="flex items-center gap-3">
             <Badge variant="outline" className="bg-blue-50 text-talentia-blue border-blue-100 font-bold px-4 py-1.5 rounded-full">
-              Plan Starter: 10 contactos/mes
+              Plan Starter
             </Badge>
             <Button variant="outline" asChild className="rounded-full border-gray-200 font-bold">
               <Link href="/app/institution/favorites" className="flex items-center gap-2">
@@ -244,7 +244,6 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
           </div>
 
           {/* Preview Panel (Sticky) */}
-          {selectedEducator && console.log('[Preview Panel] educator data:', selectedEducator)}
           {selectedEducator && (
             <div className="hidden xl:block xl:sticky xl:top-24 h-[calc(100vh-8rem)] animate-in slide-in-from-right-8 duration-500">
               <div className="bg-white rounded-3xl shadow-xl border border-gray-100 h-full overflow-y-auto flex flex-col">
@@ -305,7 +304,9 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
                       </div>
                       <div className="flex items-center gap-3 text-sm font-bold text-gray-600">
                         <Briefcase size={18} className="text-talentia-blue" />
-                        {selectedEducator.experience_years}+ años exp.
+                        {selectedEducator.experience_years > 0
+                          ? `${selectedEducator.experience_years}+ años exp.`
+                          : "Sin especificar"}
                       </div>
                     </div>
                   </div>
@@ -313,18 +314,30 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
                   <div className="space-y-4">
                     <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Biografía</h4>
                     <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
-                      {selectedEducator.bio}
+                      {selectedEducator.bio || "Este docente aún no ha completado su biografía."}
                     </p>
                   </div>
 
                   <div className="space-y-4">
                     <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Especialidades</h4>
                     <div className="flex flex-wrap gap-2">
-                      {selectedEducator.expertise?.map((exp: any) => (
-                        <Badge key={exp.id} className="bg-gray-50 text-gray-600 border-none px-4 py-2 rounded-xl text-xs font-bold">
-                          {exp.area}: {exp.subarea}
-                        </Badge>
-                      ))}
+                      {selectedEducator.expertise?.length > 0
+                        ? selectedEducator.expertise.map((exp: any) => {
+                            const areaLabel = typeof exp.area === 'string' ? exp.area : (exp.area?.name ?? '');
+                            const subareaLabel = typeof exp.subarea === 'string' ? exp.subarea : (exp.subarea?.name ?? '');
+                            const label = [areaLabel, subareaLabel].filter(Boolean).join(': ');
+                            return label ? (
+                              <Badge key={exp.id ?? label} className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold max-w-[180px] truncate">
+                                {label}
+                              </Badge>
+                            ) : null;
+                          })
+                        : selectedEducator.faculty_areas?.slice(0, 4).map((area: any) => (
+                            <Badge key={area} className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold max-w-[180px] truncate">
+                              {typeof area === 'string' ? area : (area?.name ?? '')}
+                            </Badge>
+                          ))
+                      }
                     </div>
                   </div>
                 </div>

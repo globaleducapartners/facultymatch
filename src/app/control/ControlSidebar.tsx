@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
-import { Home, Clock, CheckCircle2, XCircle, Building2, Settings } from "lucide-react";
+import { Home, Clock, CheckCircle2, XCircle, Building2, Settings, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AdminLogoutButton } from "./AdminLogoutButton";
+import { useState } from "react";
 
 interface Props {
   pendingCount: number;
@@ -14,6 +15,7 @@ interface Props {
 
 export default function ControlSidebar({ pendingCount, adminName }: Props) {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const navItems = [
     { label: "Dashboard", href: "/control", icon: Home },
@@ -24,11 +26,11 @@ export default function ControlSidebar({ pendingCount, adminName }: Props) {
     { label: "Configuración", href: "/control/settings", icon: Settings },
   ];
 
-  return (
-    <aside className="hidden lg:flex w-64 shrink-0 flex-col bg-navy min-h-screen sticky top-0 h-screen">
+  const SidebarContent = () => (
+    <>
       {/* Logo */}
       <div className="p-6 border-b border-white/10">
-        <Link href="/control">
+        <Link href="/control" onClick={() => setMobileOpen(false)}>
           <Logo variant="light" />
         </Link>
         <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-2">
@@ -45,6 +47,7 @@ export default function ControlSidebar({ pendingCount, adminName }: Props) {
             <Link
               key={item.label}
               href={item.href}
+              onClick={() => setMobileOpen(false)}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors",
                 isActive
@@ -77,6 +80,44 @@ export default function ControlSidebar({ pendingCount, adminName }: Props) {
         </div>
         <AdminLogoutButton />
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile top bar */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-navy flex items-center justify-between px-4 h-14 border-b border-white/10">
+        <Link href="/control">
+          <Logo variant="light" />
+        </Link>
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5"
+        >
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+      </div>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-40 bg-black/50"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile drawer */}
+      <div className={cn(
+        "lg:hidden fixed top-14 left-0 bottom-0 z-40 w-72 bg-navy flex flex-col transition-transform duration-300",
+        mobileOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <SidebarContent />
+      </div>
+
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex w-64 shrink-0 flex-col bg-navy min-h-screen sticky top-0 h-screen">
+        <SidebarContent />
+      </aside>
+    </>
   );
 }

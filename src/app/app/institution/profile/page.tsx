@@ -23,11 +23,25 @@ export default async function InstitutionProfilePage() {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  // Auto-create institution record if it doesn't exist
+  // Auto-create institution record if it doesn't exist (use signup metadata when available)
   if (!institution) {
+    const meta = user.user_metadata || {};
+    const cityCountry = [meta.city, meta.country].filter(Boolean).join(', ');
     const { data: newInst } = await supabase
       .from("institutions")
-      .insert({ user_id: user.id, name: userProfile?.full_name || "Mi Institución", status: "active" })
+      .insert({
+        user_id: user.id,
+        name: meta.institution_name || userProfile?.full_name || "Mi Institución",
+        institution_type: meta.institution_type ?? null,
+        type: meta.institution_type ?? null,
+        country: meta.country ?? null,
+        city: meta.city ?? null,
+        location: cityCountry || null,
+        website: meta.website ?? null,
+        phone: meta.phone ?? null,
+        contact_email: user.email ?? null,
+        status: "active",
+      })
       .select()
       .single();
     institution = newInst;
