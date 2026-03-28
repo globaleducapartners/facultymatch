@@ -218,7 +218,9 @@ export async function signUpInstitution(formData: FormData) {
     contact_position: position,
     areas_needed: knowledge_areas,
     urgency: urgency || null,
-  }).catch(e => console.warn('[signUpInstitution] application insert failed:', e));
+  }).then(({ error }) => {
+    if (error) console.warn('[signUpInstitution] application insert failed:', error.message);
+  });
 
   // Send branded welcome email via Resend (not Supabase)
   sendWelcomeEmail(email.toLowerCase(), fullName, "institution", institutionName)

@@ -5,6 +5,7 @@ import { Building2, Globe, MapPin, Phone, Mail, Users, Calendar, Link as LinkIco
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { InstitutionLogoUpload } from "@/components/dashboard/InstitutionLogoUpload";
 
 export default async function InstitutionProfilePage() {
   const supabase = await createClient();
@@ -133,15 +134,11 @@ export default async function InstitutionProfilePage() {
       <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
         <CardContent className="pt-5 pb-5">
           <div className="flex items-center gap-4">
-            {/* Logo placeholder */}
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-navy to-talentia-blue flex items-center justify-center flex-shrink-0 shadow-lg">
-              {institution?.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={institution.logo_url} alt="Logo" className="w-full h-full object-cover rounded-2xl" />
-              ) : (
-                <Building2 size={28} className="text-white" />
-              )}
-            </div>
+            {/* Logo upload */}
+            <InstitutionLogoUpload
+              institutionId={institution?.id ?? ""}
+              currentLogoUrl={institution?.logo_url ?? null}
+            />
             <div className="flex-1 min-w-0">
               <h2 className="text-lg font-black text-navy truncate">{institution?.name || "Mi Institución"}</h2>
               <p className="text-sm text-gray-500 font-medium">{[institution?.city, institution?.country].filter(Boolean).join(", ") || "Ubicación por configurar"}</p>

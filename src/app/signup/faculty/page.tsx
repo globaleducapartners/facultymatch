@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, GraduationCap, ShieldCheck, Users, ArrowRight, Loader2 } from "lucide-react";
+import { Eye, EyeOff, GraduationCap, ShieldCheck, Users, ArrowRight, Loader2, Check } from "lucide-react";
 
 const AREAS_OPTIONS = [
   "Business & Management", "Ingeniería & Tecnología", "Salud & Ciencias",
@@ -14,6 +14,19 @@ const AREAS_OPTIONS = [
   "Economía & Finanzas", "Comunicación & Marketing", "Ciencias Sociales",
   "Matemáticas & Estadística",
 ];
+
+const AREAS_ICONS: Record<string, string> = {
+  "Business & Management": "💼",
+  "Ingeniería & Tecnología": "⚙️",
+  "Salud & Ciencias": "🔬",
+  "Derecho & Ciencias Políticas": "⚖️",
+  "Educación": "🎓",
+  "Artes & Humanidades": "🎨",
+  "Economía & Finanzas": "📊",
+  "Comunicación & Marketing": "📣",
+  "Ciencias Sociales": "🌐",
+  "Matemáticas & Estadística": "📐",
+};
 
 const MODALITIES_OPTIONS = ["Presencial", "Online", "Híbrido", "Internacional"];
 
@@ -372,24 +385,30 @@ export default function SignupFacultyPage() {
                 </select>
                 {errors.academicLevel && <p className="text-xs text-red-500 font-medium">{errors.academicLevel}</p>}
               </div>
-              <div data-error={!!errors.areas} className="space-y-1.5">
-                <label className="text-sm font-bold text-navy">
-                  Áreas de conocimiento <span className="text-red-500">*</span>
-                  <span className="text-gray-400 font-normal text-xs ml-2">máx. 3</span>
-                </label>
-                <div className="flex flex-wrap gap-2">
+              <div data-error={!!errors.areas} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-bold text-navy">
+                    Áreas de conocimiento <span className="text-red-500">*</span>
+                  </label>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${selectedAreas.length >= 3 ? "bg-talentia-blue/10 text-talentia-blue" : "text-gray-400"}`}>
+                    {selectedAreas.length}/3
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
                   {AREAS_OPTIONS.map(area => {
                     const active = selectedAreas.includes(area);
                     const disabled = !active && selectedAreas.length >= 3;
                     return (
                       <button key={area} type="button" onClick={() => { toggleArea(area); clearError("areas"); }}
                         disabled={disabled}
-                        className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-                          active ? "bg-talentia-blue text-white border-talentia-blue" :
+                        className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold border transition-all text-left ${
+                          active ? "bg-talentia-blue text-white border-talentia-blue shadow-sm" :
                           disabled ? "bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed" :
-                          "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                          "bg-white text-gray-600 border-gray-200 hover:border-talentia-blue hover:bg-blue-50/50"
                         }`}>
-                        {area}
+                        <span className="text-sm leading-none flex-shrink-0">{AREAS_ICONS[area]}</span>
+                        <span className="flex-1 leading-tight">{area}</span>
+                        {active && <Check size={12} className="flex-shrink-0" />}
                       </button>
                     );
                   })}

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase-server";
 import { InstitutionSearchPage } from "@/components/dashboard/InstitutionSearchPage";
+import { InstitutionWelcomeBanner } from "@/components/dashboard/InstitutionWelcomeBanner";
 
 export default async function InstitutionDashboard({
   searchParams,
@@ -17,7 +18,7 @@ export default async function InstitutionDashboard({
 
   const { data: institution } = await supabase
     .from("institutions")
-    .select("id, name, type, country, location, website, description")
+    .select("id, name, type, country, location, website, description, created_at")
     .eq("user_id", user!.id)
     .maybeSingle();
 
@@ -39,8 +40,14 @@ export default async function InstitutionDashboard({
     .from("favorites")
     .select("faculty_id")
     .eq("institution_id", institution?.id);
-  
+
   const favorites = favoritesData?.map(f => f.faculty_id) || [];
+
+  // Check if institution has sent any contacts (for welcome banner)
+  const { count: contactsCount } = await supabase
+    .from("contacts")
+    .select("*", { count: "exact", head: true })
+    .eq("institution_id", institution?.id);
 
   // Search logic (JOIN with user_profiles to get full_name)
   let educatorQuery = supabase
@@ -112,12 +119,27 @@ export default async function InstitutionDashboard({
       };
     });
 
+  const isNewUser = !!(institution.created_at &&
+    new Date().getTime() - new Date(institution.created_at).getTime() < 1000 * 60 * 60 * 24 * 30);
+
   return (
-    <InstitutionSearchPage 
-      initialEducators={transformedEducators} 
-      institutionId={institution?.id || ""} 
-      searchParams={params}
-      initialFavorites={favorites}
-    />
+    <>
+      {isNewUser && (
+        <InstitutionWelcomeBanner
+          institutionName={institution.name || ""}
+          institutionId={institution.id}
+          hasDescription={!!institution.description}
+          hasFavorites={favorites.length > 0}
+          hasContacts={(contactsCount ?? 0) > 0}
+          storageKey={`fm_welcome_inst_${institution.id}`}
+        />
+      )}
+      <InstitutionSearchPage
+        initialEducators={transformedEducators}
+        institutionId={institution?.id || ""}
+        searchParams={params}
+        initialFavorites={favorites}
+      />
+    </>
   );
 }

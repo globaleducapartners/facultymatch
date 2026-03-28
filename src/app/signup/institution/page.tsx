@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Building2, ShieldCheck, Search, Users, ArrowRight, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Building2, ShieldCheck, Search, Users, ArrowRight, Loader2, Check } from "lucide-react";
 import { signUpInstitution } from "@/app/auth/actions";
 
 const AREAS_OPTIONS = [
@@ -14,6 +14,19 @@ const AREAS_OPTIONS = [
   "Economía & Finanzas", "Comunicación & Marketing", "Ciencias Sociales",
   "Matemáticas & Estadística",
 ];
+
+const AREAS_ICONS: Record<string, string> = {
+  "Business & Management": "💼",
+  "Ingeniería & Tecnología": "⚙️",
+  "Salud & Ciencias": "🔬",
+  "Derecho & Ciencias Políticas": "⚖️",
+  "Educación": "🎓",
+  "Artes & Humanidades": "🎨",
+  "Economía & Finanzas": "📊",
+  "Comunicación & Marketing": "📣",
+  "Ciencias Sociales": "🌐",
+  "Matemáticas & Estadística": "📐",
+};
 
 const INSTITUTION_TYPES = [
   "Universidad pública", "Universidad privada", "Business School",
@@ -76,8 +89,32 @@ export default function SignupInstitutionPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [nameCheckStatus, setNameCheckStatus] = useState<"idle" | "checking" | "taken" | "available">("idle");
+  const nameCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const pwStrength = getPasswordStrength(password);
+
+  // Debounced institution name duplicate check
+  useEffect(() => {
+    if (nameCheckTimer.current) clearTimeout(nameCheckTimer.current);
+    if (!institutionName.trim() || institutionName.trim().length < 3) {
+      setNameCheckStatus("idle");
+      return;
+    }
+    setNameCheckStatus("checking");
+    nameCheckTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/institution/check-name?name=${encodeURIComponent(institutionName.trim())}`);
+        const { exists } = await res.json();
+        setNameCheckStatus(exists ? "taken" : "available");
+      } catch {
+        setNameCheckStatus("idle");
+      }
+    }, 600);
+    return () => {
+      if (nameCheckTimer.current) clearTimeout(nameCheckTimer.current);
+    };
+  }, [institutionName]);
 
   const toggleArea = (area: string) => {
     setSelectedAreas(prev =>
@@ -246,11 +283,27 @@ export default function SignupInstitutionPage() {
               <p className="text-xs font-black uppercase tracking-widest text-gray-400 border-b border-gray-100 pb-2">
                 Datos del centro
               </p>
-              <div data-error={!!errors.institutionName} className="space-y-1.5">
+              <div data-error={!!errors.institutionName || nameCheckStatus === "taken"} className="space-y-1.5">
                 <label className="text-sm font-bold text-navy">Nombre de la institución <span className="text-red-500">*</span></label>
-                <input type="text" value={institutionName} placeholder="Universidad de Madrid"
-                  onChange={e => { setInstitutionName(e.target.value); clearError("institutionName"); }}
-                  className={inputClass("institutionName")} />
+                <div className="relative">
+                  <input type="text" value={institutionName} placeholder="Universidad de Madrid"
+                    onChange={e => { setInstitutionName(e.target.value); clearError("institutionName"); }}
+                    className={`w-full h-11 px-4 pr-10 rounded-xl border text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all ${
+                      errors.institutionName || nameCheckStatus === "taken" ? "border-red-400 ring-1 ring-red-300" :
+                      nameCheckStatus === "available" ? "border-green-400" : "border-gray-200"
+                    }`} />
+                  {nameCheckStatus === "checking" && (
+                    <Loader2 size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
+                  )}
+                  {nameCheckStatus === "available" && (
+                    <Check size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500" />
+                  )}
+                </div>
+                {nameCheckStatus === "taken" && !errors.institutionName && (
+                  <p className="text-xs text-amber-600 font-medium">
+                    Ya existe una institución con un nombre similar. Si es la tuya, <a href="/login" className="font-bold underline">inicia sesión</a>.
+                  </p>
+                )}
                 {errors.institutionName && <p className="text-xs text-red-500 font-medium">{errors.institutionName}</p>}
               </div>
               <div data-error={!!errors.institutionType} className="space-y-1.5">
@@ -397,17 +450,27 @@ export default function SignupInstitutionPage() {
               <p className="text-xs font-black uppercase tracking-widest text-gray-400 border-b border-gray-100 pb-2">
                 Necesidades actuales
               </p>
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-navy">Áreas donde buscáis profesorado</label>
-                <div className="flex flex-wrap gap-2">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-bold text-navy">Áreas donde buscáis profesorado</label>
+                  {selectedAreas.length > 0 && (
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-energy-orange/10 text-energy-orange">
+                      {selectedAreas.length} seleccionada{selectedAreas.length > 1 ? "s" : ""}
+                    </span>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
                   {AREAS_OPTIONS.map(area => {
                     const active = selectedAreas.includes(area);
                     return (
                       <button key={area} type="button" onClick={() => toggleArea(area)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-                          active ? "bg-energy-orange text-white border-energy-orange" : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                        className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold border transition-all text-left ${
+                          active ? "bg-energy-orange text-white border-energy-orange shadow-sm" :
+                          "bg-white text-gray-600 border-gray-200 hover:border-energy-orange hover:bg-orange-50/50"
                         }`}>
-                        {area}
+                        <span className="text-sm leading-none flex-shrink-0">{AREAS_ICONS[area]}</span>
+                        <span className="flex-1 leading-tight">{area}</span>
+                        {active && <Check size={12} className="flex-shrink-0" />}
                       </button>
                     );
                   })}
