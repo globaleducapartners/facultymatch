@@ -21,7 +21,7 @@ export default async function InstitutionProfilePage() {
     .from("institutions")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   // Auto-create institution record if it doesn't exist
   if (!institution) {
@@ -79,15 +79,15 @@ export default async function InstitutionProfilePage() {
     revalidatePath("/app/institution/profile");
   }
 
-  const completedFields = [
+  const fields = [
     institution?.name,
-    institution?.description,
+    (institution as any)?.institution_type,
     institution?.country,
-    institution?.city,
+    institution?.location ?? (institution as any)?.city,
+    institution?.description,
     institution?.website,
-    institution?.contact_email,
-  ].filter(Boolean).length;
-  const profileCompletion = Math.round((completedFields / 6) * 100);
+  ];
+  const profileCompletion = Math.round(fields.filter(Boolean).length / fields.length * 100);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -156,7 +156,7 @@ export default async function InstitutionProfilePage() {
             <div className="grid md:grid-cols-2 gap-5">
               <div className="space-y-1.5">
                 <label className="text-xs font-black uppercase tracking-widest text-gray-400">Nombre de la institución <span className="text-red-500">*</span></label>
-                <input name="name" defaultValue={institution?.name} required
+                <input name="name" defaultValue={institution?.name ?? ''} required
                   className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
                   placeholder="Universidad / Escuela de Negocios / Centro..." />
               </div>
@@ -176,7 +176,7 @@ export default async function InstitutionProfilePage() {
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-black uppercase tracking-widest text-gray-400">Descripción de la institución</label>
-              <textarea name="description" defaultValue={(institution as any)?.description} rows={4}
+              <textarea name="description" defaultValue={(institution as any)?.description ?? ''} rows={4}
                 className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium resize-none"
                 placeholder="Describe brevemente tu institución, misión y programas principales..." />
             </div>
@@ -194,13 +194,13 @@ export default async function InstitutionProfilePage() {
             <div className="grid md:grid-cols-2 gap-5">
               <div className="space-y-1.5">
                 <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-1"><Globe size={11} /> País</label>
-                <input name="country" defaultValue={institution?.country}
+                <input name="country" defaultValue={institution?.country ?? ''}
                   className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
                   placeholder="España" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-1"><MapPin size={11} /> Ciudad</label>
-                <input name="city" defaultValue={(institution as any)?.city}
+                <input name="city" defaultValue={(institution as any)?.city ?? ''}
                   className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
                   placeholder="Madrid" />
               </div>
@@ -231,7 +231,7 @@ export default async function InstitutionProfilePage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-1"><Globe size={11} /> Web oficial</label>
-                <input name="website" defaultValue={institution?.website}
+                <input name="website" defaultValue={institution?.website ?? ''}
                   className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
                   placeholder="https://www.universidad.edu" />
               </div>
