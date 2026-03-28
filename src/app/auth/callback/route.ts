@@ -100,25 +100,32 @@ export async function GET(request: Request) {
 
     if (lead) {
       await supabaseAdmin
-        .from('faculty_profiles')
-        .upsert({
-          user_id: user.id,
-          bio: lead.bio ?? undefined,
-          location: lead.city
-            ? [lead.city, lead.country].filter(Boolean).join(', ')
-            : lead.country ?? undefined,
-          city: lead.city ?? undefined,
-          country: lead.country ?? undefined,
-          linkedin_url: lead.linkedin_url ?? undefined,
-          modalities: lead.modalities ?? undefined,
-          faculty_areas: lead.fields ?? lead.faculty_areas ?? undefined,
-          languages: lead.languages ?? undefined,
-          availability: lead.availability ?? undefined,
-          headline: lead.academic_level ? `Docente · ${lead.academic_level}` : undefined,
-          visibility: 'public',
-          is_active: true,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: 'user_id' });
+  .from('faculty_profiles')
+  .upsert({
+    user_id: user.id,
+    bio: lead.bio ?? undefined,
+    location: lead.city
+      ? [lead.city, lead.country].filter(Boolean).join(', ')
+      : lead.country ?? undefined,
+    city: lead.city ?? undefined,
+    country: lead.country ?? undefined,
+    linkedin_url: lead.linkedin_url ?? undefined,
+    modalities: lead.modalities ?? undefined,
+    // CORREGIDO: primary_fields en leads = faculty_areas en profiles
+    faculty_areas: lead.primary_fields ?? lead.fields ?? lead.faculty_areas ?? undefined,
+    // AÑADIDO: subjects se guarda como datos extra
+    subjects: lead.subjects ?? undefined,
+    languages: lead.languages ?? undefined,
+    availability: lead.availability ?? undefined,
+    years_experience: lead.years_experience ?? undefined,
+    current_institution: lead.current_institution ?? undefined,
+    headline: lead.academic_level
+      ? `Docente · ${lead.academic_level}`
+      : undefined,
+    visibility: 'public',
+    is_active: true,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'user_id' });
 
       // Only update full_name — do NOT set onboarding_completed here
       // to avoid overwriting what the trigger already set
