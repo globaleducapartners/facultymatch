@@ -244,6 +244,7 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
           </div>
 
           {/* Preview Panel (Sticky) */}
+          {selectedEducator && console.log('[Preview Panel] educator data:', selectedEducator)}
           {selectedEducator && (
             <div className="hidden xl:block xl:sticky xl:top-24 h-[calc(100vh-8rem)] animate-in slide-in-from-right-8 duration-500">
               <div className="bg-white rounded-3xl shadow-xl border border-gray-100 h-full overflow-y-auto flex flex-col">
@@ -294,7 +295,9 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
                       </div>
                       <div className="flex items-center gap-3 text-sm font-bold text-gray-600">
                         <Globe size={18} className="text-talentia-blue" />
-                        {selectedEducator.languages?.join(', ') || "Español"}
+                        {(Array.isArray(selectedEducator.languages) ? selectedEducator.languages : [])
+                          .map((l: any) => typeof l === 'string' ? l : l.lang ?? l.language ?? '')
+                          .filter(Boolean).join(', ') || "Español"}
                       </div>
                       <div className="flex items-center gap-3 text-sm font-bold text-gray-600">
                         <Award size={18} className="text-talentia-blue" />

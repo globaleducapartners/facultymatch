@@ -72,7 +72,9 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
                 </span>
                 <span className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-widest">
                   <Globe size={14} className="text-gray-300" />
-                  {educator.languages?.join(', ') || "Español"}
+                  {(Array.isArray(educator.languages) ? educator.languages : [])
+                    .map((l: any) => typeof l === 'string' ? l : l.lang ?? l.language ?? '')
+                    .filter(Boolean).join(', ') || "Español"}
                 </span>
               </div>
             </div>

@@ -127,7 +127,9 @@ export default async function FacultyProfilePage({
                   </div>
                   <div className="flex items-center gap-2 text-sm font-bold text-gray-400">
                     <Languages size={16} className="text-talentia-blue" />
-                    {faculty.languages?.join(', ')}
+                    {(Array.isArray(faculty.languages) ? faculty.languages : [])
+                      .map((l: any) => typeof l === 'string' ? l : l.lang ?? l.language ?? '')
+                      .filter(Boolean).join(', ')}
                   </div>
                 </div>
               </div>
