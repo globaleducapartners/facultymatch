@@ -1,24 +1,19 @@
+import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase-server";
 import { Building2, Globe, Mail, Phone, MapPin, Calendar, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { revalidatePath } from "next/cache";
 
-async function toggleInstitutionStatus(formData: FormData) {
+aasync function approveInstitution(formData: FormData) {
   "use server";
   const admin = createAdminClient();
   const id = formData.get("id") as string;
-  const currentStatus = formData.get("currentStatus") as string;
-  const newStatus = currentStatus === "active" ? "blocked" : "active";
-  await admin.from("institutions").update({ status: newStatus }).eq("id", id);
+  await admin.from("institutions").update({ 
+    status: "active",
+    verified_at: new Date().toISOString()
+  }).eq("id", id);
   revalidatePath("/control/institutions");
-}
-
-async function approveInstitution(formData: FormData) {
-  "use server";
-  const admin = createAdminClient();
-  const id = formData.get("id") as string;
-  await admin.from("institutions").update({ status: "active" }).eq("id", id);
-  revalidatePath("/control/institutions");
+  redirect("/control/institutions");
 }
 
 async function rejectInstitution(formData: FormData) {
@@ -27,6 +22,7 @@ async function rejectInstitution(formData: FormData) {
   const id = formData.get("id") as string;
   await admin.from("institutions").update({ status: "blocked" }).eq("id", id);
   revalidatePath("/control/institutions");
+  redirect("/control/institutions");
 }
 
 export default async function ControlInstitutionsPage() {
@@ -55,7 +51,7 @@ export default async function ControlInstitutionsPage() {
     );
   }
 
-  const total = institutions?.length ?? 0;
+  const total = (institutions?.length ?? 0) + (pendingInstitutions?.length ?? 0);
   const active = institutions?.filter(i => i.status === "active").length ?? 0;
   const blocked = institutions?.filter(i => i.status === "blocked").length ?? 0;
   const pendingCount = pendingInstitutions?.length ?? 0;
