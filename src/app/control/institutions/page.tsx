@@ -1,29 +1,8 @@
-import { redirect } from "next/navigation";
+
 import { createAdminClient } from "@/lib/supabase-server";
 import { Building2, Globe, Mail, Phone, MapPin, Calendar, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { revalidatePath } from "next/cache";
-
-aasync function approveInstitution(formData: FormData) {
-  "use server";
-  const admin = createAdminClient();
-  const id = formData.get("id") as string;
-  await admin.from("institutions").update({ 
-    status: "active",
-    verified_at: new Date().toISOString()
-  }).eq("id", id);
-  revalidatePath("/control/institutions");
-  redirect("/control/institutions");
-}
-
-async function rejectInstitution(formData: FormData) {
-  "use server";
-  const admin = createAdminClient();
-  const id = formData.get("id") as string;
-  await admin.from("institutions").update({ status: "blocked" }).eq("id", id);
-  revalidatePath("/control/institutions");
-  redirect("/control/institutions");
-}
+import { approveInstitution, rejectInstitution } from "./actions";
 
 export default async function ControlInstitutionsPage() {
   const admin = createAdminClient();
