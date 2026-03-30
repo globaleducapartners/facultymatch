@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase-server";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Mail, Calendar, MapPin, ChevronLeft, Search, Clock, CheckCircle2 } from "lucide-react";
+import { Mail, Calendar, MapPin, ChevronLeft, Clock, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 export default async function ContactsPage() {
@@ -16,28 +16,24 @@ export default async function ContactsPage() {
     .single();
 
   const { data: contacts } = await supabase
-  .from("contacts")
-  .select(`
-    *,
-    faculty:faculty_profiles!faculty_id (
-      user_id,
-      headline,
-      avatar_url,
-      user_profiles!user_id (
-        full_name
-      )
-    )
-  `)
-  .eq("institution_id", institution?.id)
-  .order('created_at', { ascending: false });
+    .from("contacts")
+    .select("*, faculty_profiles!faculty_id(headline, avatar_url, user_id)")
+    .eq("institution_id", institution?.id)
+    .order('created_at', { ascending: false });
+
+  // Obtener nombres de docentes por separado
+  const userIds = contacts?.map((c: any) => c.faculty_profiles?.user_id).filter(Boolean) ?? [];
+  const { data: userProfiles } = userIds.length > 0
+    ? await supabase.from("user_profiles").select("id, full_name").in("id", userIds)
+    : { data: [] };
+  const nameMap: Record<string, string> = {};
+  (userProfiles ?? []).forEach((u: any) => { nameMap[u.id] = u.full_name; });
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild className="rounded-full hover:bg-gray-100">
-          <Link href="/app/institution">
-            <ChevronLeft size={24} />
-          </Link>
+          <Link href="/app/institution"><ChevronLeft size={24} /></Link>
         </Button>
         <div>
           <h1 className="text-3xl font-bold text-navy">Contactos enviados</h1>
@@ -47,71 +43,54 @@ export default async function ContactsPage() {
 
       {contacts && contacts.length > 0 ? (
         <div className="grid gap-4">
-          {contacts.map((contact) => (
-            <div key={contact.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+          {contacts.map((contact: any) => {
+            const fp = contact.faculty_profiles;
+            const fullName = fp?.user_id ? nameMap[fp.user_id] : null;
+            const isSent = contact.status === 'sent' || contact.status === 'pending';
+            return (
+              <div key={contact.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="w-16 h-16 bg-talentia-blue/10 text-talentia-blue rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden">
-                    {contact.faculty?.avatar_url ? (
-                      <Image src={contact.faculty?.avatar_url!} alt="Avatar" fill sizes="64px" className="object-cover" />
+                    {fp?.avatar_url ? (
+                      <Image src={fp.avatar_url} alt="Avatar" fill sizes="64px" className="object-cover" />
                     ) : (
-                      <span className="text-xl font-black">{(contact.faculty?.user_profiles as any)?.full_name?.substring(0, 2).toUpperCase()}</span>
+                      <span className="text-xl font-black">{fullName?.substring(0, 2).toUpperCase() ?? "?"}</span>
                     )}
                   </div>
-
-                <div className="flex-1 space-y-4">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                      <h3 className="text-lg font-bold text-navy">{(contact.faculty?.user_profiles as any)?.full_name}</h3>
-                      <p className="text-sm font-medium text-gray-500">{contact.faculty?.headline}</p>
+                  <div className="flex-1 space-y-4">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-navy">{fullName ?? "Docente"}</h3>
+                        <p className="text-sm font-medium text-gray-500">{fp?.headline}</p>
+                      </div>
+                      <Badge className={`${isSent ? 'bg-blue-50 text-blue-600' : contact.status === 'replied' ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-600'} border-none px-4 py-1.5 rounded-full text-xs font-bold`}>
+                        {isSent && <Clock size={14} className="mr-1.5 inline" />}
+                        {contact.status === 'replied' && <CheckCircle2 size={14} className="mr-1.5 inline" />}
+                        {isSent ? 'Enviada' : contact.status === 'replied' ? 'Respondida' : 'Archivada'}
+                      </Badge>
                     </div>
-                    <Badge className={`${
-                      (contact.status === 'sent' || contact.status === 'pending') ? 'bg-blue-50 text-blue-600' : 
-                      contact.status === 'replied' ? 'bg-green-50 text-green-600' : 
-                      'bg-gray-50 text-gray-600'
-                    } border-none px-4 py-1.5 rounded-full text-xs font-bold`}>
-                      {(contact.status === 'sent' || contact.status === 'pending') && <Clock size={14} className="mr-1.5 inline" />}
-                      {contact.status === 'replied' && <CheckCircle2 size={14} className="mr-1.5 inline" />}
-                      {(contact.status === 'sent' || contact.status === 'pending') ? 'Enviada' : contact.status === 'replied' ? 'Respondida' : 'Archivada'}
-                    </Badge>
-                  </div>
-
-                  <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 space-y-3">
-                    <div className="flex flex-wrap gap-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                      <span className="flex items-center gap-1.5">
-                        <Mail size={14} className="text-talentia-blue" />
-                        {contact.subject}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <MapPin size={14} className="text-talentia-blue" />
-                        {contact.modality}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Calendar size={14} className="text-talentia-blue" />
-                        {contact.dates}
-                      </span>
+                    <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 space-y-3">
+                      <div className="flex flex-wrap gap-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                        {contact.subject && <span className="flex items-center gap-1.5"><Mail size={14} className="text-talentia-blue" />{contact.subject}</span>}
+                        {contact.modality && <span className="flex items-center gap-1.5"><MapPin size={14} className="text-talentia-blue" />{contact.modality}</span>}
+                        {contact.dates && <span className="flex items-center gap-1.5"><Calendar size={14} className="text-talentia-blue" />{contact.dates}</span>}
+                      </div>
+                      {contact.message && <p className="text-gray-600 text-sm italic leading-relaxed">"{contact.message}"</p>}
                     </div>
-                    <p className="text-gray-600 text-sm italic leading-relaxed">
-                      "{contact.message}"
-                    </p>
-                  </div>
-
-                  <div className="flex justify-end text-xs font-medium text-gray-400">
-                    Enviada el {new Date(contact.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    <div className="flex justify-end text-xs font-medium text-gray-400">
+                      Enviada el {new Date(contact.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="bg-white p-20 rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center text-center">
-          <div className="bg-blue-50 p-6 rounded-full text-talentia-blue mb-6">
-            <Mail size={48} />
-          </div>
+          <div className="bg-blue-50 p-6 rounded-full text-talentia-blue mb-6"><Mail size={48} /></div>
           <h3 className="text-xl font-bold text-navy mb-2">No has enviado contactos aún</h3>
-          <p className="text-gray-500 max-w-xs mx-auto font-medium">
-            Cuando encuentres un docente que encaje con tu programa, podrás contactarle directamente desde aquí.
-          </p>
+          <p className="text-gray-500 max-w-xs mx-auto font-medium">Cuando encuentres un docente que encaje con tu programa, podrás contactarle directamente desde aquí.</p>
           <Button asChild className="mt-8 bg-talentia-blue hover:bg-blue-700 text-white font-bold h-12 rounded-xl px-8">
             <Link href="/app/institution">Buscar docentes</Link>
           </Button>
