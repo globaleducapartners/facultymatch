@@ -1,8 +1,7 @@
-
+import { ApproveButtons } from "./ApproveButtons";
 import { createAdminClient } from "@/lib/supabase-server";
 import { Building2, Globe, Mail, Phone, MapPin, Calendar, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { approveInstitution, rejectInstitution } from "./actions";
 
 export default async function ControlInstitutionsPage() {
   const admin = createAdminClient();
@@ -95,18 +94,7 @@ export default async function ControlInstitutionsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <form action={approveInstitution}>
-                    <input type="hidden" name="id" value={inst.id} />
-                    <button type="submit" className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-colors">
-                      <CheckCircle2 size={13} /> Aprobar
-                    </button>
-                  </form>
-                  <form action={rejectInstitution}>
-                    <input type="hidden" name="id" value={inst.id} />
-                    <button type="submit" className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl bg-white border border-red-200 text-red-600 hover:bg-red-50 transition-colors">
-                      <XCircle size={13} /> Rechazar
-                    </button>
-                  </form>
+                  <ApproveButtons institutionId={inst.id} />
                 </div>
               </div>
             ))}

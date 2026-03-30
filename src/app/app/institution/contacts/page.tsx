@@ -66,9 +66,9 @@ export default async function ContactsPage() {
                       contact.status === 'replied' ? 'bg-green-50 text-green-600' : 
                       'bg-gray-50 text-gray-600'
                     } border-none px-4 py-1.5 rounded-full text-xs font-bold`}>
-                      {contact.status === 'sent' && <Clock size={14} className="mr-1.5 inline" />}
+                      {(contact.status === 'sent' || contact.status === 'pending') && <Clock size={14} className="mr-1.5 inline" />}
                       {contact.status === 'replied' && <CheckCircle2 size={14} className="mr-1.5 inline" />}
-                      {contact.status === 'sent' ? 'Enviada' : contact.status === 'replied' ? 'Respondida' : 'Archivada'}
+                      {(contact.status === 'sent' || contact.status === 'pending') ? 'Enviada' : contact.status === 'replied' ? 'Respondida' : 'Archivada'}
                     </Badge>
                   </div>
 
