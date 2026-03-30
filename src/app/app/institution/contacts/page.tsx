@@ -16,17 +16,20 @@ export default async function ContactsPage() {
     .single();
 
   const { data: contacts } = await supabase
-    .from("contacts")
-    .select(`
-      *,
-      faculty_profiles (
-        full_name,
-        headline,
-        avatar_url
+  .from("contacts")
+  .select(`
+    *,
+    faculty:faculty_profiles!faculty_id (
+      user_id,
+      headline,
+      avatar_url,
+      user_profiles!user_id (
+        full_name
       )
-    `)
-    .eq("institution_id", institution?.id)
-    .order('created_at', { ascending: false });
+    )
+  `)
+  .eq("institution_id", institution?.id)
+  .order('created_at', { ascending: false });
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto">
@@ -48,21 +51,21 @@ export default async function ContactsPage() {
             <div key={contact.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="w-16 h-16 bg-talentia-blue/10 text-talentia-blue rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden">
-                    {contact.faculty_profiles?.avatar_url ? (
-                      <Image src={contact.faculty_profiles.avatar_url} alt="Avatar" fill sizes="64px" className="object-cover" />
+                    {contact.faculty?.avatar_url ? (
+                      <Image src={contact.faculty?.avatar_url!} alt="Avatar" fill sizes="64px" className="object-cover" />
                     ) : (
-                      <span className="text-xl font-black">{contact.faculty_profiles?.full_name?.substring(0, 2).toUpperCase()}</span>
+                      <span className="text-xl font-black">{(contact.faculty?.user_profiles as any)?.full_name?.substring(0, 2).toUpperCase()}</span>
                     )}
                   </div>
 
                 <div className="flex-1 space-y-4">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                      <h3 className="text-lg font-bold text-navy">{contact.faculty_profiles?.full_name}</h3>
-                      <p className="text-sm font-medium text-gray-500">{contact.faculty_profiles?.headline}</p>
+                      <h3 className="text-lg font-bold text-navy">{(contact.faculty?.user_profiles as any)?.full_name}</h3>
+                      <p className="text-sm font-medium text-gray-500">{contact.faculty?.headline}</p>
                     </div>
                     <Badge className={`${
-                      contact.status === 'sent' ? 'bg-blue-50 text-blue-600' : 
+                      (contact.status === 'sent' || contact.status === 'pending') ? 'bg-blue-50 text-blue-600' : 
                       contact.status === 'replied' ? 'bg-green-50 text-green-600' : 
                       'bg-gray-50 text-gray-600'
                     } border-none px-4 py-1.5 rounded-full text-xs font-bold`}>
