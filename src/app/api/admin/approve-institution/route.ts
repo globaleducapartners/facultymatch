@@ -13,8 +13,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { institutionId, action } = await request.json();
   if (!institutionId || !action) return NextResponse.json({ error: "Missing data" }, { status: 400 });
-  const newStatus = action === "approve" ? "active" : "blocked";
-  const { error } = await admin.from("institutions").update({ status: newStatus, verified_at: action === "approve" ? new Date().toISOString() : null }).eq("id", institutionId);
+  const newStatus = action === "approve" ? "approved" : "rejected";
+  const { error } = await admin.from("institutions")
+    .update({ status: newStatus, verified_at: action === "approve" ? new Date().toISOString() : null })
+    .eq("id", institutionId);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (action === "approve") {
     const { data: inst } = await admin.from("institutions").select("name, contact_email, user_id").eq("id", institutionId).single();
