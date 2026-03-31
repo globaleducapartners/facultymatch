@@ -3,6 +3,18 @@ import { createAdminClient } from "@/lib/supabase-server";
 import { Building2, Globe, Mail, Phone, MapPin, Calendar, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+async function toggleInstitutionStatus(formData: FormData) {
+  "use server";
+  const { createAdminClient } = await import("@/lib/supabase-server");
+  const { revalidatePath } = await import("next/cache");
+  const admin = createAdminClient();
+  const id = formData.get("id") as string;
+  const currentStatus = formData.get("currentStatus") as string;
+  const newStatus = currentStatus === "approved" ? "rejected" : "approved";
+  await admin.from("institutions").update({ status: newStatus }).eq("id", id);
+  revalidatePath("/control/institutions");
+}
+
 export default async function ControlInstitutionsPage() {
   const admin = createAdminClient();
 
