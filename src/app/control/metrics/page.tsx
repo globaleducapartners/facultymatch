@@ -111,13 +111,13 @@ export default async function MetricsPage() {
       {/* Faculty stats */}
       <section className="space-y-3">
         <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Docentes</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard icon={GraduationCap} label="Total docentes" value={totalFaculty ?? 0} color="blue" />
           <StatCard icon={Clock} label="Pendientes" value={pendingFaculty ?? 0} color="orange" sub="Esperando revisión" />
           <StatCard icon={CheckCircle2} label="Aprobados" value={approvedFaculty ?? 0} color="green" />
           <StatCard icon={XCircle} label="Rechazados" value={rejectedFaculty ?? 0} color="red" />
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-1 lg:grid-cols-3 gap-4">
           <StatCard icon={UserPlus} label="Nuevos esta semana" value={facultyThisWeek ?? 0} color="purple" />
           <StatCard icon={TrendingUp} label="Nuevos este mes" value={facultyThisMonth ?? 0} color="blue" />
           <StatCard icon={Users} label="Tasa aprobación" value={totalFaculty ? `${Math.round(((approvedFaculty ?? 0) / (totalFaculty ?? 1)) * 100)}%` : "—"} color="green" />
@@ -127,7 +127,7 @@ export default async function MetricsPage() {
       {/* Institution stats */}
       <section className="space-y-3">
         <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Instituciones</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard icon={Building2} label="Total instituciones" value={totalInstitutions ?? 0} color="blue" />
           <StatCard icon={CheckCircle2} label="Activas" value={activeInstitutions ?? 0} color="green" />
           <StatCard icon={UserPlus} label="Nuevas este mes" value={instThisMonth ?? 0} color="purple" />
