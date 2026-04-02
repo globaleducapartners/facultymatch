@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from 'next/server';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const PRICE_IDS: Record<string, string> = {
-  'faculty-pro': 'price_1TDvExLw5PCavs69t029xaaY',
-  'institution-pro': 'price_1TDvFgLw5PCavs69YGuYE0Z0',
+  'faculty-pro': process.env.STRIPE_PRICE_FACULTY_PRO!,
+  'institution-pro': process.env.STRIPE_PRICE_INSTITUTION_PRO!,
 };
 
 export async function POST(req: NextRequest) {
