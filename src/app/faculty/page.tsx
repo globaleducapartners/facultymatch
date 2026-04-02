@@ -213,7 +213,7 @@ export default function FacultyPage() {
                       <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Oculto para tu centro actual</li>
                       <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Posicionamiento prioritario</li>
                     </ul>
-                    <UpgradeButton plan="faculty-pro" label="Upgrade Profesional" className="w-full bg-talentia-blue hover:bg-blue-700 text-white h-14 rounded-xl font-bold shadow-lg shadow-blue-100 hover:scale-105 transition-transform duration-200" />
+                    <UpgradeButton plan="faculty-pro" label="Upgrade Profesional" className="inline-flex items-center justify-center w-full bg-[#1d4ed8] hover:bg-blue-700 text-white font-black py-3 px-6 rounded-xl text-sm transition-colors" />
                 </div>
               </div>
             </div>

@@ -235,7 +235,7 @@ export default function InstitutionsPage() {
                         <UpgradeButton
                           plan="institution-pro"
                           label={plan.buttonText}
-                          className="w-full h-14 rounded-2xl font-black text-lg shadow-xl transition-all bg-energy-orange hover:bg-orange-600 text-white"
+                          className="inline-flex items-center justify-center w-full bg-[#F97316] hover:bg-orange-600 text-white font-black py-3 px-6 rounded-xl text-sm transition-colors"
                         />
                       ) : (
                         <Button
