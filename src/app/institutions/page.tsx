@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { UpgradeButton } from "@/components/profile/UpgradeButton";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { 
@@ -230,18 +231,20 @@ export default function InstitutionsPage() {
                         </li>
                       ))}
                     </ul>
-                      <Button 
+                      {plan.highlight ? (
+                        <UpgradeButton
+                          plan="institution-pro"
+                          label={plan.buttonText}
+                          className="w-full h-14 rounded-2xl font-black text-lg shadow-xl transition-all bg-energy-orange hover:bg-orange-600 text-white"
+                        />
+                      ) : (
+                        <Button
                           asChild
-                          className={`w-full h-14 rounded-2xl font-black text-lg shadow-xl transition-all ${
-                              plan.highlight 
-                              ? 'bg-energy-orange hover:bg-orange-600 text-white' 
-                              : 'bg-white border-2 border-gray-200 text-navy hover:bg-gray-50'
-                          }`}
-                      >
-                        <Link href={plan.highlight ? '/checkout?plan=institution-pro' : '/signup/institution'}>
-                          {plan.buttonText}
-                        </Link>
-                      </Button>
+                          className="w-full h-14 rounded-2xl font-black text-lg shadow-xl transition-all bg-white border-2 border-gray-200 text-navy hover:bg-gray-50"
+                        >
+                          <Link href="/signup/institution">{plan.buttonText}</Link>
+                        </Button>
+                      )}
                   </div>
                 </div>
               ))}

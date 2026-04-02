@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { UpgradeButton } from "@/components/profile/UpgradeButton";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { 
@@ -212,9 +213,7 @@ export default function FacultyPage() {
                       <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Oculto para tu centro actual</li>
                       <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Posicionamiento prioritario</li>
                     </ul>
-                    <Link href="/checkout?plan=faculty-pro">
-                      <Button className="w-full bg-talentia-blue hover:bg-blue-700 text-white h-14 rounded-xl font-bold shadow-lg shadow-blue-100 hover:scale-105 transition-transform duration-200">Upgrade Profesional</Button>
-                    </Link>
+                    <UpgradeButton plan="faculty-pro" label="Upgrade Profesional" className="w-full bg-talentia-blue hover:bg-blue-700 text-white h-14 rounded-xl font-bold shadow-lg shadow-blue-100 hover:scale-105 transition-transform duration-200" />
                 </div>
               </div>
             </div>
