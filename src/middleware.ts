@@ -53,7 +53,9 @@ export async function middleware(request: NextRequest) {
     pathname === "/app" ||
     pathname.startsWith("/app/") ||
     pathname === "/admin" ||
-    pathname.startsWith("/admin/");
+    pathname.startsWith("/admin/") ||
+    pathname === "/checkout" ||
+    pathname.startsWith("/checkout");
 
   const isProtected = isAppRoute || isControlRoute;
 
