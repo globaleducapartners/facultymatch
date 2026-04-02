@@ -1,6 +1,5 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import ControlSidebar from "./ControlSidebar";
 
 export default async function ControlLayout({ children }: { children: React.ReactNode }) {
@@ -8,20 +7,6 @@ export default async function ControlLayout({ children }: { children: React.Reac
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect("/login?next=/control");
-
-  // Setup key — upgrades authenticated user to super_admin (one-time bootstrap)
-  const headersList = await headers();
-  const search = headersList.get('x-url-search') || '';
-  const setupKey = new URLSearchParams(search).get('setup_key');
-
-  if (setupKey === 'FM_ADMIN_2026') {
-    const admin = createAdminClient();
-    await admin.from('user_profiles').upsert(
-      { id: user.id, role: 'super_admin' },
-      { onConflict: 'id' }
-    );
-    redirect('/control');
-  }
 
   const { data: profile } = await supabase
     .from("user_profiles")
