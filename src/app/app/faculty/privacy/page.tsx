@@ -26,15 +26,21 @@ export default async function PrivacyPage({
     .eq("id", user.id)
     .maybeSingle();
 
+  // Plan lives in user_profiles (set by Stripe webhook)
+  const { data: userProfile } = await supabase
+    .from("user_profiles")
+    .select("plan, subscription_status, subscription_current_period_end")
+    .eq("id", user.id)
+    .single();
+
   const { data: visibilityRules } = await supabase
     .from("visibility_rules")
     .select("*, institution:institutions(name, country)")
     .eq("faculty_id", facultyProfile?.id)
     .eq("rule", "block");
 
-  // Premium check — field name may vary; defaults to false if not yet set
-  const isPremium = (facultyProfile as any)?.plan === "professional" ||
-    (facultyProfile as any)?.is_premium === true;
+  // Pro: plan set by Stripe webhook in user_profiles
+  const isPremium = userProfile?.plan === "faculty-pro" && userProfile?.subscription_status === "active";
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.facultymatch.app";
   const profileToken = facultyProfile?.profile_token;

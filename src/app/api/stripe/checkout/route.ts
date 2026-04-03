@@ -29,14 +29,17 @@ export async function POST(req: NextRequest) {
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.facultymatch.app';
+    const dashboardPath = plan.startsWith('faculty') ? 'faculty' : 'institution';
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
       customer_email: user.email,
       client_reference_id: user.id,
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/${plan.startsWith('faculty') ? 'faculty' : 'institution'}?upgrade=success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout?plan=${plan}`,
+      success_url: `${siteUrl}/app/${dashboardPath}?upgrade=success`,
+      cancel_url: `${siteUrl}/checkout?plan=${plan}`,
       locale: 'es',
     });
 

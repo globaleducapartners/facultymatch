@@ -41,10 +41,19 @@ export default async function InstitutionSearchRoute({
     .select("*", { count: "exact", head: true })
     .eq("institution_id", institution.id);
 
-  // Search
+  // Faculty who have blocked this institution (they don't want to appear here)
+  const { data: blockedRules } = await supabase
+    .from("visibility_rules")
+    .select("faculty_id")
+    .eq("institution_id", institution.id)
+    .eq("rule", "block");
+
+  const blockedFacultyIds = new Set((blockedRules || []).map((r: any) => r.faculty_id));
+
+  // Search — include plan + subscription_status for pro priority sorting
   let educatorQuery = supabase
     .from("faculty_profiles")
-    .select(`*, user:user_profiles(full_name, avatar_url), expertise:faculty_expertise(*)`)
+    .select(`*, user:user_profiles(full_name, avatar_url, plan, subscription_status), expertise:faculty_expertise(*)`)
     .eq('visibility', 'public');
 
   if (query) {
@@ -54,9 +63,12 @@ export default async function InstitutionSearchRoute({
     educatorQuery = educatorQuery.ilike('location', `%${country}%`);
   }
 
-  const { data: educators } = await educatorQuery.limit(100);
+  const { data: educators } = await educatorQuery.limit(150);
 
-  let filteredEducators = educators || [];
+  let filteredEducators = (educators || []).filter(ed =>
+    // Exclude faculty who explicitly blocked this institution
+    !blockedFacultyIds.has((ed as any).id)
+  );
 
   if (query) {
     filteredEducators = filteredEducators.filter(ed =>
@@ -83,18 +95,28 @@ export default async function InstitutionSearchRoute({
     );
   }
 
-  const transformedEducators = filteredEducators.map(ed => {
-    const userJoin = (ed as any).user;
-    const userObj = Array.isArray(userJoin) ? userJoin[0] : userJoin;
-    return {
-      ...ed,
-      full_name: userObj?.full_name || (ed as any).full_name || "Docente",
-      avatar_url: userObj?.avatar_url || null,
-      country: (ed as any).country || ed.location || null,
-      city: (ed as any).city || null,
-      experience_years: (ed as any).years_teaching || (ed as any).years_experience || 0,
-    };
-  });
+  const transformedEducators = filteredEducators
+    .map(ed => {
+      const userJoin = (ed as any).user;
+      const userObj = Array.isArray(userJoin) ? userJoin[0] : userJoin;
+      const isPro = userObj?.plan === 'faculty-pro' && userObj?.subscription_status === 'active';
+      return {
+        ...ed,
+        full_name: userObj?.full_name || (ed as any).full_name || "Docente",
+        avatar_url: userObj?.avatar_url || null,
+        country: (ed as any).country || ed.location || null,
+        city: (ed as any).city || null,
+        experience_years: (ed as any).years_teaching || (ed as any).years_experience || 0,
+        is_pro: isPro,
+      };
+    })
+    // Sort: pro users first, then the rest
+    .sort((a, b) => {
+      if ((a as any).is_pro && !(b as any).is_pro) return -1;
+      if (!(a as any).is_pro && (b as any).is_pro) return 1;
+      return 0;
+    })
+    .slice(0, 100);
 
   const isNewUser = !!(institution.created_at &&
     new Date().getTime() - new Date(institution.created_at).getTime() < 1000 * 60 * 60 * 24 * 30);

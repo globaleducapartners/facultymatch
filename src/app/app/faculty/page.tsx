@@ -16,6 +16,8 @@ import {
   Briefcase,
   AlertCircle,
   XCircle,
+  Sparkles,
+  CalendarDays,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -369,6 +371,63 @@ export default async function EducatorDashboard() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Pro Plan / Upgrade Card */}
+          {profile?.plan === "faculty-pro" && profile?.subscription_status === "active" ? (
+            <Card className="border-none shadow-sm rounded-3xl bg-gradient-to-br from-navy to-[#1a3a6b] text-white overflow-hidden">
+              <CardContent className="pt-6 pb-6 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Sparkles size={18} className="text-energy-orange" />
+                  <span className="text-xs font-black uppercase tracking-widest text-energy-orange">Plan Professional</span>
+                </div>
+                <p className="text-sm font-medium text-white/80 leading-relaxed">
+                  Tu perfil aparece <strong className="text-white">prioritario</strong> en todas las búsquedas de instituciones y tienes acceso completo a la privacidad avanzada.
+                </p>
+                {profile?.subscription_current_period_end && (() => {
+                  const end = new Date(profile.subscription_current_period_end);
+                  const now = new Date();
+                  const daysLeft = Math.max(0, Math.round((end.getTime() - now.getTime()) / 86400000));
+                  const renewalDateStr = end.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+                  return (
+                    <div className="bg-white/10 rounded-2xl p-4 space-y-1">
+                      <div className="flex items-center gap-2 text-white/70 text-xs font-bold uppercase tracking-widest">
+                        <CalendarDays size={13} /> Renovación automática
+                      </div>
+                      <p className="text-white font-black text-sm">{renewalDateStr}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="flex-1 h-1.5 bg-white/20 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-energy-orange rounded-full"
+                            style={{ width: `${Math.max(5, 100 - Math.round(daysLeft / 3.65))}%` }}
+                          />
+                        </div>
+                        <span className="text-[10px] font-black text-white/60">{daysLeft}d restantes</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden border-2 border-dashed border-energy-orange/30">
+              <CardContent className="pt-6 pb-6 space-y-4 text-center">
+                <div className="flex items-center justify-center gap-2 text-energy-orange">
+                  <Sparkles size={18} />
+                  <span className="text-xs font-black uppercase tracking-widest">Plan Professional</span>
+                </div>
+                <p className="text-sm font-medium text-gray-600">
+                  Aparece primero en búsquedas, bloquea instituciones y controla tu privacidad avanzada.
+                </p>
+                <div className="text-2xl font-black text-navy">29€ <span className="text-sm text-gray-400 font-bold">/ año</span></div>
+                <Link
+                  href="/checkout?plan=faculty-pro"
+                  className="inline-flex items-center gap-2 w-full justify-center bg-energy-orange hover:bg-orange-600 text-white font-black py-3 px-6 rounded-xl text-sm transition-colors"
+                >
+                  <Sparkles size={15} /> Activar Plan Professional
+                </Link>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Recent Requests Card */}
           <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden">
