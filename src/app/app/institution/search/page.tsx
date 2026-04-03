@@ -66,7 +66,7 @@ export default async function InstitutionSearchRoute({
   let educatorQuery = supabase
     .from("faculty_profiles")
     .select(`*, user:user_profiles(full_name, avatar_url, plan, subscription_status), expertise:faculty_expertise(*)`)
-    .eq('visibility', 'public');
+    .in('visibility', ['public', 'private']);
 
   if (query) {
     educatorQuery = educatorQuery.or(`headline.ilike.%${query}%,bio.ilike.%${query}%`);

@@ -511,7 +511,7 @@ export async function saveOnboarding(formData: FormData) {
     const headline = formData.get("headline") as string;
     const location = formData.get("location") as string;
     const bio = formData.get("bio") as string;
-    const visibility = formData.get("visibility") as 'public' | 'hidden' | 'institutions_only';
+    const visibility = formData.get("visibility") as 'public' | 'hidden' | 'private';
     const fullName = formData.get("full_name") as string;
     const termsAccepted = formData.get("terms_accepted") === "on";
     const privacyAccepted = formData.get("privacy_accepted") === "on";

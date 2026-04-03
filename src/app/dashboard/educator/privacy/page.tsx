@@ -27,7 +27,7 @@ export default async function PrivacyPage() {
 
   async function updateVisibility(formData: FormData) {
     "use server";
-    const mode = formData.get("visibilityMode") as "public" | "institutions_only" | "hidden";
+    const mode = formData.get("visibilityMode") as "public" | "private" | "hidden";
     
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -104,7 +104,7 @@ export default async function PrivacyPage() {
                   </div>
 
                   <div className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:border-blue-100 transition-all cursor-pointer group">
-                    <RadioGroupItem value="institutions_only" id="institutions" className="mt-1" />
+                    <RadioGroupItem value="private" id="institutions" className="mt-1" />
                     <Label htmlFor="institutions" className="flex-1 cursor-pointer">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-bold text-navy">Solo instituciones</span>

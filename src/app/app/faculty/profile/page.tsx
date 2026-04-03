@@ -300,7 +300,7 @@ export default async function ProfilePage({
                   const vis = facultyProfile?.visibility || "public";
                   const cfg = vis === "public"
                     ? { bg: "bg-green-100", text: "text-green-700", dot: "bg-green-500", label: "Perfil público" }
-                    : vis === "institutions_only"
+                    : vis === "private"
                     ? { bg: "bg-blue-100", text: "text-blue-700", dot: "bg-blue-500", label: "Solo instituciones" }
                     : { bg: "bg-gray-100", text: "text-gray-600", dot: "bg-gray-400", label: "Perfil oculto" };
                   return (

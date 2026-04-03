@@ -48,7 +48,7 @@ export default async function PrivacyPage({
 
   async function updateVisibility(formData: FormData) {
     "use server";
-    const mode = formData.get("visibilityMode") as "public" | "institutions_only" | "hidden";
+    const mode = formData.get("visibilityMode") as "public" | "private" | "hidden";
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -185,7 +185,7 @@ export default async function PrivacyPage({
                       badge: null,
                     },
                     {
-                      value: "institutions_only",
+                      value: "private",
                       id: "institutions",
                       label: "Solo instituciones",
                       desc: "Solo las instituciones verificadas en FacultyMatch pueden ver tu perfil completo.",
