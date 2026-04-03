@@ -10,7 +10,7 @@ async function toggleInstitutionStatus(formData: FormData) {
   const admin = createAdminClient();
   const id = formData.get("id") as string;
   const currentStatus = formData.get("currentStatus") as string;
-  const newStatus = currentStatus === "approved" ? "rejected" : "approved";
+  const newStatus = currentStatus === "blocked" ? "active" : "blocked";
   await admin.from("institutions").update({ status: newStatus }).eq("id", id);
   revalidatePath("/control/institutions");
 }
@@ -42,8 +42,9 @@ export default async function ControlInstitutionsPage() {
   }
 
   const total = (institutions?.length ?? 0) + (pendingInstitutions?.length ?? 0);
-  const active = institutions?.filter(i => i.status === "active").length ?? 0;
+  const active = institutions?.filter(i => i.status === "active" || i.status === "approved").length ?? 0;
   const blocked = institutions?.filter(i => i.status === "blocked").length ?? 0;
+  const rejected = institutions?.filter(i => i.status === "rejected").length ?? 0;
   const pendingCount = pendingInstitutions?.length ?? 0;
 
   return (
@@ -58,9 +59,9 @@ export default async function ControlInstitutionsPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "Total registradas", value: total, icon: Building2, color: "text-talentia-blue bg-blue-50" },
-          { label: "Activas", value: active, icon: CheckCircle2, color: "text-green-600 bg-green-50" },
+          { label: "Activas / Aprobadas", value: active, icon: CheckCircle2, color: "text-green-600 bg-green-50" },
           { label: "Pendientes", value: pendingCount, icon: Clock, color: "text-amber-600 bg-amber-50" },
-          { label: "Bloqueadas", value: blocked, icon: XCircle, color: "text-red-500 bg-red-50" },
+          { label: "Bloqueadas / Rechazadas", value: blocked + rejected, icon: XCircle, color: "text-red-500 bg-red-50" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color} mb-3`}>
@@ -84,7 +85,7 @@ export default async function ControlInstitutionsPage() {
           </div>
           <div className="divide-y divide-amber-100">
             {(pendingInstitutions || []).map(inst => (
-              <div key={inst.id} className="px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div key={inst.id} className="px-6 py-5 flex flex-col sm:flex-row sm:items-start gap-4">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-navy text-sm">{inst.name || "Sin nombre"}</h3>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
@@ -98,14 +99,30 @@ export default async function ControlInstitutionsPage() {
                         <Mail size={11} /> {inst.contact_email}
                       </span>
                     )}
+                    {inst.website && (
+                      <a href={inst.website.startsWith('http') ? inst.website : `https://${inst.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-talentia-blue font-medium hover:underline">
+                        <Globe size={11} /> {inst.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                      </a>
+                    )}
                     {inst.created_at && (
                       <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">
                         <Calendar size={11} /> {new Date(inst.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
                       </span>
                     )}
                   </div>
+                  {inst.description && (
+                    <p className="text-xs text-gray-500 font-medium mt-2 line-clamp-2">{inst.description}</p>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  {inst.contact_email && (
+                    <a
+                      href={`mailto:${inst.contact_email}?subject=Tu solicitud en FacultyMatch`}
+                      className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors bg-white"
+                    >
+                      <Mail size={12} /> Contactar
+                    </a>
+                  )}
                   <ApproveButtons institutionId={inst.id} />
                 </div>
               </div>
@@ -135,11 +152,14 @@ export default async function ControlInstitutionsPage() {
         ) : (
           <div className="divide-y divide-gray-50">
             {institutions.map((inst) => {
-              const statusBadge = inst.status === "active"
-                ? <Badge className="bg-green-50 text-green-700 border-none text-[10px] font-black flex items-center gap-1"><CheckCircle2 size={10} /> Activa</Badge>
+              const isActive = inst.status === "active" || inst.status === "approved";
+              const statusBadge = isActive
+                ? <Badge className="bg-green-50 text-green-700 border-none text-[10px] font-black flex items-center gap-1"><CheckCircle2 size={10} /> Aprobada</Badge>
                 : inst.status === "blocked"
                   ? <Badge className="bg-red-50 text-red-600 border-none text-[10px] font-black flex items-center gap-1"><XCircle size={10} /> Bloqueada</Badge>
-                  : <Badge className="bg-amber-50 text-amber-700 border-none text-[10px] font-black flex items-center gap-1"><Clock size={10} /> Pendiente</Badge>;
+                  : inst.status === "rejected"
+                    ? <Badge className="bg-gray-100 text-gray-500 border-none text-[10px] font-black flex items-center gap-1"><XCircle size={10} /> Rechazada</Badge>
+                    : <Badge className="bg-amber-50 text-amber-700 border-none text-[10px] font-black flex items-center gap-1"><Clock size={10} /> Pendiente</Badge>;
 
               return (
                 <div key={inst.id} className="p-5 hover:bg-gray-50/50 transition-colors">
@@ -198,10 +218,23 @@ export default async function ControlInstitutionsPage() {
                           </span>
                         )}
                       </div>
+
+                      {inst.description && (
+                        <p className="text-xs text-gray-400 font-medium mt-2 line-clamp-1">{inst.description}</p>
+                      )}
                     </div>
 
                     {/* Actions */}
                     <div className="flex items-center gap-2 flex-shrink-0">
+                      {inst.contact_email && (
+                        <a
+                          href={`mailto:${inst.contact_email}?subject=Comunicación desde FacultyMatch`}
+                          className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+                          title={`Contactar con ${inst.name}`}
+                        >
+                          <Mail size={12} /> Contactar
+                        </a>
+                      )}
                       <form action={toggleInstitutionStatus}>
                         <input type="hidden" name="id" value={inst.id} />
                         <input type="hidden" name="currentStatus" value={inst.status || "active"} />

@@ -158,7 +158,7 @@ export default function ResourcesPage() {
               </div>
             </div>
             <Button asChild className="bg-navy hover:bg-slate-800 text-white font-bold h-14 px-8 rounded-xl shadow-lg">
-              <a href="mailto:info@facultymatch.app">Contacta con nosotros</a>
+              <a href="mailto:support@facultymatch.app">Contacta con nosotros</a>
             </Button>
           </div>
               <div className="relative">
