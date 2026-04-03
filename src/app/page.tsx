@@ -43,7 +43,7 @@ export default function Home() {
             <div className="space-y-8 lg:pr-8">
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-talentia-blue text-xs font-black uppercase tracking-widest mb-4">
-                  🎓 +500 docentes verificados · 40 países
+                  Verificación rigurosa · Estándar académico internacional
                 </div>
                 <h1 className="text-4xl lg:text-7xl font-black tracking-tight text-navy leading-[0.95]">
                   Convierte tu experiencia <span className="text-talentia-blue">académica en ingresos.</span>
@@ -138,36 +138,6 @@ export default function Home() {
                   <p className="text-white font-bold text-lg leading-tight">{item.text}</p>
                   <p className="text-gray-400 text-sm font-medium">{item.sub}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Categories Section */}
-        <section className="bg-white py-24 px-6 lg:px-12 border-y border-gray-50">
-          <div className="max-w-7xl mx-auto space-y-12">
-            <div className="text-center space-y-4">
-              <h2 className="text-3xl lg:text-4xl font-black text-navy">Explora por Áreas de Conocimiento</h2>
-              <div className="w-24 h-1.5 bg-talentia-blue mx-auto rounded-full opacity-20"></div>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                { name: "Business & Management", icon: Briefcase, color: "bg-navy", slug: "business-management" },
-                { name: "Ingeniería & Tech", icon: Cpu, color: "bg-tech-cyan", slug: "ingenieria-tech" },
-                { name: "Salud & Ciencias", icon: HeartPulse, color: "bg-talentia-blue", slug: "salud-ciencias" },
-                { name: "Derecho & Política", icon: Scale, color: "bg-energy-orange", slug: "derecho-politica" },
-                { name: "Educación", icon: GraduationCap, color: "bg-navy", slug: "educacion" },
-                { name: "Artes & Humanidades", icon: Palette, color: "bg-energy-orange", slug: "artes-humanidades" },
-              ].map((cat, idx) => (
-                <Link key={idx} href={`/directory?area=${cat.slug}`} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:scale-[1.05] transition-all group cursor-pointer">
-                  <div className={`${cat.color} w-12 h-12 rounded-xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform`}>
-                    <cat.icon size={24} />
-                  </div>
-                  <h3 className="font-bold text-navy leading-tight">{cat.name}</h3>
-                  <div className="mt-4 flex items-center text-talentia-blue group-hover:translate-x-2 transition-transform">
-                    <ArrowRight size={18} />
-                  </div>
-                </Link>
               ))}
             </div>
           </div>

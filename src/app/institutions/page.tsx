@@ -237,6 +237,13 @@ export default function InstitutionsPage() {
                           label={plan.buttonText}
                           className="inline-flex items-center justify-center w-full bg-[#F97316] hover:bg-orange-600 text-white font-black py-3 px-6 rounded-xl text-sm transition-colors"
                         />
+                      ) : plan.name === "Enterprise" ? (
+                        <Button
+                          asChild
+                          className="w-full h-14 rounded-2xl font-black text-lg shadow-xl transition-all bg-white border-2 border-gray-200 text-navy hover:bg-gray-50"
+                        >
+                          <a href="mailto:support@facultymatch.app?subject=Solicitud%20Plan%20Enterprise%20FacultyMatch&body=Hola%2C%20me%20interesa%20el%20plan%20Enterprise%20para%20mi%20institución.">Contactar por email</a>
+                        </Button>
                       ) : (
                         <Button
                           asChild
