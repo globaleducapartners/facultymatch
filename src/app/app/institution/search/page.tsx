@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { InstitutionSearchPage } from "@/components/dashboard/InstitutionSearchPage";
 import { InstitutionWelcomeBanner } from "@/components/dashboard/InstitutionWelcomeBanner";
 import { redirect } from "next/navigation";
@@ -41,14 +41,26 @@ export default async function InstitutionSearchRoute({
     .select("*", { count: "exact", head: true })
     .eq("institution_id", institution.id);
 
-  // Faculty who have blocked this institution (they don't want to appear here)
+  // Faculty who have blocked this institution (visibility_rules — legacy/registered-inst blocks)
   const { data: blockedRules } = await supabase
     .from("visibility_rules")
     .select("faculty_id")
     .eq("institution_id", institution.id)
     .eq("rule", "block");
 
-  const blockedFacultyIds = new Set((blockedRules || []).map((r: any) => r.faculty_id));
+  // Faculty who have blocked by institution name (works for all institutions incl. unregistered)
+  const adminSearch = createAdminClient();
+  const { data: nameBlockedFaculty } = institution.name
+    ? await adminSearch
+        .from("faculty_profiles")
+        .select("id")
+        .contains("blocked_institutions", [institution.name])
+    : { data: [] };
+
+  const blockedFacultyIds = new Set([
+    ...(blockedRules || []).map((r: any) => r.faculty_id),
+    ...((nameBlockedFaculty as any[] | null) || []).map((f: any) => f.id),
+  ]);
 
   // Search — include plan + subscription_status for pro priority sorting
   let educatorQuery = supabase

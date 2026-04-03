@@ -12,9 +12,9 @@ import { redirect } from "next/navigation";
 export default async function PrivacyPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; blocked?: string }>;
 }) {
-  const { saved } = await searchParams;
+  const { saved, blocked } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -33,11 +33,8 @@ export default async function PrivacyPage({
     .eq("id", user.id)
     .single();
 
-  const { data: visibilityRules } = await supabase
-    .from("visibility_rules")
-    .select("*, institution:institutions(name, country)")
-    .eq("faculty_id", facultyProfile?.id)
-    .eq("rule", "block");
+  const blockedInstitutions: string[] =
+    (facultyProfile?.blocked_institutions as string[] | null) || [];
 
   // Pro: plan set by Stripe webhook in user_profiles
   const isPremium = userProfile?.plan === "faculty-pro" && userProfile?.subscription_status === "active";
@@ -74,31 +71,38 @@ export default async function PrivacyPage({
     revalidatePath("/app/faculty/privacy");
   }
 
-  async function unblockInstitution(id: string) {
+  async function unblockInstitution(name: string) {
     "use server";
     const supabase = await createClient();
-    await supabase.from("visibility_rules").delete().eq("id", id);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const admin = createAdminClient();
+    const { data: fp } = await admin
+      .from("faculty_profiles").select("blocked_institutions").eq("id", user.id).maybeSingle();
+    const updated = ((fp?.blocked_institutions as string[] | null) || []).filter(n => n !== name);
+    await admin.from("faculty_profiles")
+      .upsert({ id: user.id, user_id: user.id, blocked_institutions: updated }, { onConflict: "id" });
     revalidatePath("/app/faculty/privacy");
   }
 
   async function blockInstitution(formData: FormData) {
     "use server";
-    const name = formData.get("institutionName") as string;
+    const name = (formData.get("institutionName") as string)?.trim();
     if (!name) return;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const admin = createAdminClient();
-    const { data: inst } = await admin
-      .from("institutions").select("id").ilike("name", `%${name}%`).limit(1).maybeSingle();
-    if (inst) {
-      await admin.from("visibility_rules").insert({
-        faculty_id: user.id,
-        institution_id: inst.id,
-        rule: "block",
-      });
-      revalidatePath("/app/faculty/privacy");
+    const { data: fp } = await admin
+      .from("faculty_profiles").select("blocked_institutions").eq("id", user.id).maybeSingle();
+    const current = (fp?.blocked_institutions as string[] | null) || [];
+    if (!current.includes(name)) {
+      current.push(name);
+      await admin.from("faculty_profiles")
+        .upsert({ id: user.id, user_id: user.id, blocked_institutions: current }, { onConflict: "id" });
     }
+    revalidatePath("/app/faculty/privacy");
+    redirect("/app/faculty/privacy?blocked=1");
   }
 
   async function addPreferredInstitution(formData: FormData) {
@@ -145,6 +149,11 @@ export default async function PrivacyPage({
       {saved === "1" && (
         <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
           ✓ Configuración guardada correctamente
+        </div>
+      )}
+      {blocked === "1" && (
+        <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
+          ✓ Institución bloqueada correctamente
         </div>
       )}
 
@@ -288,30 +297,25 @@ export default async function PrivacyPage({
 
                   <div className="space-y-3">
                     <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">
-                      Instituciones bloqueadas ({visibilityRules?.length || 0})
+                      Instituciones bloqueadas ({blockedInstitutions.length})
                     </h4>
-                    {visibilityRules && visibilityRules.length > 0 ? (
+                    {blockedInstitutions.length > 0 ? (
                       <div className="grid gap-3">
-                        {visibilityRules.map((item: any) => (
+                        {blockedInstitutions.map((instName) => (
                           <div
-                            key={item.id}
+                            key={instName}
                             className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-red-100 transition-colors group"
                           >
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-red-50 group-hover:text-red-400 transition-colors">
                                 <Lock size={18} />
                               </div>
-                              <div>
-                                <p className="text-sm font-bold text-navy">{item.institution?.name}</p>
-                                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
-                                  {item.institution?.country}
-                                </p>
-                              </div>
+                              <p className="text-sm font-bold text-navy">{instName}</p>
                             </div>
                             <form
                               action={async () => {
                                 "use server";
-                                await unblockInstitution(item.id);
+                                await unblockInstitution(instName);
                               }}
                             >
                               <button
