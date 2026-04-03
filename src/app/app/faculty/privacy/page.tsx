@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { ShieldCheck, Eye, EyeOff, Lock, UserPlus, Search, X, AlertCircle, Sparkles, Star } from "lucide-react";
 import { UNIVERSITIES } from "@/data/universities";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -55,7 +55,8 @@ export default async function PrivacyPage({
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    await supabase.from("faculty_profiles")
+    const admin = createAdminClient();
+    await admin.from("faculty_profiles")
       .upsert({ id: user.id, user_id: user.id, visibility: mode }, { onConflict: "id" });
     revalidatePath("/app/faculty/privacy");
     redirect("/app/faculty/privacy?saved=1");
@@ -67,7 +68,8 @@ export default async function PrivacyPage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const token = crypto.randomUUID();
-    await supabase.from("faculty_profiles")
+    const admin = createAdminClient();
+    await admin.from("faculty_profiles")
       .upsert({ id: user.id, user_id: user.id, profile_token: token }, { onConflict: "id" });
     revalidatePath("/app/faculty/privacy");
   }
@@ -86,10 +88,11 @@ export default async function PrivacyPage({
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const { data: inst } = await supabase
+    const admin = createAdminClient();
+    const { data: inst } = await admin
       .from("institutions").select("id").ilike("name", `%${name}%`).limit(1).maybeSingle();
     if (inst) {
-      await supabase.from("visibility_rules").insert({
+      await admin.from("visibility_rules").insert({
         faculty_id: user.id,
         institution_id: inst.id,
         rule: "block",
@@ -105,11 +108,12 @@ export default async function PrivacyPage({
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const { data: fp } = await supabase
+    const admin = createAdminClient();
+    const { data: fp } = await admin
       .from("faculty_profiles").select("preferred_institutions").eq("id", user.id).maybeSingle();
     const current = (fp?.preferred_institutions as string[] | null) || [];
     if (!current.includes(name) && current.length < 5) current.push(name);
-    await supabase.from("faculty_profiles")
+    await admin.from("faculty_profiles")
       .upsert({ id: user.id, user_id: user.id, preferred_institutions: current }, { onConflict: "id" });
     revalidatePath("/app/faculty/privacy");
   }
@@ -120,10 +124,11 @@ export default async function PrivacyPage({
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    const { data: fp } = await supabase
+    const admin = createAdminClient();
+    const { data: fp } = await admin
       .from("faculty_profiles").select("preferred_institutions").eq("id", user.id).maybeSingle();
     const updated = ((fp?.preferred_institutions as string[] | null) || []).filter(i => i !== name);
-    await supabase.from("faculty_profiles")
+    await admin.from("faculty_profiles")
       .upsert({ id: user.id, user_id: user.id, preferred_institutions: updated }, { onConflict: "id" });
     revalidatePath("/app/faculty/privacy");
   }
@@ -254,24 +259,31 @@ export default async function PrivacyPage({
               ) : (
                 /* ── Block form (premium users) ── */
                 <>
-                  <form action={blockInstitution} className="relative">
-                    <Search
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                      size={18}
-                    />
-                    <input
-                      name="institutionName"
-                      type="text"
-                      list="block-university-list"
-                      placeholder="Escribe el nombre del centro a bloquear..."
-                      className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium"
-                    />
-                    <datalist id="block-university-list">
-                      {UNIVERSITIES.map((u) => (
-                        <option key={u} value={u} />
-                      ))}
-                    </datalist>
-                    <button type="submit" className="hidden">Bloquear</button>
+                  <form action={blockInstitution} className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Search
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                        size={18}
+                      />
+                      <input
+                        name="institutionName"
+                        type="text"
+                        list="block-university-list"
+                        placeholder="Escribe el nombre del centro a bloquear..."
+                        className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium"
+                      />
+                      <datalist id="block-university-list">
+                        {UNIVERSITIES.map((u) => (
+                          <option key={u} value={u} />
+                        ))}
+                      </datalist>
+                    </div>
+                    <Button
+                      type="submit"
+                      className="bg-talentia-blue hover:bg-blue-700 text-white font-black rounded-xl px-5 shrink-0 h-auto"
+                    >
+                      Bloquear
+                    </Button>
                   </form>
 
                   <div className="space-y-3">

@@ -296,22 +296,20 @@ export default async function ProfilePage({
               </p>
               <p className="text-xs text-gray-400 mt-2">{user.email}</p>
               <div className="flex items-center justify-center sm:justify-start gap-2 mt-3">
-                <span
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                    facultyProfile?.visibility === "public"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-orange-100 text-orange-700"
-                  }`}
-                >
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full ${
-                      facultyProfile?.visibility === "public"
-                        ? "bg-green-500"
-                        : "bg-orange-500"
-                    }`}
-                  />
-                  {facultyProfile?.visibility === "public" ? "Perfil público" : "Perfil privado"}
-                </span>
+                {(() => {
+                  const vis = facultyProfile?.visibility || "public";
+                  const cfg = vis === "public"
+                    ? { bg: "bg-green-100", text: "text-green-700", dot: "bg-green-500", label: "Perfil público" }
+                    : vis === "institutions_only"
+                    ? { bg: "bg-blue-100", text: "text-blue-700", dot: "bg-blue-500", label: "Solo instituciones" }
+                    : { bg: "bg-gray-100", text: "text-gray-600", dot: "bg-gray-400", label: "Perfil oculto" };
+                  return (
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${cfg.bg} ${cfg.text}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                      {cfg.label}
+                    </span>
+                  );
+                })()}
               </div>
             </div>
           </div>
