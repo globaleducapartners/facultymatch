@@ -470,7 +470,7 @@ export default async function PrivacyPage({
                           className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-energy-orange focus:border-transparent outline-none transition-all font-medium"
                         />
                         <datalist id="preferred-univ-list">
-                          {UNIVERSITIES.map((u) => <option key={u} value={u} />)}
+                          {allUniversityNames.map((u) => <option key={u} value={u} />)}
                         </datalist>
                       </div>
                       <Button type="submit" size="sm" className="bg-energy-orange hover:bg-orange-500 text-white font-black rounded-xl px-4 shrink-0">
