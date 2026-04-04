@@ -28,6 +28,47 @@ export default async function InstitutionSearchRoute({
     redirect("/app/institution");
   }
 
+  // Check institution plan
+  const { data: userProfile } = await supabase
+    .from("user_profiles")
+    .select("plan, subscription_status")
+    .eq("id", user.id)
+    .single();
+
+  const isPro = userProfile?.plan === "institution-pro" && userProfile?.subscription_status === "active";
+
+  // Detect if this is an active search (any filter applied)
+  const hasSearchParams = !!(
+    params.query || params.area || params.subarea || params.country ||
+    params.language || params.phd || params.modality || params.aneca
+  );
+
+  // Search limit enforcement for Essential plan
+  let searchLimitReached = false;
+  const admin = createAdminClient();
+  const currentMonth = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
+
+  if (!isPro && hasSearchParams) {
+    const { data: usageData } = await admin
+      .from("search_usage")
+      .select("search_count")
+      .eq("institution_id", institution.id)
+      .eq("month", currentMonth)
+      .maybeSingle();
+
+    const currentCount = usageData?.search_count ?? 0;
+
+    if (currentCount >= 2) {
+      searchLimitReached = true;
+    } else {
+      // Atomic increment via PostgreSQL function
+      await admin.rpc("increment_search_usage", {
+        p_institution_id: institution.id,
+        p_month: currentMonth,
+      });
+    }
+  }
+
   // Fetch favorites
   const { data: favoritesData } = await supabase
     .from("favorites")
@@ -42,15 +83,12 @@ export default async function InstitutionSearchRoute({
     .eq("institution_id", institution.id);
 
   // Faculty who have blocked this institution — check both institution_id and institution_name
-  const admin = createAdminClient();
   const [{ data: blockedById }, { data: blockedByName }] = await Promise.all([
-    // Blocks where the institution has a registered account (matched by UUID)
     admin
       .from("visibility_rules")
       .select("faculty_id")
       .eq("institution_id", institution.id)
       .eq("rule", "block"),
-    // Preventive blocks by institution name (covers unregistered institutions)
     institution.name
       ? admin
           .from("visibility_rules")
@@ -81,7 +119,6 @@ export default async function InstitutionSearchRoute({
   const { data: educators } = await educatorQuery.limit(150);
 
   let filteredEducators = (educators || []).filter(ed =>
-    // Exclude faculty who explicitly blocked this institution
     !blockedFacultyIds.has((ed as any).id)
   );
 
@@ -114,7 +151,7 @@ export default async function InstitutionSearchRoute({
     .map(ed => {
       const userJoin = (ed as any).user;
       const userObj = Array.isArray(userJoin) ? userJoin[0] : userJoin;
-      const isPro = userObj?.plan === 'faculty-pro' && userObj?.subscription_status === 'active';
+      const isFacultyPro = userObj?.plan === 'faculty-pro' && userObj?.subscription_status === 'active';
       return {
         ...ed,
         full_name: userObj?.full_name || (ed as any).full_name || "Docente",
@@ -122,10 +159,9 @@ export default async function InstitutionSearchRoute({
         country: (ed as any).country || ed.location || null,
         city: (ed as any).city || null,
         experience_years: (ed as any).years_teaching || (ed as any).years_experience || 0,
-        is_pro: isPro,
+        is_pro: isFacultyPro,
       };
     })
-    // Sort: pro users first, then the rest
     .sort((a, b) => {
       if ((a as any).is_pro && !(b as any).is_pro) return -1;
       if (!(a as any).is_pro && (b as any).is_pro) return 1;
@@ -153,6 +189,8 @@ export default async function InstitutionSearchRoute({
         institutionId={institution.id || ""}
         searchParams={params}
         initialFavorites={favorites}
+        isPro={isPro}
+        searchLimitReached={searchLimitReached}
       />
     </>
   );

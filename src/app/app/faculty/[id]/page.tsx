@@ -1,10 +1,10 @@
 import { createClient } from "@/lib/supabase-server";
 import { notFound, redirect } from "next/navigation";
-import { 
-    GraduationCap, Globe, MapPin, Award, Star, Mail, 
-    Briefcase, BookOpen, ExternalLink, FileText, 
+import {
+    GraduationCap, Globe, MapPin, Award, Star, Mail,
+    Briefcase, BookOpen, ExternalLink, FileText,
     Calendar, CheckCircle2, ShieldCheck, ChevronRight,
-    Languages, Building2, Search, Sparkles
+    Languages, Building2, Search, Sparkles, Lock, Zap
   } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,12 +25,15 @@ export default async function FacultyProfilePage({
 
   if (!user) redirect("/login");
 
-  // Get current institution profile
-  const { data: institution } = await supabase
-    .from("institutions")
-    .select("*")
-    .eq("user_id", user.id)
-    .single();
+  // Get current institution profile + plan
+  const [{ data: institution }, { data: institutionUserProfile }] = await Promise.all([
+    supabase.from("institutions").select("*").eq("user_id", user.id).single(),
+    supabase.from("user_profiles").select("plan, subscription_status").eq("id", user.id).single(),
+  ]);
+
+  const institutionIsPro =
+    institutionUserProfile?.plan === "institution-pro" &&
+    institutionUserProfile?.subscription_status === "active";
 
   // Fetch faculty profile with related data
   // RLS will automatically filter this out if blocked
@@ -388,29 +391,29 @@ export default async function FacultyProfilePage({
 
         {/* Sidebar Actions (Fixed position on large screens) */}
         <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
-          {institution ? (
+          {institution && institutionIsPro ? (
             <div className="bg-navy p-8 rounded-[2.5rem] shadow-2xl text-white space-y-8 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-              
+
               <div className="space-y-2">
                 <h3 className="text-2xl font-black">¿Interesado?</h3>
                 <p className="text-blue-200 font-medium">Inicia una conversación para explorar una colaboración académica.</p>
               </div>
 
               <div className="flex flex-col gap-4">
-                <ContactModalWrapper 
+                <ContactModalWrapper
                   facultyId={faculty.id}
                   facultyName={faculty.full_name}
                   institutionId={institution.id}
                 />
-                
+
                 <div className="flex gap-4">
-                  <FavoriteButton 
+                  <FavoriteButton
                     facultyId={faculty.id}
                     institutionId={institution.id}
                     initialIsFavorite={isFavorite}
                   />
-                  
+
                   <Button variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 font-bold h-12 rounded-xl">
                     Descargar CV
                   </Button>
@@ -419,8 +422,33 @@ export default async function FacultyProfilePage({
 
               <div className="pt-6 border-t border-white/10 flex items-center justify-between text-xs font-bold text-blue-200 uppercase tracking-widest">
                 <span>Visitas totales: 12</span>
-                  <span>Respuesta: &lt; 24h</span>
+                <span>Respuesta: &lt; 24h</span>
               </div>
+            </div>
+          ) : institution && !institutionIsPro ? (
+            <div className="bg-white p-8 rounded-[2.5rem] border-2 border-gray-100 shadow-sm space-y-6 text-center">
+              <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto">
+                <Lock size={24} className="text-gray-400" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg font-black text-navy">Datos de contacto bloqueados</h3>
+                <p className="text-sm text-gray-500 font-medium leading-relaxed">
+                  Activa el Plan Professional para acceder a los datos de contacto de docentes verificados.
+                </p>
+              </div>
+              <Link
+                href="/app/institution/billing"
+                className="inline-flex items-center justify-center gap-2 w-full bg-[#1d4ed8] hover:bg-blue-700 text-white font-black py-3 rounded-xl text-sm transition-colors"
+              >
+                <Zap size={15} /> Activar Plan Professional
+              </Link>
+              {isFavorite !== undefined && (
+                <FavoriteButton
+                  facultyId={faculty.id}
+                  institutionId={institution.id}
+                  initialIsFavorite={isFavorite}
+                />
+              )}
             </div>
           ) : (
             <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center space-y-4">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Filter, GraduationCap, Globe, MapPin, ChevronRight, CheckCircle2, Award, Star, Mail, Briefcase, BookOpen, ExternalLink, X } from "lucide-react";
+import { Search, Filter, GraduationCap, Globe, MapPin, ChevronRight, CheckCircle2, Award, Star, Mail, Briefcase, BookOpen, ExternalLink, X, Lock, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EducatorCard } from "./EducatorCard";
@@ -15,9 +15,11 @@ interface InstitutionSearchPageProps {
   institutionId: string;
   searchParams: any;
   initialFavorites: string[];
+  isPro: boolean;
+  searchLimitReached: boolean;
 }
 
-export function InstitutionSearchPage({ initialEducators, institutionId, searchParams, initialFavorites }: InstitutionSearchPageProps) {
+export function InstitutionSearchPage({ initialEducators, institutionId, searchParams, initialFavorites, isPro, searchLimitReached }: InstitutionSearchPageProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [favorites, setFavorites] = useState<string[]>(initialFavorites || []);
@@ -50,8 +52,8 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
           <p className="text-gray-500 font-medium">Encuentra el profesorado adecuado para tus programas.</p>
         </div>
           <div className="flex items-center gap-3">
-            <Badge variant="outline" className="bg-blue-50 text-talentia-blue border-blue-100 font-bold px-4 py-1.5 rounded-full">
-              Plan Starter
+            <Badge variant="outline" className={`font-bold px-4 py-1.5 rounded-full ${isPro ? "bg-blue-50 text-talentia-blue border-blue-100" : "bg-gray-50 text-gray-500 border-gray-200"}`}>
+              {isPro ? "Plan Professional" : "Plan Essential"}
             </Badge>
             <Button variant="outline" asChild className="rounded-full border-gray-200 font-bold">
               <Link href="/app/institution/favorites" className="flex items-center gap-2">
@@ -64,6 +66,27 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
           </div>
       </div>
 
+      {/* Search limit banner */}
+      {searchLimitReached && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+              <Lock size={18} className="text-amber-600" />
+            </div>
+            <div>
+              <p className="font-black text-amber-900 text-sm">Has alcanzado el límite de 2 búsquedas mensuales</p>
+              <p className="text-amber-700 text-sm font-medium mt-0.5">Activa el Plan Professional para búsquedas ilimitadas y filtros avanzados.</p>
+            </div>
+          </div>
+          <Link
+            href="/app/institution/billing"
+            className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
+          >
+            <Zap size={14} /> Activar Plan Professional
+          </Link>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative items-start">
         {/* Left Sidebar: Filters */}
         <aside className="lg:col-span-3 space-y-6 lg:sticky lg:top-24">
@@ -74,13 +97,13 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
                   <h2 className="font-bold">Filtros académicos</h2>
                 </div>
                 {Object.keys(searchParams).length > 0 && (
-                  <Link href="/app/institution" className="text-xs font-bold text-gray-400 hover:text-talentia-blue transition-colors">
+                  <Link href="/app/institution/search" className="text-xs font-bold text-gray-400 hover:text-talentia-blue transition-colors">
                     Limpiar
                   </Link>
                 )}
               </div>
-            
-              <form action="/app/institution" method="get" className="space-y-6">
+
+              <form action="/app/institution/search" method="get" className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Búsqueda por palabra clave</label>
                   <div className="relative">
@@ -96,7 +119,7 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
 
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Área Académica</label>
-                  <select 
+                  <select
                     name="area"
                     defaultValue={searchParams.area || ""}
                     className="w-full px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none"
@@ -122,7 +145,7 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
 
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Idioma</label>
-                  <select 
+                  <select
                     name="language"
                     defaultValue={searchParams.language || ""}
                     className="w-full px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none"
@@ -138,7 +161,7 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
 
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">País</label>
-                  <select 
+                  <select
                     name="country"
                     defaultValue={searchParams.country || ""}
                     className="w-full px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none"
@@ -155,7 +178,7 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
 
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Acreditación ANECA</label>
-                  <select 
+                  <select
                     name="aneca"
                     defaultValue={searchParams.aneca || ""}
                     className="w-full px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none"
@@ -171,12 +194,12 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 text-talentia-blue">Nivel Académico</label>
                   <label className="flex items-center gap-2 cursor-pointer group">
-                    <input 
-                      type="checkbox" 
-                      name="phd" 
-                      value="true" 
+                    <input
+                      type="checkbox"
+                      name="phd"
+                      value="true"
                       defaultChecked={searchParams.phd === "true"}
-                      className="rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue" 
+                      className="rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue"
                     />
                     <span className="text-sm font-medium text-gray-600 group-hover:text-navy transition-colors">Solo PhD / Doctores</span>
                   </label>
@@ -187,12 +210,12 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
                   <div className="space-y-2">
                     {['Online', 'Presencial', 'Híbrida'].map((m) => (
                       <label key={m} className="flex items-center gap-2 cursor-pointer group">
-                        <input 
-                          type="checkbox" 
-                          name="modality" 
-                          value={m.toLowerCase()} 
+                        <input
+                          type="checkbox"
+                          name="modality"
+                          value={m.toLowerCase()}
                           defaultChecked={Array.isArray(searchParams.modality) ? searchParams.modality.includes(m.toLowerCase()) : searchParams.modality === m.toLowerCase()}
-                          className="rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue" 
+                          className="rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue"
                         />
                         <span className="text-sm font-medium text-gray-600 group-hover:text-navy transition-colors">{m}</span>
                       </label>
@@ -217,14 +240,14 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
             <div className="grid gap-6">
               {initialEducators.length > 0 ? (
                 initialEducators.map((educator) => (
-                    <div 
-                      key={educator.id} 
+                    <div
+                      key={educator.id}
                       onClick={() => setSelectedId(educator.id)}
                       className={`cursor-pointer transition-all ${selectedId === educator.id ? 'ring-2 ring-talentia-blue shadow-lg' : ''} rounded-2xl`}
                     >
-                      <EducatorCard 
-                        educator={educator} 
-                        institutionId={institutionId} 
+                      <EducatorCard
+                        educator={educator}
+                        institutionId={institutionId}
                         isFavorite={favorites.includes(educator.id)}
                       />
                     </div>
@@ -257,9 +280,9 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
                       <p className="text-sm font-bold text-gray-500">{selectedEducator.headline}</p>
                     </div>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setSelectedId(null)}
                     className="rounded-full hover:bg-gray-100"
                   >
@@ -269,14 +292,23 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
 
                 <div className="p-8 space-y-8 flex-1">
                     <div className="flex gap-2">
-                      <Button 
-                        onClick={() => setIsContactModalOpen(true)}
-                        className="flex-1 bg-energy-orange hover:bg-orange-600 text-white font-bold h-12 rounded-xl shadow-lg shadow-orange-100"
-                      >
-                        <Mail size={18} className="mr-2" /> Contactar ahora
-                      </Button>
-                      <Button 
-                        variant="outline" 
+                      {isPro ? (
+                        <Button
+                          onClick={() => setIsContactModalOpen(true)}
+                          className="flex-1 bg-energy-orange hover:bg-orange-600 text-white font-bold h-12 rounded-xl shadow-lg shadow-orange-100"
+                        >
+                          <Mail size={18} className="mr-2" /> Contactar ahora
+                        </Button>
+                      ) : (
+                        <Link
+                          href="/app/institution/billing"
+                          className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold h-12 rounded-xl transition-colors text-sm"
+                        >
+                          <Lock size={16} /> Activa Pro para contactar
+                        </Link>
+                      )}
+                      <Button
+                        variant="outline"
                         size="icon"
                         onClick={(e) => handleToggleFavorite(e, selectedEducator.id)}
                         className={`h-12 w-12 rounded-xl transition-all ${favorites.includes(selectedEducator.id) ? "text-energy-orange bg-orange-50 border-orange-100" : "text-gray-300 border-gray-100 hover:text-energy-orange hover:bg-orange-50"}`}
@@ -355,9 +387,9 @@ export function InstitutionSearchPage({ initialEducators, institutionId, searchP
         </div>
       </div>
 
-      {selectedEducator && (
-        <ContactModal 
-          isOpen={isContactModalOpen} 
+      {selectedEducator && isPro && (
+        <ContactModal
+          isOpen={isContactModalOpen}
           onClose={() => setIsContactModalOpen(false)}
           facultyId={selectedEducator.id}
           facultyName={selectedEducator.full_name}
