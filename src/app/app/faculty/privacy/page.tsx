@@ -44,11 +44,23 @@ export default async function PrivacyPage({
     ...(institutionRows || []).map((i: any) => i.name as string),
   ].filter(Boolean))).sort() as string[];
 
-  const { data: blockedRules } = await adminClient
+  // Try SELECT with institution_name column; fall back if column doesn't exist yet
+  let blockedRules: any[] | null = null;
+  const { data: rulesWithName, error: rulesError } = await adminClient
     .from("visibility_rules")
     .select("id, institution_name, institution:institutions(id, name)")
     .eq("faculty_id", user.id)
     .eq("rule", "block");
+  if (!rulesError) {
+    blockedRules = rulesWithName;
+  } else {
+    const { data: rulesFallback } = await adminClient
+      .from("visibility_rules")
+      .select("id, institution:institutions(id, name)")
+      .eq("faculty_id", user.id)
+      .eq("rule", "block");
+    blockedRules = rulesFallback;
+  }
 
   const blockedInstitutions = (blockedRules || []).map((r: any) => ({
     ruleId: r.id as string,
@@ -140,6 +152,7 @@ export default async function PrivacyPage({
       existing = data;
     }
     if (!existing) {
+      // Try insert with institution_name (requires migration: ADD COLUMN institution_name text)
       const { error: insertError } = await admin.from("visibility_rules").insert({
         faculty_id: user.id,
         institution_id: inst?.id ?? null,
@@ -147,9 +160,24 @@ export default async function PrivacyPage({
         rule: "block",
       });
       if (insertError) {
-        console.error("[blockInstitution] Insert failed:", insertError.message);
-        revalidatePath("/app/faculty/privacy");
-        redirect("/app/faculty/privacy?error=save-failed");
+        // Column may not exist yet — fallback without institution_name (only works if institution has an account)
+        if (inst?.id) {
+          const { error: fallbackError } = await admin.from("visibility_rules").insert({
+            faculty_id: user.id,
+            institution_id: inst.id,
+            rule: "block",
+          });
+          if (fallbackError) {
+            console.error("[blockInstitution] Fallback insert failed:", fallbackError.message);
+            revalidatePath("/app/faculty/privacy");
+            redirect("/app/faculty/privacy?error=save-failed");
+          }
+        } else {
+          // Unregistered institution and no institution_name column — cannot save
+          console.error("[blockInstitution] Insert failed (institution_name column missing):", insertError.message);
+          revalidatePath("/app/faculty/privacy");
+          redirect("/app/faculty/privacy?error=save-failed");
+        }
       }
     }
     revalidatePath("/app/faculty/privacy");
