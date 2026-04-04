@@ -210,7 +210,7 @@ export default function SignupInstitutionPage() {
     <div className="min-h-screen flex">
       {/* Left decorative panel */}
       <div
-        className="hidden lg:flex flex-col justify-between w-[40%] shrink-0 p-10 relative overflow-hidden"
+        className="hidden lg:flex flex-col justify-between w-[40%] shrink-0 p-10 relative overflow-hidden sticky top-0 h-screen"
         style={{ background: "#0B1220" }}
       >
         <div
