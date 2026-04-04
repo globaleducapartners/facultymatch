@@ -41,25 +41,28 @@ export default async function InstitutionSearchRoute({
     .select("*", { count: "exact", head: true })
     .eq("institution_id", institution.id);
 
-  // Faculty who have blocked this institution (visibility_rules — legacy/registered-inst blocks)
-  const { data: blockedRules } = await supabase
-    .from("visibility_rules")
-    .select("faculty_id")
-    .eq("institution_id", institution.id)
-    .eq("rule", "block");
-
-  // Faculty who have blocked by institution name (works for all institutions incl. unregistered)
-  const adminSearch = createAdminClient();
-  const { data: nameBlockedFaculty } = institution.name
-    ? await adminSearch
-        .from("faculty_profiles")
-        .select("id")
-        .contains("blocked_institutions", [institution.name])
-    : { data: [] };
+  // Faculty who have blocked this institution — check both institution_id and institution_name
+  const admin = createAdminClient();
+  const [{ data: blockedById }, { data: blockedByName }] = await Promise.all([
+    // Blocks where the institution has a registered account (matched by UUID)
+    admin
+      .from("visibility_rules")
+      .select("faculty_id")
+      .eq("institution_id", institution.id)
+      .eq("rule", "block"),
+    // Preventive blocks by institution name (covers unregistered institutions)
+    institution.name
+      ? admin
+          .from("visibility_rules")
+          .select("faculty_id")
+          .ilike("institution_name", institution.name)
+          .eq("rule", "block")
+      : Promise.resolve({ data: null }),
+  ]);
 
   const blockedFacultyIds = new Set([
-    ...(blockedRules || []).map((r: any) => r.faculty_id),
-    ...((nameBlockedFaculty as any[] | null) || []).map((f: any) => f.id),
+    ...(blockedById || []).map((r: any) => r.faculty_id),
+    ...(blockedByName || []).map((r: any) => r.faculty_id),
   ]);
 
   // Search — include plan + subscription_status for pro priority sorting
