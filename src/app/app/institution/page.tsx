@@ -73,6 +73,7 @@ export default async function InstitutionDashboardPage() {
     const foundedYear = formData.get("foundedYear") ? parseInt(formData.get("foundedYear") as string) : null;
     const numStudents = formData.get("numStudents") as string;
     const linkedinUrl = formData.get("linkedinUrl") as string;
+    const modality = formData.get("modality") as string;
     const cityCountry = [city, country].filter(Boolean).join(", ");
 
     const adminClient = createAdminClient();
@@ -89,6 +90,7 @@ export default async function InstitutionDashboardPage() {
         founded_year: foundedYear,
         num_students: numStudents,
         linkedin_url: linkedinUrl,
+        modality: modality || null,
         updated_at: new Date().toISOString(),
       }).eq("user_id", user.id);
     } else {
@@ -103,6 +105,7 @@ export default async function InstitutionDashboardPage() {
         founded_year: foundedYear,
         num_students: numStudents,
         linkedin_url: linkedinUrl,
+        modality: modality || null,
         status: "active",
       });
     }
@@ -246,6 +249,17 @@ export default async function InstitutionDashboardPage() {
                   <option value="online">Universidad online</option>
                   <option value="research">Centro de investigación</option>
                   <option value="other">Otro centro educativo</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-black uppercase tracking-widest text-gray-400">Modalidad de estudios</label>
+                <select name="modality" defaultValue={(institution as any)?.modality || ""}
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium appearance-none">
+                  <option value="">Sin especificar</option>
+                  <option value="Presencial">Presencial</option>
+                  <option value="Online">Online</option>
+                  <option value="Híbrida">Híbrida</option>
+                  <option value="A distancia">A distancia</option>
                 </select>
               </div>
             </div>
