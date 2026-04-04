@@ -12,9 +12,9 @@ import { redirect } from "next/navigation";
 export default async function PrivacyPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; blocked?: string }>;
+  searchParams: Promise<{ saved?: string; blocked?: string; error?: string }>;
 }) {
-  const { saved, blocked } = await searchParams;
+  const { saved, blocked, error } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -33,8 +33,17 @@ export default async function PrivacyPage({
     .eq("id", user.id)
     .single();
 
-  const blockedInstitutions: string[] =
-    (facultyProfile?.blocked_institutions as string[] | null) || [];
+  const adminClient = createAdminClient();
+  const { data: blockedRules } = await adminClient
+    .from("visibility_rules")
+    .select("id, institution:institutions(id, name)")
+    .eq("faculty_id", user.id)
+    .eq("rule", "block");
+
+  const blockedInstitutions = (blockedRules || []).map((r: any) => ({
+    ruleId: r.id as string,
+    name: (r.institution as any)?.name as string || "Institución desconocida",
+  }));
 
   // Pro: plan set by Stripe webhook in user_profiles
   const isPremium = userProfile?.plan === "faculty-pro" && userProfile?.subscription_status === "active";
@@ -71,17 +80,16 @@ export default async function PrivacyPage({
     revalidatePath("/app/faculty/privacy");
   }
 
-  async function unblockInstitution(name: string) {
+  async function unblockInstitution(ruleId: string) {
     "use server";
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const admin = createAdminClient();
-    const { data: fp } = await admin
-      .from("faculty_profiles").select("blocked_institutions").eq("id", user.id).maybeSingle();
-    const updated = ((fp?.blocked_institutions as string[] | null) || []).filter(n => n !== name);
-    await admin.from("faculty_profiles")
-      .upsert({ id: user.id, user_id: user.id, blocked_institutions: updated }, { onConflict: "id" });
+    await admin.from("visibility_rules")
+      .delete()
+      .eq("id", ruleId)
+      .eq("faculty_id", user.id);
     revalidatePath("/app/faculty/privacy");
   }
 
@@ -93,13 +101,29 @@ export default async function PrivacyPage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const admin = createAdminClient();
-    const { data: fp } = await admin
-      .from("faculty_profiles").select("blocked_institutions").eq("id", user.id).maybeSingle();
-    const current = (fp?.blocked_institutions as string[] | null) || [];
-    if (!current.includes(name)) {
-      current.push(name);
-      await admin.from("faculty_profiles")
-        .upsert({ id: user.id, user_id: user.id, blocked_institutions: current }, { onConflict: "id" });
+    const { data: inst } = await admin
+      .from("institutions")
+      .select("id")
+      .ilike("name", name)
+      .limit(1)
+      .maybeSingle();
+    if (!inst) {
+      revalidatePath("/app/faculty/privacy");
+      redirect("/app/faculty/privacy?error=not-found");
+    }
+    const { data: existing } = await admin
+      .from("visibility_rules")
+      .select("id")
+      .eq("faculty_id", user.id)
+      .eq("institution_id", inst.id)
+      .eq("rule", "block")
+      .maybeSingle();
+    if (!existing) {
+      await admin.from("visibility_rules").insert({
+        faculty_id: user.id,
+        institution_id: inst.id,
+        rule: "block",
+      });
     }
     revalidatePath("/app/faculty/privacy");
     redirect("/app/faculty/privacy?blocked=1");
@@ -154,6 +178,11 @@ export default async function PrivacyPage({
       {blocked === "1" && (
         <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
           ✓ Institución bloqueada correctamente
+        </div>
+      )}
+      {error === "not-found" && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-red-700 font-bold text-sm">
+          ✗ Institución no encontrada en FacultyMatch. Solo puedes bloquear instituciones registradas.
         </div>
       )}
 
@@ -301,21 +330,21 @@ export default async function PrivacyPage({
                     </h4>
                     {blockedInstitutions.length > 0 ? (
                       <div className="grid gap-3">
-                        {blockedInstitutions.map((instName) => (
+                        {blockedInstitutions.map((inst) => (
                           <div
-                            key={instName}
+                            key={inst.ruleId}
                             className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-red-100 transition-colors group"
                           >
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-red-50 group-hover:text-red-400 transition-colors">
                                 <Lock size={18} />
                               </div>
-                              <p className="text-sm font-bold text-navy">{instName}</p>
+                              <p className="text-sm font-bold text-navy">{inst.name}</p>
                             </div>
                             <form
                               action={async () => {
                                 "use server";
-                                await unblockInstitution(instName);
+                                await unblockInstitution(inst.ruleId);
                               }}
                             >
                               <button
