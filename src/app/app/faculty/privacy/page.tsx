@@ -11,9 +11,9 @@ import { redirect } from "next/navigation";
 export default async function PrivacyPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; blocked?: string }>;
+  searchParams: Promise<{ saved?: string; blocked?: string; error?: string }>;
 }) {
-  const { saved, blocked } = await searchParams;
+  const { saved, blocked, error } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -118,21 +118,39 @@ export default async function PrivacyPage({
       .ilike("name", name)
       .limit(1)
       .maybeSingle();
-    // Check for duplicate (match by name, case-insensitive)
-    const { data: existing } = await admin
-      .from("visibility_rules")
-      .select("id")
-      .eq("faculty_id", user.id)
-      .ilike("institution_name", name)
-      .eq("rule", "block")
-      .maybeSingle();
+    // Check for duplicate: by institution_id if registered, otherwise by institution_name
+    let existing = null;
+    if (inst) {
+      const { data } = await admin
+        .from("visibility_rules")
+        .select("id")
+        .eq("faculty_id", user.id)
+        .eq("institution_id", inst.id)
+        .eq("rule", "block")
+        .maybeSingle();
+      existing = data;
+    } else {
+      const { data } = await admin
+        .from("visibility_rules")
+        .select("id")
+        .eq("faculty_id", user.id)
+        .ilike("institution_name", name)
+        .eq("rule", "block")
+        .maybeSingle();
+      existing = data;
+    }
     if (!existing) {
-      await admin.from("visibility_rules").insert({
+      const { error: insertError } = await admin.from("visibility_rules").insert({
         faculty_id: user.id,
         institution_id: inst?.id ?? null,
         institution_name: name,
         rule: "block",
       });
+      if (insertError) {
+        console.error("[blockInstitution] Insert failed:", insertError.message);
+        revalidatePath("/app/faculty/privacy");
+        redirect("/app/faculty/privacy?error=save-failed");
+      }
     }
     revalidatePath("/app/faculty/privacy");
     redirect("/app/faculty/privacy?blocked=1");
@@ -187,6 +205,11 @@ export default async function PrivacyPage({
       {blocked === "1" && (
         <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
           ✓ Institución bloqueada correctamente
+        </div>
+      )}
+      {error === "save-failed" && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-red-700 font-bold text-sm">
+          ✗ No se pudo guardar el bloqueo. Inténtalo de nuevo.
         </div>
       )}
 
