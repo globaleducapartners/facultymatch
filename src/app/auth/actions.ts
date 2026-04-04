@@ -202,6 +202,21 @@ export async function signUpInstitution(formData: FormData) {
     status: "pending",
   }, { onConflict: "user_id" });
 
+  // Auto-link any faculty who pre-blocked this institution by name
+  const { data: newInst } = await admin
+    .from("institutions")
+    .select("id")
+    .eq("user_id", data.user.id)
+    .maybeSingle();
+  if (newInst) {
+    await admin
+      .from("visibility_rules")
+      .update({ institution_id: newInst.id })
+      .ilike("institution_name", institutionName)
+      .is("institution_id", null)
+      .eq("rule", "block");
+  }
+
   // Auto-login
   const supabase = await createClient();
   const { error: signInError } = await supabase.auth.signInWithPassword({

@@ -1,6 +1,5 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { ShieldCheck, Eye, EyeOff, Lock, UserPlus, Search, X, AlertCircle, Sparkles, Star } from "lucide-react";
-import { UNIVERSITIES } from "@/data/universities";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,9 +11,9 @@ import { redirect } from "next/navigation";
 export default async function PrivacyPage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; blocked?: string; error?: string }>;
+  searchParams: Promise<{ saved?: string; blocked?: string }>;
 }) {
-  const { saved, blocked, error } = await searchParams;
+  const { saved, blocked } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -34,15 +33,26 @@ export default async function PrivacyPage({
     .single();
 
   const adminClient = createAdminClient();
+
+  // Combined university list for datalist: universities_es + registered institutions, deduplicated
+  const [{ data: univEsRows }, { data: institutionRows }] = await Promise.all([
+    adminClient.from("universities_es").select("name"),
+    adminClient.from("institutions").select("name"),
+  ]);
+  const allUniversityNames = Array.from(new Set([
+    ...(univEsRows || []).map((u: any) => u.name as string),
+    ...(institutionRows || []).map((i: any) => i.name as string),
+  ].filter(Boolean))).sort() as string[];
+
   const { data: blockedRules } = await adminClient
     .from("visibility_rules")
-    .select("id, institution:institutions(id, name)")
+    .select("id, institution_name, institution:institutions(id, name)")
     .eq("faculty_id", user.id)
     .eq("rule", "block");
 
   const blockedInstitutions = (blockedRules || []).map((r: any) => ({
     ruleId: r.id as string,
-    name: (r.institution as any)?.name as string || "Institución desconocida",
+    name: (r.institution_name as string) || (r.institution as any)?.name || "Institución desconocida",
   }));
 
   // Pro: plan set by Stripe webhook in user_profiles
@@ -101,27 +111,26 @@ export default async function PrivacyPage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const admin = createAdminClient();
+    // Look up institution UUID if it has a registered account
     const { data: inst } = await admin
       .from("institutions")
       .select("id")
       .ilike("name", name)
       .limit(1)
       .maybeSingle();
-    if (!inst) {
-      revalidatePath("/app/faculty/privacy");
-      redirect("/app/faculty/privacy?error=not-found");
-    }
+    // Check for duplicate (match by name, case-insensitive)
     const { data: existing } = await admin
       .from("visibility_rules")
       .select("id")
       .eq("faculty_id", user.id)
-      .eq("institution_id", inst.id)
+      .ilike("institution_name", name)
       .eq("rule", "block")
       .maybeSingle();
     if (!existing) {
       await admin.from("visibility_rules").insert({
         faculty_id: user.id,
-        institution_id: inst.id,
+        institution_id: inst?.id ?? null,
+        institution_name: name,
         rule: "block",
       });
     }
@@ -178,11 +187,6 @@ export default async function PrivacyPage({
       {blocked === "1" && (
         <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
           ✓ Institución bloqueada correctamente
-        </div>
-      )}
-      {error === "not-found" && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-red-700 font-bold text-sm">
-          ✗ Institución no encontrada en FacultyMatch. Solo puedes bloquear instituciones registradas.
         </div>
       )}
 
@@ -311,7 +315,7 @@ export default async function PrivacyPage({
                         className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium"
                       />
                       <datalist id="block-university-list">
-                        {UNIVERSITIES.map((u) => (
+                        {allUniversityNames.map((u) => (
                           <option key={u} value={u} />
                         ))}
                       </datalist>
