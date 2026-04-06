@@ -213,7 +213,28 @@ export async function signUpInstitution(formData: FormData) {
   if (autoVerify) institutionRecord.verified = true;
   if (universityId != null && !isNaN(universityId)) institutionRecord.university_id = universityId;
 
-  await admin.from("institutions").upsert(institutionRecord, { onConflict: "user_id" });
+  const { error: upsertError } = await admin.from("institutions").upsert(institutionRecord, { onConflict: "user_id" });
+  if (upsertError) {
+    console.error("[signUpInstitution] institutions upsert failed:", upsertError.message, "| record:", JSON.stringify({ auto_verify: autoVerify, university_id: universityId, verified: institutionRecord.verified }));
+  }
+
+  // Explicit UPDATE for auto-verify fields — runs after the upsert/trigger so it always wins
+  if (autoVerify) {
+    const verifiedPayload: Record<string, unknown> = {
+      verified: true,
+      status: "active",
+      name: nameToSave,
+    };
+    if (universityId != null && !isNaN(universityId)) verifiedPayload.university_id = universityId;
+
+    const { error: verifiedUpdateError } = await admin
+      .from("institutions")
+      .update(verifiedPayload)
+      .eq("user_id", data.user.id);
+    if (verifiedUpdateError) {
+      console.error("[signUpInstitution] verified update failed:", verifiedUpdateError.message);
+    }
+  }
 
   // Auto-link any faculty who pre-blocked this institution by name
   const { data: newInst } = await admin
