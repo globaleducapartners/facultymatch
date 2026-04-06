@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Building2, ShieldCheck, Search, Users, ArrowRight, Loader2, Check } from "lucide-react";
 import { signUpInstitution } from "@/app/auth/actions";
 
+type University = { id: number; name: string; acronym: string | null; domain: string | null };
+
 const AREAS_OPTIONS = [
   "Business & Management", "Ingeniería & Tecnología", "Salud & Ciencias",
   "Derecho & Ciencias Políticas", "Educación", "Artes & Humanidades",
@@ -92,6 +94,15 @@ export default function SignupInstitutionPage() {
   const [nameCheckStatus, setNameCheckStatus] = useState<"idle" | "checking" | "taken" | "available">("idle");
   const nameCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // University autocomplete
+  const [selectedUniversity, setSelectedUniversity] = useState<University | null>(null);
+  const [suggestions, setSuggestions] = useState<University[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [domainMatchStatus, setDomainMatchStatus] = useState<"match" | "mismatch" | "idle">("idle");
+  const [domainCandidates, setDomainCandidates] = useState<University[]>([]);
+  const autocompleteRef = useRef<HTMLDivElement>(null);
+  const suggestionsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const pwStrength = getPasswordStrength(password);
 
   // Debounced institution name duplicate check
@@ -115,6 +126,123 @@ export default function SignupInstitutionPage() {
       if (nameCheckTimer.current) clearTimeout(nameCheckTimer.current);
     };
   }, [institutionName]);
+
+  // University autocomplete search
+  useEffect(() => {
+    if (suggestionsTimer.current) clearTimeout(suggestionsTimer.current);
+    const trimmed = institutionName.trim();
+    if (trimmed.length < 2) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+    // If user has a selected university whose name matches current input, don't re-search
+    if (selectedUniversity && selectedUniversity.name === trimmed) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+    suggestionsTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/universities/search?q=${encodeURIComponent(trimmed)}`);
+        const { universities } = await res.json();
+        setSuggestions(universities || []);
+        setShowDropdown(true);
+      } catch {
+        setSuggestions([]);
+      }
+    }, 300);
+    return () => {
+      if (suggestionsTimer.current) clearTimeout(suggestionsTimer.current);
+    };
+  }, [institutionName, selectedUniversity]);
+
+  // Email domain validation
+  useEffect(() => {
+    const atIndex = email.indexOf("@");
+    if (atIndex < 0) {
+      setDomainMatchStatus("idle");
+      setDomainCandidates([]);
+      return;
+    }
+    const emailDomain = email.slice(atIndex + 1).toLowerCase().trim();
+    if (!emailDomain || !emailDomain.includes(".")) {
+      setDomainMatchStatus("idle");
+      setDomainCandidates([]);
+      return;
+    }
+
+    // If a university is already selected, just compare domains synchronously
+    if (selectedUniversity?.domain) {
+      setDomainMatchStatus(
+        emailDomain === selectedUniversity.domain.toLowerCase() ? "match" : "mismatch"
+      );
+      setDomainCandidates([]);
+      return;
+    }
+
+    // No university selected — look up by domain after a short debounce
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/universities/search?domain=${encodeURIComponent(emailDomain)}`);
+        const { universities } = await res.json();
+        if (cancelled) return;
+        if (!universities || universities.length === 0) {
+          setDomainMatchStatus("idle");
+          setDomainCandidates([]);
+        } else if (universities.length === 1) {
+          // Auto-select the unique match
+          setSelectedUniversity(universities[0]);
+          setInstitutionName(universities[0].name);
+          setDomainMatchStatus("match");
+          setDomainCandidates([]);
+        } else {
+          // Multiple universities share this domain — ask user to choose
+          setDomainCandidates(universities);
+          setDomainMatchStatus("idle");
+        }
+      } catch {
+        if (!cancelled) {
+          setDomainMatchStatus("idle");
+          setDomainCandidates([]);
+        }
+      }
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [email, selectedUniversity]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (autocompleteRef.current && !autocompleteRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectUniversity = (uni: University) => {
+    setSelectedUniversity(uni);
+    setInstitutionName(uni.name);
+    setShowDropdown(false);
+    setSuggestions([]);
+    setDomainCandidates([]);
+    clearError("institutionName");
+    // Immediately recalculate domain match for the current email
+    if (uni.domain) {
+      const atIndex = email.indexOf("@");
+      if (atIndex >= 0) {
+        const emailDomain = email.slice(atIndex + 1).toLowerCase().trim();
+        setDomainMatchStatus(emailDomain === uni.domain.toLowerCase() ? "match" : "mismatch");
+      }
+    }
+  };
 
   const toggleArea = (area: string) => {
     setSelectedAreas(prev =>
@@ -159,6 +287,7 @@ export default function SignupInstitutionPage() {
     setLoading(true);
     try {
       const fullName = `${firstName.trim()} ${lastName.trim()}`;
+      const autoVerify = !!(selectedUniversity?.domain && domainMatchStatus === "match");
 
       const formData = new FormData();
       formData.set("email", email.trim().toLowerCase());
@@ -179,6 +308,10 @@ export default function SignupInstitutionPage() {
       formData.set("terms_accepted", String(consentTerms));
       formData.set("privacy_accepted", String(consentPrivacy));
       formData.set("marketing_opt_in", String(marketingOptIn));
+      // University autocomplete data
+      formData.set("university_id", selectedUniversity?.id != null ? String(selectedUniversity.id) : "");
+      formData.set("auto_verify", String(autoVerify));
+      formData.set("university_verified_name", selectedUniversity?.name || "");
 
       const result = await signUpInstitution(formData);
 
@@ -192,7 +325,7 @@ export default function SignupInstitutionPage() {
         return;
       }
 
-      // Success — go directly to institution dashboard (no email confirmation needed)
+      // Success — go directly to institution dashboard
       router.push("/app/institution");
       router.refresh();
     } catch (err: unknown) {
@@ -283,29 +416,125 @@ export default function SignupInstitutionPage() {
               <p className="text-xs font-black uppercase tracking-widest text-gray-400 border-b border-gray-100 pb-2">
                 Datos del centro
               </p>
+
+              {/* Institution name — autocomplete */}
               <div data-error={!!errors.institutionName || nameCheckStatus === "taken"} className="space-y-1.5">
                 <label className="text-sm font-bold text-navy">Nombre de la institución <span className="text-red-500">*</span></label>
-                <div className="relative">
-                  <input type="text" value={institutionName} placeholder="Universidad de Madrid"
-                    onChange={e => { setInstitutionName(e.target.value); clearError("institutionName"); }}
-                    className={`w-full h-11 px-4 pr-10 rounded-xl border text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all ${
-                      errors.institutionName || nameCheckStatus === "taken" ? "border-red-400 ring-1 ring-red-300" :
-                      nameCheckStatus === "available" ? "border-green-400" : "border-gray-200"
-                    }`} />
-                  {nameCheckStatus === "checking" && (
-                    <Loader2 size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
-                  )}
-                  {nameCheckStatus === "available" && (
-                    <Check size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500" />
+                <div className="relative" ref={autocompleteRef}>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={institutionName}
+                      placeholder="Universidad de Madrid"
+                      autoComplete="off"
+                      onChange={e => {
+                        const val = e.target.value;
+                        setInstitutionName(val);
+                        clearError("institutionName");
+                        // If user edits away from the selected university name, clear selection
+                        if (selectedUniversity && val !== selectedUniversity.name) {
+                          setSelectedUniversity(null);
+                          setDomainMatchStatus("idle");
+                        }
+                      }}
+                      onFocus={() => {
+                        if (suggestions.length > 0) setShowDropdown(true);
+                      }}
+                      className={`w-full h-11 px-4 pr-10 rounded-xl border text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all ${
+                        errors.institutionName || nameCheckStatus === "taken"
+                          ? "border-red-400 ring-1 ring-red-300"
+                          : nameCheckStatus === "available"
+                          ? "border-green-400"
+                          : "border-gray-200"
+                      }`}
+                    />
+                    {nameCheckStatus === "checking" && (
+                      <Loader2 size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
+                    )}
+                    {nameCheckStatus === "available" && (
+                      <Check size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500" />
+                    )}
+                  </div>
+
+                  {/* Autocomplete dropdown */}
+                  {showDropdown && (
+                    <div className="absolute z-50 w-full top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+                      {suggestions.map(uni => (
+                        <button
+                          key={uni.id}
+                          type="button"
+                          onMouseDown={e => { e.preventDefault(); selectUniversity(uni); }}
+                          className="w-full px-4 py-2.5 text-left hover:bg-blue-50 transition-colors flex items-center gap-2"
+                        >
+                          <Building2 size={13} className="text-gray-400 flex-shrink-0" />
+                          <span className="text-sm font-medium text-navy flex-1">{uni.name}</span>
+                          {uni.acronym && (
+                            <span className="text-xs text-gray-400 font-medium flex-shrink-0">({uni.acronym})</span>
+                          )}
+                        </button>
+                      ))}
+                      {/* Free-text option */}
+                      <button
+                        type="button"
+                        onMouseDown={e => {
+                          e.preventDefault();
+                          setShowDropdown(false);
+                          setSuggestions([]);
+                          if (selectedUniversity) {
+                            setSelectedUniversity(null);
+                            setDomainMatchStatus("idle");
+                          }
+                        }}
+                        className="w-full px-4 py-2.5 text-left text-sm text-talentia-blue font-medium hover:bg-gray-50 transition-colors border-t border-gray-100"
+                      >
+                        + Añadir: &ldquo;{institutionName}&rdquo;
+                      </button>
+                    </div>
                   )}
                 </div>
+
+                {/* Domain selector for multiple university candidates */}
+                {domainCandidates.length > 1 && (
+                  <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 space-y-2">
+                    <p className="text-xs font-bold text-talentia-blue">
+                      Tu email coincide con varias instituciones. ¿Cuál es la tuya?
+                    </p>
+                    <div className="space-y-1">
+                      {domainCandidates.map(uni => (
+                        <button
+                          key={uni.id}
+                          type="button"
+                          onClick={() => selectUniversity(uni)}
+                          className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium text-navy hover:bg-blue-100 transition-colors flex items-center gap-2"
+                        >
+                          <Building2 size={12} className="text-talentia-blue flex-shrink-0" />
+                          {uni.name}{uni.acronym ? ` (${uni.acronym})` : ""}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Verification status messages */}
+                {domainMatchStatus === "match" && (
+                  <p className="text-xs text-green-600 font-medium">
+                    ✓ Email verificado. Tu cuenta se activará automáticamente como institución verificada.
+                  </p>
+                )}
+                {domainMatchStatus === "mismatch" && (
+                  <p className="text-xs text-gray-500 font-medium">
+                    Tu cuenta se revisará manualmente para verificación.
+                  </p>
+                )}
                 {nameCheckStatus === "taken" && !errors.institutionName && (
                   <p className="text-xs text-amber-600 font-medium">
-                    Ya existe una institución con un nombre similar. Si es la tuya, <a href="/login" className="font-bold underline">inicia sesión</a>.
+                    Ya existe una institución con un nombre similar. Si es la tuya,{" "}
+                    <a href="/login" className="font-bold underline">inicia sesión</a>.
                   </p>
                 )}
                 {errors.institutionName && <p className="text-xs text-red-500 font-medium">{errors.institutionName}</p>}
               </div>
+
               <div data-error={!!errors.institutionType} className="space-y-1.5">
                 <label className="text-sm font-bold text-navy">Tipo de centro <span className="text-red-500">*</span></label>
                 <select value={institutionType} onChange={e => { setInstitutionType(e.target.value); clearError("institutionType"); }}

@@ -137,6 +137,12 @@ export async function signUpInstitution(formData: FormData) {
   const privacyAccepted = formData.get("privacy_accepted") === "true";
   const marketingOptIn = formData.get("marketing_opt_in") === "true";
 
+  const universityIdStr = formData.get("university_id") as string;
+  const autoVerify = formData.get("auto_verify") === "true";
+  const universityVerifiedName = formData.get("university_verified_name") as string;
+  // university_id is integer in universities_es
+  const universityId = universityIdStr ? parseInt(universityIdStr, 10) : null;
+
   let knowledge_areas: string[] = [];
   try { knowledge_areas = JSON.parse((formData.get("knowledge_areas") as string) || "[]"); } catch {}
 
@@ -186,11 +192,14 @@ export async function signUpInstitution(formData: FormData) {
 
   if (!data.user) return { error: "No se pudo crear la cuenta. Inténtalo de nuevo." };
 
+  // If domain matches a university, use its official name and mark as verified
+  const nameToSave = autoVerify && universityVerifiedName ? universityVerifiedName : institutionName;
+
   // Create institution record immediately with all signup data
   const cityCountry = [city, country].filter(Boolean).join(', ');
-  await admin.from("institutions").upsert({
+  const institutionRecord: Record<string, unknown> = {
     user_id: data.user.id,
-    name: institutionName,
+    name: nameToSave,
     institution_type: institutionType || null,
     type: institutionType || null,
     country: country || null,
@@ -199,8 +208,12 @@ export async function signUpInstitution(formData: FormData) {
     website: website || null,
     phone: phone || null,
     contact_email: email.toLowerCase(),
-    status: "pending",
-  }, { onConflict: "user_id" });
+    status: autoVerify ? "active" : "pending",
+  };
+  if (autoVerify) institutionRecord.verified = true;
+  if (universityId != null && !isNaN(universityId)) institutionRecord.university_id = universityId;
+
+  await admin.from("institutions").upsert(institutionRecord, { onConflict: "user_id" });
 
   // Auto-link any faculty who pre-blocked this institution by name
   const { data: newInst } = await admin
@@ -209,12 +222,17 @@ export async function signUpInstitution(formData: FormData) {
     .eq("user_id", data.user.id)
     .maybeSingle();
   if (newInst) {
-    await admin
-      .from("visibility_rules")
-      .update({ institution_id: newInst.id })
-      .ilike("institution_name", institutionName)
-      .is("institution_id", null)
-      .eq("rule", "block");
+    // Search by both user-typed name and official verified name to maximize matches
+    try {
+      await admin
+        .from("visibility_rules")
+        .update({ institution_id: newInst.id })
+        .ilike("institution_name", nameToSave)
+        .is("institution_id", null)
+        .eq("rule", "block");
+    } catch {
+      // Non-blocking — ignore errors silently
+    }
   }
 
   // Auto-login
