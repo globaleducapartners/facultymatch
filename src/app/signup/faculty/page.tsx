@@ -253,7 +253,7 @@ export default function SignupFacultyPage() {
         <div className="w-full max-w-xl space-y-6">
           <div>
             <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
-              Paso 1 de 1 · Gratis para siempre
+              Convierte tu experiencia en oportunidades
             </p>
             <h1 className="text-3xl font-black text-navy">Crea tu perfil docente</h1>
             <p className="text-gray-500 font-medium mt-1">Tarda menos de 3 minutos</p>
@@ -532,8 +532,6 @@ export default function SignupFacultyPage() {
             <p className="text-center text-xs text-gray-400 font-medium">
               ¿Ya tienes cuenta?{" "}
               <Link href="/login" className="text-talentia-blue font-bold hover:underline">Acceder aquí</Link>
-              {" · "}
-              <Link href="/apply" className="text-gray-500 hover:underline">Enviar perfil sin cuenta</Link>
             </p>
           </form>
         </div>
