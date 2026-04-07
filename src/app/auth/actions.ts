@@ -208,7 +208,7 @@ export async function signUpInstitution(formData: FormData) {
     website: website || null,
     phone: phone || null,
     contact_email: email.toLowerCase(),
-    status: autoVerify ? "active" : "pending",
+    status: autoVerify ? "approved" : "pending",
   };
   if (autoVerify) institutionRecord.verified = true;
   if (universityId != null && !isNaN(universityId)) institutionRecord.university_id = universityId;
@@ -218,22 +218,43 @@ export async function signUpInstitution(formData: FormData) {
     console.error("[signUpInstitution] institutions upsert failed:", upsertError.message, "| record:", JSON.stringify({ auto_verify: autoVerify, university_id: universityId, verified: institutionRecord.verified }));
   }
 
+  // Log exactly what values we received from the form
+  console.log("[signUpInstitution] auto_verify values:", {
+    autoVerify,
+    universityId,
+    universityVerifiedName,
+    nameToSave,
+    userId: data.user.id,
+  });
+
   // Explicit UPDATE for auto-verify fields — runs after the upsert/trigger so it always wins
   if (autoVerify) {
     const verifiedPayload: Record<string, unknown> = {
       verified: true,
-      status: "active",
+      status: "approved",
       name: nameToSave,
     };
     if (universityId != null && !isNaN(universityId)) verifiedPayload.university_id = universityId;
+
+    console.log("[signUpInstitution] running verified UPDATE with:", verifiedPayload);
 
     const { error: verifiedUpdateError } = await admin
       .from("institutions")
       .update(verifiedPayload)
       .eq("user_id", data.user.id);
     if (verifiedUpdateError) {
-      console.error("[signUpInstitution] verified update failed:", verifiedUpdateError.message);
+      console.error("[signUpInstitution] verified update FAILED:", verifiedUpdateError.message, verifiedUpdateError.details, verifiedUpdateError.hint);
+    } else {
+      console.log("[signUpInstitution] verified UPDATE succeeded — reading back row...");
     }
+
+    // Read back what's actually in the DB now
+    const { data: checkRow } = await admin
+      .from("institutions")
+      .select("verified, university_id, name, status")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+    console.log("[signUpInstitution] DB row after update:", checkRow);
   }
 
   // Auto-link any faculty who pre-blocked this institution by name
