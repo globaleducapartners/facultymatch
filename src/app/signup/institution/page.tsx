@@ -325,6 +325,23 @@ export default function SignupInstitutionPage() {
         return;
       }
 
+      // If auto-verified, call the verify endpoint AFTER the server action completes
+      // (runs after signInWithPassword inside the action, so auth triggers have already fired)
+      if (autoVerify && selectedUniversity?.id != null) {
+        try {
+          await fetch("/api/institution/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              university_id: selectedUniversity.id,
+              university_name: selectedUniversity.name,
+            }),
+          });
+        } catch {
+          // Non-blocking — never fail signup due to verify step
+        }
+      }
+
       // Success — go directly to institution dashboard
       router.push("/app/institution");
       router.refresh();
