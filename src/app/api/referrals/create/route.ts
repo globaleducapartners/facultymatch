@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
   // Send invitation email
   const inviterFullName = profile.full_name || user.email?.split('@')[0] || 'Un docente';
   const inviterFirstName = inviterFullName.split(' ')[0];
-  const registrationLink = `${SITE}/registro?ref=${code}`;
+  const registrationLink = `${SITE}/signup/faculty?ref=${code}`;
 
   await resend.emails.send({
     from: FROM,
