@@ -74,7 +74,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Pasarela de pago no configurada' }, { status: 500 });
   }
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-06-20',
+  });
   const code = generateInviteCode();
 
   let stripePromoCode: Stripe.PromotionCode;
