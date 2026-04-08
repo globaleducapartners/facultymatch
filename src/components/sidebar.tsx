@@ -18,7 +18,8 @@ import {
   Building2,
   CreditCard,
   Users,
-  FileCheck
+  FileCheck,
+  Gift,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -29,6 +30,7 @@ const educatorItems = [
   { label: "Especialidades", href: "/app/faculty/specialties", icon: Award },
   { label: "Visibilidad & Privacidad", href: "/app/faculty/privacy", icon: ShieldCheck },
   { label: "Solicitudes", href: "/app/faculty/requests", icon: Mail },
+  { label: "Invita y Gana", href: "/app/faculty/referrals", icon: Gift },
   { label: "Verificación", href: "/app/faculty/verification", icon: CheckCircle2 },
   { label: "Ajustes", href: "/app/faculty/settings", icon: Settings },
 ];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
@@ -90,9 +90,23 @@ export default function SignupFacultyPage() {
   const [consentPrivacy, setConsentPrivacy] = useState(false);
   const [marketingOptIn, setMarketingOptIn] = useState(false);
 
+  const [referralCode, setReferralCode] = useState<string>("");
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) {
+      localStorage.setItem("fm_referral_code", ref);
+      setReferralCode(ref);
+    } else {
+      const stored = localStorage.getItem("fm_referral_code");
+      if (stored) setReferralCode(stored);
+    }
+  }, []);
 
   const pwStrength = getPasswordStrength(password);
 
@@ -174,6 +188,7 @@ export default function SignupFacultyPage() {
             privacy_accepted: true,
             marketing_opt_in: marketingOptIn,
             consent_version: "v1",
+            referral_code: referralCode || null,
           },
         },
       });
@@ -189,6 +204,7 @@ export default function SignupFacultyPage() {
         return;
       }
 
+      if (referralCode) localStorage.removeItem("fm_referral_code");
       router.push(`/signup/faculty/confirm?email=${encodeURIComponent(email.trim().toLowerCase())}`);
     } catch (err: unknown) {
       setServerError(err instanceof Error ? err.message : "Error inesperado. Inténtalo de nuevo.");

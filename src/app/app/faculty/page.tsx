@@ -18,6 +18,7 @@ import {
   XCircle,
   Sparkles,
   CalendarDays,
+  Gift,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -82,6 +83,11 @@ export default async function EducatorDashboard() {
   const completedCount = checklist.filter(i => i.completed).length;
   const calculatedProgress = Math.round((completedCount / checklist.length) * 100);
   const isPublished = calculatedProgress >= 80;
+
+  const rawReferralStats = (facultyProfile?.referral_stats as Record<string, number>) || {};
+  const successfulReferrals = typeof rawReferralStats.successful_referrals === "number"
+    ? rawReferralStats.successful_referrals
+    : 0;
 
   return (
     <div className="space-y-10 animate-in fade-in duration-500 pb-20 lg:pb-0">
@@ -424,6 +430,35 @@ export default async function EducatorDashboard() {
                   className="inline-flex items-center gap-2 w-full justify-center bg-energy-orange hover:bg-orange-600 text-white font-black py-3 px-6 rounded-xl text-sm transition-colors"
                 >
                   <Sparkles size={15} /> Activar Plan Professional
+                </Link>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Referral widget — only when goal not yet reached */}
+          {successfulReferrals < 10 && (
+            <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden border border-dashed border-energy-orange/40">
+              <CardContent className="pt-4 pb-4 space-y-3">
+                <p className="text-[10px] font-black text-energy-orange uppercase tracking-widest">
+                  Programa de invitaciones
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-energy-orange rounded-full transition-all"
+                      style={{ width: `${Math.min(100, (successfulReferrals / 10) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-xs font-black text-navy whitespace-nowrap">
+                    {successfulReferrals}/10
+                  </span>
+                </div>
+                <Link
+                  href="/app/faculty/referrals"
+                  className="inline-flex items-center gap-1.5 text-xs font-black text-energy-orange hover:underline"
+                >
+                  <Gift size={12} />
+                  Ver mis invitaciones →
                 </Link>
               </CardContent>
             </Card>

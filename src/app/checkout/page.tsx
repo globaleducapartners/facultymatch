@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Lock, CreditCard, ArrowLeft, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
+import { ShieldCheck, Lock, CreditCard, ArrowLeft, CheckCircle2, AlertCircle, RefreshCw, ChevronDown, Tag } from "lucide-react";
 import type { PlanConfig } from "./plans";
 import { PLANS } from "./plans";
 import { createClient } from "@/lib/supabase-client";
@@ -24,6 +24,9 @@ function CheckoutContent() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoOpen, setPromoOpen] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
 
   useEffect(() => {
     // Pre-warm auth check
@@ -34,17 +37,21 @@ function CheckoutContent() {
   const handleCheckout = async () => {
     setLoading(true);
     setError(null);
+    setPromoError(null);
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: planId }),
+        body: JSON.stringify({ plan: planId, promoCode: promoCode.trim() || undefined }),
       });
       let data: any = {};
       try { data = await res.json(); } catch { /* non-JSON response */ }
       if (data.url) {
         window.location.href = data.url;
+      } else if (data.invalidPromoCode) {
+        setPromoError(data.error || 'Código de invitación no válido o ya utilizado.');
+        setLoading(false);
       } else {
         setError(data.error || `Error ${res.status}: No se pudo conectar con la pasarela de pago.`);
         setLoading(false);
@@ -155,6 +162,43 @@ function CheckoutContent() {
                   Serás redirigido a la pasarela segura de Stripe para completar el pago con tarjeta, Apple Pay o Google Pay. FacultyMatch nunca almacena datos de tarjeta.
                 </p>
               </div>
+            </div>
+
+            {/* Referral code — collapsible */}
+            <div className="border-t border-gray-100 pt-4 space-y-3">
+              <button
+                type="button"
+                onClick={() => { setPromoOpen(o => !o); setPromoError(null); }}
+                className="flex items-center gap-1.5 text-sm text-talentia-blue font-bold hover:underline"
+              >
+                <Tag size={14} />
+                ¿Tienes un código de invitación?
+                <ChevronDown
+                  size={14}
+                  className={`transition-transform duration-200 ${promoOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+              {promoOpen && (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={e => { setPromoCode(e.target.value.toUpperCase()); setPromoError(null); }}
+                    placeholder="INVITE-XXXXXXXX"
+                    className={`w-full h-11 px-4 rounded-xl border text-sm font-mono bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all ${
+                      promoError ? "border-red-300 ring-1 ring-red-200" : "border-gray-200"
+                    }`}
+                  />
+                  {promoError && (
+                    <p className="text-xs text-red-500 font-medium">{promoError}</p>
+                  )}
+                  {promoCode && !promoError && (
+                    <p className="text-xs text-green-600 font-medium flex items-center gap-1">
+                      <CheckCircle2 size={12} /> Código listo — se aplicará al pagar.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             {error && (

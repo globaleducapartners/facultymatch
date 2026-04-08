@@ -86,7 +86,47 @@ export async function GET(request: Request) {
     }
   }
 
-  // Step 4b: Try to pre-populate faculty_profiles from faculty_leads
+  // Step 4b: Save referral code for faculty users who registered via a referral link
+  if (user.user_metadata?.role === 'faculty' && user.user_metadata?.referral_code) {
+    try {
+      const code: string = user.user_metadata.referral_code;
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+      let referredBy: string | null = null;
+
+      if (uuidRegex.test(code)) {
+        // Personal referral link: the code is the referrer's user_id
+        referredBy = code;
+      } else {
+        // Email invite code (INVITE-XXXXXXXX): look up referrer_id in referrals table
+        const { data: referralRow } = await supabaseAdmin
+          .from('referrals')
+          .select('referrer_id')
+          .eq('code', code)
+          .maybeSingle();
+        referredBy = referralRow?.referrer_id || null;
+
+        // Update referral status to 'registered'
+        if (referralRow) {
+          await supabaseAdmin
+            .from('referrals')
+            .update({ status: 'registered' })
+            .eq('code', code);
+        }
+      }
+
+      // Only set once (don't overwrite if already redeemed)
+      await supabaseAdmin
+        .from('faculty_profiles')
+        .update({ referral_code_redeemed: code, referred_by: referredBy })
+        .eq('user_id', user.id)
+        .is('referral_code_redeemed', null);
+    } catch (e) {
+      console.warn('[callback] referral code save failed:', e);
+    }
+  }
+
+  // Step 4c: Try to pre-populate faculty_profiles from faculty_leads
   // (only for old /apply magic-link users — skip for new /signup/faculty users
   //  to avoid overwriting onboarding_completed with false)
   try {

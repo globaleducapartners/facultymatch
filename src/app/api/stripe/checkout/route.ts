@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No autenticado. Inicia sesión para continuar.' }, { status: 401 });
     }
 
-    const { plan } = await req.json();
+    const { plan, promoCode } = await req.json();
 
     const priceId = PRICE_IDS[plan];
     if (!priceId) {
@@ -32,6 +32,22 @@ export async function POST(req: NextRequest) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.facultymatch.app';
     const dashboardPath = plan.startsWith('faculty') ? 'faculty' : 'institution';
 
+    // Resolve promo code to a Stripe promotion_code ID
+    let discounts: { promotion_code: string }[] = [];
+    if (promoCode) {
+      const codes = await stripe.promotionCodes.list({
+        code: promoCode.trim(),
+        active: true,
+      });
+      if (codes.data.length === 0) {
+        return NextResponse.json(
+          { error: `El código "${promoCode}" no es válido o ya ha sido utilizado.`, invalidPromoCode: true },
+          { status: 400 }
+        );
+      }
+      discounts = [{ promotion_code: codes.data[0].id }];
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -41,6 +57,7 @@ export async function POST(req: NextRequest) {
       success_url: `${siteUrl}/app/${dashboardPath}?upgrade=success`,
       cancel_url: `${siteUrl}/checkout?plan=${plan}`,
       locale: 'es',
+      ...(discounts.length > 0 ? { discounts } : {}),
     });
 
     return NextResponse.json({ url: session.url });
