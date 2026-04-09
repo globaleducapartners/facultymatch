@@ -642,6 +642,17 @@ export async function saveInstitutionOnboarding(formData: FormData) {
 
   if (!name?.trim()) return { error: "El nombre de la institución es obligatorio." };
 
+  // Check for duplicate institution name (different user) — soft warning only
+  const { data: existingByName } = await admin
+    .from("institutions")
+    .select("id, user_id")
+    .ilike("name", name.trim())
+    .neq("user_id", user.id)
+    .maybeSingle();
+  const duplicateWarning = existingByName
+    ? "Ya existe una institución con este nombre registrada por otra cuenta. Si crees que es un error, contacta con soporte@facultymatch.app."
+    : undefined;
+
   const { error: instError } = await admin
     .from("institutions")
     .upsert({
@@ -670,7 +681,7 @@ export async function saveInstitutionOnboarding(formData: FormData) {
   }
 
   revalidatePath("/app/institution");
-  return { success: true };
+  return { success: true, warning: duplicateWarning };
 }
 
 export async function assignRole(role: "faculty" | "institution") {

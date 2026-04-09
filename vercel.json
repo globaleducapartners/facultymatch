@@ -1,5 +1,11 @@
 {
   "framework": "nextjs",
   "buildCommand": "next build",
-  "installCommand": "bun install"
+  "installCommand": "bun install",
+  "crons": [
+    {
+      "path": "/api/referrals/expiry-reminder",
+      "schedule": "0 9 * * *"
+    }
+  ]
 }

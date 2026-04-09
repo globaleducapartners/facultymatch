@@ -74,8 +74,12 @@ export default function InstitutionOnboardingClient({
       return;
     }
 
+    if (result?.warning) {
+      toast.warning(result.warning, { duration: 8000 });
+    } else {
       toast.success("¡Perfil institucional creado!");
-      window.location.href = "/app/institution";
+    }
+    window.location.href = "/app/institution";
     };
 
   const initials = contactName

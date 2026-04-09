@@ -1,6 +1,6 @@
 import { ApproveButtons } from "./ApproveButtons";
 import { createAdminClient } from "@/lib/supabase-server";
-import { Building2, Globe, Mail, Phone, MapPin, Calendar, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Building2, Globe, Mail, Phone, MapPin, Calendar, CheckCircle2, XCircle, Clock, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 async function toggleInstitutionStatus(formData: FormData) {
@@ -12,6 +12,17 @@ async function toggleInstitutionStatus(formData: FormData) {
   const currentStatus = formData.get("currentStatus") as string;
   const newStatus = currentStatus === "blocked" ? "active" : "blocked";
   await admin.from("institutions").update({ status: newStatus }).eq("id", id);
+  revalidatePath("/control/institutions");
+}
+
+async function deleteInstitution(formData: FormData) {
+  "use server";
+  const { createAdminClient } = await import("@/lib/supabase-server");
+  const { revalidatePath } = await import("next/cache");
+  const admin = createAdminClient();
+  const id = formData.get("id") as string;
+  // Delete from auth.users — cascades to user_profiles → institutions → contacts/favorites
+  await admin.auth.admin.deleteUser(id);
   revalidatePath("/control/institutions");
 }
 
@@ -247,6 +258,18 @@ export default async function ControlInstitutionsPage() {
                           }`}
                         >
                           {inst.status === "blocked" ? "Reactivar" : "Bloquear"}
+                        </button>
+                      </form>
+                      <form action={deleteInstitution} onSubmit={(e) => {
+                        if (!confirm(`¿Eliminar permanentemente "${inst.name}"? Esta acción no se puede deshacer.`)) e.preventDefault();
+                      }}>
+                        <input type="hidden" name="id" value={inst.id} />
+                        <button
+                          type="submit"
+                          className="text-xs font-bold p-2 rounded-xl transition-colors bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 border border-gray-100"
+                          title="Eliminar institución (duplicada o inválida)"
+                        >
+                          <Trash2 size={14} />
                         </button>
                       </form>
                     </div>
