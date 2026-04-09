@@ -62,8 +62,7 @@ function ConfirmContent() {
 
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
             <p className="text-sm font-medium text-navy leading-relaxed">
-              Una vez confirmado, tus datos ya estarán en tu dashboard.
-              No tendrás que rellenar nada más.
+              Una vez confirmado tu email, podrás acceder y completar tu perfil.
             </p>
           </div>
 
