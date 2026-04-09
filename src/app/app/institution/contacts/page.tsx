@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient } from "@/lib/supabase-server";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,9 @@ export default async function ContactsPage() {
     .eq("user_id", user!.id)
     .single();
 
-  const { data: contacts } = await supabase
+  // Use admin to bypass RLS (institution_id ≠ auth.uid() — it's the institution record ID)
+  const admin = createAdminClient();
+  const { data: contacts } = await admin
     .from("contacts")
     .select("*, faculty_profiles!faculty_id(headline, avatar_url, user_id)")
     .eq("institution_id", institution?.id)
@@ -24,7 +26,7 @@ export default async function ContactsPage() {
   // Obtener nombres de docentes por separado
   const userIds = contacts?.map((c: any) => c.faculty_profiles?.user_id).filter(Boolean) ?? [];
   const { data: userProfiles } = userIds.length > 0
-    ? await supabase.from("user_profiles").select("id, full_name").in("id", userIds)
+    ? await admin.from("user_profiles").select("id, full_name").in("id", userIds)
     : { data: [] };
   const nameMap: Record<string, string> = {};
   (userProfiles ?? []).forEach((u: any) => { nameMap[u.id] = u.full_name; });

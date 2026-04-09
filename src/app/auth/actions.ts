@@ -507,8 +507,21 @@ export async function contactFaculty(formData: FormData) {
 
 export async function toggleFavorite(facultyId: string, institutionId: string) {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'No autenticado' };
 
-  const { data: existing } = await supabase
+  // Use admin to bypass RLS (institution_id ≠ auth.uid() — it's the institution record ID)
+  // Validate ownership first: the institutionId must belong to this user
+  const admin = createAdminClient();
+  const { data: ownedInstitution } = await admin
+    .from("institutions")
+    .select("id")
+    .eq("id", institutionId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (!ownedInstitution) return { error: 'No autorizado' };
+
+  const { data: existing } = await admin
     .from("favorites")
     .select("id")
     .eq("faculty_id", facultyId)
@@ -516,7 +529,7 @@ export async function toggleFavorite(facultyId: string, institutionId: string) {
     .maybeSingle();
 
   if (existing) {
-    const { error } = await supabase
+    const { error } = await admin
       .from("favorites")
       .delete()
       .eq("id", existing.id);
@@ -524,7 +537,7 @@ export async function toggleFavorite(facultyId: string, institutionId: string) {
     revalidatePath("/app/institution/favorites");
     return { success: true, action: 'removed' };
   } else {
-    const { error } = await supabase
+    const { error } = await admin
       .from("favorites")
       .insert({
         faculty_id: facultyId,

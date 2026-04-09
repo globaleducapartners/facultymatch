@@ -69,15 +69,16 @@ export default async function InstitutionSearchRoute({
     }
   }
 
-  // Fetch favorites
-  const { data: favoritesData } = await supabase
+  // Fetch favorites — use admin to bypass RLS (institution_id ≠ auth.uid())
+  const { data: favoritesData } = await admin
     .from("favorites")
     .select("faculty_id")
     .eq("institution_id", institution.id);
 
   const favorites = favoritesData?.map(f => f.faculty_id) || [];
 
-  const { count: contactsCount } = await supabase
+  // Use admin for contacts counts (RLS: institution_id ≠ auth.uid())
+  const { count: contactsCount } = await admin
     .from("contacts")
     .select("*", { count: "exact", head: true })
     .eq("institution_id", institution.id);
@@ -87,7 +88,7 @@ export default async function InstitutionSearchRoute({
   const nextMonthStr = monthNum === 12
     ? `${year + 1}-01-01`
     : `${year}-${String(monthNum + 1).padStart(2, '0')}-01`;
-  const { count: monthlyContactsUsed } = await supabase
+  const { count: monthlyContactsUsed } = await admin
     .from("contacts")
     .select("*", { count: "exact", head: true })
     .eq("institution_id", institution.id)
