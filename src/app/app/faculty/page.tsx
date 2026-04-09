@@ -70,12 +70,14 @@ export default async function EducatorDashboard() {
     .order("created_at", { ascending: false })
     .limit(3);
 
-  const { count: expertiseCount } = await supabase
+  const { data: expertiseData } = await supabase
     .from("faculty_expertise")
-    .select("*", { count: "exact", head: true })
-    .eq("faculty_id", user.id);
+    .select("id")
+    .eq("faculty_id", user.id)
+    .limit(1);
+  const hasExpertise = (expertiseData?.length ?? 0) > 0;
 
-  const hasAreas = (expertiseCount ?? 0) > 0 || (facultyProfile?.faculty_areas || []).length > 0;
+  const hasAreas = hasExpertise || (facultyProfile?.faculty_areas || []).length > 0;
 
   // Checklist logic enriched
   const checklist = [

@@ -38,9 +38,16 @@ export default async function VerificationPage() {
   const verificationStatus = userProfile?.verification_status || "pending";
   const verificationNotes = userProfile?.verification_notes;
 
+  const { data: expertiseData } = await supabase
+    .from("faculty_expertise")
+    .select("id")
+    .eq("faculty_id", user.id)
+    .limit(1);
+  const hasExpertise = (expertiseData?.length ?? 0) > 0;
+
   const hasIdDocument = (documents?.length ?? 0) > 0;
   const hasLanguages = (facultyProfile?.languages?.length ?? 0) > 0;
-  const hasAreas = (facultyProfile?.faculty_areas?.length ?? 0) > 0;
+  const hasAreas = hasExpertise || (facultyProfile?.faculty_areas?.length ?? 0) > 0;
 
   const steps = [
     {
