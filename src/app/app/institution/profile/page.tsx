@@ -11,7 +11,12 @@ import { InstitutionLogoUpload } from "@/components/dashboard/InstitutionLogoUpl
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || "FacultyMatch <noreply@facultymatch.app>";
 
-export default async function InstitutionProfilePage() {
+export default async function InstitutionProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string }>;
+}) {
+  const { saved } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -140,6 +145,7 @@ export default async function InstitutionProfilePage() {
 
     revalidatePath("/app/institution/profile");
     revalidatePath("/app/institution");
+    redirect("/app/institution/profile?saved=1");
   }
 
   const fields = [
@@ -154,6 +160,11 @@ export default async function InstitutionProfilePage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      {saved === "1" && (
+        <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
+          ✓ Cambios guardados correctamente
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
