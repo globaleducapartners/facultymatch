@@ -19,9 +19,10 @@ interface ContactModalProps {
   facultyId: string;
   facultyName: string;
   institutionId: string;
+  onSuccess?: () => void;
 }
 
-export function ContactModal({ isOpen, onClose, facultyId, facultyName, institutionId }: ContactModalProps) {
+export function ContactModal({ isOpen, onClose, facultyId, facultyName, institutionId, onSuccess }: ContactModalProps) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +50,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
     } else {
       setSuccess(true);
       setLoading(false);
+      if (onSuccess) onSuccess();
       setTimeout(() => {
         onClose();
         setSuccess(false);

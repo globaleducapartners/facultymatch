@@ -82,6 +82,18 @@ export default async function InstitutionSearchRoute({
     .select("*", { count: "exact", head: true })
     .eq("institution_id", institution.id);
 
+  // Monthly contacts count for free plan limit (2/month)
+  const [year, monthNum] = currentMonth.split('-').map(Number);
+  const nextMonthStr = monthNum === 12
+    ? `${year + 1}-01-01`
+    : `${year}-${String(monthNum + 1).padStart(2, '0')}-01`;
+  const { count: monthlyContactsUsed } = await supabase
+    .from("contacts")
+    .select("*", { count: "exact", head: true })
+    .eq("institution_id", institution.id)
+    .gte("created_at", `${currentMonth}-01`)
+    .lt("created_at", nextMonthStr);
+
   // Faculty who have blocked this institution — check both institution_id and institution_name
   const [{ data: blockedById }, { data: blockedByName }] = await Promise.all([
     admin
@@ -191,6 +203,7 @@ export default async function InstitutionSearchRoute({
         initialFavorites={favorites}
         isPro={isPro}
         searchLimitReached={searchLimitReached}
+        monthlyContactsUsed={monthlyContactsUsed ?? 0}
       />
     </>
   );

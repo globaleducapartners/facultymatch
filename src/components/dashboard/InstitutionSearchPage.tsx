@@ -29,6 +29,8 @@ import { toast } from "sonner";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+const FREE_CONTACTS_LIMIT = 2;
+
 interface InstitutionSearchPageProps {
   initialEducators: any[];
   institutionId: string;
@@ -36,6 +38,7 @@ interface InstitutionSearchPageProps {
   initialFavorites: string[];
   isPro: boolean;
   searchLimitReached: boolean;
+  monthlyContactsUsed: number;
 }
 
 // ─── Filter chip helpers ──────────────────────────────────────────────────────
@@ -80,6 +83,7 @@ export function InstitutionSearchPage({
   initialFavorites,
   isPro,
   searchLimitReached,
+  monthlyContactsUsed,
 }: InstitutionSearchPageProps) {
   // Open drawer from URL param on first render
   const [selectedId, setSelectedId] = useState<string | null>(() => {
@@ -90,6 +94,9 @@ export function InstitutionSearchPage({
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [favorites, setFavorites] = useState<string[]>(initialFavorites || []);
   const [showMoreFilters, setShowMoreFilters] = useState(false);
+  const [usedContacts, setUsedContacts] = useState(monthlyContactsUsed);
+
+  const canContact = isPro || usedContacts < FREE_CONTACTS_LIMIT;
 
   const selectedEducator = initialEducators.find((e) => e.id === selectedId);
 
@@ -458,37 +465,49 @@ export function InstitutionSearchPage({
               <div className="flex-1 overflow-y-auto">
                 <div className="p-6 space-y-6">
                   {/* Actions */}
-                  <div className="flex gap-3">
-                    {isPro ? (
+                  <div className="space-y-2">
+                    <div className="flex gap-3">
+                      {canContact ? (
+                        <Button
+                          onClick={() => setIsContactModalOpen(true)}
+                          className="flex-1 bg-energy-orange hover:bg-orange-600 text-white font-bold h-11 rounded-xl shadow-lg shadow-orange-100"
+                        >
+                          <Mail size={16} className="mr-2" /> Enviar propuesta
+                        </Button>
+                      ) : (
+                        <Link
+                          href="/app/institution/billing"
+                          className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold h-11 rounded-xl transition-colors text-sm"
+                        >
+                          <Lock size={15} /> Actualiza a Pro para más contactos
+                        </Link>
+                      )}
                       <Button
-                        onClick={() => setIsContactModalOpen(true)}
-                        className="flex-1 bg-energy-orange hover:bg-orange-600 text-white font-bold h-11 rounded-xl shadow-lg shadow-orange-100"
+                        variant="outline"
+                        size="icon"
+                        onClick={(e) => handleToggleFavorite(e, selectedEducator.id)}
+                        className={`h-11 w-11 rounded-xl flex-shrink-0 transition-all ${
+                          favorites.includes(selectedEducator.id)
+                            ? "text-energy-orange bg-orange-50 border-orange-100"
+                            : "text-gray-400 border-gray-200 hover:text-energy-orange hover:bg-orange-50"
+                        }`}
                       >
-                        <Mail size={16} className="mr-2" /> Enviar propuesta
+                        <Star
+                          size={18}
+                          className={favorites.includes(selectedEducator.id) ? "fill-current" : ""}
+                        />
                       </Button>
-                    ) : (
-                      <Link
-                        href="/app/institution/billing"
-                        className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold h-11 rounded-xl transition-colors text-sm"
-                      >
-                        <Lock size={15} /> Activa Pro para contactar
-                      </Link>
+                    </div>
+                    {!isPro && usedContacts < FREE_CONTACTS_LIMIT && (
+                      <p className="text-xs text-gray-400 text-center">
+                        {usedContacts} de {FREE_CONTACTS_LIMIT} contactos gratuitos usados este mes
+                      </p>
                     )}
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={(e) => handleToggleFavorite(e, selectedEducator.id)}
-                      className={`h-11 w-11 rounded-xl flex-shrink-0 transition-all ${
-                        favorites.includes(selectedEducator.id)
-                          ? "text-energy-orange bg-orange-50 border-orange-100"
-                          : "text-gray-300 border-gray-100 hover:text-energy-orange hover:bg-orange-50"
-                      }`}
-                    >
-                      <Star
-                        size={18}
-                        className={favorites.includes(selectedEducator.id) ? "fill-current" : ""}
-                      />
-                    </Button>
+                    {!isPro && usedContacts >= FREE_CONTACTS_LIMIT && (
+                      <p className="text-xs text-amber-500 text-center font-medium">
+                        Límite mensual alcanzado · <Link href="/app/institution/billing" className="underline">Actualiza a Pro</Link>
+                      </p>
+                    )}
                   </div>
 
                   {/* Basic info */}
@@ -587,14 +606,15 @@ export function InstitutionSearchPage({
         </SheetContent>
       </Sheet>
 
-      {/* Contact modal (Pro only) */}
-      {selectedEducator && isPro && (
+      {/* Contact modal */}
+      {selectedEducator && canContact && (
         <ContactModal
           isOpen={isContactModalOpen}
           onClose={() => setIsContactModalOpen(false)}
           facultyId={selectedEducator.id}
           facultyName={selectedEducator.full_name}
           institutionId={institutionId}
+          onSuccess={() => setUsedContacts((n) => n + 1)}
         />
       )}
     </div>
