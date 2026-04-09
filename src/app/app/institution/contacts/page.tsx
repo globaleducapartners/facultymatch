@@ -17,19 +17,34 @@ export default async function ContactsPage() {
 
   // Use admin to bypass RLS (institution_id ≠ auth.uid() — it's the institution record ID)
   const admin = createAdminClient();
+
+  // Simple select without FK join — joins were failing because faculty_profiles
+  // shares its id with user_profiles (no separate user_id / avatar_url columns)
   const { data: contacts } = await admin
     .from("contacts")
-    .select("*, faculty_profiles!faculty_id(headline, avatar_url, user_id)")
+    .select("*")
     .eq("institution_id", institution?.id)
-    .order('created_at', { ascending: false });
+    .order("created_at", { ascending: false });
 
-  // Obtener nombres de docentes por separado
-  const userIds = contacts?.map((c: any) => c.faculty_profiles?.user_id).filter(Boolean) ?? [];
-  const { data: userProfiles } = userIds.length > 0
-    ? await admin.from("user_profiles").select("id, full_name").in("id", userIds)
-    : { data: [] };
-  const nameMap: Record<string, string> = {};
-  (userProfiles ?? []).forEach((u: any) => { nameMap[u.id] = u.full_name; });
+  // faculty_profiles.id === user_profiles.id === contacts.faculty_id
+  const facultyIds = contacts?.map((c: any) => c.faculty_id).filter(Boolean) ?? [];
+
+  const [{ data: facultyUsers }, { data: facultyProfiles }] = await Promise.all([
+    facultyIds.length > 0
+      ? admin.from("user_profiles").select("id, full_name, avatar_url").in("id", facultyIds)
+      : Promise.resolve({ data: [] as any[] }),
+    facultyIds.length > 0
+      ? admin.from("faculty_profiles").select("id, headline").in("id", facultyIds)
+      : Promise.resolve({ data: [] as any[] }),
+  ]);
+
+  const facultyMap: Record<string, { full_name: string; avatar_url: string | null; headline: string }> = {};
+  (facultyUsers ?? []).forEach((u: any) => {
+    facultyMap[u.id] = { full_name: u.full_name ?? "Docente", avatar_url: u.avatar_url ?? null, headline: "" };
+  });
+  (facultyProfiles ?? []).forEach((fp: any) => {
+    if (facultyMap[fp.id]) facultyMap[fp.id].headline = fp.headline ?? "";
+  });
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto">
@@ -46,29 +61,30 @@ export default async function ContactsPage() {
       {contacts && contacts.length > 0 ? (
         <div className="grid gap-4">
           {contacts.map((contact: any) => {
-            const fp = contact.faculty_profiles;
-            const fullName = fp?.user_id ? nameMap[fp.user_id] : null;
-            const isSent = contact.status === 'sent' || contact.status === 'pending';
+            const faculty = facultyMap[contact.faculty_id];
+            const isSent = contact.status === "sent" || contact.status === "pending";
             return (
               <div key={contact.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="w-16 h-16 bg-talentia-blue/10 text-talentia-blue rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden">
-                    {fp?.avatar_url ? (
-                      <Image src={fp.avatar_url} alt="Avatar" fill sizes="64px" className="object-cover" />
+                    {faculty?.avatar_url ? (
+                      <Image src={faculty.avatar_url} alt="Avatar" fill sizes="64px" className="object-cover" />
                     ) : (
-                      <span className="text-xl font-black">{fullName?.substring(0, 2).toUpperCase() ?? "?"}</span>
+                      <span className="text-xl font-black">
+                        {faculty?.full_name?.substring(0, 2).toUpperCase() ?? "?"}
+                      </span>
                     )}
                   </div>
                   <div className="flex-1 space-y-4">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div>
-                        <h3 className="text-lg font-bold text-navy">{fullName ?? "Docente"}</h3>
-                        <p className="text-sm font-medium text-gray-500">{fp?.headline}</p>
+                        <h3 className="text-lg font-bold text-navy">{faculty?.full_name ?? "Docente"}</h3>
+                        <p className="text-sm font-medium text-gray-500">{faculty?.headline}</p>
                       </div>
-                      <Badge className={`${isSent ? 'bg-blue-50 text-blue-600' : contact.status === 'replied' ? 'bg-green-50 text-green-600' : 'bg-gray-50 text-gray-600'} border-none px-4 py-1.5 rounded-full text-xs font-bold`}>
+                      <Badge className={`${isSent ? "bg-blue-50 text-blue-600" : contact.status === "replied" ? "bg-green-50 text-green-600" : "bg-gray-50 text-gray-600"} border-none px-4 py-1.5 rounded-full text-xs font-bold`}>
                         {isSent && <Clock size={14} className="mr-1.5 inline" />}
-                        {contact.status === 'replied' && <CheckCircle2 size={14} className="mr-1.5 inline" />}
-                        {isSent ? 'Enviada' : contact.status === 'replied' ? 'Respondida' : 'Archivada'}
+                        {contact.status === "replied" && <CheckCircle2 size={14} className="mr-1.5 inline" />}
+                        {isSent ? "Enviada" : contact.status === "replied" ? "Respondida" : "Archivada"}
                       </Badge>
                     </div>
                     <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 space-y-3">
@@ -77,10 +93,12 @@ export default async function ContactsPage() {
                         {contact.modality && <span className="flex items-center gap-1.5"><MapPin size={14} className="text-talentia-blue" />{contact.modality}</span>}
                         {contact.dates && <span className="flex items-center gap-1.5"><Calendar size={14} className="text-talentia-blue" />{contact.dates}</span>}
                       </div>
-                      {contact.message && <p className="text-gray-600 text-sm italic leading-relaxed">"{contact.message}"</p>}
+                      {contact.message && (
+                        <p className="text-gray-600 text-sm italic leading-relaxed">"{contact.message}"</p>
+                      )}
                     </div>
                     <div className="flex justify-end text-xs font-medium text-gray-400">
-                      Enviada el {new Date(contact.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      Enviada el {new Date(contact.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}
                     </div>
                   </div>
                 </div>
@@ -92,9 +110,11 @@ export default async function ContactsPage() {
         <div className="bg-white p-20 rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center text-center">
           <div className="bg-blue-50 p-6 rounded-full text-talentia-blue mb-6"><Mail size={48} /></div>
           <h3 className="text-xl font-bold text-navy mb-2">No has enviado contactos aún</h3>
-          <p className="text-gray-500 max-w-xs mx-auto font-medium">Cuando encuentres un docente que encaje con tu programa, podrás contactarle directamente desde aquí.</p>
+          <p className="text-gray-500 max-w-xs mx-auto font-medium">
+            Cuando encuentres un docente que encaje con tu programa, podrás contactarle directamente desde aquí.
+          </p>
           <Button asChild className="mt-8 bg-talentia-blue hover:bg-blue-700 text-white font-bold h-12 rounded-xl px-8">
-            <Link href="/app/institution">Buscar docentes</Link>
+            <Link href="/app/institution/search">Buscar docentes</Link>
           </Button>
         </div>
       )}
