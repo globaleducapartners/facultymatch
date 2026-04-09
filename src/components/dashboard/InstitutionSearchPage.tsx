@@ -556,7 +556,7 @@ export function InstitutionSearchPage({
                               return label ? (
                                 <Badge
                                   key={exp.id ?? label}
-                                  className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold max-w-[200px] truncate"
+                                  className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold whitespace-normal break-words"
                                 >
                                   {label}
                                 </Badge>
@@ -568,7 +568,7 @@ export function InstitutionSearchPage({
                               return label ? (
                                 <Badge
                                   key={label}
-                                  className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold max-w-[200px] truncate"
+                                  className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold whitespace-normal break-words"
                                 >
                                   {label}
                                 </Badge>
