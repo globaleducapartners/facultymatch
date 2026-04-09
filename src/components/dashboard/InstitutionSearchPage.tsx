@@ -546,17 +546,16 @@ export function InstitutionSearchPage({
                       <div className="flex flex-wrap gap-2">
                         {selectedEducator.expertise?.length > 0
                           ? selectedEducator.expertise.map((exp: any) => {
-                              const areaLabel =
-                                typeof exp.area === "string" ? exp.area : (exp.area?.name ?? "");
-                              const subareaLabel =
-                                typeof exp.subarea === "string"
-                                  ? exp.subarea
-                                  : (exp.subarea?.name ?? exp.level ?? "");
+                              if (!exp) return null;
+                              const areaLabel = typeof exp.area === "string" ? exp.area : "";
+                              const subareaLabel = typeof exp.subarea === "string"
+                                ? exp.subarea
+                                : (exp.level ?? "");
                               const label = [areaLabel, subareaLabel].filter(Boolean).join(": ");
                               return label ? (
                                 <Badge
                                   key={exp.id ?? label}
-                                  className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold whitespace-normal break-words"
+                                  className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold"
                                 >
                                   {label}
                                 </Badge>
@@ -568,7 +567,7 @@ export function InstitutionSearchPage({
                               return label ? (
                                 <Badge
                                   key={label}
-                                  className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold whitespace-normal break-words"
+                                  className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold"
                                 >
                                   {label}
                                 </Badge>
@@ -582,14 +581,6 @@ export function InstitutionSearchPage({
 
               {/* Footer */}
               <div className="p-5 border-t border-gray-100 flex-shrink-0 bg-gray-50/50">
-                <Button variant="outline" asChild className="w-full rounded-2xl border-gray-200 bg-white font-bold h-11">
-                  <Link
-                    href={`/app/faculty/${selectedEducator.id}`}
-                    className="flex items-center justify-center gap-2"
-                  >
-                    Ver perfil completo <ExternalLink size={15} />
-                  </Link>
-                </Button>
               </div>
             </>
           )}
