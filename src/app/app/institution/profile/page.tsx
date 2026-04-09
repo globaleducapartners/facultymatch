@@ -77,12 +77,10 @@ export default async function InstitutionProfilePage({
     const modality = formData.get("modality") as string;
     const cityCountry = [city, country].filter(Boolean).join(", ");
 
-    // Use admin client to bypass RLS on institutions table
-    const admin = createAdminClient();
-    const { data: existing } = await admin.from("institutions").select("id").eq("user_id", user.id).maybeSingle();
+    const { data: existing } = await supabase.from("institutions").select("id").eq("user_id", user.id).maybeSingle();
 
     if (existing) {
-      await admin.from("institutions").update({
+      await supabase.from("institutions").update({
         name, description, country, city,
         location: cityCountry || null,
         website, phone,
@@ -96,7 +94,7 @@ export default async function InstitutionProfilePage({
         updated_at: new Date().toISOString(),
       }).eq("user_id", user.id);
     } else {
-      await admin.from("institutions").insert({
+      await supabase.from("institutions").insert({
         user_id: user.id,
         name, description, country, city,
         location: cityCountry || null,
