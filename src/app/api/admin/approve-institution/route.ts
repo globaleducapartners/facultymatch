@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   // "active" on approve so the institution appears correctly in all stats/badges
   const newStatus = action === "approve" ? "active" : "rejected";
   const { error } = await admin.from("institutions")
-    .update({ status: newStatus, verified_at: action === "approve" ? new Date().toISOString() : null })
+    .update({ status: newStatus, verified: action === "approve" ? true : false, verified_at: action === "approve" ? new Date().toISOString() : null })
     .eq("id", institutionId);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
