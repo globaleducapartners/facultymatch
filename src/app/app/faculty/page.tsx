@@ -70,10 +70,17 @@ export default async function EducatorDashboard() {
     .order("created_at", { ascending: false })
     .limit(3);
 
+  const { count: expertiseCount } = await supabase
+    .from("faculty_expertise")
+    .select("*", { count: "exact", head: true })
+    .eq("faculty_id", user.id);
+
+  const hasAreas = (expertiseCount ?? 0) > 0 || (facultyProfile?.faculty_areas || []).length > 0;
+
   // Checklist logic enriched
   const checklist = [
     { id: 'info', label: "Titular y ubicación", completed: !!facultyProfile?.headline && !!facultyProfile?.location },
-    { id: 'areas', label: "Áreas de conocimiento", completed: (facultyProfile?.faculty_areas || []).length > 0 },
+    { id: 'areas', label: "Áreas de conocimiento", completed: hasAreas },
     { id: 'langs', label: "Idiomas", completed: (facultyProfile?.languages || []).length > 0 },
     { id: 'history', label: "Historial docente", completed: (facultyProfile?.institutions_taught || []).length > 0 },
     { id: 'bio', label: "Biografía profesional", completed: !!facultyProfile?.bio },
