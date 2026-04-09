@@ -124,8 +124,7 @@ export default async function ProfilePage({
     if (!user) return;
 
     await supabase.from("faculty_profiles")
-      .upsert({
-        id: user.id, user_id: user.id,
+      .update({
         current_institution: currentInstitution,
         years_experience: yearsExperience,
         availability,
@@ -133,7 +132,7 @@ export default async function ProfilePage({
         academic_level: academicLevel,
         institutions_taught: institutionsTaught,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "id" });
+      }).eq("id", user.id);
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -150,7 +149,7 @@ export default async function ProfilePage({
     if (!user) return;
 
     await supabase.from("faculty_profiles")
-      .upsert({ id: user.id, user_id: user.id, degrees, updated_at: new Date().toISOString() }, { onConflict: "id" });
+      .update({ degrees, updated_at: new Date().toISOString() }).eq("id", user.id);
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -167,7 +166,7 @@ export default async function ProfilePage({
     if (!user) return;
 
     await supabase.from("faculty_profiles")
-      .upsert({ id: user.id, user_id: user.id, languages, updated_at: new Date().toISOString() }, { onConflict: "id" });
+      .update({ languages, updated_at: new Date().toISOString() }).eq("id", user.id);
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -191,14 +190,13 @@ export default async function ProfilePage({
     if (!user) return;
 
     await supabase.from("faculty_profiles")
-      .upsert({
-        id: user.id, user_id: user.id,
+      .update({
         aneca_accreditation: anecaAccreditation,
         research_publications: researchPublications,
         google_scholar_id: googleScholarId,
         orcid_id: orcidId,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "id" });
+      }).eq("id", user.id);
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -216,13 +214,12 @@ export default async function ProfilePage({
     if (!user) return;
 
     await supabase.from("faculty_profiles")
-      .upsert({
-        id: user.id, user_id: user.id,
+      .update({
         linkedin_url: linkedinUrl || null,
         website: website || null,
         phone: phone || null,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "id" });
+      }).eq("id", user.id);
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -243,8 +240,7 @@ export default async function ProfilePage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase.from("faculty_profiles").upsert({
-      id: user.id, user_id: user.id,
+    await supabase.from("faculty_profiles").update({
       contact_email: contactEmail || null,
       contact_whatsapp: contactWhatsapp || null,
       contact_linkedin: contactLinkedin || null,
@@ -252,7 +248,8 @@ export default async function ProfilePage({
       notify_messages: notifyMessages,
       notify_weekly_digest: notifyWeeklyDigest,
       preferred_contact_method: preferredContact,
-    }, { onConflict: "id" });
+      updated_at: new Date().toISOString(),
+    }).eq("id", user.id);
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
