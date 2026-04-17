@@ -47,6 +47,16 @@
   --color-talentia-blue: #2563EB;
   --color-tech-cyan: #06B6D4;
   --color-energy-orange: #F97316;
+
+  /* FacultyMatch design system */
+  --color-fm-ink:    #0C1018;
+  --color-fm-navy:   #0D2240;
+  --color-fm-brass:  #B8963E;
+  --color-fm-cream:  #F7F5F0;
+  --color-fm-paper:  #FDFCF9;
+  --color-fm-border: #E5E1D8;
+  --color-fm-muted:  #6B7280;
+  --color-fm-faint:  #9CA3AF;
 }
 
 :root {
