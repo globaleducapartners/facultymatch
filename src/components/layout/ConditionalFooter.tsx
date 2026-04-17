@@ -6,10 +6,11 @@ import { Footer } from "./Footer";
 export function ConditionalFooter() {
   const pathname = usePathname();
   
-  // Do not show global footer on app/dashboard or auth pages
-    const hideFooter = 
-      pathname?.startsWith("/app") || 
-      pathname?.startsWith("/login") || 
+  // Do not show global footer on app/dashboard, auth pages, or landing (has own footer)
+    const hideFooter =
+      pathname === "/" ||
+      pathname?.startsWith("/app") ||
+      pathname?.startsWith("/login") ||
       pathname?.startsWith("/signup") ||
       pathname?.startsWith("/auth") ||
       pathname?.startsWith("/onboarding");
