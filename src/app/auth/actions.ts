@@ -814,3 +814,13 @@ function buildSupportNotification(
 </table></td></tr></table>
 </body></html>`;
 }
+
+export async function switchActiveMode(formData: FormData) {
+  const newMode = formData.get("mode") as "faculty" | "institution";
+  if (!newMode) return;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase.from("user_profiles").update({ active_mode: newMode }).eq("id", user.id);
+  redirect(newMode === "faculty" ? "/app/faculty" : "/app/institution");
+}

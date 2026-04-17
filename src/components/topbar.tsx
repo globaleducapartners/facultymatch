@@ -10,6 +10,7 @@ import {
   Building2,
   MessageSquare,
   CheckCheck,
+  GraduationCap,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -19,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { signOut } from "@/app/auth/actions";
+import { signOut, switchActiveMode } from "@/app/auth/actions";
 import { createBrowserClient } from "@supabase/ssr";
 
 interface TopbarProps {
@@ -32,6 +33,8 @@ interface TopbarProps {
     avatar_url?: string;
     role?: string;
     aneca_accreditation?: string;
+    can_switch_role?: boolean;
+    active_mode?: string | null;
   } | null;
 }
 
@@ -146,6 +149,40 @@ export function Topbar({ user, profile }: TopbarProps) {
           </span>
         </Link>
       </div>
+
+      {/* ── Role switcher (dual-role users only) ── */}
+      {profile?.can_switch_role && (
+        <div className="hidden md:flex items-center bg-gray-100 rounded-xl p-1 gap-0.5">
+          <form action={switchActiveMode}>
+            <input type="hidden" name="mode" value="faculty" />
+            <button
+              type="submit"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                profile.active_mode === "faculty"
+                  ? "bg-white text-navy shadow-sm"
+                  : "text-gray-500 hover:text-gray-800"
+              }`}
+            >
+              <GraduationCap size={13} />
+              Modo docente
+            </button>
+          </form>
+          <form action={switchActiveMode}>
+            <input type="hidden" name="mode" value="institution" />
+            <button
+              type="submit"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                profile.active_mode === "institution"
+                  ? "bg-white text-navy shadow-sm"
+                  : "text-gray-500 hover:text-gray-800"
+              }`}
+            >
+              <Building2 size={13} />
+              Modo institución
+            </button>
+          </form>
+        </div>
+      )}
 
       <div className="flex items-center gap-4 md:gap-8">
         <div className="hidden md:flex items-center gap-2 text-sm text-gray-500 font-medium">
