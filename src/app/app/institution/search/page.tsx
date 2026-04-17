@@ -10,10 +10,14 @@ export default async function InstitutionSearchRoute({
 }) {
   const supabase = await createClient();
   const params = await searchParams;
-  const query = (params.query as string) || "";
-  const area = (params.area as string) || "";
-  const subarea = (params.subarea as string) || "";
-  const country = (params.country as string) || "";
+  const query    = (params.query    as string) || "";
+  const area     = (params.area     as string) || "";
+  const subarea  = (params.subarea  as string) || "";
+  const country  = (params.country  as string) || "";
+  const language = (params.language as string) || "";
+  const modality = Array.isArray(params.modality) ? params.modality[0] : (params.modality as string) || "";
+  const phd      = (params.phd      as string) || "";
+  const aneca    = (params.aneca    as string) || "";
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -24,11 +28,9 @@ export default async function InstitutionSearchRoute({
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!institution) {
-    redirect("/app/institution");
-  }
+  if (!institution) redirect("/app/institution");
 
-  // Check institution plan
+  // Plan check
   const { data: userProfile } = await supabase
     .from("user_profiles")
     .select("plan, subscription_status")
@@ -37,7 +39,6 @@ export default async function InstitutionSearchRoute({
 
   const isPro = userProfile?.plan === "institution-pro" && userProfile?.subscription_status === "active";
 
-  // Detect if this is an active search (any filter applied)
   const hasSearchParams = !!(
     params.query || params.area || params.subarea || params.country ||
     params.language || params.phd || params.modality || params.aneca
@@ -46,7 +47,7 @@ export default async function InstitutionSearchRoute({
   // Search limit enforcement for Essential plan
   let searchLimitReached = false;
   const admin = createAdminClient();
-  const currentMonth = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
+  const currentMonth = new Date().toISOString().slice(0, 7);
 
   if (!isPro && hasSearchParams) {
     const { data: usageData } = await admin
@@ -56,12 +57,9 @@ export default async function InstitutionSearchRoute({
       .eq("month", currentMonth)
       .maybeSingle();
 
-    const currentCount = usageData?.search_count ?? 0;
-
-    if (currentCount >= 2) {
+    if ((usageData?.search_count ?? 0) >= 2) {
       searchLimitReached = true;
     } else {
-      // Atomic increment via PostgreSQL function
       await admin.rpc("increment_search_usage", {
         p_institution_id: institution.id,
         p_month: currentMonth,
@@ -69,134 +67,174 @@ export default async function InstitutionSearchRoute({
     }
   }
 
-  // Fetch favorites — use admin to bypass RLS (institution_id ≠ auth.uid())
-  const { data: favoritesData } = await admin
-    .from("favorites")
-    .select("faculty_id")
-    .eq("institution_id", institution.id);
-
-  const favorites = favoritesData?.map(f => f.faculty_id) || [];
-
-  // Use admin for contacts counts (RLS: institution_id ≠ auth.uid())
-  const { count: contactsCount } = await admin
-    .from("contacts")
-    .select("*", { count: "exact", head: true })
-    .eq("institution_id", institution.id);
-
-  // Monthly contacts count for free plan limit (2/month)
-  const [year, monthNum] = currentMonth.split('-').map(Number);
+  // ── Pre-queries (run in parallel) ────────────────────────────────────────
+  const [year, monthNum] = currentMonth.split("-").map(Number);
   const nextMonthStr = monthNum === 12
     ? `${year + 1}-01-01`
-    : `${year}-${String(monthNum + 1).padStart(2, '0')}-01`;
-  const { count: monthlyContactsUsed } = await admin
-    .from("contacts")
-    .select("*", { count: "exact", head: true })
-    .eq("institution_id", institution.id)
-    .gte("created_at", `${currentMonth}-01`)
-    .lt("created_at", nextMonthStr);
+    : `${year}-${String(monthNum + 1).padStart(2, "0")}-01`;
 
-  // Faculty who have blocked this institution — check both institution_id and institution_name
-  const [{ data: blockedById }, { data: blockedByName }] = await Promise.all([
-    admin
-      .from("visibility_rules")
-      .select("faculty_id")
+  // Area / subarea: resolve matching faculty IDs from faculty_expertise
+  const areaPreQuery = (area || subarea)
+    ? (() => {
+        let q = admin.from("faculty_expertise").select("faculty_id");
+        if (area)    q = q.ilike("area", `%${area}%`);
+        if (subarea) q = q.or(`area.ilike.%${subarea}%,level.ilike.%${subarea}%`);
+        return q;
+      })()
+    : Promise.resolve({ data: null as null | { faculty_id: string }[] });
+
+  // Text search: resolve faculty IDs whose full_name matches
+  const namePreQuery = query
+    ? supabase.from("user_profiles").select("id").ilike("full_name", `%${query}%`)
+    : Promise.resolve({ data: null as null | { id: string }[] });
+
+  const [
+    { data: favoritesData },
+    { count: contactsCount },
+    { count: monthlyContactsUsed },
+    { data: blockedById },
+    { data: blockedByName },
+    { data: areaMatchData },
+    { data: nameMatchData },
+  ] = await Promise.all([
+    admin.from("favorites").select("faculty_id").eq("institution_id", institution.id),
+    admin.from("contacts").select("*", { count: "exact", head: true }).eq("institution_id", institution.id),
+    admin.from("contacts").select("*", { count: "exact", head: true })
       .eq("institution_id", institution.id)
-      .eq("rule", "block"),
+      .gte("created_at", `${currentMonth}-01`)
+      .lt("created_at", nextMonthStr),
+    admin.from("visibility_rules").select("faculty_id").eq("institution_id", institution.id).eq("rule", "block"),
     institution.name
-      ? admin
-          .from("visibility_rules")
-          .select("faculty_id")
-          .ilike("institution_name", institution.name)
-          .eq("rule", "block")
-      : Promise.resolve({ data: null }),
+      ? admin.from("visibility_rules").select("faculty_id").ilike("institution_name", institution.name).eq("rule", "block")
+      : Promise.resolve({ data: null as null | { faculty_id: string }[] }),
+    areaPreQuery,
+    namePreQuery,
   ]);
 
+  const favorites = favoritesData?.map((f: any) => f.faculty_id) || [];
+
   const blockedFacultyIds = new Set([
-    ...(blockedById || []).map((r: any) => r.faculty_id),
+    ...(blockedById   || []).map((r: any) => r.faculty_id),
     ...(blockedByName || []).map((r: any) => r.faculty_id),
   ]);
 
-  // Search — include plan + subscription_status for pro priority sorting
+  const areaMatchIds: string[] = [...new Set((areaMatchData || []).map((e: any) => e.faculty_id))];
+  const nameMatchIds: string[] = (nameMatchData || []).map((m: any) => m.id);
+
+  // If area/subarea filter is active but produced zero matches, bail out early
+  const hasAreaFilter = !!(area || subarea);
+  const earlyEmpty = hasAreaFilter && areaMatchIds.length === 0;
+
+  const isNewUser = !!(
+    institution.created_at &&
+    Date.now() - new Date(institution.created_at).getTime() < 1000 * 60 * 60 * 24 * 30
+  );
+
+  const welcomeBanner = isNewUser ? (
+    <InstitutionWelcomeBanner
+      institutionName={institution.name || ""}
+      institutionId={institution.id}
+      hasDescription={!!institution.description}
+      hasFavorites={favorites.length > 0}
+      hasContacts={(contactsCount ?? 0) > 0}
+      storageKey={`fm_welcome_inst_${institution.id}`}
+    />
+  ) : null;
+
+  if (earlyEmpty) {
+    return (
+      <>
+        {welcomeBanner}
+        <InstitutionSearchPage
+          initialEducators={[]}
+          institutionId={institution.id || ""}
+          searchParams={params}
+          initialFavorites={favorites}
+          isPro={isPro}
+          searchLimitReached={searchLimitReached}
+          monthlyContactsUsed={monthlyContactsUsed ?? 0}
+        />
+      </>
+    );
+  }
+
+  // ── Main DB query with all filters pushed down ────────────────────────────
   let educatorQuery = supabase
     .from("faculty_profiles")
     .select(`*, user:user_profiles(full_name, avatar_url, plan, subscription_status), expertise:faculty_expertise(*)`)
-    .in('visibility', ['public', 'private']);
+    .in("visibility", ["public", "private"]);
 
-  if (query) {
-    educatorQuery = educatorQuery.or(`headline.ilike.%${query}%,bio.ilike.%${query}%`);
+  // Exclude blocked faculty
+  if (blockedFacultyIds.size > 0) {
+    educatorQuery = educatorQuery.not("id", "in", `(${[...blockedFacultyIds].join(",")})`);
   }
+
+  // Text search: headline + bio + full_name (via pre-queried IDs)
+  if (query) {
+    const orParts = [`headline.ilike.%${query}%`, `bio.ilike.%${query}%`];
+    if (nameMatchIds.length > 0) {
+      orParts.push(`id.in.(${nameMatchIds.join(",")})`);
+    }
+    educatorQuery = educatorQuery.or(orParts.join(","));
+  }
+
+  // Country → location column
   if (country) {
-    educatorQuery = educatorQuery.ilike('location', `%${country}%`);
+    educatorQuery = educatorQuery.ilike("location", `%${country}%`);
   }
 
-  const { data: educators } = await educatorQuery.limit(150);
-
-  let filteredEducators = (educators || []).filter(ed =>
-    !blockedFacultyIds.has((ed as any).id)
-  );
-
-  if (query) {
-    filteredEducators = filteredEducators.filter(ed =>
-      (ed as any).user?.full_name?.toLowerCase().includes(query.toLowerCase()) ||
-      ed.headline?.toLowerCase().includes(query.toLowerCase()) ||
-      ed.bio?.toLowerCase().includes(query.toLowerCase())
-    );
+  // Area / subarea (resolved via pre-query)
+  if (hasAreaFilter) {
+    educatorQuery = educatorQuery.in("id", areaMatchIds);
   }
 
-  if (area) {
-    filteredEducators = filteredEducators.filter(ed =>
-      (ed as any).expertise?.some((exp: any) =>
-        exp.area.toLowerCase().includes(area.toLowerCase())
-      )
-    );
+  // PhD
+  if (phd === "true") {
+    educatorQuery = educatorQuery.eq("is_phd", true);
   }
 
-  if (subarea) {
-    filteredEducators = filteredEducators.filter(ed =>
-      (ed as any).expertise?.some((exp: any) =>
-        exp.level?.toLowerCase().includes(subarea.toLowerCase()) ||
-        exp.area.toLowerCase().includes(subarea.toLowerCase())
-      )
-    );
+  // ANECA accreditation
+  if (aneca) {
+    educatorQuery = educatorQuery.ilike("aneca_accreditation", `%${aneca}%`);
   }
 
-  const transformedEducators = filteredEducators
-    .map(ed => {
-      const userJoin = (ed as any).user;
+  // Language — JSONB column cast to text for ilike
+  if (language) {
+    educatorQuery = (educatorQuery as any).filter("languages::text", "ilike", `%${language}%`);
+  }
+
+  // Modality → availability column
+  if (modality) {
+    educatorQuery = educatorQuery.ilike("availability", `%${modality}%`);
+  }
+
+  // First page: 50 results
+  const { data: educators } = await educatorQuery.range(0, 49);
+
+  const transformedEducators = (educators || [])
+    .map((ed: any) => {
+      const userJoin = ed.user;
       const userObj = Array.isArray(userJoin) ? userJoin[0] : userJoin;
-      const isFacultyPro = userObj?.plan === 'faculty-pro' && userObj?.subscription_status === 'active';
+      const isFacultyPro = userObj?.plan === "faculty-pro" && userObj?.subscription_status === "active";
       return {
         ...ed,
-        full_name: userObj?.full_name || (ed as any).full_name || "Docente",
+        full_name: userObj?.full_name || ed.full_name || "Docente",
         avatar_url: userObj?.avatar_url || null,
-        country: (ed as any).country || ed.location || null,
-        city: (ed as any).city || null,
-        experience_years: (ed as any).years_teaching || (ed as any).years_experience || 0,
+        country: ed.country || ed.location || null,
+        city: ed.city || null,
+        experience_years: ed.years_teaching || ed.years_experience || 0,
         is_pro: isFacultyPro,
       };
     })
-    .sort((a, b) => {
-      if ((a as any).is_pro && !(b as any).is_pro) return -1;
-      if (!(a as any).is_pro && (b as any).is_pro) return 1;
+    .sort((a: any, b: any) => {
+      if (a.is_pro && !b.is_pro) return -1;
+      if (!a.is_pro && b.is_pro) return 1;
       return 0;
-    })
-    .slice(0, 100);
-
-  const isNewUser = !!(institution.created_at &&
-    new Date().getTime() - new Date(institution.created_at).getTime() < 1000 * 60 * 60 * 24 * 30);
+    });
 
   return (
     <>
-      {isNewUser && (
-        <InstitutionWelcomeBanner
-          institutionName={institution.name || ""}
-          institutionId={institution.id}
-          hasDescription={!!institution.description}
-          hasFavorites={favorites.length > 0}
-          hasContacts={(contactsCount ?? 0) > 0}
-          storageKey={`fm_welcome_inst_${institution.id}`}
-        />
-      )}
+      {welcomeBanner}
       <InstitutionSearchPage
         initialEducators={transformedEducators}
         institutionId={institution.id || ""}
