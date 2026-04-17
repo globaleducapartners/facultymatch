@@ -113,10 +113,15 @@ function Nav() {
               FacultyMatch
             </span>
           </div>
-          {["Directorio", "Para instituciones", "Cómo funciona", "Precios"].map((l) => (
-            <span key={l} style={{ fontFamily: SANS, fontSize: 13, color: C.muted, cursor: "pointer" }}>
-              {l}
-            </span>
+          {[
+            { label: "Para docentes",      href: "/faculty" },
+            { label: "Para instituciones", href: "/institutions" },
+            { label: "Cómo funciona",      href: "#como-funciona" },
+            { label: "Precios",            href: "/faculty#precios" },
+          ].map((l) => (
+            <Link key={l.href} href={l.href} style={{ fontFamily: SANS, fontSize: 13, color: C.muted, textDecoration: "none", cursor: "pointer" }}>
+              {l.label}
+            </Link>
           ))}
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -611,7 +616,7 @@ function Feature() {
     <section style={{ background: C.white, borderTop: `1px solid ${C.border}`, overflow: "hidden" }}>
       <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 380 }}>
         <PhotoBg
-          url="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=700"
+          url="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=700"
           height={380}
           overlay="rgba(12,16,24,0.08)"
           position="center top"
