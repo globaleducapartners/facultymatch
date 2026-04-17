@@ -1,318 +1,282 @@
-import Link from "next/link";
-import { UpgradeButton } from "@/components/profile/UpgradeButton";
-import Image from "next/image";
+// src/app/faculty/page.tsx  ← reemplaza el archivo completo
 import type { Metadata } from "next";
-import { 
-  CheckCircle2, 
-  Globe, 
-  ShieldCheck, 
-  Zap, 
-  Briefcase, 
-  Search, 
-  Users,
-  ArrowRight,
-  GraduationCap,
-  Sparkles
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
-  title: "Talento Docente | FacultyMatch - La Red Global de Educación Superior",
-    description: "Crea tu perfil docente profesional, verifica tus credenciales y conecta con universidades e instituciones de todo el mundo. Potencia tu carrera académica.",
-
-  keywords: "perfil docente, carrera académica, educación superior, red de profesores, talento académico",
+  title: "Para docentes y expertos | FacultyMatch",
+  description:
+    "Publica tu perfil en el directorio de FacultyMatch. Las instituciones educativas te encuentran cuando buscan tu área. Tú decides si respondes.",
+  keywords:
+    "perfil docente, experto universitario, dar clases universidad, docencia, investigador",
 };
+
+// ─── Tokens ────────────────────────────────────────────────────────────────────
+const SERIF = `var(--font-serif, 'Georgia', 'Times New Roman', serif)`;
+const SANS  = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
+
+const C = {
+  ink: "#0C1018", navy: "#0D2240", brass: "#B8963E",
+  cream: "#F7F5F0", paper: "#FDFCF9", white: "#FFFFFF",
+  muted: "#6B7280", faint: "#9CA3AF", border: "#E5E1D8",
+};
+
+// ─── Secciones ─────────────────────────────────────────────────────────────────
+
+const PROFILES = [
+  {
+    label: "Docente académico",
+    dot: "#2563EB",
+    desc: "Profesores universitarios, investigadores y titulares que quieren ampliar su colaboración con otras instituciones sin dejar su puesto actual.",
+    examples: ["Doctor en Economía · UAM", "Catedrática de Derecho · UCM", "Investigador en IA · UPM"],
+  },
+  {
+    label: "Profesional experto",
+    dot: C.brass,
+    desc: "Directivos, consultores y especialistas con experiencia real en empresa que quieren trasladar ese conocimiento al aula de una business school o programa ejecutivo.",
+    examples: ["Director de Operaciones · 18 años en empresa", "Ex-CMO · Varias startups", "Abogada Mercantil · Bufete"],
+  },
+  {
+    label: "Educador independiente",
+    dot: "#059669",
+    desc: "Formadores, creadores de contenido educativo y expertos freelance que buscan colaboración con instituciones con respaldo oficial.",
+    examples: ["Consultor de Liderazgo", "Formador en Transformación Digital", "Especialista en Marketing"],
+  },
+];
+
+const BENEFITS = [
+  { title: "Perfil estructurado", desc: "Por área de conocimiento, formación, idiomas y disponibilidad. Exactamente lo que un director de programa necesita ver." },
+  { title: "Las instituciones vienen a ti", desc: "Tu perfil aparece en sus búsquedas. Ellas contactan. Tú decides si respondes, cuándo y en qué condiciones." },
+  { title: "Privacidad selectiva", desc: "Bloquea instituciones específicas por nombre. Tu institución actual no tiene acceso a tu perfil salvo que tú lo permitas." },
+  { title: "Sin coste de entrada", desc: "El plan básico es gratuito para siempre. Publicas tu perfil, recibes solicitudes y decides sin pagar nada." },
+];
 
 export default function FacultyPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#F8FAFC]">
+    <div style={{ background: C.paper, fontFamily: SANS }}>
       <Navbar />
 
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="px-6 lg:px-12 py-20 lg:py-32 bg-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-50/30 rounded-l-[100px] -z-10"></div>
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-talentia-blue text-xs font-black uppercase tracking-widest">
-                <GraduationCap size={14} /> Red para Docentes
-              </div>
-                <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-navy leading-tight">
-                  Tu conocimiento vale <span className="text-talentia-blue">más de lo que crees.</span>
-                </h1>
-                <div className="absolute top-0 right-0 w-96 h-96 bg-blue-50 rounded-full opacity-40 blur-3xl -z-10" />
-                <p className="text-xl text-gray-500 font-medium max-w-lg leading-relaxed">
-                  Cada año, miles de instituciones buscan docentes especializados para sus programas. Con FacultyMatch, ellas te encuentran a ti.
-                </p>
+      {/* ── HERO ── */}
+      <section style={{ position: "relative", height: 520, overflow: "hidden" }}>
+        {/* Foto con CSS — evita problemas de CSP */}
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage: `url(https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=1800)`,
+          backgroundSize: "cover", backgroundPosition: "center 30%",
+        }} />
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(160deg, rgba(12,16,24,0.52) 0%, rgba(12,16,24,0.72) 60%, rgba(12,16,24,0.9) 100%)",
+        }} />
+        <div style={{
+          position: "relative", zIndex: 2, height: "100%",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          textAlign: "center", padding: "0 40px",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
+            <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
+            <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.45)" }}>
+              Para docentes y expertos
+            </span>
+            <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
+          </div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/signup/faculty">
-                    <Button className="w-full sm:w-auto bg-talentia-blue hover:bg-blue-700 text-white font-bold h-14 px-10 rounded-xl shadow-xl shadow-blue-100 transition-all text-lg">
-                      Crear perfil gratis
-                    </Button>
-                  </Link>
-                </div>
-                <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest text-tech-cyan">
-                  <span className="flex items-center gap-1.5"><CheckCircle2 size={14} /> Perfil Profesional</span>
-                  <span className="flex items-center gap-1.5"><ShieldCheck size={14} /> Privacidad Avanzada</span>
-                </div>
+          <h1 style={{ fontFamily: SERIF, fontSize: 54, fontWeight: 400, color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em", margin: "0 0 20px", maxWidth: 680 }}>
+            Tu perfil, visible para quien
+            busca lo que enseñas.
+          </h1>
 
-                <div className="flex flex-wrap gap-8 pt-4">
-                  {[
-                    { num: "500+", label: "Docentes registrados" },
-                    { num: "40+", label: "Países representados" },
-                    { num: "98%", label: "Tasa de satisfacción" },
-                  ].map((s) => (
-                    <div key={s.label}>
-                      <p className="text-2xl font-black text-navy">{s.num}</p>
-                      <p className="text-xs font-bold text-gray-400">{s.label}</p>
-                    </div>
+          <p style={{ fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.58)", lineHeight: 1.75, margin: "0 0 38px", maxWidth: 480 }}>
+            Crea tu perfil en el directorio. Las instituciones te encuentran
+            cuando buscan tu área. Tú decides si respondes y en qué condiciones.
+          </p>
+
+          <div style={{ display: "flex", gap: 12 }}>
+            <Link href="/signup/faculty">
+              <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 32px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+                Publicar mi perfil
+              </button>
+            </Link>
+            <Link href="/login">
+              <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.8)", border: "1px solid rgba(255,255,255,0.28)", padding: "13px 32px", borderRadius: 6, fontSize: 14, cursor: "pointer" }}>
+                Ya tengo cuenta
+              </button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── TIPOS DE PERFIL ── */}
+      <section style={{ background: C.white, padding: "72px 40px", borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 52 }}>
+            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
+              Quién puede publicar su perfil
+            </div>
+            <h2 style={{ fontFamily: SERIF, fontSize: 32, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 12px", lineHeight: 1.1 }}>
+              No hace falta ser catedrático.
+            </h2>
+            <p style={{ fontFamily: SANS, fontSize: 15, color: C.muted, maxWidth: 480, margin: "0 auto" }}>
+              FacultyMatch conecta tres tipos de talento con las instituciones que los buscan.
+            </p>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+            {PROFILES.map((p, i) => (
+              <div key={i} style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: 12, padding: "28px 26px", borderTop: `3px solid ${p.dot}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: p.dot }} />
+                  <span style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 400, color: C.ink }}>{p.label}</span>
+                </div>
+                <p style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.75, margin: "0 0 18px" }}>{p.desc}</p>
+                <div style={{ display: "flex", flexDirection: "column" as const, gap: 6 }}>
+                  {p.examples.map((ex, j) => (
+                    <span key={j} style={{ fontFamily: SANS, fontSize: 11, color: C.faint, background: C.white, padding: "4px 10px", borderRadius: 20, border: `1px solid ${C.border}`, display: "inline-block", alignSelf: "flex-start" }}>
+                      {ex}
+                    </span>
                   ))}
                 </div>
-
-            </div>
-              <div className="relative">
-              <div className="rounded-[3rem] overflow-hidden shadow-2xl shadow-blue-900/10 border-8 border-white relative aspect-[4/3]">
-                <Image 
-                  src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=1200" 
-                  alt="Docente impartiendo clase"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                />
-                </div>
-
-              <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-3xl shadow-xl border border-gray-100 max-w-[240px] animate-bounce-slow">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-green-100 text-green-600 p-2 rounded-lg">
-                    <Sparkles size={20} />
-                  </div>
-                  <p className="text-xs font-black text-navy uppercase tracking-widest">Oportunidad</p>
-                </div>
-                <p className="text-sm font-medium text-gray-500 italic">"Una universidad en Madrid ha visto tu perfil hoy"</p>
               </div>
-            </div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Benefits Section */}
-        <section className="py-24 px-6 lg:px-12 bg-[#F8FAFC]">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center space-y-4 mb-20">
-              <h2 className="text-4xl lg:text-5xl font-black text-navy tracking-tight">Diseñado para el académico moderno</h2>
-              <p className="text-lg text-gray-500 font-medium max-w-2xl mx-auto">Más que un CV online, FacultyMatch es tu centro de operaciones para gestionar tu presencia institucional.</p>
+      {/* ── BENEFICIOS ── */}
+      <section style={{ background: C.cream, padding: "72px 40px", borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
+          {/* Foto */}
+          <div style={{ borderRadius: 14, overflow: "hidden", height: 420 }}>
+            <div style={{
+              width: "100%", height: "100%",
+              backgroundImage: `url(https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800)`,
+              backgroundSize: "cover", backgroundPosition: "center top",
+            }} />
+          </div>
+          {/* Contenido */}
+          <div>
+            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>
+              Cómo funciona para ti
             </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  title: "Visibilidad Selectiva",
-                  desc: "Tú decides quién ve tu perfil. Bloquea instituciones específicas o mantén tu perfil oculto hasta que tú decidas.",
-                  icon: ShieldCheck,
-                  color: "text-talentia-blue"
-                },
-                {
-                  title: "Dossier Académico",
-                  desc: "Estructura tu experiencia por áreas, subáreas, idiomas y disponibilidad. Un perfil pensado por y para la universidad.",
-                  icon: Briefcase,
-                  color: "text-tech-cyan"
-                },
-                {
-                  title: "Networking Global",
-                  desc: "Conecta con directores de programa de universidades líderes en todo el mundo sin intermediarios.",
-                  icon: Globe,
-                  color: "text-energy-orange"
-                }
-              ].map((benefit, idx) => (
-                <div key={idx} className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all group">
-                  <div className={`${benefit.color} mb-8 group-hover:scale-110 transition-transform`}>
-                    <benefit.icon size={48} strokeWidth={1.5} />
+            <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 32px", lineHeight: 1.2 }}>
+              Tú pones el conocimiento.<br />
+              Las instituciones ponen el interés.
+            </h2>
+            <div style={{ display: "flex", flexDirection: "column" as const, gap: 20 }}>
+              {BENEFITS.map((b, i) => (
+                <div key={i} style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 7, background: C.white, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
+                    <span style={{ fontFamily: SERIF, fontSize: 12, color: C.brass, fontStyle: "italic" }}>{["I", "II", "III", "IV"][i]}</span>
                   </div>
-                  <h3 className="text-2xl font-black text-navy mb-4 leading-tight">{benefit.title}</h3>
-                  <p className="text-gray-500 font-medium leading-relaxed">{benefit.desc}</p>
+                  <div>
+                    <h3 style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 400, color: C.ink, margin: "0 0 5px" }}>{b.title}</h3>
+                    <p style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.7, margin: 0 }}>{b.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* How it works */}
-        <section className="py-24 px-6 lg:px-12 bg-white">
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-            <div className="order-2 lg:order-1 relative">
-              <div className="aspect-square bg-blue-50 rounded-[4rem] flex items-center justify-center">
-                <div className="space-y-6 w-full max-w-sm px-8">
-                  {[1, 2, 3, 4].map((step) => (
-                    <div key={step} className="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 transform hover:-translate-y-1 transition-all">
-                      <div className="bg-talentia-blue text-white w-8 h-8 rounded-lg flex items-center justify-center font-black">{step}</div>
-                      <div className="h-2 bg-gray-100 rounded-full flex-1">
-                        <div className={`h-full bg-tech-cyan rounded-full w-[${step * 25}%]`}></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+      {/* ── PRECIOS ── */}
+      <section id="precios" style={{ background: C.white, padding: "72px 40px", borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
+              Precios
             </div>
-            <div className="order-1 lg:order-2 space-y-12">
-              <div className="space-y-4">
-                <h2 className="text-4xl lg:text-5xl font-black text-navy leading-tight">Tu perfil verificado en 3 pasos</h2>
-                <p className="text-lg text-gray-500 font-medium">Elevamos tu perfil al estándar de calidad que las universidades exigen.</p>
-              </div>
-              <div className="space-y-8">
-                {[
-                  { title: "Crea tu perfil en 5 minutos", desc: "Crea tu cuenta y define tu área principal de conocimiento." },
-                  { title: "Añade tus especialidades", desc: "Añade tus subáreas detalladas y sube tu documentación académica." },
-                  { title: "Recibe propuestas reales", desc: "Nuestro equipo valida tus credenciales y tu perfil entra en la red global." }
-                ].map((step, idx) => (
-                  <div key={idx} className="flex gap-6">
-                    <div className="flex-shrink-0 w-12 h-12 bg-navy text-white rounded-2xl flex items-center justify-center font-black text-xl">
-                      {idx + 1}
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="text-xl font-bold text-navy">{step.title}</h4>
-                      <p className="text-gray-500 font-medium">{step.desc}</p>
-                    </div>
+            <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: 0 }}>
+              Para docentes y expertos, sin coste de entrada.
+            </h2>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 760, margin: "0 auto" }}>
+            {/* Basic */}
+            <div style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: 14, padding: "32px 30px" }}>
+              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: C.faint, marginBottom: 16 }}>Plan Basic</div>
+              <div style={{ fontFamily: SERIF, fontSize: 38, color: C.ink, margin: "0 0 4px" }}>0 €</div>
+              <div style={{ fontFamily: SANS, fontSize: 13, color: C.faint, marginBottom: 24 }}>siempre gratuito</div>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 10, marginBottom: 28 }}>
+                {["Perfil en el directorio", "Recepción de solicitudes", "Control de disponibilidad", "Visibilidad pública"].map((f, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: C.brass, flexShrink: 0 }} />
+                    <span style={{ fontFamily: SANS, fontSize: 13, color: C.muted }}>{f}</span>
                   </div>
                 ))}
               </div>
+              <Link href="/signup/faculty">
+                <button style={{ fontFamily: SANS, width: "100%", background: "transparent", color: C.navy, border: `1px solid ${C.navy}`, padding: "11px 0", borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+                  Empezar gratis
+                </button>
+              </Link>
+            </div>
+
+            {/* Pro */}
+            <div style={{ background: C.navy, borderRadius: 14, padding: "32px 30px" }}>
+              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>Plan Professional</div>
+              <div style={{ fontFamily: SERIF, fontSize: 38, color: "#fff", margin: "0 0 4px" }}>29 €</div>
+              <div style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>al año · sin permanencia</div>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 10, marginBottom: 28 }}>
+                {["Todo lo del plan Basic", "Bloqueo de instituciones específicas", "Oculto para tu institución actual", "Posicionamiento prioritario en búsquedas", "Estadísticas de visitas a tu perfil"].map((f, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: C.brass, flexShrink: 0 }} />
+                    <span style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+              <Link href="/checkout?plan=faculty-pro">
+                <button style={{ fontFamily: SANS, width: "100%", background: C.brass, color: "#fff", border: "none", padding: "11px 0", borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                  Activar Professional
+                </button>
+              </Link>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-          {/* Membership Section */}
-          <section className="py-24 px-6 lg:px-12 bg-white">
-            <div className="max-w-7xl mx-auto">
-              <div className="text-center space-y-4 mb-20">
-                <h2 className="text-4xl lg:text-5xl font-black text-navy tracking-tight">Eleva tu presencia académica</h2>
-                <p className="text-lg text-gray-500 font-medium max-w-2xl mx-auto">Toma el control total de tu carrera y visibilidad profesional.</p>
-              </div>
-  
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <div className="bg-[#F8FAFC] p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                  <h3 className="text-2xl font-black text-navy mb-4">Plan Basic</h3>
-                  <p className="text-4xl font-black text-navy mb-6">0€ <span className="text-lg text-gray-400 font-bold">/ siempre</span></p>
-                  <ul className="space-y-4 mb-8">
-                    <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Perfil verificado</li>
-                    <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Visibilidad en el directorio</li>
-                    <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Recepción de ofertas</li>
-                  </ul>
-                  <Button className="w-full bg-white border-2 border-gray-200 text-navy hover:bg-gray-50 h-14 rounded-xl font-bold">Plan por defecto</Button>
-                </div>
-  
-                <div className="bg-white p-10 rounded-[2.5rem] border-4 border-talentia-blue shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-4 right-4 bg-talentia-blue text-white text-[10px] font-black px-3 py-1 rounded-full">RECOMENDADO</div>
-                  <h3 className="text-2xl font-black text-navy mb-4">Plan Professional</h3>
-                    <div className="mb-6">
-                      <p className="text-4xl font-black text-navy">29€ <span className="text-lg text-gray-400 font-bold">/ año</span></p>
-                      <p className="text-xs font-bold text-energy-orange mt-1 uppercase tracking-widest">Acceso completo · Sin permanencia</p>
-                    </div>
-                    <ul className="space-y-4 mb-8">
-                      <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Todo lo del plan Basic</li>
-                      <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Bloqueo de instituciones específicas</li>
-                      <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Oculto para tu centro actual</li>
-                      <li className="flex items-center gap-2 font-bold text-navy"><CheckCircle2 className="text-talentia-blue" size={18} /> Posicionamiento prioritario</li>
-                    </ul>
-                    <UpgradeButton plan="faculty-pro" label="Upgrade Profesional" className="inline-flex items-center justify-center w-full bg-[#1d4ed8] hover:bg-blue-700 text-white font-black py-3 px-6 rounded-xl text-sm transition-colors" />
-                </div>
-              </div>
+      {/* ── CTA FINAL ── */}
+      <section style={{ position: "relative", overflow: "hidden" }}>
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage: `url(https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&q=80&w=1800)`,
+          backgroundSize: "cover", backgroundPosition: "center 50%",
+        }} />
+        <div style={{ position: "absolute", inset: 0, background: "rgba(12,16,24,0.76)" }} />
+        <div style={{
+          position: "relative", zIndex: 2,
+          maxWidth: 1080, margin: "0 auto",
+          padding: "64px 40px",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          flexWrap: "wrap" as const, gap: 32,
+        }}>
+          <div>
+            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
+              Empieza hoy
             </div>
-          </section>
-
-          {/* Social Proof */}
-          <section className="py-16 px-6 bg-white border-t border-gray-100">
-            <div className="max-w-5xl mx-auto">
-              <p className="text-center text-xs font-black uppercase tracking-widest text-gray-400 mb-10">
-                Por qué los docentes eligen FacultyMatch
-              </p>
-              <div className="grid md:grid-cols-3 gap-6">
-                {[
-                  {
-                    quote: "En 3 semanas conseguí dos colaboraciones nuevas con universidades que nunca habría conocido de otra forma.",
-                    name: "Dra. Carmen R.",
-                    role: "Profesora de Marketing Digital",
-                    avatar: "CR"
-                  },
-                  {
-                    quote: "Lo que más valoro es el control de privacidad. Puedo decidir exactamente quién ve mi perfil.",
-                    name: "Prof. Javier M.",
-                    role: "Doctor en Economía",
-                    avatar: "JM"
-                  },
-                  {
-                    quote: "FacultyMatch entiende el mundo académico. No es LinkedIn. Es una herramienta específica para nosotros.",
-                    name: "Dra. Laura S.",
-                    role: "Investigadora y Docente",
-                    avatar: "LS"
-                  }
-                ].map((t, i) => (
-                  <div key={i} className="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-6 space-y-4">
-                    <div className="flex gap-1">
-                      {[...Array(5)].map((_, j) => (
-                        <span key={j} className="text-energy-orange text-sm">★</span>
-                      ))}
-                    </div>
-                    <p className="text-gray-600 font-medium text-sm leading-relaxed">
-                      "{t.quote}"
-                    </p>
-                    <div className="flex items-center gap-3 pt-2">
-                      <div className="w-9 h-9 rounded-full bg-talentia-blue text-white text-xs font-black flex items-center justify-center">
-                        {t.avatar}
-                      </div>
-                      <div>
-                        <p className="text-xs font-black text-navy">{t.name}</p>
-                        <p className="text-xs text-gray-400">{t.role}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* CTA */}
-          <section className="py-24 px-6 lg:px-12 bg-[#F8FAFC]">
-            <div className="max-w-6xl mx-auto">
-              <div className="relative rounded-[3rem] overflow-hidden shadow-2xl shadow-blue-900/20 min-h-[420px] flex items-center">
-                <div className="absolute inset-0">
-                  <Image
-                    src="https://images.unsplash.com/photo-1544531585-9847b68c8c86?auto=format&fit=crop&q=80&w=1800"
-                    alt="Docentes colaborando globalmente"
-                    fill
-                    sizes="100vw"
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-talentia-blue/85"></div>
-                </div>
-                <div className="relative z-10 w-full px-10 py-16 lg:px-20 flex flex-col lg:flex-row items-center justify-between gap-10">
-                  <div className="space-y-4 max-w-xl">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-tech-cyan text-xs font-black uppercase tracking-widest">
-                      <GraduationCap size={14} /> Tu siguiente paso académico
-                    </div>
-                    <h2 className="text-4xl lg:text-5xl font-black text-white leading-tight">
-                      Empieza a generar ingresos con tu conocimiento.
-                    </h2>
-                    <p className="text-lg text-white/70 font-medium">
-                      Miles de instituciones buscan docentes como tú. Crea tu perfil y empieza a recibir propuestas académicas hoy mismo.
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-4 min-w-[240px]">
-                    <Link href="/signup/faculty">
-                      <Button className="w-full bg-energy-orange hover:bg-orange-500 text-white font-black h-16 px-10 rounded-2xl text-lg shadow-xl shadow-orange-900/30 transition-all hover:scale-105">
-                        Crear mi perfil gratis
-                        <ArrowRight size={20} className="ml-2" />
-                      </Button>
-                    </Link>
-                    <Link href="/login" className="text-center text-white/60 font-bold hover:text-white transition-colors text-sm py-2">
-                      Ya tengo cuenta →
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </main>
-      </div>
-    );
-  }
-
+            <p style={{ fontFamily: SERIF, fontSize: 26, color: "rgba(255,255,255,0.9)", lineHeight: 1.35, margin: 0 }}>
+              Crea tu perfil. Es gratuito<br />
+              para docentes y expertos.
+            </p>
+            <p style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "8px 0 0" }}>
+              Sin permanencia. Sin cuotas de inscripción.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Link href="/signup/faculty">
+              <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 28px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+                Publicar mi perfil
+              </button>
+            </Link>
+            <Link href="/signup/institution">
+              <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.22)", padding: "13px 28px", borderRadius: 6, fontSize: 14, cursor: "pointer" }}>
+                Soy institución
+              </button>
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

@@ -1,26 +1,81 @@
 "use client";
+// src/components/layout/Navbar.tsx  ← reemplaza el archivo completo
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { Logo } from "@/components/ui/Logo";
 
-const navLinks = [
-  { name: "Inicio", href: "/" },
-  { name: "Docentes", href: "/faculty" },
-  { name: "Instituciones", href: "/institutions" },
-  { name: "Recursos", href: "/resources" },
+const NAV_LINKS = [
+  { name: "Para docentes",      href: "/faculty" },
+  { name: "Para instituciones", href: "/institutions" },
+  { name: "Cómo funciona",      href: "/#como-funciona" },
+  { name: "Precios",            href: "/faculty#precios" },
 ];
 
-const APPLY_HREF = "/apply";
+// ─── Estilos inline — consistentes con el sistema universitario ───────────────
+const S = {
+  nav: {
+    display: "flex" as const,
+    alignItems: "center" as const,
+    justifyContent: "space-between" as const,
+    padding: "0 40px",
+    height: 58,
+    background: "#FFFFFF",
+    borderBottom: "1px solid #E5E1D8",
+    position: "sticky" as const,
+    top: 0,
+    zIndex: 100,
+  },
+  wordmark: {
+    fontFamily: "var(--font-serif, Georgia, serif)",
+    fontSize: 17,
+    color: "#0C1018",
+    letterSpacing: "-0.01em",
+    textDecoration: "none",
+  },
+  dot: {
+    width: 26, height: 26, borderRadius: 5,
+    background: "#0D2240",
+    display: "flex" as const,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+    flexShrink: 0 as const,
+  },
+  link: {
+    fontFamily: "var(--font-sans, system-ui, sans-serif)",
+    fontSize: 13, color: "#6B7280",
+    textDecoration: "none", cursor: "pointer",
+    transition: "color 0.15s",
+  },
+  btnOutline: {
+    fontFamily: "var(--font-sans, system-ui, sans-serif)",
+    background: "transparent",
+    border: "1px solid #E5E1D8",
+    color: "#0C1018",
+    fontSize: 13, fontWeight: 500,
+    padding: "6px 18px", borderRadius: 6,
+    cursor: "pointer", textDecoration: "none",
+    display: "inline-block",
+  },
+  btnPrimary: {
+    fontFamily: "var(--font-sans, system-ui, sans-serif)",
+    background: "#0D2240",
+    border: "none",
+    color: "#fff",
+    fontSize: 13, fontWeight: 600,
+    padding: "6px 18px", borderRadius: 6,
+    cursor: "pointer", textDecoration: "none",
+    display: "inline-block",
+  },
+};
 
 export function Navbar() {
   const pathname = usePathname();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [role, setRole] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser]   = useState<any>(null);
+  const [role, setRole]   = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createBrowserClient(
@@ -30,143 +85,122 @@ export function Navbar() {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-
       if (user) {
         const { data: profile } = await supabase
           .from("user_profiles")
-          .select("role")
+          .select("role, active_mode")
           .eq("id", user.id)
           .single();
-        setRole(profile?.role || null);
+        setRole(profile?.active_mode ?? profile?.role ?? null);
       }
     };
     getUser();
   }, []);
 
-    const dashboardHref =
-      role === "faculty"
-        ? "/app/faculty"
-        : role === "institution"
-        ? "/app/institution"
-        : role === "admin" || role === "super_admin"
-        ? "/app/admin"
-        : "/dashboard";
+  const dashboardHref =
+    role === "faculty"      ? "/app/faculty" :
+    role === "institution"  ? "/app/institution" :
+    role === "admin" || role === "super_admin" ? "/control" :
+    "/app/faculty";
 
+  // Ocultar navbar en las páginas que tienen la suya propia
+  if (pathname === "/") return null;
 
   return (
-    <nav className="flex items-center justify-between px-6 lg:px-12 py-6 bg-white border-b border-gray-100 sticky top-0 z-50">
-      <div className="flex items-center gap-3">
-        <Link href="/" className="flex items-center gap-3 group">
-          <Logo />
+    <>
+      <nav style={S.nav}>
+        {/* Wordmark */}
+        <Link href="/" style={{ display: "flex", alignItems: "baseline", gap: 9, textDecoration: "none" }}>
+          <div style={S.dot}>
+            <span style={{ color: "#fff", fontSize: 10, fontWeight: 700 }}>FM</span>
+          </div>
+          <span style={S.wordmark}>FacultyMatch</span>
         </Link>
-      </div>
-      
-      {/* Desktop Navigation */}
-      <div className="hidden lg:flex items-center gap-8">
-        {navLinks.map((link) => {
-          const isActive = pathname === link.href;
-          return (
-            <Link 
-              key={link.href} 
-              href={link.href} 
-              className={`text-sm font-bold transition-colors ${
-                isActive 
-                  ? "text-talentia-blue border-b-2 border-talentia-blue pb-1" 
-                  : "text-gray-500 hover:text-navy"
-              }`}
-            >
-              {link.name}
-            </Link>
-          );
-        })}
-      </div>
 
-      <div className="flex items-center gap-3">
-        {user ? (
-          <Link href={dashboardHref} className="flex items-center gap-2 bg-talentia-blue text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
-            <User size={18} />
-            <span>Dashboard</span>
-          </Link>
-        ) : (
-          <>
-            {/* Mobile only: avatar icon button */}
-            <Link
-              href="/login"
-              aria-label="Acceder"
-              className="sm:hidden flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 hover:bg-talentia-blue hover:text-white text-navy transition-all"
-            >
-              <User size={20} />
-            </Link>
-            {/* sm+: full Acceder text link */}
-            <Link href="/login" className="hidden sm:block text-sm font-bold text-navy px-5 py-2.5 hover:bg-gray-50 rounded-xl transition-colors">
-              Acceder
-            </Link>
-            {/* lg only: institution link + separator */}
-            <Link
-              href="/signup/institution"
-              className="hidden lg:block text-xs font-bold text-gray-400 hover:text-navy transition-colors whitespace-nowrap"
-            >
-              Instituciones
-            </Link>
-            <span className="hidden lg:block w-px h-5 bg-gray-200" />
-            {/* sm+: Soy docente CTA (hidden on mobile — CTA is in the hero section) */}
-            <Link href="/signup/faculty" className="hidden sm:inline-flex bg-energy-orange text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-100">
-              Soy docente
-            </Link>
-          </>
-        )}
-        
-        {/* Mobile Menu Toggle */}
-        <button 
-          className="lg:hidden p-2 text-navy"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="absolute top-full left-0 w-full bg-white border-b border-gray-100 p-6 flex flex-col gap-4 lg:hidden shadow-xl animate-in fade-in slide-in-from-top-4">
-          {navLinks.map((link) => (
-            <Link 
-              key={link.href} 
-              href={link.href} 
-              className="text-lg font-bold text-navy py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {link.name}
+        {/* Links — desktop */}
+        <div style={{ display: "flex", gap: 28, alignItems: "center" }}
+          className="hidden lg:flex">
+          {NAV_LINKS.map((l) => (
+            <Link key={l.href} href={l.href} style={{
+              ...S.link,
+              color: pathname === l.href ? "#0C1018" : "#6B7280",
+              fontWeight: pathname === l.href ? 500 : 400,
+            }}>
+              {l.name}
             </Link>
           ))}
-          <hr className="my-2 border-gray-100" />
+        </div>
+
+        {/* Auth — desktop */}
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }} className="hidden lg:flex">
           {user ? (
-            <Link 
-              href={dashboardHref} 
-              className="text-lg font-bold text-talentia-blue py-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Dashboard
+            <Link href={dashboardHref} style={S.btnPrimary}>
+              Mi dashboard
             </Link>
+          ) : (
+            <>
+              <Link href="/login" style={S.btnOutline}>Acceder</Link>
+              <Link href="/signup/faculty" style={S.btnPrimary}>Publicar perfil</Link>
+            </>
+          )}
+        </div>
+
+        {/* Hamburger — mobile */}
+        <button
+          className="lg:hidden"
+          onClick={() => setMenuOpen(!menuOpen)}
+          style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}
+        >
+          {menuOpen
+            ? <X size={22} color="#0C1018" />
+            : <Menu size={22} color="#0C1018" />}
+        </button>
+      </nav>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div style={{
+          position: "fixed", top: 58, left: 0, right: 0, zIndex: 99,
+          background: "#fff", borderBottom: "1px solid #E5E1D8",
+          padding: "20px 24px 28px",
+          display: "flex", flexDirection: "column", gap: 4,
+        }} className="lg:hidden">
+          {NAV_LINKS.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setMenuOpen(false)}
+              style={{
+                fontFamily: "var(--font-sans, system-ui, sans-serif)",
+                fontSize: 16, color: "#0C1018", fontWeight: 500,
+                textDecoration: "none", padding: "10px 0",
+                borderBottom: "0.5px solid #E5E1D8",
+              }}
+            >
+              {l.name}
+            </Link>
+          ))}
+          <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+            {user ? (
+              <Link href={dashboardHref} style={{ ...S.btnPrimary, textAlign: "center", padding: "12px 18px" }}
+                onClick={() => setMenuOpen(false)}>
+                Mi dashboard
+              </Link>
             ) : (
               <>
-                <Link 
-                  href="/login" 
-                  className="text-lg font-bold text-navy py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <Link href="/login" style={{ ...S.btnOutline, textAlign: "center", padding: "12px 18px" }}
+                  onClick={() => setMenuOpen(false)}>
                   Acceder
                 </Link>
-                <Link 
-                  href={APPLY_HREF} 
-                  className="text-lg font-bold text-energy-orange py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Unirse a FacultyMatch
+                <Link href="/signup/faculty" style={{ ...S.btnPrimary, textAlign: "center", padding: "12px 18px" }}
+                  onClick={() => setMenuOpen(false)}>
+                  Publicar perfil
                 </Link>
               </>
             )}
+          </div>
         </div>
       )}
-    </nav>
+    </>
   );
 }
