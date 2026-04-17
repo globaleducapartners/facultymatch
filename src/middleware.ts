@@ -71,7 +71,7 @@ export async function middleware(request: NextRequest) {
   if (user && isAppRoute && !pathname.startsWith("/onboarding") && !pathname.startsWith("/auth")) {
     const { data: profile } = await supabase
       .from("user_profiles")
-      .select("role")
+      .select("role, active_mode")
       .eq("id", user.id)
       .single();
 
@@ -80,6 +80,9 @@ export async function middleware(request: NextRequest) {
       url.pathname = "/onboarding/role";
       return NextResponse.redirect(url);
     }
+
+    // active_mode as source of truth; fall back to role when null
+    const activeMode = profile.active_mode ?? profile.role;
 
     // Redirigir admins a /control cuando intentan acceder a /app/*
     const role = profile.role;
@@ -91,12 +94,12 @@ export async function middleware(request: NextRequest) {
       }
     }
     // Evitar que un faculty acceda a /app/institution y viceversa
-    if (role === "faculty" && pathname.startsWith("/app/institution")) {
+    if (activeMode === "faculty" && pathname.startsWith("/app/institution")) {
       const url = request.nextUrl.clone();
       url.pathname = "/app/faculty";
       return NextResponse.redirect(url);
     }
-    if (role === "institution" && pathname.startsWith("/app/faculty")) {
+    if (activeMode === "institution" && pathname.startsWith("/app/faculty")) {
       const url = request.nextUrl.clone();
       url.pathname = "/app/institution";
       return NextResponse.redirect(url);
