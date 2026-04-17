@@ -97,9 +97,9 @@ export default async function InstitutionSearchRoute({
     { data: areaMatchData },
     { data: nameMatchData },
   ] = await Promise.all([
-    admin.from("favorites").select("faculty_id").eq("institution_id", institution.id),
-    admin.from("contacts").select("*", { count: "exact", head: true }).eq("institution_id", institution.id),
-    admin.from("contacts").select("*", { count: "exact", head: true })
+    supabase.from("favorites").select("faculty_id").eq("institution_id", institution.id),
+    supabase.from("contacts").select("*", { count: "exact", head: true }).eq("institution_id", institution.id),
+    supabase.from("contacts").select("*", { count: "exact", head: true })
       .eq("institution_id", institution.id)
       .gte("created_at", `${currentMonth}-01`)
       .lt("created_at", nextMonthStr),
