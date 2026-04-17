@@ -19,8 +19,9 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.facultymatch.app'),
-  title: "FacultyMatch | Red Global de Talento Académico",
-  description: "Conectamos universidades y docentes expertos de todo el mundo. La red de confianza académica líder.",
+  title: "FacultyMatch | Directorio de talento para la educación superior",
+  description: "El directorio de docentes, investigadores y expertos para instituciones educativas. Perfiles revisados. Contacto directo. Sin intermediarios.",
+  keywords: "directorio docentes, talento académico, educación superior, expertos universidad",
   icons: {
     icon: [
       { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
@@ -34,8 +35,8 @@ export const metadata: Metadata = {
     shortcut: [{ url: "/favicon.ico" }],
   },
   openGraph: {
-    title: "FacultyMatch | Red Global de Talento Académico",
-    description: "Conectamos universidades y docentes expertos de todo el mundo.",
+    title: "FacultyMatch | Directorio de talento para la educación superior",
+    description: "El directorio de docentes, investigadores y expertos para instituciones educativas. Perfiles revisados. Contacto directo. Sin intermediarios.",
     images: ["/icon-512.png"],
   }
 };
