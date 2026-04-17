@@ -16,7 +16,6 @@ export const PLANS: Record<string, PlanConfig> = {
     description: "Visibilidad prioritaria, control de privacidad avanzado y acceso a todas las oportunidades.",
     price: "29€",
     period: "/ año",
-    promo: "Acceso completo · Sin permanencia",
     features: [
       "Todo lo del plan Basic",
       "Bloqueo de instituciones específicas",

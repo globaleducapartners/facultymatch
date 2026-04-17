@@ -165,7 +165,7 @@ export default async function PrivacyPage() {
                       <p className="text-sm text-gray-500 font-medium">Actualiza a Professional para bloquear instituciones específicas y ocultar tu perfil de tu centro actual.</p>
                     </div>
                     <Button className="bg-talentia-blue hover:bg-blue-700 text-white font-black rounded-xl h-11 px-8 uppercase tracking-widest text-xs shadow-lg shadow-blue-100">
-                      Mejorar plan · 9,99€
+                      Mejorar plan · 29€/año
                     </Button>
                   </div>
                 )}
