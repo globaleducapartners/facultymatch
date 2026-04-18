@@ -129,8 +129,8 @@ function Nav() {
           {[
             { label: "Para docentes",      href: "/faculty" },
             { label: "Para instituciones", href: "/institutions" },
-            { label: "Recursos",           href: "/resources" },
-            { label: "Cómo funciona",      href: "/faculty#como-funciona" },
+            { label: "Cómo funciona",      href: "#como-funciona" },
+            { label: "Precios",            href: "/faculty#precios" },
           ].map((l) => (
             <Link key={l.href} href={l.href} style={{ fontFamily: SANS, fontSize: 13, color: C.muted, textDecoration: "none", cursor: "pointer", display: isMob ? "none" : "inline" }}>
               {l.label}
@@ -251,7 +251,6 @@ function Hero() {
 
 // ─── TICKER ───────────────────────────────────────────────────────────────────
 function Ticker() {
-  const isMob = useIsMobile();
   return (
     <div style={{ background: C.navy, padding: "11px 0", overflow: "hidden" }}>
       <div style={{
@@ -535,7 +534,6 @@ function TwoColumns() {
 
 // ─── PULL QUOTE ───────────────────────────────────────────────────────────────
 function PullQuote() {
-  const isMob = useIsMobile();
   return (
     <PhotoBg
       url="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1800"

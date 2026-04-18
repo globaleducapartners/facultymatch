@@ -53,10 +53,42 @@ const HOW = [
 export default function InstitutionsPage() {
   return (
     <div style={{ background: C.paper, fontFamily: SANS }}>
+      <style>{`
+        .fm-hero-section { height: 520px; overflow: hidden; position: relative; }
+        .fm-hero-h1 { font-size: 54px !important; }
+        .fm-pad { padding: 72px 40px; }
+        .fm-pad-section { padding: 64px 40px; }
+        .fm-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+        .fm-grid-2-60 { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .fm-grid-2-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 760px; margin: 0 auto; }
+        .fm-grid-2-12 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .fm-cta-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 32px; padding: 64px 40px; max-width: 1080px; margin: 0 auto; width: 100%; }
+        .fm-col-pad { padding: 40px 44px 48px; }
+        .fm-feature-grid { display: grid; grid-template-columns: 1fr 1fr; min-height: 420px; }
+        .fm-feature-pad { padding: 52px 48px; display: flex; flex-direction: column; justify-content: center; }
+        @media (max-width: 768px) {
+          .fm-hero-section { height: auto !important; min-height: 440px; padding: 80px 0 60px; }
+          .fm-hero-h1 { font-size: 32px !important; }
+          .fm-pad { padding: 48px 20px !important; }
+          .fm-pad-section { padding: 48px 20px !important; }
+          .fm-grid-3 { grid-template-columns: 1fr !important; }
+          .fm-grid-2-60 { grid-template-columns: 1fr !important; gap: 0 !important; }
+          .fm-grid-2-eq { grid-template-columns: 1fr !important; }
+          .fm-grid-2-12 { grid-template-columns: 1fr !important; }
+          .fm-cta-inner { flex-direction: column; align-items: flex-start; padding: 48px 20px !important; }
+          .fm-col-pad { padding: 28px 20px 32px !important; }
+          .fm-feature-grid { grid-template-columns: 1fr !important; min-height: 0 !important; }
+          .fm-feature-pad { padding: 28px 20px !important; }
+          .fm-photo-hide { display: none !important; }
+          .fm-nav-links { display: none !important; }
+          .fm-max-1080 { padding-left: 20px !important; padding-right: 20px !important; }
+        }
+      `}</style>
+
       <Navbar />
 
       {/* ── HERO ── */}
-      <section style={{ position: "relative", height: 520, overflow: "hidden" }}>
+      <section className="fm-hero-section">
         <div style={{
           position: "absolute", inset: 0,
           backgroundImage: `url(https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?auto=format&fit=crop&q=85&w=1800)`,
@@ -67,9 +99,10 @@ export default function InstitutionsPage() {
           background: "linear-gradient(160deg, rgba(12,16,24,0.5) 0%, rgba(12,16,24,0.72) 60%, rgba(12,16,24,0.92) 100%)",
         }} />
         <div style={{
-          position: "relative", zIndex: 2, height: "100%",
+          position: "relative", zIndex: 2,
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
+          minHeight: "inherit",
           textAlign: "center", padding: "0 40px",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
@@ -80,7 +113,7 @@ export default function InstitutionsPage() {
             <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
           </div>
 
-          <h1 style={{ fontFamily: SERIF, fontSize: 54, fontWeight: 400, color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em", margin: "0 0 20px", maxWidth: 700 }}>
+          <h1 className="fm-hero-h1" style={{ fontFamily: SERIF, fontSize: 54, fontWeight: 400, color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em", margin: "0 0 20px", maxWidth: 700 }}>
             El directorio que busca lo que
             ningún portal de empleo tiene.
           </h1>
@@ -92,7 +125,7 @@ export default function InstitutionsPage() {
           </p>
 
           <div style={{ display: "flex", gap: 12 }}>
-            <Link href="/signup/institution">
+            <Link href="/signup?intent=institution">
               <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 32px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
                 Acceder al directorio
               </button>
@@ -107,7 +140,7 @@ export default function InstitutionsPage() {
       </section>
 
       {/* ── PREVIEW DEL DIRECTORIO ── */}
-      <section style={{ background: C.cream, padding: "72px 40px", borderBottom: `1px solid ${C.border}` }}>
+      <section style={{ background: C.cream }}>
         <div style={{ maxWidth: 1080, margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap" as const, gap: 20 }}>
             <div>
@@ -118,7 +151,7 @@ export default function InstitutionsPage() {
                 Perfiles que no están en LinkedIn.
               </h2>
             </div>
-            <Link href="/signup/institution">
+            <Link href="/signup?intent=institution">
               <button style={{ fontFamily: SANS, background: C.navy, color: "#fff", border: "none", padding: "10px 22px", borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
                 Ver el directorio completo
               </button>
@@ -126,7 +159,7 @@ export default function InstitutionsPage() {
           </div>
 
           {/* Grid de perfiles */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 24 }}>
+          <div style={{ marginBottom: 24 }} className="fm-grid-3">
             {SAMPLE_PROFILES.map((p, i) => {
               const k = KIND[p.kind];
               return (
@@ -159,8 +192,8 @@ export default function InstitutionsPage() {
       </section>
 
       {/* ── FILTROS ── */}
-      <section style={{ background: C.white, padding: "72px 40px", borderBottom: `1px solid ${C.border}` }}>
-        <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
+      <section style={{ background: C.white }}>
+        <div className="fm-pad fm-grid-2-60" style={{ maxWidth: 1080, margin: "0 auto" }}>
           <div>
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>
               Búsqueda estructurada
@@ -172,7 +205,7 @@ export default function InstitutionsPage() {
               No hay palabras clave ni CVs que interpretar. El directorio está estructurado
               por los criterios que usan los directores de programa para seleccionar profesorado.
             </p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div className="fm-grid-2-12">
               {FILTERS.map((f, i) => (
                 <div key={i} style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 16px" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
@@ -196,7 +229,7 @@ export default function InstitutionsPage() {
       </section>
 
       {/* ── CÓMO FUNCIONA ── */}
-      <section style={{ background: C.cream, padding: "72px 40px", borderBottom: `1px solid ${C.border}` }}>
+      <section style={{ background: C.cream }}>
         <div style={{ maxWidth: 1080, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
@@ -206,7 +239,7 @@ export default function InstitutionsPage() {
               Tres pasos. Sin proceso de selección previo.
             </h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
+          <div className="fm-grid-3">
             {HOW.map((s, i) => (
               <div key={i} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "28px 26px", borderTop: `3px solid ${C.brass}` }}>
                 <div style={{ fontFamily: SERIF, fontSize: 24, color: C.brass, opacity: 0.45, marginBottom: 14, letterSpacing: "-0.02em" }}>{s.n}</div>
@@ -219,7 +252,7 @@ export default function InstitutionsPage() {
       </section>
 
       {/* ── PRECIOS ── */}
-      <section id="precios" style={{ background: C.white, padding: "72px 40px", borderBottom: `1px solid ${C.border}` }}>
+      <section id="precios" style={{ background: C.white }}>
         <div style={{ maxWidth: 1080, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
@@ -233,7 +266,7 @@ export default function InstitutionsPage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 760, margin: "0 auto" }}>
+          <div className="fm-grid-2-eq">
             {/* Essential */}
             <div style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: 14, padding: "32px 30px" }}>
               <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: C.faint, marginBottom: 16 }}>Plan Essential</div>
@@ -252,7 +285,7 @@ export default function InstitutionsPage() {
                   </div>
                 ))}
               </div>
-              <Link href="/signup/institution">
+              <Link href="/signup?intent=institution">
                 <button style={{ fontFamily: SANS, width: "100%", background: "transparent", color: C.navy, border: `1px solid ${C.navy}`, padding: "11px 0", borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
                   Registrar mi institución
                 </button>
@@ -321,12 +354,12 @@ export default function InstitutionsPage() {
             </p>
           </div>
           <div style={{ display: "flex", gap: 10 }}>
-            <Link href="/signup/institution">
+            <Link href="/signup?intent=institution">
               <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 28px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
                 Acceder al directorio
               </button>
             </Link>
-            <Link href="/signup/faculty">
+            <Link href="/signup">
               <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.22)", padding: "13px 28px", borderRadius: 6, fontSize: 14, cursor: "pointer" }}>
                 Soy docente
               </button>

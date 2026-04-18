@@ -54,10 +54,62 @@ const BENEFITS = [
 export default function FacultyPage() {
   return (
     <div style={{ background: C.paper, fontFamily: SANS }}>
+      <style>{`
+        .fm-hero-section { height: 520px; overflow: hidden; position: relative; }
+        .fm-hero-h1 { font-size: 54px !important; }
+        .fm-pad { padding: 72px 40px; }
+        .fm-pad-section { padding: 64px 40px; }
+        .fm-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+        .fm-grid-2-60 { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .fm-grid-2-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 760px; margin: 0 auto; }
+        .fm-grid-2-12 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .fm-cta-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 32px; padding: 64px 40px; max-width: 1080px; margin: 0 auto; width: 100%; }
+        .fm-col-pad { padding: 40px 44px 48px; }
+        .fm-feature-grid { display: grid; grid-template-columns: 1fr 1fr; min-height: 420px; }
+        .fm-feature-pad { padding: 52px 48px; display: flex; flex-direction: column; justify-content: center; }
+        @media (max-width: 768px) {
+          .fm-hero-section { height: auto !important; min-height: 440px; padding: 80px 0 60px; }
+          .fm-hero-h1 { font-size: 32px !important; }
+          .fm-pad { padding: 48px 20px !important; }
+          .fm-pad-section { padding: 48px 20px !important; }
+          .fm-grid-3 { grid-template-columns: 1fr !important; }
+          .fm-grid-2-60 { grid-template-columns: 1fr !important; gap: 0 !important; }
+          .fm-grid-2-eq { grid-template-columns: 1fr !important; }
+          .fm-grid-2-12 { grid-template-columns: 1fr !important; }
+          .fm-cta-inner { flex-direction: column; align-items: flex-start; padding: 48px 20px !important; }
+          .fm-col-pad { padding: 28px 20px 32px !important; }
+          .fm-feature-grid { grid-template-columns: 1fr !important; min-height: 0 !important; }
+          .fm-feature-pad { padding: 28px 20px !important; }
+          .fm-photo-hide { display: none !important; }
+          .fm-nav-links { display: none !important; }
+          .fm-max-1080 { padding-left: 20px !important; padding-right: 20px !important; }
+        }
+      `}</style>
+
+      {/* ── Mobile responsive styles ── */}
+      <style>{`
+        .fm-hero { height: 520px; }
+        .fm-hero-h1 { font-size: 54px; }
+        .fm-section-pad { padding: 72px 40px; }
+        .fm-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+        .fm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .fm-grid-2-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 760px; margin: 0 auto; }
+        .fm-cta-row { display: flex; align-items: center; justify-content: space-between; padding: 64px 40px; }
+        @media (max-width: 768px) {
+          .fm-hero { height: auto !important; min-height: 480px; padding-top: 60px; padding-bottom: 60px; }
+          .fm-hero-h1 { font-size: 34px !important; }
+          .fm-section-pad { padding: 48px 20px !important; }
+          .fm-grid-3 { grid-template-columns: 1fr !important; }
+          .fm-grid-2 { grid-template-columns: 1fr !important; gap: 0 !important; }
+          .fm-grid-2-eq { grid-template-columns: 1fr !important; }
+          .fm-cta-row { flex-direction: column !important; padding: 48px 20px !important; text-align: center; }
+          .fm-photo-hide { display: none; }
+        }
+      `}</style>
       <Navbar />
 
       {/* ── HERO ── */}
-      <section style={{ position: "relative", height: 520, overflow: "hidden" }}>
+      <section className="fm-hero" style={{ position: "relative", overflow: "hidden" }}>
         {/* Foto con CSS — evita problemas de CSP */}
         <div style={{
           position: "absolute", inset: 0,
@@ -69,9 +121,10 @@ export default function FacultyPage() {
           background: "linear-gradient(160deg, rgba(12,16,24,0.52) 0%, rgba(12,16,24,0.72) 60%, rgba(12,16,24,0.9) 100%)",
         }} />
         <div style={{
-          position: "relative", zIndex: 2, height: "100%",
+          position: "relative", zIndex: 2,
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
+          minHeight: "inherit",
           textAlign: "center", padding: "0 40px",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
@@ -82,7 +135,7 @@ export default function FacultyPage() {
             <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
           </div>
 
-          <h1 style={{ fontFamily: SERIF, fontSize: 54, fontWeight: 400, color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em", margin: "0 0 20px", maxWidth: 680 }}>
+          <h1 className="fm-hero-h1" style={{ fontFamily: SERIF, fontSize: 54, fontWeight: 400, color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em", margin: "0 0 20px", maxWidth: 680 }}>
             Tu perfil, visible para quien
             busca lo que enseñas.
           </h1>
@@ -93,7 +146,7 @@ export default function FacultyPage() {
           </p>
 
           <div style={{ display: "flex", gap: 12 }}>
-            <Link href="/signup/faculty">
+            <Link href="/signup">
               <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 32px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
                 Publicar mi perfil
               </button>
@@ -108,8 +161,8 @@ export default function FacultyPage() {
       </section>
 
       {/* ── TIPOS DE PERFIL ── */}
-      <section style={{ background: C.white, padding: "72px 40px", borderBottom: `1px solid ${C.border}` }}>
-        <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+      <section style={{ background: C.white }}>
+        <div className="fm-section-pad" style={{ maxWidth: 1080, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 52 }}>
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
               Quién puede publicar su perfil
@@ -122,7 +175,7 @@ export default function FacultyPage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          <div className="fm-grid-3">
             {PROFILES.map((p, i) => (
               <div key={i} style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: 12, padding: "28px 26px", borderTop: `3px solid ${p.dot}` }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
@@ -144,44 +197,46 @@ export default function FacultyPage() {
       </section>
 
       {/* ── BENEFICIOS ── */}
-      <section style={{ background: C.cream, padding: "72px 40px", borderBottom: `1px solid ${C.border}` }}>
-        <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
-          {/* Foto */}
-          <div style={{ borderRadius: 14, overflow: "hidden", height: 420 }}>
-            <div style={{
-              width: "100%", height: "100%",
-              backgroundImage: `url(https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800)`,
-              backgroundSize: "cover", backgroundPosition: "center top",
-            }} />
-          </div>
-          {/* Contenido */}
-          <div>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>
-              Cómo funciona para ti
+      <section style={{ background: C.cream }}>
+        <div className="fm-section-pad" style={{ maxWidth: 1080, margin: "0 auto" }}>
+          <div className="fm-grid-2" style={{ alignItems: "center" }}>
+            {/* Foto */}
+            <div style={{ borderRadius: 14, overflow: "hidden", height: 420 }}>
+              <div style={{
+                width: "100%", height: "100%",
+                backgroundImage: `url(https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800)`,
+                backgroundSize: "cover", backgroundPosition: "center top",
+              }} />
             </div>
-            <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 32px", lineHeight: 1.2 }}>
-              Tú pones el conocimiento.<br />
-              Las instituciones ponen el interés.
-            </h2>
-            <div style={{ display: "flex", flexDirection: "column" as const, gap: 20 }}>
-              {BENEFITS.map((b, i) => (
-                <div key={i} style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 7, background: C.white, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
-                    <span style={{ fontFamily: SERIF, fontSize: 12, color: C.brass, fontStyle: "italic" }}>{["I", "II", "III", "IV"][i]}</span>
+            {/* Contenido */}
+            <div>
+              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>
+                Cómo funciona para ti
+              </div>
+              <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 32px", lineHeight: 1.2 }}>
+                Tú pones el conocimiento.<br />
+                Las instituciones ponen el interés.
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 20 }}>
+                {BENEFITS.map((b, i) => (
+                  <div key={i} style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: C.white, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
+                      <span style={{ fontFamily: SERIF, fontSize: 12, color: C.brass, fontStyle: "italic" }}>{["I", "II", "III", "IV"][i]}</span>
+                    </div>
+                    <div>
+                      <h3 style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 400, color: C.ink, margin: "0 0 5px" }}>{b.title}</h3>
+                      <p style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.7, margin: 0 }}>{b.desc}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 400, color: C.ink, margin: "0 0 5px" }}>{b.title}</h3>
-                    <p style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.7, margin: 0 }}>{b.desc}</p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* ── PRECIOS ── */}
-      <section id="precios" style={{ background: C.white, padding: "72px 40px", borderBottom: `1px solid ${C.border}` }}>
+      <section id="precios" style={{ background: C.white }}>
         <div style={{ maxWidth: 1080, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
@@ -192,7 +247,7 @@ export default function FacultyPage() {
             </h2>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 760, margin: "0 auto" }}>
+          <div className="fm-grid-2-eq">
             {/* Basic */}
             <div style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: 14, padding: "32px 30px" }}>
               <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: C.faint, marginBottom: 16 }}>Plan Basic</div>
@@ -206,7 +261,7 @@ export default function FacultyPage() {
                   </div>
                 ))}
               </div>
-              <Link href="/signup/faculty">
+              <Link href="/signup">
                 <button style={{ fontFamily: SANS, width: "100%", background: "transparent", color: C.navy, border: `1px solid ${C.navy}`, padding: "11px 0", borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
                   Empezar gratis
                 </button>
@@ -264,12 +319,12 @@ export default function FacultyPage() {
             </p>
           </div>
           <div style={{ display: "flex", gap: 10 }}>
-            <Link href="/signup/faculty">
+            <Link href="/signup">
               <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 28px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
                 Publicar mi perfil
               </button>
             </Link>
-            <Link href="/signup/institution">
+            <Link href="/signup?intent=institution">
               <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.22)", padding: "13px 28px", borderRadius: 6, fontSize: 14, cursor: "pointer" }}>
                 Soy institución
               </button>
