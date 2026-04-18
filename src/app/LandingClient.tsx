@@ -59,7 +59,7 @@ function PhotoBg({
       />
       <div style={{ position: "absolute", inset: 0, background: overlay }} />
       {children && (
-        <div style={{ position: "relative", zIndex: 2, height: "100%" }}>
+        <div style={{ position: "relative", zIndex: 2, height: height === "auto" ? undefined : "100%" }}>
           {children}
         </div>
       )}
@@ -481,8 +481,8 @@ function TwoColumns() {
   const isMob = useIsMobile();
   const cols = [
     {
-      url: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=900",
-      pos: "center 30%",
+      url: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=900",
+      pos: "center 35%",
       eyebrow: "Para docentes y expertos",
       headline: "Tus clases son\nel extra que\nestabas esperando.",
       body: "Lo que tardaste años en aprender tiene demanda real. Hay programas ejecutivos, másters y centros de formación buscando exactamente lo que tú sabes. Publica tu perfil y deja que te encuentren.",
@@ -491,7 +491,7 @@ function TwoColumns() {
       primary: true,
     },
     {
-      url: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=900",
+      url: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=900",
       pos: "center 40%",
       eyebrow: "Para instituciones educativas",
       headline: "El docente que necesitas\nno está en LinkedIn,\nestá en FacultyMatch.",
@@ -510,7 +510,7 @@ function TwoColumns() {
             <PhotoBg
               url={col.url}
               height={280}
-              overlay="rgba(12,16,24,0.2)"
+              overlay="rgba(12,16,24,0.08)"
               position={col.pos}
               fallback={i === 0 ? "linear-gradient(135deg, #101820 0%, #0D2240 100%)" : "linear-gradient(135deg, #1C1409 0%, #2D1F08 100%)"}
             />
@@ -758,32 +758,57 @@ function CampusCTA() {
 // ─── FOOTER PROPIO (la landing tiene el suyo, el global está desactivado) ─────
 function LandingFooter() {
   const isMob = useIsMobile();
+  const links = [
+    { label: "Para docentes",      href: "/faculty" },
+    { label: "Para instituciones", href: "/institutions" },
+    { label: "Recursos",           href: "/resources" },
+    { label: "Privacidad",         href: "/privacy" },
+    { label: "Términos",           href: "/terms" },
+    { label: "Contacto",           href: "mailto:info@facultymatch.app" },
+  ];
   return (
-    <footer style={{ background: C.ink, borderTop: `1px solid rgba(255,255,255,0.06)` }}>
+    <footer style={{ background: C.ink }}>
       <div style={{
         maxWidth: 1080, margin: "0 auto",
-        padding: isMob ? "28px 20px" : "28px 40px",
-        display: "flex", alignItems: isMob ? "flex-start" : "center",
-        flexDirection: isMob ? "column" as const : "row" as const,
-        justifyContent: "space-between", flexWrap: "wrap" as const, gap: 16,
+        padding: isMob ? "36px 20px 32px" : "40px 40px 36px",
+        borderTop: `1px solid rgba(255,255,255,0.08)`,
       }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-          <span style={{ fontFamily: SERIF, fontSize: 15, color: "rgba(255,255,255,0.8)" }}>FacultyMatch</span>
-          <span style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.22)" }}>
-            · Grupo Global Educa SL · 2026
+        {/* Brand row */}
+        <div style={{
+          display: "flex", alignItems: "center",
+          justifyContent: "space-between", flexWrap: "wrap" as const,
+          gap: 20, marginBottom: isMob ? 24 : 28,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{
+              width: 24, height: 24, borderRadius: 5, background: "rgba(255,255,255,0.12)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 9, fontWeight: 700, fontFamily: SANS }}>FM</span>
+            </div>
+            <span style={{ fontFamily: SERIF, fontSize: 16, color: "rgba(255,255,255,0.82)", letterSpacing: "-0.01em" }}>
+              FacultyMatch
+            </span>
+          </div>
+          <span style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.2)" }}>
+            Grupo Global Educa SL · 2026
           </span>
         </div>
-        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" as const }}>
-          {[
-            { label: "Para docentes",      href: "/faculty" },
-            { label: "Para instituciones", href: "/institutions" },
-            { label: "Recursos",           href: "/resources" },
-            { label: "Privacidad",         href: "/privacy" },
-            { label: "Términos",           href: "/terms" },
-            { label: "Contacto",           href: "mailto:info@facultymatch.app" },
-          ].map((l) => (
+        {/* Links row */}
+        <div style={{
+          display: "flex", flexWrap: "wrap" as const,
+          gap: isMob ? "10px 20px" : "8px 28px",
+          borderTop: `1px solid rgba(255,255,255,0.06)`,
+          paddingTop: 20,
+        }}>
+          {links.map((l) => (
             <Link key={l.label} href={l.href}>
-              <span style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.35)", cursor: "pointer" }}>
+              <span style={{
+                fontFamily: SANS, fontSize: 12,
+                color: "rgba(255,255,255,0.38)",
+                cursor: "pointer",
+                letterSpacing: "0.01em",
+              }}>
                 {l.label}
               </span>
             </Link>
