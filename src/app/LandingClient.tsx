@@ -134,7 +134,7 @@ function Nav() {
               Acceder
             </button>
           </Link>
-          <Link href="/signup/faculty">
+          <Link href="/signup">
             <button style={{
               fontFamily: SANS, background: C.navy, border: "none",
               color: "#fff", fontSize: 13, fontWeight: 600,
@@ -194,7 +194,7 @@ function Hero() {
         </p>
 
         <div style={{ display: "flex", gap: 12 }}>
-          <Link href="/signup/faculty">
+          <Link href="/signup">
             <button style={{
               fontFamily: SANS, background: "#fff", color: C.ink,
               border: "none", padding: "13px 32px", borderRadius: 6,
@@ -203,7 +203,7 @@ function Hero() {
               Publicar mi perfil
             </button>
           </Link>
-          <Link href="/signup/institution">
+          <Link href="/signup?intent=institution">
             <button style={{
               fontFamily: SANS, background: "transparent",
               color: "rgba(255,255,255,0.82)",
@@ -416,7 +416,7 @@ function Directory() {
             Todos los perfiles son revisados antes de publicarse.
           </p>
           <div style={{ display: "flex", gap: 10 }}>
-            <Link href="/signup/faculty">
+            <Link href="/signup">
               <button style={{
                 fontFamily: SANS, background: C.navy, color: "#fff",
                 border: "none", padding: "10px 22px", borderRadius: 6,
@@ -425,7 +425,7 @@ function Directory() {
                 Publicar mi perfil
               </button>
             </Link>
-            <Link href="/signup/institution">
+            <Link href="/signup?intent=institution">
               <button style={{
                 fontFamily: SANS, background: "transparent", color: C.navy,
                 border: `1px solid ${C.navy}`, padding: "10px 22px",
@@ -451,7 +451,7 @@ function TwoColumns() {
       headline: "Tu perfil,\nvisible para quien\nbusca lo que enseñas.",
       body: "Crea un perfil estructurado con tu formación, experiencia y disponibilidad. Las instituciones te encuentran cuando buscan tu área. Tú decides si respondes y en qué condiciones.",
       cta: "Crear mi perfil",
-      href: "/signup/faculty",
+      href: "/signup",
       primary: true,
     },
     {
@@ -461,7 +461,7 @@ function TwoColumns() {
       headline: "Busca por área,\nidioma y disponibilidad.\nContacto directo.",
       body: "Directorio estructurado de docentes, investigadores y expertos con experiencia real. Cada perfil revisado antes de publicarse. Sin comisiones por contratación.",
       cta: "Acceder al directorio",
-      href: "/signup/institution",
+      href: "/signup?intent=institution",
       primary: false,
     },
   ];
@@ -686,7 +686,7 @@ function CampusCTA() {
           </p>
         </div>
         <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
-          <Link href="/signup/faculty">
+          <Link href="/signup">
             <button style={{
               fontFamily: SANS, background: "#fff", color: C.ink,
               border: "none", padding: "12px 28px", borderRadius: 6,
@@ -695,7 +695,7 @@ function CampusCTA() {
               Publicar mi perfil
             </button>
           </Link>
-          <Link href="/signup/institution">
+          <Link href="/signup?intent=institution">
             <button style={{
               fontFamily: SANS, background: "transparent",
               color: "rgba(255,255,255,0.7)",
