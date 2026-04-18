@@ -2,21 +2,40 @@
 
 import { useState, Suspense } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { signIn } from "@/app/auth/actions";
-import { Loader2, ArrowRight, GraduationCap, ShieldCheck, Globe } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/ui/Logo";
 
+// ─── Tokens ─────────────────────────────────────────────────────────────────
+const SERIF = `var(--font-serif, 'Georgia', 'Times New Roman', serif)`;
+const SANS  = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
+const C = {
+  ink: "#0C1018", navy: "#0D2240", brass: "#B8963E",
+  cream: "#F7F5F0", white: "#FFFFFF",
+  muted: "#6B7280", faint: "#9CA3AF", border: "#E5E1D8",
+  error: "#DC2626", errorBg: "#FEF2F2",
+};
+
+const inp: React.CSSProperties = {
+  fontFamily: SANS, width: "100%", fontSize: 14, color: C.ink,
+  background: C.white, border: `1px solid ${C.border}`,
+  borderRadius: 8, padding: "11px 14px", outline: "none",
+  boxSizing: "border-box" as const,
+};
+
+const lbl: React.CSSProperties = {
+  fontFamily: SANS, fontSize: 13, fontWeight: 500,
+  color: C.ink, display: "block", marginBottom: 6,
+};
+
+// ─── Contenido del login ─────────────────────────────────────────────────────
 function LoginContent() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const searchParams = useSearchParams();
-  const message = searchParams.get("message");
-  const next = searchParams.get("next");
-  const urlError = searchParams.get("error");
-  const urlErrorCode = searchParams.get("error_code");
+  const [error, setError]     = useState<string | null>(null);
+  const searchParams   = useSearchParams();
+  const message        = searchParams.get("message");
+  const next           = searchParams.get("next");
+  const urlError       = searchParams.get("error");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,144 +50,162 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left: Image panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-navy flex-col justify-between p-14 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image
-            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=1200"
-            alt="Docente en aula"
-            fill
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover opacity-30"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-navy via-navy/95 to-talentia-blue/60"></div>
-        </div>
-          <div className="relative z-10">
-            <Link href="/">
-              <Logo variant="light" />
-            </Link>
+    <div style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "2fr 3fr", fontFamily: SANS }}>
+
+      {/* ── Panel izquierdo — navy ── */}
+      <div style={{
+        background: C.navy, padding: "48px 44px",
+        display: "flex", flexDirection: "column", justifyContent: "space-between",
+      }}>
+        {/* Wordmark */}
+        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "baseline", gap: 8 }}>
+          <div style={{
+            width: 26, height: 26, borderRadius: 5,
+            background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <span style={{ color: "#fff", fontSize: 10, fontWeight: 700 }}>FM</span>
           </div>
-        <div className="relative z-10 space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-4xl font-black text-white leading-tight">
-              La red global del talento académico.
-            </h2>
-            <p className="text-white/60 font-medium text-lg leading-relaxed">
-              Conecta con universidades e instituciones de más de 40 países. Gestiona tu carrera académica desde un solo lugar.
-            </p>
+          <span style={{ fontFamily: SERIF, fontSize: 16, color: "#fff" }}>FacultyMatch</span>
+        </Link>
+
+        {/* Cuerpo */}
+        <div>
+          <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>
+            Directorio de talento educativo
           </div>
-          <div className="space-y-4">
+          <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: "#fff", lineHeight: 1.25, margin: "0 0 28px", letterSpacing: "-0.02em" }}>
+            Bienvenido de nuevo.
+          </h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[
-              { icon: GraduationCap, text: "Perfil académico verificado" },
-              { icon: ShieldCheck, text: "Privacidad y control total" },
-              { icon: Globe, text: "Red global de instituciones" },
-            ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-center gap-3 text-white/70">
-                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                  <Icon size={16} className="text-tech-cyan" />
-                </div>
-                <span className="font-bold text-sm">{text}</span>
+              "Tu perfil sigue activo en el directorio",
+              "Las instituciones pueden seguir encontrándote",
+              "Gestiona tu disponibilidad y privacidad",
+              "Revisa las solicitudes que hayas recibido",
+            ].map((t, i) => (
+              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                <div style={{ width: 5, height: 5, borderRadius: "50%", background: C.brass, flexShrink: 0, marginTop: 6 }} />
+                <span style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.58)", lineHeight: 1.55 }}>{t}</span>
               </div>
             ))}
           </div>
         </div>
-        <div className="relative z-10">
-          <p className="text-white/30 text-xs font-bold uppercase tracking-widest">© 2026 Grupo Global Educa SL</p>
-        </div>
+
+        {/* Pie */}
+        <span style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.22)" }}>
+          © 2026 FacultyMatch · Grupo Global Educa SL
+        </span>
       </div>
 
-      {/* Right: Form panel */}
-      <div className="flex-1 flex flex-col items-center justify-center bg-[#F8FAFC] px-6 py-12">
-        <div className="w-full max-w-md space-y-8">
-          {/* Mobile logo */}
-          <div className="lg:hidden text-center">
-            <Link href="/">
-              <Logo />
-            </Link>
+      {/* ── Panel derecho — cream ── */}
+      <div style={{ background: C.cream, padding: "48px 56px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <div style={{ maxWidth: 400, margin: "0 auto", width: "100%" }}>
+
+          {/* Cabecera */}
+          <div style={{ marginBottom: 32 }}>
+            <h1 style={{ fontFamily: SERIF, fontSize: 26, fontWeight: 400, color: C.ink, margin: "0 0 6px", letterSpacing: "-0.02em" }}>
+              Accede a tu cuenta.
+            </h1>
+            <p style={{ fontFamily: SANS, fontSize: 14, color: C.muted, margin: 0 }}>
+              Introduce tu email y contraseña para continuar.
+            </p>
           </div>
 
-          <div>
-            <h1 className="text-3xl font-black text-navy tracking-tight">Bienvenido de nuevo</h1>
-            <p className="text-gray-500 font-medium mt-1">Accede a tu cuenta de FacultyMatch</p>
-          </div>
+          {/* Mensaje de confirmación */}
+          {message && (
+            <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 8, padding: "12px 14px", marginBottom: 20 }}>
+              <p style={{ fontFamily: SANS, fontSize: 13, color: "#15803D", margin: 0 }}>{message}</p>
+            </div>
+          )}
 
-            {message && (
-              <div className="p-3.5 rounded-xl bg-green-50 border border-green-100 text-green-700 text-sm font-bold animate-in fade-in duration-500">
-                {message}
-              </div>
-            )}
-
-            {(error || urlError) && (
-              <div className="p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-bold animate-in fade-in duration-500">
+          {/* Error */}
+          {(error || urlError) && (
+            <div style={{ background: C.errorBg, border: "1px solid #FCA5A5", borderRadius: 8, padding: "12px 14px", marginBottom: 20 }}>
+              <p style={{ fontFamily: SANS, fontSize: 13, color: C.error, margin: 0 }}>
                 {error?.toLowerCase().includes("email not confirmed")
                   ? "Debes confirmar tu email antes de acceder. Revisa tu bandeja de entrada."
-                  : error || 'Error de autenticación. Por favor, inténtalo de nuevo.'}
-              </div>
-            )}
+                  : error || "Error de autenticación. Por favor, inténtalo de nuevo."}
+              </p>
+            </div>
+          )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Formulario */}
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             <input type="hidden" name="next" value={next || ""} />
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-widest text-gray-500 ml-1">Correo electrónico</label>
+            <div>
+              <label style={lbl}>Correo electrónico</label>
               <input
                 name="email"
                 type="email"
                 required
                 autoComplete="email"
-                className="w-full px-5 py-4 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium text-navy shadow-sm"
                 placeholder="nombre@universidad.edu"
+                style={inp}
               />
             </div>
 
-            <div className="space-y-1.5">
-              <div className="flex justify-between items-center ml-1">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-500">Contraseña</label>
-                <Link href="/reset-password" className="text-[11px] font-bold text-talentia-blue hover:underline">¿Olvidaste tu contraseña?</Link>
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <label style={{ ...lbl, marginBottom: 0 }}>Contraseña</label>
+                <Link href="/reset-password" style={{ fontFamily: SANS, fontSize: 12, color: C.navy, textDecoration: "none" }}>
+                  ¿Olvidaste tu contraseña?
+                </Link>
               </div>
               <input
                 name="password"
                 type="password"
                 required
                 autoComplete="current-password"
-                className="w-full px-5 py-4 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium shadow-sm"
                 placeholder="••••••••"
+                style={inp}
               />
             </div>
 
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-talentia-blue hover:bg-blue-700 text-white py-7 rounded-xl font-bold transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2 group"
-              >
-                {loading ? <Loader2 className="animate-spin" size={20} /> : (
-                  <>
-                    Acceder
-                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                  </>
-                )}
-              </Button>
-            </form>
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                fontFamily: SANS, width: "100%",
+                background: loading ? C.muted : C.navy,
+                color: C.white, border: "none",
+                padding: "13px 22px", borderRadius: 8,
+                fontSize: 14, fontWeight: 600,
+                cursor: loading ? "default" : "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                marginTop: 4,
+              }}
+            >
+              {loading
+                ? <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Entrando...</>
+                : "Acceder →"
+              }
+            </button>
+          </form>
 
-
-          <p className="text-center text-gray-500 text-sm font-medium">
+          <p style={{ fontFamily: SANS, fontSize: 13, color: C.faint, textAlign: "center", marginTop: 24 }}>
             ¿No tienes cuenta?{" "}
-            <Link href="/signup" className="text-talentia-blue font-bold hover:underline">
+            <Link href="/signup" style={{ color: C.navy, fontWeight: 500, textDecoration: "none" }}>
               Crear perfil
             </Link>
           </p>
         </div>
       </div>
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>
     </div>
   );
 }
 
+// ─── Export con Suspense (necesario por useSearchParams) ─────────────────────
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
-        <Loader2 className="animate-spin text-talentia-blue" size={32} />
+      <div style={{ minHeight: "100vh", background: C.navy, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ fontFamily: SERIF, fontSize: 18, color: "rgba(255,255,255,0.5)" }}>
+          Cargando...
+        </div>
       </div>
     }>
       <LoginContent />
