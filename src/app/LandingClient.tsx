@@ -338,12 +338,16 @@ function Directory() {
   const [focus, setFocus] = useState(false);
   const [filter, setFilter] = useState<string | null>(null);
 
+  const visibleProfiles = isMob ? PROFILES.slice(0, 4) : PROFILES;
+
   return (
-    <section style={{ background: C.cream, padding: isMob ? "48px 20px 56px" : "64px 40px 72px" }}>
+    <section style={{ background: C.cream, padding: isMob ? "48px 20px 56px" : "64px 40px 72px", overflowX: "hidden" }}>
       <div style={{ maxWidth: 1080, margin: "0 auto" }}>
         <div style={{
-          display: "flex", alignItems: "flex-end", justifyContent: "space-between",
-          marginBottom: 32, flexWrap: "wrap" as const, gap: 20,
+          display: "flex", alignItems: isMob ? "flex-start" : "flex-end",
+          flexDirection: isMob ? "column" : "row",
+          justifyContent: "space-between",
+          marginBottom: 32, gap: 16,
         }}>
           <div>
             <div style={{
@@ -364,9 +368,10 @@ function Directory() {
             display: "flex", alignItems: "center", gap: 8,
             background: C.white,
             border: `1px solid ${focus ? C.navy : C.border}`,
-            borderRadius: 8, padding: "0 10px 0 16px", minWidth: 260,
+            borderRadius: 8, padding: "0 10px 0 16px",
+            width: isMob ? "100%" : undefined, minWidth: isMob ? 0 : 260,
             boxShadow: focus ? "0 0 0 3px rgba(13,34,64,0.07)" : "none",
-            transition: "all 0.15s",
+            transition: "all 0.15s", boxSizing: "border-box" as const,
           }}>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <circle cx="6.5" cy="6.5" r="4.5" stroke={C.faint} strokeWidth="1.4" />
@@ -381,7 +386,7 @@ function Directory() {
               style={{
                 flex: 1, border: "none", outline: "none",
                 fontFamily: SANS, fontSize: 14, color: C.ink,
-                padding: "11px 0", background: "transparent",
+                padding: "11px 0", background: "transparent", minWidth: 0,
               }}
             />
           </div>
@@ -407,45 +412,54 @@ function Directory() {
               {f}
             </button>
           ))}
-          <div style={{ marginLeft: "auto", display: "flex", gap: 14, alignItems: "center" }}>
-            {Object.entries(KIND_STYLE).map(([k, v]) => (
-              <div key={k} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: v.dot }} />
-                <span style={{ fontFamily: SANS, fontSize: 11, color: C.faint }}>{k}</span>
-              </div>
-            ))}
-          </div>
+          {!isMob && (
+            <div style={{ marginLeft: "auto", display: "flex", gap: 14, alignItems: "center" }}>
+              {Object.entries(KIND_STYLE).map(([k, v]) => (
+                <div key={k} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: v.dot }} />
+                  <span style={{ fontFamily: SANS, fontSize: 11, color: C.faint }}>{k}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div style={{
-          display: "grid", gridTemplateColumns: "repeat(3,1fr)",
+          display: "grid",
+          gridTemplateColumns: isMob ? "1fr 1fr" : "repeat(3,1fr)",
           gap: 14, marginBottom: 32,
         }}>
-          {PROFILES.map((p, i) => <ProfileCard key={i} p={p} />)}
+          {visibleProfiles.map((p, i) => <ProfileCard key={i} p={p} />)}
         </div>
 
         <div style={{
           paddingTop: 24, borderTop: `1px solid ${C.border}`,
-          display: "flex", alignItems: "center", justifyContent: "space-between",
+          display: "flex", alignItems: isMob ? "stretch" : "center",
+          flexDirection: isMob ? "column" : "row",
+          justifyContent: "space-between", gap: 12,
         }}>
-          <p style={{ fontFamily: SANS, fontSize: 13, color: C.faint, margin: 0 }}>
-            Todos los perfiles son revisados antes de publicarse.
-          </p>
-          <div style={{ display: "flex", gap: 10 }}>
+          {!isMob && (
+            <p style={{ fontFamily: SANS, fontSize: 13, color: C.faint, margin: 0 }}>
+              Todos los perfiles son revisados antes de publicarse.
+            </p>
+          )}
+          <div style={{ display: "flex", gap: 10, flexDirection: isMob ? "column" : "row" }}>
             <Link href="/signup">
               <button style={{
                 fontFamily: SANS, background: C.navy, color: "#fff",
                 border: "none", padding: "10px 22px", borderRadius: 6,
                 fontSize: 13, fontWeight: 500, cursor: "pointer",
+                width: isMob ? "100%" : undefined,
               }}>
                 Publicar mi perfil
               </button>
             </Link>
-            <Link href="/signup?intent=institution">
+            <Link href="/signup?intent=institution" style={{ width: isMob ? "100%" : undefined }}>
               <button style={{
                 fontFamily: SANS, background: "transparent", color: C.navy,
                 border: `1px solid ${C.navy}`, padding: "10px 22px",
                 borderRadius: 6, fontSize: 13, cursor: "pointer",
+                width: isMob ? "100%" : undefined,
               }}>
                 Acceder al directorio completo
               </button>
