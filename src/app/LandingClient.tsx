@@ -90,8 +90,21 @@ const AREAS = [
   "Estrategia empresarial", "Comunicación", "Emprendimiento",
 ];
 
+// ─── Hook responsive ──────────────────────────────────────────────────────────
+function useIsMobile() {
+  const [mob, setMob] = useState(false);
+  useEffect(() => {
+    const check = () => setMob(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return mob;
+}
+
 // ─── NAV ──────────────────────────────────────────────────────────────────────
 function Nav() {
+  const isMob = useIsMobile();
   return (
     <nav style={{
       position: "sticky", top: 0, zIndex: 100,
@@ -116,10 +129,10 @@ function Nav() {
           {[
             { label: "Para docentes",      href: "/faculty" },
             { label: "Para instituciones", href: "/institutions" },
-            { label: "Cómo funciona",      href: "#como-funciona" },
-            { label: "Precios",            href: "/faculty#precios" },
+            { label: "Recursos",           href: "/resources" },
+            { label: "Cómo funciona",      href: "/faculty#como-funciona" },
           ].map((l) => (
-            <Link key={l.href} href={l.href} style={{ fontFamily: SANS, fontSize: 13, color: C.muted, textDecoration: "none", cursor: "pointer" }}>
+            <Link key={l.href} href={l.href} style={{ fontFamily: SANS, fontSize: 13, color: C.muted, textDecoration: "none", cursor: "pointer", display: isMob ? "none" : "inline" }}>
               {l.label}
             </Link>
           ))}
@@ -151,18 +164,20 @@ function Nav() {
 
 // ─── HERO ─────────────────────────────────────────────────────────────────────
 function Hero() {
+  const isMob = useIsMobile();
   return (
     <PhotoBg
       url="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=85&w=1800"
-      height={580}
+      height={isMob ? "auto" : 580}
       overlay="linear-gradient(160deg,rgba(12,16,24,0.5) 0%,rgba(12,16,24,0.7) 55%,rgba(12,16,24,0.88) 100%)"
       position="center 40%"
       fallback="linear-gradient(135deg, #0D2240 0%, #0C1018 60%)"
     >
       <div style={{
-        height: "100%", display: "flex", flexDirection: "column",
+        minHeight: isMob ? 420 : undefined, paddingTop: isMob ? 80 : 0, paddingBottom: isMob ? 60 : 0,
+        display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
-        textAlign: "center", padding: "0 40px",
+        textAlign: "center", padding: isMob ? "0 20px" : "0 40px",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 30 }}>
           <div style={{ width: 32, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
@@ -236,6 +251,7 @@ function Hero() {
 
 // ─── TICKER ───────────────────────────────────────────────────────────────────
 function Ticker() {
+  const isMob = useIsMobile();
   return (
     <div style={{ background: C.navy, padding: "11px 0", overflow: "hidden" }}>
       <div style={{
@@ -318,12 +334,13 @@ function ProfileCard({ p }: { p: typeof PROFILES[0] }) {
 
 // ─── DIRECTORY ────────────────────────────────────────────────────────────────
 function Directory() {
+  const isMob = useIsMobile();
   const [q, setQ] = useState("");
   const [focus, setFocus] = useState(false);
   const [filter, setFilter] = useState<string | null>(null);
 
   return (
-    <section style={{ background: C.cream, padding: "64px 40px 72px" }}>
+    <section style={{ background: C.cream, padding: isMob ? "48px 20px 56px" : "64px 40px 72px" }}>
       <div style={{ maxWidth: 1080, margin: "0 auto" }}>
         <div style={{
           display: "flex", alignItems: "flex-end", justifyContent: "space-between",
@@ -443,6 +460,7 @@ function Directory() {
 
 // ─── TWO COLUMNS ──────────────────────────────────────────────────────────────
 function TwoColumns() {
+  const isMob = useIsMobile();
   const cols = [
     {
       url: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=900",
@@ -468,7 +486,7 @@ function TwoColumns() {
 
   return (
     <section style={{ background: C.white, borderTop: `1px solid ${C.border}` }}>
-      <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+      <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr" }}>
         {cols.map((col, i) => (
           <div key={i} style={{ borderRight: i === 0 ? `1px solid ${C.border}` : "none" }}>
             <PhotoBg
@@ -478,7 +496,7 @@ function TwoColumns() {
               position={col.pos}
               fallback={i === 0 ? "linear-gradient(135deg, #101820 0%, #0D2240 100%)" : "linear-gradient(135deg, #1C1409 0%, #2D1F08 100%)"}
             />
-            <div style={{ padding: "40px 44px 48px" }}>
+            <div style={{ padding: isMob ? "28px 20px 32px" : "40px 44px 48px" }}>
               <div style={{
                 fontFamily: SANS, fontSize: 10, fontWeight: 700,
                 letterSpacing: "0.14em", textTransform: "uppercase" as const,
@@ -517,6 +535,7 @@ function TwoColumns() {
 
 // ─── PULL QUOTE ───────────────────────────────────────────────────────────────
 function PullQuote() {
+  const isMob = useIsMobile();
   return (
     <PhotoBg
       url="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1800"
@@ -557,13 +576,14 @@ function PullQuote() {
 
 // ─── PROCESS ──────────────────────────────────────────────────────────────────
 function Process() {
+  const isMob = useIsMobile();
   const steps = [
     { n: "I",   title: "Crea tu perfil",          body: "Registro estructurado por área de conocimiento, formación y experiencia docente. Sin documentos adicionales. En menos de diez minutos." },
     { n: "II",  title: "Lo revisamos",             body: "Nuestro equipo revisa cada perfil antes de publicarlo en el directorio. Un proceso manual que garantiza la calidad de los perfiles." },
     { n: "III", title: "Las instituciones contactan", body: "Tu perfil aparece en las búsquedas de directores de programa. Recibes las solicitudes y decides si aceptas y en qué términos." },
   ];
   return (
-    <section style={{ background: C.cream, padding: "64px 40px 72px", borderTop: `1px solid ${C.border}` }}>
+    <section style={{ background: C.cream, padding: isMob ? "48px 20px 56px" : "64px 40px 72px", borderTop: `1px solid ${C.border}` }}>
       <div style={{ maxWidth: 1080, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{
@@ -580,7 +600,7 @@ function Process() {
             Tres pasos. Sin complicaciones.
           </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 18 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr 1fr", gap: 18 }}>
           {steps.map((s, i) => (
             <div key={i} style={{
               background: C.white, border: `1px solid ${C.border}`,
@@ -612,17 +632,18 @@ function Process() {
 
 // ─── FEATURE PRIVACIDAD ───────────────────────────────────────────────────────
 function Feature() {
+  const isMob = useIsMobile();
   return (
     <section style={{ background: C.white, borderTop: `1px solid ${C.border}`, overflow: "hidden" }}>
-      <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 380 }}>
+      <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", minHeight: 380 }}>
         <PhotoBg
           url="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=700"
-          height={380}
+          height={isMob ? 240 : 380}
           overlay="rgba(12,16,24,0.08)"
           position="center top"
           fallback="linear-gradient(160deg, #1C2030 0%, #0D2240 100%)"
         />
-        <div style={{ padding: "52px 48px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <div style={{ padding: isMob ? "28px 20px" : "52px 48px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
           <div style={{
             fontFamily: SANS, fontSize: 10, fontWeight: 700,
             letterSpacing: "0.14em", textTransform: "uppercase" as const,
@@ -659,6 +680,7 @@ function Feature() {
 
 // ─── CAMPUS CTA ───────────────────────────────────────────────────────────────
 function CampusCTA() {
+  const isMob = useIsMobile();
   return (
     <PhotoBg
       url="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?auto=format&fit=crop&q=80&w=1800"
@@ -669,7 +691,10 @@ function CampusCTA() {
     >
       <div style={{
         height: "100%", display: "flex", alignItems: "center",
-        justifyContent: "space-between", padding: "0 60px",
+        justifyContent: isMob ? "center" : "space-between",
+        flexDirection: isMob ? "column" as const : "row" as const,
+        textAlign: isMob ? "center" as const : "left" as const,
+        padding: isMob ? "40px 20px" : "0 60px",
         maxWidth: 1080, margin: "0 auto", width: "100%",
         flexWrap: "wrap" as const, gap: 28,
       }}>
@@ -714,10 +739,12 @@ function CampusCTA() {
 
 // ─── FOOTER PROPIO (la landing tiene el suyo, el global está desactivado) ─────
 function LandingFooter() {
+  const isMob = useIsMobile();
   return (
     <footer style={{
-      background: C.ink, padding: "24px 40px",
-      display: "flex", alignItems: "center",
+      background: C.ink, padding: isMob ? "24px 20px" : "24px 40px",
+      display: "flex", alignItems: isMob ? "flex-start" : "center",
+      flexDirection: isMob ? "column" as const : "row" as const,
       justifyContent: "space-between", flexWrap: "wrap" as const, gap: 14,
     }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>

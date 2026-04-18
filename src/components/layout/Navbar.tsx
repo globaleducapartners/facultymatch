@@ -10,8 +10,8 @@ import { createBrowserClient } from "@supabase/ssr";
 const NAV_LINKS = [
   { name: "Para docentes",      href: "/faculty" },
   { name: "Para instituciones", href: "/institutions" },
-  { name: "Cómo funciona",      href: "/#como-funciona" },
-  { name: "Precios",            href: "/faculty#precios" },
+  { name: "Recursos",           href: "/resources" },
+  { name: "Cómo funciona",      href: "/faculty#como-funciona" },
 ];
 
 // ─── Estilos inline — consistentes con el sistema universitario ───────────────
@@ -108,6 +108,15 @@ export function Navbar() {
 
   return (
     <>
+      <style>{`
+        .fm-nav-desktop { display: flex !important; }
+        .fm-hamburger { display: none !important; }
+        .fm-mobile-menu { display: none; }
+        @media (max-width: 768px) {
+          .fm-nav-desktop { display: none !important; }
+          .fm-hamburger { display: flex !important; }
+        }
+      `}</style>
       <nav style={S.nav}>
         {/* Wordmark */}
         <Link href="/" style={{ display: "flex", alignItems: "baseline", gap: 9, textDecoration: "none" }}>
@@ -118,8 +127,7 @@ export function Navbar() {
         </Link>
 
         {/* Links — desktop */}
-        <div style={{ display: "flex", gap: 28, alignItems: "center" }}
-          className="hidden lg:flex">
+        <div className="fm-nav-desktop" style={{ display: "flex", gap: 28, alignItems: "center" }}>
           {NAV_LINKS.map((l) => (
             <Link key={l.href} href={l.href} style={{
               ...S.link,
@@ -132,7 +140,7 @@ export function Navbar() {
         </div>
 
         {/* Auth — desktop */}
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }} className="hidden lg:flex">
+        <div className="fm-nav-desktop" style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {user ? (
             <Link href={dashboardHref} style={S.btnPrimary}>
               Mi dashboard
@@ -140,14 +148,14 @@ export function Navbar() {
           ) : (
             <>
               <Link href="/login" style={S.btnOutline}>Acceder</Link>
-              <Link href="/signup/faculty" style={S.btnPrimary}>Publicar perfil</Link>
+              <Link href="/signup" style={S.btnPrimary}>Publicar perfil</Link>
             </>
           )}
         </div>
 
         {/* Hamburger — mobile */}
         <button
-          className="lg:hidden"
+          className="fm-hamburger"
           onClick={() => setMenuOpen(!menuOpen)}
           style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}
         >
@@ -164,7 +172,7 @@ export function Navbar() {
           background: "#fff", borderBottom: "1px solid #E5E1D8",
           padding: "20px 24px 28px",
           display: "flex", flexDirection: "column", gap: 4,
-        }} className="lg:hidden">
+        }}>
           {NAV_LINKS.map((l) => (
             <Link
               key={l.href}
@@ -192,7 +200,7 @@ export function Navbar() {
                   onClick={() => setMenuOpen(false)}>
                   Acceder
                 </Link>
-                <Link href="/signup/faculty" style={{ ...S.btnPrimary, textAlign: "center", padding: "12px 18px" }}
+                <Link href="/signup" style={{ ...S.btnPrimary, textAlign: "center", padding: "12px 18px" }}
                   onClick={() => setMenuOpen(false)}>
                   Publicar perfil
                 </Link>
