@@ -150,7 +150,7 @@ export default function FacultyPage() {
           <div style={{ borderRadius: 14, overflow: "hidden", height: 420 }}>
             <div style={{
               width: "100%", height: "100%",
-              backgroundImage: `url(https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800)`,
+              backgroundImage: `url(https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800)`,
               backgroundSize: "cover", backgroundPosition: "center top",
             }} />
           </div>
