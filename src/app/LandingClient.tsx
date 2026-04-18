@@ -1,5 +1,5 @@
 "use client";
-// src/app/LandingClient.tsx  ← archivo nuevo
+// src/app/LandingClient.tsx
 // Componente cliente de la landing. El metadata está en page.tsx (server).
 
 import { useState, useEffect } from "react";
@@ -69,12 +69,12 @@ function PhotoBg({
 
 // ─── Datos del directorio ilustrativo ────────────────────────────────────────
 const PROFILES = [
-  { init: "MR", name: "María R.",   role: "Economía · Política fiscal",    org: "Univ. Autónoma · Madrid", kind: "Académica",   avail: true,  lang: "ES · EN" },
-  { init: "JL", name: "Javier L.",  role: "Dirección de operaciones",       org: "18 años en empresa",       kind: "Experto",     avail: true,  lang: "ES · EN" },
-  { init: "CR", name: "Carmen R.",  role: "Derecho Mercantil · Compliance", org: "UCM · Madrid",             kind: "Académica",   avail: false, lang: "ES · FR" },
-  { init: "PV", name: "Pablo V.",   role: "Marketing digital · Growth",     org: "Ex-Google · Ex-Cabify",    kind: "Profesional", avail: true,  lang: "ES · EN" },
-  { init: "BM", name: "Beatriz M.", role: "Inteligencia Artificial · ML",   org: "UPM Madrid",               kind: "Académica",   avail: true,  lang: "ES · EN" },
-  { init: "AS", name: "Álvaro S.",  role: "Liderazgo · Gestión de equipos", org: "Consultor independiente",  kind: "Experto",     avail: true,  lang: "ES" },
+  { init: "MR", name: "María R.",   role: "Economía · Política fiscal",    org: "Univ. Autónoma · Madrid", kind: "Académica",   avail: true,  lang: "ES · EN", photo: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120&h=120" },
+  { init: "JL", name: "Javier L.",  role: "Dirección de operaciones",       org: "18 años en empresa",       kind: "Experto",     avail: true,  lang: "ES · EN", photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=120&h=120" },
+  { init: "CR", name: "Carmen R.",  role: "Derecho Mercantil · Compliance", org: "UCM · Madrid",             kind: "Académica",   avail: false, lang: "ES · FR", photo: "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?auto=format&fit=crop&q=80&w=120&h=120" },
+  { init: "PV", name: "Pablo V.",   role: "Marketing digital · Growth",     org: "Ex-Google · Ex-Cabify",    kind: "Profesional", avail: true,  lang: "ES · EN", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=120&h=120" },
+  { init: "BM", name: "Beatriz M.", role: "Inteligencia Artificial · ML",   org: "UPM Madrid",               kind: "Académica",   avail: true,  lang: "ES · EN", photo: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=120&h=120" },
+  { init: "AS", name: "Álvaro S.",  role: "Liderazgo · Gestión de equipos", org: "Consultor independiente",  kind: "Experto",     avail: true,  lang: "ES",      photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=120&h=120" },
 ];
 
 const KIND_STYLE: Record<string, { dot: string; bg: string; text: string }> = {
@@ -130,7 +130,6 @@ function Nav() {
             { label: "Para docentes",      href: "/faculty" },
             { label: "Para instituciones", href: "/institutions" },
             { label: "Recursos",           href: "/resources" },
-            { label: "Cómo funciona",      href: "#como-funciona" },
           ].map((l) => (
             <Link key={l.href} href={l.href} style={{ fontFamily: SANS, fontSize: 13, color: C.muted, textDecoration: "none", cursor: "pointer", display: isMob ? "none" : "inline" }}>
               {l.label}
@@ -167,17 +166,17 @@ function Hero() {
   const isMob = useIsMobile();
   return (
     <PhotoBg
-      url="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=85&w=1800"
+      url="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=85&w=1800"
       height={isMob ? "auto" : 580}
       overlay="linear-gradient(160deg,rgba(12,16,24,0.5) 0%,rgba(12,16,24,0.7) 55%,rgba(12,16,24,0.88) 100%)"
       position="center 40%"
       fallback="linear-gradient(135deg, #0D2240 0%, #0C1018 60%)"
     >
       <div style={{
-        minHeight: isMob ? 420 : undefined, paddingTop: isMob ? 80 : 0, paddingBottom: isMob ? 60 : 0,
+        minHeight: isMob ? 420 : undefined,
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
-        textAlign: "center", padding: isMob ? "0 20px" : "0 40px",
+        textAlign: "center", padding: isMob ? "80px 20px 60px" : "0 40px",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 30 }}>
           <div style={{ width: 32, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
@@ -192,23 +191,22 @@ function Hero() {
         </div>
 
         <h1 style={{
-          fontFamily: SERIF, fontSize: 58, fontWeight: 400,
+          fontFamily: SERIF, fontSize: isMob ? 34 : 58, fontWeight: 400,
           color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em",
           margin: "0 0 22px", maxWidth: 680,
         }}>
-          El directorio de docentes y expertos
-          para la educación superior.
+          En la era de la IA, tu experiencia
+          es el conocimiento más demandado.
         </h1>
 
         <p style={{
           fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.58)",
           lineHeight: 1.75, margin: "0 0 40px", maxWidth: 460,
         }}>
-          Perfiles revisados de profesores, investigadores y profesionales.
-          Búsqueda directa para instituciones. Sin intermediarios.
+          Únete al mayor directorio de docentes, expertos y profesionales que comparten su conocimiento y su experiencia en el aula y generan ingresos. Regístrate gratis y saca partido a tu conocimiento.
         </p>
 
-        <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const, justifyContent: "center" }}>
           <Link href="/signup">
             <button style={{
               fontFamily: SANS, background: "#fff", color: C.ink,
@@ -231,19 +229,21 @@ function Hero() {
           </Link>
         </div>
 
-        <div style={{
-          position: "absolute", bottom: 26,
-          display: "flex", flexDirection: "column",
-          alignItems: "center", gap: 7,
-        }}>
-          <span style={{
-            fontFamily: SANS, fontSize: 9, letterSpacing: "0.16em",
-            textTransform: "uppercase" as const, color: "rgba(255,255,255,0.28)",
+        {!isMob && (
+          <div style={{
+            position: "absolute", bottom: 26,
+            display: "flex", flexDirection: "column",
+            alignItems: "center", gap: 7,
           }}>
-            Directorio
-          </span>
-          <div style={{ width: "0.5px", height: 24, background: "rgba(255,255,255,0.18)" }} />
-        </div>
+            <span style={{
+              fontFamily: SANS, fontSize: 9, letterSpacing: "0.16em",
+              textTransform: "uppercase" as const, color: "rgba(255,255,255,0.28)",
+            }}>
+              Directorio
+            </span>
+            <div style={{ width: "0.5px", height: 24, background: "rgba(255,255,255,0.18)" }} />
+          </div>
+        )}
       </div>
     </PhotoBg>
   );
@@ -297,10 +297,13 @@ function ProfileCard({ p }: { p: typeof PROFILES[0] }) {
         <div style={{
           width: 42, height: 42, borderRadius: 8, flexShrink: 0,
           background: C.cream, border: `1px solid ${C.border}`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontFamily: SERIF, fontSize: 14, color: C.navy,
+          overflow: "hidden",
         }}>
-          {p.init}
+          <div style={{
+            width: "100%", height: "100%",
+            backgroundImage: `url(${p.photo})`,
+            backgroundSize: "cover", backgroundPosition: "center top",
+          }} />
         </div>
         <div style={{ minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 3 }}>
@@ -344,7 +347,8 @@ function Directory() {
     <section style={{ background: C.cream, padding: isMob ? "48px 20px 56px" : "64px 40px 72px", overflowX: "hidden" }}>
       <div style={{ maxWidth: 1080, margin: "0 auto" }}>
         <div style={{
-          display: "flex", alignItems: isMob ? "flex-start" : "flex-end",
+          display: "flex",
+          alignItems: isMob ? "flex-start" : "flex-end",
           flexDirection: isMob ? "column" : "row",
           justifyContent: "space-between",
           marginBottom: 32, gap: 16,
@@ -361,7 +365,7 @@ function Directory() {
               fontFamily: SERIF, fontSize: 30, fontWeight: 400,
               color: C.ink, letterSpacing: "-0.025em", margin: 0, lineHeight: 1.1,
             }}>
-              Perfiles disponibles ahora mismo.
+              Perfiles que no encontrarás en ningún otro sitio.
             </h2>
           </div>
           <div style={{
@@ -434,7 +438,8 @@ function Directory() {
 
         <div style={{
           paddingTop: 24, borderTop: `1px solid ${C.border}`,
-          display: "flex", alignItems: isMob ? "stretch" : "center",
+          display: "flex",
+          alignItems: isMob ? "stretch" : "center",
           flexDirection: isMob ? "column" : "row",
           justifyContent: "space-between", gap: 12,
         }}>
@@ -476,22 +481,22 @@ function TwoColumns() {
   const isMob = useIsMobile();
   const cols = [
     {
-      url: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=900",
+      url: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=900",
       pos: "center 30%",
       eyebrow: "Para docentes y expertos",
-      headline: "Tu perfil,\nvisible para quien\nbusca lo que enseñas.",
-      body: "Crea un perfil estructurado con tu formación, experiencia y disponibilidad. Las instituciones te encuentran cuando buscan tu área. Tú decides si respondes y en qué condiciones.",
-      cta: "Crear mi perfil",
+      headline: "Tus clases son\nel extra que\nestabas esperando.",
+      body: "Lo que tardaste años en aprender tiene demanda real. Hay programas ejecutivos, másters y centros de formación buscando exactamente lo que tú sabes. Publica tu perfil y deja que te encuentren.",
+      cta: "Publicar mi perfil",
       href: "/signup",
       primary: true,
     },
     {
-      url: "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&q=80&w=900",
+      url: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=900",
       pos: "center 40%",
       eyebrow: "Para instituciones educativas",
-      headline: "Busca por área,\nidioma y disponibilidad.\nContacto directo.",
-      body: "Directorio estructurado de docentes, investigadores y expertos con experiencia real. Cada perfil revisado antes de publicarse. Sin comisiones por contratación.",
-      cta: "Acceder al directorio",
+      headline: "El docente que necesitas\nno está en LinkedIn,\nestá en FacultyMatch.",
+      body: "Los mejores perfiles están ejerciendo, investigando o dirigiendo empresas. No buscan trabajo — pero están abiertos a enseñar. FacultyMatch los hace accesibles, directamente.",
+      cta: "Buscar en el directorio",
       href: "/signup?intent=institution",
       primary: false,
     },
@@ -501,7 +506,7 @@ function TwoColumns() {
     <section style={{ background: C.white, borderTop: `1px solid ${C.border}` }}>
       <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr" }}>
         {cols.map((col, i) => (
-          <div key={i} style={{ borderRight: i === 0 ? `1px solid ${C.border}` : "none" }}>
+          <div key={i} style={{ borderRight: i === 0 && !isMob ? `1px solid ${C.border}` : "none" }}>
             <PhotoBg
               url={col.url}
               height={280}
@@ -548,10 +553,11 @@ function TwoColumns() {
 
 // ─── PULL QUOTE ───────────────────────────────────────────────────────────────
 function PullQuote() {
+  const isMob = useIsMobile();
   return (
     <PhotoBg
-      url="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1800"
-      height={280}
+      url="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=1800"
+      height={isMob ? 260 : 280}
       overlay="rgba(12,16,24,0.72)"
       position="center 60%"
       fallback="linear-gradient(135deg, #1C1409 0%, #2D1F08 100%)"
@@ -567,12 +573,11 @@ function PullQuote() {
             <div style={{ width: 24, height: "0.5px", background: C.brass, opacity: 0.6 }} />
           </div>
           <blockquote style={{
-            fontFamily: SERIF, fontSize: 21, fontWeight: 400, fontStyle: "italic" as const,
+            fontFamily: SERIF, fontSize: isMob ? 17 : 21, fontWeight: 400, fontStyle: "italic" as const,
             color: "rgba(255,255,255,0.88)", lineHeight: 1.6,
             margin: "0 0 18px", letterSpacing: "-0.01em",
           }}>
-            "La calidad de la educación superior depende de las personas que la imparten.
-            FacultyMatch conecta a esas personas con las instituciones que las necesitan."
+            "En un mundo donde la IA genera contenido infinito, la experiencia real de quien ha estado ahí es lo que más se valora."
           </blockquote>
           <div style={{
             fontFamily: SANS, fontSize: 10, color: "rgba(255,255,255,0.3)",
@@ -590,9 +595,9 @@ function PullQuote() {
 function Process() {
   const isMob = useIsMobile();
   const steps = [
-    { n: "I",   title: "Crea tu perfil",          body: "Registro estructurado por área de conocimiento, formación y experiencia docente. Sin documentos adicionales. En menos de diez minutos." },
-    { n: "II",  title: "Lo revisamos",             body: "Nuestro equipo revisa cada perfil antes de publicarlo en el directorio. Un proceso manual que garantiza la calidad de los perfiles." },
-    { n: "III", title: "Las instituciones contactan", body: "Tu perfil aparece en las búsquedas de directores de programa. Recibes las solicitudes y decides si aceptas y en qué términos." },
+    { n: "I",   title: "Crea tu perfil",           body: "Diez minutos. Tus áreas, tu experiencia, tu disponibilidad. Sin documentos innecesarios. Nada que no tengas ya en la cabeza." },
+    { n: "II",  title: "Lo revisamos",             body: "Alguien de nuestro equipo lee tu perfil antes de publicarlo. Una persona, no un algoritmo. Eso garantiza que lo que aparece en el directorio tiene nivel." },
+    { n: "III", title: "Las instituciones contactan", body: "Apareces en sus búsquedas. Ellas dan el primer paso. Tú decides si aceptas, cuándo y en qué condiciones. Sin presiones." },
   ];
   return (
     <section style={{ background: C.cream, padding: isMob ? "48px 20px 56px" : "64px 40px 72px", borderTop: `1px solid ${C.border}` }}>
@@ -609,7 +614,7 @@ function Process() {
             fontFamily: SERIF, fontSize: 28, fontWeight: 400,
             color: C.ink, letterSpacing: "-0.025em", margin: 0, lineHeight: 1.15,
           }}>
-            Tres pasos. Sin complicaciones.
+            Publica hoy. Recibe tu primera propuesta esta semana.
           </h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr 1fr", gap: 18 }}>
@@ -668,13 +673,13 @@ function Feature() {
             color: C.ink, letterSpacing: "-0.02em", lineHeight: 1.2,
             margin: "0 0 16px",
           }}>
-            Tú decides quién<br />puede ver tu perfil.
+            Tu empresa no tiene<br /><em>por qué saberlo.</em>
           </h2>
           <p style={{ fontFamily: SANS, fontSize: 14, color: C.muted, lineHeight: 1.8, margin: "0 0 12px" }}>
-            Puedes bloquear instituciones específicas por nombre. Tu perfil solo aparece donde tú lo decidas. Tu institución actual no tiene acceso a tu información salvo que tú lo permitas.
+            La mayoría de nuestros docentes combinan su actividad profesional con la formación sin que nadie en su entorno actual lo sepa. Es algo habitual, y lo hemos diseñado así desde el principio.
           </p>
           <p style={{ fontFamily: SANS, fontSize: 14, color: C.muted, lineHeight: 1.8, margin: "0 0 28px" }}>
-            El control de visibilidad es tuyo en todo momento.
+            Puedes bloquear organizaciones concretas por nombre. Tu perfil aparece solo donde tú lo decidas. Sin sorpresas.
           </p>
           <button style={{
             fontFamily: SANS, background: "transparent", color: C.navy,
@@ -695,18 +700,19 @@ function CampusCTA() {
   const isMob = useIsMobile();
   return (
     <PhotoBg
-      url="https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?auto=format&fit=crop&q=80&w=1800"
-      height={200}
+      url="https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&q=80&w=1800"
+      height={isMob ? "auto" : 200}
       overlay="rgba(12,16,24,0.74)"
       position="center 50%"
       fallback="linear-gradient(135deg, #0D2240 0%, #0C1018 100%)"
     >
       <div style={{
-        height: "100%", display: "flex", alignItems: "center",
+        display: "flex", alignItems: "center",
         justifyContent: isMob ? "center" : "space-between",
         flexDirection: isMob ? "column" as const : "row" as const,
         textAlign: isMob ? "center" as const : "left" as const,
         padding: isMob ? "40px 20px" : "0 60px",
+        minHeight: isMob ? 200 : undefined,
         maxWidth: 1080, margin: "0 auto", width: "100%",
         flexWrap: "wrap" as const, gap: 28,
       }}>
@@ -716,10 +722,10 @@ function CampusCTA() {
             color: "rgba(255,255,255,0.9)", lineHeight: 1.35,
             margin: "0 0 6px",
           }}>
-            Crea tu perfil. Es gratuito para docentes y expertos.
+            Saca partido a todo lo que sabes.
           </p>
           <p style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.45)", margin: 0 }}>
-            Sin permanencia. Sin cuotas de inscripción.
+            Gratuito para docentes y expertos. Sin permanencia.
           </p>
         </div>
         <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
@@ -729,7 +735,7 @@ function CampusCTA() {
               border: "none", padding: "12px 28px", borderRadius: 6,
               fontSize: 13, fontWeight: 600, cursor: "pointer",
             }}>
-              Publicar mi perfil
+              Saca partido a tu experiencia
             </button>
           </Link>
           <Link href="/signup?intent=institution">
@@ -753,32 +759,36 @@ function CampusCTA() {
 function LandingFooter() {
   const isMob = useIsMobile();
   return (
-    <footer style={{
-      background: C.ink, padding: isMob ? "24px 20px" : "24px 40px",
-      display: "flex", alignItems: isMob ? "flex-start" : "center",
-      flexDirection: isMob ? "column" as const : "row" as const,
-      justifyContent: "space-between", flexWrap: "wrap" as const, gap: 14,
-    }}>
-      <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-        <span style={{ fontFamily: SERIF, fontSize: 15, color: "#fff" }}>FacultyMatch</span>
-        <span style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.22)" }}>
-          · Grupo Global Educa SL · 2026
-        </span>
-      </div>
-      <div style={{ display: "flex", gap: 22 }}>
-        {[
-          { label: "Para docentes",      href: "/faculty" },
-          { label: "Para instituciones", href: "/institutions" },
-          { label: "Privacidad",         href: "/privacy" },
-          { label: "Términos",           href: "/terms" },
-          { label: "Contacto",           href: "mailto:info@facultymatch.app" },
-        ].map((l) => (
-          <Link key={l.label} href={l.href}>
-            <span style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.26)", cursor: "pointer" }}>
-              {l.label}
-            </span>
-          </Link>
-        ))}
+    <footer style={{ background: C.ink, borderTop: `1px solid rgba(255,255,255,0.06)` }}>
+      <div style={{
+        maxWidth: 1080, margin: "0 auto",
+        padding: isMob ? "28px 20px" : "28px 40px",
+        display: "flex", alignItems: isMob ? "flex-start" : "center",
+        flexDirection: isMob ? "column" as const : "row" as const,
+        justifyContent: "space-between", flexWrap: "wrap" as const, gap: 16,
+      }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+          <span style={{ fontFamily: SERIF, fontSize: 15, color: "rgba(255,255,255,0.8)" }}>FacultyMatch</span>
+          <span style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.22)" }}>
+            · Grupo Global Educa SL · 2026
+          </span>
+        </div>
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" as const }}>
+          {[
+            { label: "Para docentes",      href: "/faculty" },
+            { label: "Para instituciones", href: "/institutions" },
+            { label: "Recursos",           href: "/resources" },
+            { label: "Privacidad",         href: "/privacy" },
+            { label: "Términos",           href: "/terms" },
+            { label: "Contacto",           href: "mailto:info@facultymatch.app" },
+          ].map((l) => (
+            <Link key={l.label} href={l.href}>
+              <span style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.35)", cursor: "pointer" }}>
+                {l.label}
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
     </footer>
   );
