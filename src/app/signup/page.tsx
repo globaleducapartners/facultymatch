@@ -1,374 +1,553 @@
 "use client";
+// src/app/signup/page.tsx  ← archivo nuevo (o reemplaza si existe)
 
-import { useState, Suspense } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { signUp, signInWithSSO } from "@/app/auth/actions";
-import { School, UserCircle, Loader2, CheckCircle2, ArrowRight, GraduationCap, Building2, Star, Users, Globe2 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/ui/Logo";
+import { useRouter, useSearchParams } from "next/navigation";
+import { createBrowserClient } from "@supabase/ssr";
+import { Suspense } from "react";
 
-function SignupContent() {
+// ─── Tokens ───────────────────────────────────────────────────────────────────
+const SERIF = `var(--font-serif, 'Georgia', 'Times New Roman', serif)`;
+const SANS  = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
+const C = {
+  ink: "#0C1018", navy: "#0D2240", brass: "#B8963E",
+  cream: "#F7F5F0", white: "#FFFFFF",
+  muted: "#6B7280", faint: "#9CA3AF", border: "#E5E1D8",
+  error: "#DC2626", errorBg: "#FEF2F2",
+};
+
+// ─── Opciones — solo las que alimentan filtros de búsqueda ────────────────────
+const AREAS = [
+  "Business & Management", "Economía & Finanzas",
+  "Derecho & Ciencias Políticas", "Ingeniería & Tecnología",
+  "Inteligencia Artificial & Datos", "Salud & Ciencias",
+  "Comunicación & Marketing", "Educación",
+  "Artes & Humanidades", "Ciencias Sociales",
+  "Matemáticas & Estadística", "Sostenibilidad",
+];
+
+const LANGUAGES = [
+  { code: "ES", label: "Español" }, { code: "EN", label: "Inglés" },
+  { code: "FR", label: "Francés" }, { code: "PT", label: "Portugués" },
+  { code: "DE", label: "Alemán" },  { code: "IT", label: "Italiano" },
+  { code: "ZH", label: "Chino" },   { code: "AR", label: "Árabe" },
+];
+
+const MODALITIES   = ["Presencial", "Online", "Híbrida"];
+
+const AVAILABILITY = [
+  "Disponible inmediatamente",
+  "Disponible próximo semestre",
+  "Solo asignaturas puntuales",
+  "Solo fines de semana / intensivos",
+  "Solo online",
+  "Por invitación directa",
+];
+
+const COUNTRIES = [
+  "España", "México", "Argentina", "Colombia", "Chile", "Perú",
+  "Estados Unidos", "Reino Unido", "Alemania", "Francia",
+  "Portugal", "Italia", "Países Bajos", "Otro",
+];
+
+const INSTITUTION_TYPES = [
+  "Universidad pública", "Universidad privada", "Business School",
+  "Centro de FP Superior", "Centro online",
+  "Academia / Instituto", "Empresa con formación interna", "Otro",
+];
+
+// ─── UI helpers ───────────────────────────────────────────────────────────────
+const inp = (err = false): React.CSSProperties => ({
+  fontFamily: SANS, width: "100%", fontSize: 14, color: C.ink,
+  background: C.white, border: `1px solid ${err ? C.error : C.border}`,
+  borderRadius: 8, padding: "10px 14px", outline: "none",
+  boxSizing: "border-box" as const,
+});
+
+const lbl: React.CSSProperties = {
+  fontFamily: SANS, fontSize: 13, fontWeight: 500,
+  color: C.ink, display: "block", marginBottom: 6,
+};
+
+const err: React.CSSProperties = {
+  fontFamily: SANS, fontSize: 12, color: C.error, marginTop: 4,
+};
+
+function Chips({ options, selected, onToggle }: {
+  options: string[]; selected: string[];
+  onToggle: (v: string) => void;
+}) {
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8 }}>
+      {options.map(o => {
+        const active = selected.includes(o);
+        return (
+          <button key={o} type="button" onClick={() => onToggle(o)} style={{
+            fontFamily: SANS, fontSize: 13, padding: "6px 14px",
+            borderRadius: 20, cursor: "pointer",
+            border: `1px solid ${active ? C.navy : C.border}`,
+            background: active ? C.navy : C.white,
+            color: active ? C.white : C.muted,
+            transition: "all 0.12s",
+          }}>{o}</button>
+        );
+      })}
+    </div>
+  );
+}
+
+function toggle(arr: string[], val: string) {
+  return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val];
+}
+
+// ─── Paso labels ──────────────────────────────────────────────────────────────
+const STEPS = [
+  { title: "Crea tu cuenta.",        sub: "Solo lo esencial para empezar." },
+  { title: "Tu perfil académico.",   sub: "Determina en qué búsquedas apareces." },
+  { title: "Cómo trabajas.",         sub: "Los filtros que usan los directores de programa." },
+  { title: "Casi listo.",            sub: "Un último paso antes de entrar al directorio." },
+];
+
+// ─── Formulario interno ───────────────────────────────────────────────────────
+function SignupForm() {
+  const router       = useRouter();
   const searchParams = useSearchParams();
-  const initialRole = searchParams.get("role") || "faculty";
-  const isSSO = searchParams.get("new_sso") === "true";
-  const [role, setRole] = useState<string>(initialRole);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const isInstitution = searchParams.get("intent") === "institution";
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const [step,        setStep]        = useState(1);
+  const [loading,     setLoading]     = useState(false);
+  const [serverError, setServerError] = useState("");
+  const [errors,      setErrors]      = useState<Record<string, string>>({});
+
+  // Paso 1
+  const [firstName, setFirstName] = useState("");
+  const [lastName,  setLastName]  = useState("");
+  const [email,     setEmail]     = useState("");
+  const [password,  setPassword]  = useState("");
+  const [showPwd,   setShowPwd]   = useState(false);
+
+  // Paso 2
+  const [areas,    setAreas]    = useState<string[]>([]);
+  const [country,  setCountry]  = useState("");
+  const [isPhd,    setIsPhd]    = useState(false);
+  const [hasAneca, setHasAneca] = useState(false);
+
+  // Paso 3
+  const [languages,    setLanguages]    = useState<string[]>([]);
+  const [modalities,   setModalities]   = useState<string[]>([]);
+  const [availability, setAvailability] = useState("");
+
+  // Paso 4 — institución (dual-role)
+  const [wantsInst, setWantsInst] = useState(isInstitution);
+  const [instName,  setInstName]  = useState("");
+  const [instType,  setInstType]  = useState("");
+  const [terms,     setTerms]     = useState(false);
+
+  // Pre-expand si viene con intent=institution
+  useEffect(() => {
+    if (isInstitution) setWantsInst(true);
+  }, [isInstitution]);
+
+  // ── Validaciones ─────────────────────────────────────────────────────────
+  const v1 = () => {
+    const e: Record<string, string> = {};
+    if (!firstName.trim()) e.firstName = "Indica tu nombre.";
+    if (!lastName.trim())  e.lastName  = "Indica tus apellidos.";
+    if (!email.trim() || !/\S+@\S+\.\S+/.test(email)) e.email = "Email no válido.";
+    if (password.length < 8) e.password = "Mínimo 8 caracteres.";
+    setErrors(e); return !Object.keys(e).length;
+  };
+  const v2 = () => {
+    const e: Record<string, string> = {};
+    if (!areas.length) e.areas   = "Selecciona al menos un área.";
+    if (!country)      e.country = "Indica tu país.";
+    setErrors(e); return !Object.keys(e).length;
+  };
+  const v3 = () => {
+    const e: Record<string, string> = {};
+    if (!languages.length)  e.languages  = "Indica al menos un idioma.";
+    if (!modalities.length) e.modalities = "Indica al menos una modalidad.";
+    if (!availability)      e.availability = "Indica tu disponibilidad.";
+    setErrors(e); return !Object.keys(e).length;
+  };
+  const v4 = () => {
+    const e: Record<string, string> = {};
+    if (wantsInst && !instName.trim()) e.instName = "Indica el nombre de tu institución.";
+    if (wantsInst && !instType)        e.instType = "Selecciona el tipo de centro.";
+    if (!terms) e.terms = "Debes aceptar los términos para continuar.";
+    setErrors(e); return !Object.keys(e).length;
+  };
+
+  const next = () => {
+    const valid = [null, v1, v2, v3][step];
+    if (valid && !valid()) return;
+    setStep(s => s + 1);
+  };
+
+  // ── Submit ────────────────────────────────────────────────────────────────
+  const handleSubmit = async () => {
+    if (!v4()) return;
     setLoading(true);
-    setError(null);
+    setServerError("");
 
-    const formData = new FormData(e.currentTarget);
-    const result = await signUp(formData, isSSO);
+    try {
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.facultymatch.app").replace(/\/$/, "");
 
-    if (result?.error) {
-      setError(result.error);
-      setLoading(false);
-    } else if (isSSO) {
-      setSuccess(true);
-      setLoading(false);
-    } else if (result?.success) {
-      if (role === "institution") {
-        window.location.href = "/onboarding/institution";
-      } else {
-        window.location.href = "/onboarding";
+      const { error } = await supabase.auth.signUp({
+        email: email.trim().toLowerCase(),
+        password,
+        options: {
+          emailRedirectTo: `${siteUrl}/auth/callback`,
+          data: {
+            // Identidad
+            full_name:    `${firstName.trim()} ${lastName.trim()}`,
+            first_name:   firstName.trim(),
+            last_name:    lastName.trim(),
+            role:         "faculty",
+            // Perfil docente — alimenta los filtros del buscador
+            knowledge_areas:     areas,
+            country,
+            is_phd:              isPhd,
+            aneca_accreditation: hasAneca,
+            languages:           languages.map(l => ({ lang: l, level: "Fluido" })),
+            modalities,
+            availability,
+            // Institución — trigger SQL·05 la crea si está presente
+            ...(wantsInst && instName.trim() ? {
+              institution_name: instName.trim(),
+              institution_type: instType || null,
+            } : {}),
+            // Sistema
+            onboarding_completed: true,
+            terms_accepted:       true,
+            privacy_accepted:     true,
+            marketing_opt_in:     false,
+            consent_version:      "v1",
+          },
+        },
+      });
+
+      if (error) {
+        const msg = error.message.toLowerCase();
+        if (msg.includes("already registered") || error.status === 400) {
+          setServerError("duplicate");
+        } else {
+          setServerError(error.message);
+        }
+        setLoading(false);
+        return;
       }
+
+      // Redirigir a la confirmación correcta
+      router.push(wantsInst
+        ? "/signup/institution/confirm"
+        : "/signup/faculty/confirm"
+      );
+    } catch {
+      setServerError("Error de red. Inténtalo de nuevo.");
+      setLoading(false);
     }
   };
 
-  if (success) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8FAFC] px-6 py-12 text-center">
-        <div className="max-w-md w-full bg-white p-12 rounded-[3rem] shadow-xl border border-gray-100 space-y-6">
-          <div className="w-20 h-20 bg-green-50 rounded-3xl flex items-center justify-center text-green-500 mx-auto">
-            <CheckCircle2 size={40} />
-          </div>
-          <h1 className="text-3xl font-black text-navy">¡Perfil creado!</h1>
-          <p className="text-gray-500 font-medium">Tu cuenta ha sido configurada. Ya puedes completar tu perfil.</p>
-          <Link href={role === "faculty" ? "/onboarding" : "/onboarding/institution"}>
-            <Button className="w-full bg-talentia-blue hover:bg-blue-700 text-white py-6 rounded-xl font-bold mt-4">
-              Completar Perfil
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const isFaculty = role === "faculty";
+  const TOTAL = 4;
 
   return (
-    <div className="min-h-screen flex bg-white">
-      {/* Left panel — decorative */}
-      <div
-        className="hidden lg:flex flex-col justify-between w-[420px] shrink-0 p-10 relative overflow-hidden"
-        style={{ background: isFaculty ? "#0F172A" : "#0F172A" }}
-      >
-        {/* Gradient accent */}
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            background: isFaculty
-              ? "radial-gradient(ellipse at 30% 50%, #2563EB 0%, transparent 70%)"
-              : "radial-gradient(ellipse at 30% 50%, #F97316 0%, transparent 70%)",
-          }}
-        />
+    <div style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "2fr 3fr", fontFamily: SANS }}>
 
-        <div className="relative z-10">
-          <Logo variant="light" />
-        </div>
+      {/* ── Panel izquierdo ── */}
+      <div style={{ background: C.navy, padding: "48px 44px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "baseline", gap: 8 }}>
+          <div style={{ width: 26, height: 26, borderRadius: 5, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <span style={{ color: "#fff", fontSize: 10, fontWeight: 700 }}>FM</span>
+          </div>
+          <span style={{ fontFamily: SERIF, fontSize: 16, color: "#fff" }}>FacultyMatch</span>
+        </Link>
 
-        <div className="relative z-10 space-y-8">
-          {isFaculty ? (
-            <>
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[10px] font-black uppercase tracking-widest">
-                  <GraduationCap size={12} />
-                  Red Docente Global
+        <div>
+          <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>
+            Directorio de talento educativo
+          </div>
+          <h2 style={{ fontFamily: SERIF, fontSize: 26, fontWeight: 400, color: "#fff", lineHeight: 1.3, margin: "0 0 28px", letterSpacing: "-0.02em" }}>
+            Un perfil para todo lo que sabes hacer.
+          </h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {[
+              "Apareces en búsquedas de instituciones educativas",
+              "Tú decides si respondes y en qué condiciones",
+              "Puedes también registrar tu institución",
+              "Gratuito siempre para docentes y expertos",
+            ].map((t, i) => (
+              <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                <div style={{ width: 5, height: 5, borderRadius: "50%", background: C.brass, flexShrink: 0, marginTop: 6 }} />
+                <span style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.58)", lineHeight: 1.55 }}>{t}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Progress visual en el panel izquierdo */}
+          <div style={{ marginTop: 40, display: "flex", flexDirection: "column", gap: 10 }}>
+            {STEPS.map((s, i) => (
+              <div key={i} style={{ display: "flex", gap: 10, alignItems: "center", opacity: i + 1 === step ? 1 : i + 1 < step ? 0.5 : 0.25 }}>
+                <div style={{
+                  width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
+                  background: i + 1 < step ? C.brass : i + 1 === step ? "rgba(255,255,255,0.15)" : "transparent",
+                  border: `1px solid ${i + 1 <= step ? C.brass : "rgba(255,255,255,0.2)"}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  {i + 1 < step
+                    ? <span style={{ color: C.navy, fontSize: 11, fontWeight: 700 }}>✓</span>
+                    : <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>{i + 1}</span>
+                  }
                 </div>
-                <h2 className="text-3xl font-black text-white leading-tight">
-                  Tu próxima oportunidad académica te está esperando
-                </h2>
-                <p className="text-gray-400 font-medium leading-relaxed">
-                  Conecta con universidades y escuelas de negocio en más de 30 países.
-                </p>
+                <span style={{ fontFamily: SANS, fontSize: 13, color: i + 1 === step ? "#fff" : "rgba(255,255,255,0.5)" }}>
+                  {s.title.replace(".", "")}
+                </span>
               </div>
-              <div className="space-y-3">
-                {[
-                  { icon: Star, text: "Perfil visible para 500+ instituciones" },
-                  { icon: Globe2, text: "Oportunidades en España, LATAM y Europa" },
-                  { icon: Users, text: "Red de 12.000+ docentes verificados" },
-                ].map(({ icon: Icon, text }) => (
-                  <div key={text} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
-                      <Icon size={15} />
-                    </div>
-                    <span className="text-gray-300 text-sm font-medium">{text}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-[10px] font-black uppercase tracking-widest">
-                  <Building2 size={12} />
-                  Panel Institucional
-                </div>
-                <h2 className="text-3xl font-black text-white leading-tight">
-                  Encuentra el talento académico que tu institución necesita
-                </h2>
-                <p className="text-gray-400 font-medium leading-relaxed">
-                  Accede a perfiles verificados de docentes con experiencia internacional.
-                </p>
-              </div>
-              <div className="space-y-3">
-                {[
-                  { icon: Star, text: "Filtros por área, idioma y disponibilidad" },
-                  { icon: Globe2, text: "Docentes en 30+ países" },
-                  { icon: Users, text: "Contacto directo con el docente" },
-                ].map(({ icon: Icon, text }) => (
-                  <div key={text} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 shrink-0">
-                      <Icon size={15} />
-                    </div>
-                    <span className="text-gray-300 text-sm font-medium">{text}</span>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+            ))}
+          </div>
         </div>
 
-        <div className="relative z-10 text-[10px] text-gray-600 font-medium">
-          © 2026 FacultyMatch · Todos los derechos reservados
-        </div>
+        <span style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.22)" }}>
+          © 2026 FacultyMatch · Grupo Global Educa SL
+        </span>
       </div>
 
-      {/* Right panel — form */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-[#F8FAFC]">
-        {/* Mobile logo */}
-        <div className="lg:hidden mb-8">
-          <Link href="/">
-            <Logo />
-          </Link>
-        </div>
+      {/* ── Panel derecho ── */}
+      <div style={{ background: C.cream, padding: "48px 56px", overflowY: "auto" }}>
+        <div style={{ maxWidth: 480, margin: "0 auto" }}>
 
-        <div className="w-full max-w-md space-y-8">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-black text-navy tracking-tight">
-              {isSSO ? "Completa tu perfil" : "Crea tu cuenta"}
+          {/* Barra de progreso */}
+          <div style={{ display: "flex", gap: 5, marginBottom: 36 }}>
+            {Array.from({ length: TOTAL }).map((_, i) => (
+              <div key={i} style={{
+                flex: 1, height: 3, borderRadius: 2,
+                background: i < step ? C.navy : C.border,
+                transition: "background 0.2s",
+              }} />
+            ))}
+          </div>
+
+          {/* Cabecera del paso */}
+          <div style={{ marginBottom: 28 }}>
+            <p style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: C.faint, margin: "0 0 8px" }}>
+              Paso {step} de {TOTAL}
+            </p>
+            <h1 style={{ fontFamily: SERIF, fontSize: 26, fontWeight: 400, color: C.ink, margin: 0, letterSpacing: "-0.02em" }}>
+              {STEPS[step - 1].title}
             </h1>
-            <p className="text-gray-500 font-medium">
-              {isSSO ? "Solo un paso más para acceder a la red" : "Únete a la red líder en educación superior"}
+            <p style={{ fontFamily: SANS, fontSize: 14, color: C.muted, margin: "6px 0 0" }}>
+              {STEPS[step - 1].sub}
             </p>
           </div>
 
-          {/* Role selector */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => { window.location.href = "/signup/faculty"; }}
-              className={`relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all ${
-                role === "faculty"
-                  ? "border-talentia-blue bg-blue-50"
-                  : "border-gray-200 bg-white hover:border-gray-300"
-              }`}
-            >
-              {role === "faculty" && (
-                <span className="absolute top-2.5 right-2.5 w-5 h-5 bg-talentia-blue rounded-full flex items-center justify-center">
-                  <CheckCircle2 size={12} className="text-white" />
-                </span>
-              )}
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${role === "faculty" ? "bg-talentia-blue" : "bg-gray-100"}`}>
-                <UserCircle size={24} className={role === "faculty" ? "text-white" : "text-gray-400"} />
-              </div>
-              <div className="text-center">
-                <p className={`font-black text-sm ${role === "faculty" ? "text-talentia-blue" : "text-navy"}`}>Soy docente</p>
-                <p className="text-[10px] text-gray-400 font-medium mt-0.5">Crea tu cuenta y completa tu perfil académico para aparecer en el directorio.</p>
-              </div>
-            </button>
+          {/* Error de servidor */}
+          {serverError && (
+            <div style={{ background: C.errorBg, border: "1px solid #FCA5A5", borderRadius: 8, padding: "12px 14px", marginBottom: 20 }}>
+              <p style={{ fontFamily: SANS, fontSize: 13, color: C.error, margin: 0 }}>
+                {serverError === "duplicate"
+                  ? <>Este email ya está registrado. <Link href="/login" style={{ fontWeight: 600, color: C.error }}>Acceder →</Link></>
+                  : serverError
+                }
+              </p>
+            </div>
+          )}
 
-            <button
-              type="button"
-              onClick={() => { window.location.href = "/signup/institution"; }}
-              className={`relative flex flex-col items-center gap-3 p-5 rounded-2xl border-2 transition-all ${
-                role === "institution"
-                  ? "border-energy-orange bg-orange-50"
-                  : "border-gray-200 bg-white hover:border-gray-300"
-              }`}
-            >
-              {role === "institution" && (
-                <span className="absolute top-2.5 right-2.5 w-5 h-5 bg-energy-orange rounded-full flex items-center justify-center">
-                  <CheckCircle2 size={12} className="text-white" />
-                </span>
-              )}
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${role === "institution" ? "bg-energy-orange" : "bg-gray-100"}`}>
-                <School size={24} className={role === "institution" ? "text-white" : "text-gray-400"} />
+          {/* ── PASO 1 — Cuenta ── */}
+          {step === 1 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div>
+                  <label style={lbl}>Nombre <span style={{ color: C.error }}>*</span></label>
+                  <input style={inp(!!errors.firstName)} value={firstName}
+                    onChange={e => setFirstName(e.target.value)} placeholder="María" />
+                  {errors.firstName && <p style={err}>{errors.firstName}</p>}
+                </div>
+                <div>
+                  <label style={lbl}>Apellidos <span style={{ color: C.error }}>*</span></label>
+                  <input style={inp(!!errors.lastName)} value={lastName}
+                    onChange={e => setLastName(e.target.value)} placeholder="García" />
+                  {errors.lastName && <p style={err}>{errors.lastName}</p>}
+                </div>
               </div>
-              <div className="text-center">
-                <p className={`font-black text-sm ${role === "institution" ? "text-energy-orange" : "text-navy"}`}>Soy institución</p>
-                <p className="text-[10px] text-gray-400 font-medium mt-0.5">Buscar talento docente</p>
+              <div>
+                <label style={lbl}>Email <span style={{ color: C.error }}>*</span></label>
+                <input type="email" style={inp(!!errors.email)} value={email}
+                  onChange={e => setEmail(e.target.value)} placeholder="tu@email.com" />
+                {errors.email && <p style={err}>{errors.email}</p>}
               </div>
-            </button>
+              <div>
+                <label style={lbl}>Contraseña <span style={{ color: C.error }}>*</span></label>
+                <div style={{ position: "relative" }}>
+                  <input type={showPwd ? "text" : "password"}
+                    style={{ ...inp(!!errors.password), paddingRight: 48 }}
+                    value={password} onChange={e => setPassword(e.target.value)}
+                    placeholder="Mínimo 8 caracteres" />
+                  <button type="button" onClick={() => setShowPwd(!showPwd)} style={{
+                    position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", cursor: "pointer",
+                    fontFamily: SANS, fontSize: 12, color: C.faint,
+                  }}>{showPwd ? "Ocultar" : "Ver"}</button>
+                </div>
+                {errors.password && <p style={err}>{errors.password}</p>}
+              </div>
+            </div>
+          )}
+
+          {/* ── PASO 2 — Perfil ── */}
+          {step === 2 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+              <div>
+                <label style={lbl}>Áreas de conocimiento <span style={{ color: C.error }}>*</span></label>
+                <p style={{ fontFamily: SANS, fontSize: 12, color: C.faint, margin: "0 0 10px" }}>
+                  Selecciona las que mejor describen lo que enseñas
+                </p>
+                <Chips options={AREAS} selected={areas} onToggle={v => setAreas(toggle(areas, v))} />
+                {errors.areas && <p style={err}>{errors.areas}</p>}
+              </div>
+              <div>
+                <label style={lbl}>País de residencia <span style={{ color: C.error }}>*</span></label>
+                <select style={inp(!!errors.country)} value={country} onChange={e => setCountry(e.target.value)}>
+                  <option value="">Selecciona tu país...</option>
+                  {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                {errors.country && <p style={err}>{errors.country}</p>}
+              </div>
+              <div>
+                <label style={lbl}>Acreditaciones <span style={{ fontFamily: SANS, fontSize: 12, color: C.faint, fontWeight: 400 }}>(opcional)</span></label>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {[
+                    { val: isPhd,    set: setIsPhd,    label: "Soy Doctor/a o tengo título de PhD" },
+                    { val: hasAneca, set: setHasAneca, label: "Tengo acreditación ANECA" },
+                  ].map(({ val, set, label }) => (
+                    <label key={label} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+                      <input type="checkbox" checked={val} onChange={e => set(e.target.checked)}
+                        style={{ width: 16, height: 16, accentColor: C.navy }} />
+                      <span style={{ fontFamily: SANS, fontSize: 14, color: C.ink }}>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── PASO 3 — Cómo trabajas ── */}
+          {step === 3 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+              <div>
+                <label style={lbl}>Idiomas en los que puedes enseñar <span style={{ color: C.error }}>*</span></label>
+                <Chips options={LANGUAGES.map(l => l.label)} selected={languages} onToggle={v => setLanguages(toggle(languages, v))} />
+                {errors.languages && <p style={err}>{errors.languages}</p>}
+              </div>
+              <div>
+                <label style={lbl}>Modalidad <span style={{ color: C.error }}>*</span></label>
+                <Chips options={MODALITIES} selected={modalities} onToggle={v => setModalities(toggle(modalities, v))} />
+                {errors.modalities && <p style={err}>{errors.modalities}</p>}
+              </div>
+              <div>
+                <label style={lbl}>Disponibilidad <span style={{ color: C.error }}>*</span></label>
+                <select style={inp(!!errors.availability)} value={availability} onChange={e => setAvailability(e.target.value)}>
+                  <option value="">Selecciona una opción...</option>
+                  {AVAILABILITY.map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+                {errors.availability && <p style={err}>{errors.availability}</p>}
+              </div>
+            </div>
+          )}
+
+          {/* ── PASO 4 — Institución + términos ── */}
+          {step === 4 && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+
+              {/* Check institución */}
+              <div style={{ background: C.white, border: `1px solid ${wantsInst ? C.navy : C.border}`, borderRadius: 12, overflow: "hidden", transition: "border-color 0.2s" }}>
+                <label style={{ display: "flex", gap: 14, padding: "18px 20px", cursor: "pointer", alignItems: "flex-start" }}>
+                  <input type="checkbox" checked={wantsInst} onChange={e => setWantsInst(e.target.checked)}
+                    style={{ width: 18, height: 18, accentColor: C.navy, flexShrink: 0, marginTop: 2 }} />
+                  <div>
+                    <div style={{ fontFamily: SERIF, fontSize: 16, color: C.ink, marginBottom: 4 }}>
+                      También represento a una institución educativa
+                    </div>
+                    <div style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.5 }}>
+                      Podrás buscar docentes en el directorio y tendrás acceso dual a ambos perfiles desde tu cuenta.
+                    </div>
+                  </div>
+                </label>
+
+                {/* Campos de institución — solo si el check está activo */}
+                {wantsInst && (
+                  <div style={{ padding: "0 20px 20px", borderTop: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 14 }}>
+                    <div style={{ paddingTop: 16 }}>
+                      <label style={lbl}>Nombre de la institución <span style={{ color: C.error }}>*</span></label>
+                      <input style={inp(!!errors.instName)} value={instName}
+                        onChange={e => setInstName(e.target.value)}
+                        placeholder="Universidad / Escuela de Negocios..." />
+                      {errors.instName && <p style={err}>{errors.instName}</p>}
+                    </div>
+                    <div>
+                      <label style={lbl}>Tipo de centro <span style={{ color: C.error }}>*</span></label>
+                      <select style={inp(!!errors.instType)} value={instType} onChange={e => setInstType(e.target.value)}>
+                        <option value="">Selecciona el tipo...</option>
+                        {INSTITUTION_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                      {errors.instType && <p style={err}>{errors.instType}</p>}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Términos */}
+              <div style={{ paddingTop: 4 }}>
+                <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+                  <input type="checkbox" checked={terms} onChange={e => setTerms(e.target.checked)}
+                    style={{ width: 16, height: 16, accentColor: C.navy, marginTop: 2, flexShrink: 0 }} />
+                  <span style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.6 }}>
+                    He leído y acepto los{" "}
+                    <Link href="/terms" target="_blank" style={{ color: C.navy }}>Términos y condiciones</Link>
+                    {" "}y la{" "}
+                    <Link href="/privacy" target="_blank" style={{ color: C.navy }}>Política de privacidad</Link>
+                  </span>
+                </label>
+                {errors.terms && <p style={err}>{errors.terms}</p>}
+              </div>
+            </div>
+          )}
+
+          {/* ── Botones ── */}
+          <div style={{ marginTop: 28, display: "flex", gap: 10 }}>
+            {step > 1 && (
+              <button type="button" onClick={() => setStep(s => s - 1)} style={{
+                fontFamily: SANS, background: C.white, color: C.muted,
+                border: `1px solid ${C.border}`, padding: "12px 22px",
+                borderRadius: 8, fontSize: 14, cursor: "pointer",
+              }}>← Atrás</button>
+            )}
+            {step < TOTAL ? (
+              <button type="button" onClick={next} style={{
+                fontFamily: SANS, flex: 1, background: C.navy, color: C.white,
+                border: "none", padding: "12px 22px", borderRadius: 8,
+                fontSize: 14, fontWeight: 600, cursor: "pointer",
+              }}>Continuar →</button>
+            ) : (
+              <button type="button" onClick={handleSubmit} disabled={loading} style={{
+                fontFamily: SANS, flex: 1,
+                background: loading ? C.muted : C.navy,
+                color: C.white, border: "none", padding: "12px 22px",
+                borderRadius: 8, fontSize: 14, fontWeight: 600,
+                cursor: loading ? "default" : "pointer",
+              }}>
+                {loading ? "Creando perfil..." : "Crear mi perfil"}
+              </button>
+            )}
           </div>
 
-          {role === "faculty" && (
-            <p className="text-xs text-center text-gray-400 mt-3">
-              ¿Prefieres registrarte sin crear cuenta?{" "}
-              <Link href="/apply" className="text-talentia-blue hover:underline font-bold">
-                Envía tu perfil aquí
-              </Link>
-            </p>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input type="hidden" name="role" value={role} />
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">
-                {role === "institution" ? "Nombre del responsable" : "Nombre completo"}
-              </label>
-              <input
-                name="fullName"
-                type="text"
-                required
-                className="w-full px-5 py-3.5 rounded-xl border border-gray-200 bg-white focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium text-navy"
-                placeholder={role === "institution" ? "Ej: María González" : "Ej: Carlos Ruiz"}
-              />
-            </div>
-
-            {role === "institution" && (
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Nombre de la institución</label>
-                <input
-                  name="institutionName"
-                  type="text"
-                  required
-                  className="w-full px-5 py-3.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-energy-orange focus:border-transparent outline-none transition-all font-medium text-navy"
-                  placeholder="Ej: Universidad Global"
-                />
-              </div>
-            )}
-
-            {!isSSO && (
-              <>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Correo electrónico</label>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    className="w-full px-5 py-3.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium text-navy"
-                    placeholder="nombre@universidad.edu"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Contraseña</label>
-                  <input
-                    name="password"
-                    type="password"
-                    required
-                    minLength={6}
-                    className="w-full px-5 py-3.5 rounded-xl border border-gray-200 bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium"
-                    placeholder="Mínimo 6 caracteres"
-                  />
-                </div>
-              </>
-            )}
-
-            {error && (
-              <div className="p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-bold">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-3 py-1">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input type="checkbox" name="terms_accepted" required className="mt-0.5 w-4 h-4 rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue cursor-pointer" />
-                <span className="text-xs font-medium text-gray-500 leading-tight">
-                  Acepto los{" "}
-                  <Link href="/terms" className="text-talentia-blue hover:underline font-bold">Términos y Condiciones</Link>
-                </span>
-              </label>
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input type="checkbox" name="privacy_accepted" required className="mt-0.5 w-4 h-4 rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue cursor-pointer" />
-                <span className="text-xs font-medium text-gray-500 leading-tight">
-                  Acepto la{" "}
-                  <Link href="/privacy" className="text-talentia-blue hover:underline font-bold">Política de Privacidad</Link>{" "}
-                  (GDPR)
-                </span>
-              </label>
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input type="checkbox" name="marketing_opt_in" className="mt-0.5 w-4 h-4 rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue cursor-pointer" />
-                <span className="text-xs font-medium text-gray-500 leading-tight">
-                  Deseo recibir comunicaciones académicas
-                </span>
-              </label>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={loading}
-              className={`w-full py-7 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2 group text-white ${
-                role === "institution"
-                  ? "bg-energy-orange hover:bg-orange-600 shadow-orange-100"
-                  : "bg-talentia-blue hover:bg-blue-700 shadow-blue-100"
-              }`}
-            >
-              {loading ? (
-                <Loader2 className="animate-spin" size={20} />
-              ) : (
-                <>
-                  {isSSO ? "Finalizar configuración" : "Crear cuenta"}
-                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </>
-              )}
-            </Button>
-          </form>
-
-          {!isSSO && (
-            <>
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200" />
-                </div>
-                <div className="relative flex justify-center text-[10px] font-black uppercase tracking-widest">
-                  <span className="bg-[#F8FAFC] px-4 text-gray-400">O regístrate con</span>
-                </div>
-              </div>
-
-              <Button
-                variant="outline"
-                type="button"
-                onClick={async () => {
-                  const result = await signInWithSSO("google", "/dashboard");
-                  if (result?.url) window.location.href = result.url;
-                  else if (result?.error) setError(result.error);
-                }}
-                className="w-full h-12 rounded-xl font-bold border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 flex items-center justify-center gap-3 text-navy transition-all bg-white"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                </svg>
-                Continuar con Google
-              </Button>
-            </>
-          )}
-
-          <p className="text-center text-gray-500 text-xs font-medium">
+          <p style={{ fontFamily: SANS, fontSize: 13, color: C.faint, textAlign: "center", marginTop: 18 }}>
             ¿Ya tienes cuenta?{" "}
-            <Link href="/login" className="text-talentia-blue hover:underline font-bold">
-              Acceder
-            </Link>
+            <Link href="/login" style={{ color: C.navy, fontWeight: 500 }}>Acceder</Link>
           </p>
         </div>
       </div>
@@ -376,16 +555,17 @@ function SignupContent() {
   );
 }
 
+// ─── Export con Suspense (necesario por useSearchParams) ──────────────────────
 export default function SignupPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
-          <Loader2 className="animate-spin text-talentia-blue" size={32} />
+    <Suspense fallback={
+      <div style={{ minHeight: "100vh", background: "#0D2240", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ fontFamily: "var(--font-serif, Georgia, serif)", fontSize: 18, color: "rgba(255,255,255,0.5)" }}>
+          Cargando...
         </div>
-      }
-    >
-      <SignupContent />
+      </div>
+    }>
+      <SignupForm />
     </Suspense>
   );
 }
