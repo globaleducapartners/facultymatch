@@ -129,8 +129,8 @@ function Nav() {
           {[
             { label: "Para docentes",      href: "/faculty" },
             { label: "Para instituciones", href: "/institutions" },
+            { label: "Recursos",           href: "/resources" },
             { label: "Cómo funciona",      href: "#como-funciona" },
-            { label: "Precios",            href: "/faculty#precios" },
           ].map((l) => (
             <Link key={l.href} href={l.href} style={{ fontFamily: SANS, fontSize: 13, color: C.muted, textDecoration: "none", cursor: "pointer", display: isMob ? "none" : "inline" }}>
               {l.label}

@@ -1,221 +1,310 @@
-import Link from "next/link";
-import Image from "next/image";
-import { 
-  Globe, 
-  ArrowRight, 
-  ShieldCheck, 
-  GraduationCap, 
-  Building2, 
-  BookOpen, 
-  CheckCircle2, 
-  FileText, 
-  Users, 
-  Lightbulb,
-  Search,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Navbar } from "@/components/layout/Navbar";
-import { NewsletterForm } from "@/components/NewsletterForm";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
-  title: "Recursos Académicos | FacultyMatch - Elevando el Estándar de Educación Superior",
-  description: "Guías, estándares y mejores prácticas para el reclutamiento docente y el desarrollo de carrera académica en el entorno global.",
-  keywords: "recursos académicos, guías docentes, reclutamiento universitario, estándares académicos, educación superior",
+  title: "Recursos para docentes e instituciones | FacultyMatch",
+  description:
+    "Guías, estándares y mejores prácticas para el reclutamiento docente y el desarrollo de carrera académica en educación superior.",
+  keywords:
+    "recursos académicos, guías docentes, reclutamiento universitario, estándares académicos, educación superior",
 };
 
-const resources = [
-  { 
-    title: "Cómo construir un claustro docente de alto impacto", 
-    desc: "Guía práctica para instituciones sobre selección, diversificación y fidelización de talento académico global. Aprende a equilibrar perfiles investigadores con expertos profesionales.",
-    icon: Building2,
+const SERIF = `var(--font-serif, 'Georgia', 'Times New Roman', serif)`;
+const SANS  = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
+
+const C = {
+  ink: "#0C1018", navy: "#0D2240", brass: "#B8963E",
+  cream: "#F7F5F0", paper: "#FDFCF9", white: "#FFFFFF",
+  muted: "#6B7280", faint: "#9CA3AF", border: "#E5E1D8",
+};
+
+const RESOURCES = [
+  {
     tag: "Instituciones",
+    title: "Cómo construir un claustro docente de alto impacto",
+    desc: "Guía práctica para instituciones sobre selección, diversificación y fidelización de talento académico. Aprende a equilibrar perfiles investigadores con expertos profesionales.",
     readTime: "8 min",
-    href: "/resources/claustro-docente"
+    href: "/resources/claustro-docente",
   },
-  { 
-    title: "Estándares de verificación FacultyMatch", 
-    desc: "Conoce en detalle los criterios y el proceso de auditoría que aplicamos para validar credenciales académicas, títulos de doctorado y experiencia profesional verificada.",
-    icon: ShieldCheck,
+  {
     tag: "Calidad",
+    title: "Estándares de verificación FacultyMatch",
+    desc: "Conoce los criterios y el proceso de auditoría que aplicamos para validar credenciales académicas, títulos de doctorado y experiencia profesional verificada.",
     readTime: "5 min",
-    href: "/resources/estandares-verificacion"
+    href: "/resources/estandares-verificacion",
   },
-  { 
-    title: "El futuro de la docencia online y microcredenciales", 
-    desc: "Análisis de las tendencias pedagógicas en entornos virtuales y cómo los docentes expertos pueden posicionarse en el mercado de las microcredenciales internacionales.",
-    icon: GraduationCap,
+  {
     tag: "Tendencias",
+    title: "El futuro de la docencia online y microcredenciales",
+    desc: "Análisis de las tendencias pedagógicas en entornos virtuales y cómo los docentes expertos pueden posicionarse en el mercado de las microcredenciales internacionales.",
     readTime: "12 min",
-    href: "/resources/docencia-online-microcredenciales"
+    href: "/resources/docencia-online-microcredenciales",
   },
-  { 
-    title: "Guía: Optimiza tu Perfil Docente en FacultyMatch", 
-    desc: "Mejores prácticas para destacar tu trayectoria académica. Cómo estructurar tus áreas de conocimiento y subir evidencias que generen confianza en las universidades.",
-    icon: FileText,
+  {
     tag: "Docentes",
+    title: "Guía: Optimiza tu perfil docente en FacultyMatch",
+    desc: "Mejores prácticas para destacar tu trayectoria académica. Cómo estructurar tus áreas de conocimiento y generar confianza en las instituciones.",
     readTime: "6 min",
-    href: "/resources/optimiza-perfil-docente"
+    href: "/resources/optimiza-perfil-docente",
   },
-  { 
-    title: "Taxonomía Académica Global", 
-    desc: "Descubre cómo clasificamos las disciplinas y sub-áreas siguiendo los estándares internacionales. Una herramienta clave para el matching preciso entre oferta y demanda.",
-    icon: BookOpen,
+  {
     tag: "Estructura",
+    title: "Taxonomía Académica Global",
+    desc: "Cómo clasificamos las disciplinas y sub-áreas siguiendo estándares internacionales. Una herramienta clave para el matching preciso entre oferta y demanda.",
     readTime: "10 min",
-    href: "/resources/taxonomia-academica"
+    href: "/resources/taxonomia-academica",
   },
-  { 
-    title: "Estrategias de Reclutamiento en 90 días", 
-    desc: "Plan de acción para directores académicos: desde la identificación de necesidades hasta la firma de la colaboración docente mediante nuestra infraestructura conectada.",
-    icon: Lightbulb,
+  {
     tag: "Gestión",
+    title: "Estrategias de reclutamiento en 90 días",
+    desc: "Plan de acción para directores académicos: desde la identificación de necesidades hasta la firma de la colaboración docente.",
     readTime: "15 min",
-    href: "/resources/reclutamiento-90-dias"
+    href: "/resources/reclutamiento-90-dias",
   },
 ];
 
+const TAG_COLORS: Record<string, { bg: string; text: string }> = {
+  Instituciones: { bg: "#EFF6FF", text: "#1D4ED8" },
+  Calidad:       { bg: "#F0FDF4", text: "#065F46" },
+  Tendencias:    { bg: "#FEF3C7", text: "#92400E" },
+  Docentes:      { bg: "#EFF6FF", text: "#1D4ED8" },
+  Estructura:    { bg: "#F5F3FF", text: "#5B21B6" },
+  Gestión:       { bg: "#FFF7ED", text: "#9A3412" },
+};
+
 export default function ResourcesPage() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div style={{ background: C.paper, fontFamily: SANS }}>
+      <style>{`
+        .fm-hero-h1 { font-size: 54px; }
+        .fm-section-pad { padding: 72px 40px; }
+        .fm-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+        .fm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .fm-cta-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 32px; }
+        @media (max-width: 768px) {
+          .fm-hero-h1 { font-size: 34px !important; }
+          .fm-section-pad { padding: 48px 20px !important; }
+          .fm-grid-3 { grid-template-columns: 1fr !important; }
+          .fm-grid-2 { grid-template-columns: 1fr !important; gap: 0 !important; }
+          .fm-cta-row { flex-direction: column !important; align-items: flex-start !important; }
+          .fm-photo-hide { display: none !important; }
+        }
+      `}</style>
+
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-6 py-16 lg:py-24 space-y-24">
-        {/* Hero */}
-        <div className="text-center space-y-6 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-talentia-blue text-xs font-black uppercase tracking-widest">
-            <BookOpen size={14} /> Knowledge Center
+      {/* ── HERO ── */}
+      <section style={{ position: "relative", overflow: "hidden" }}>
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage: `url(https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1800)`,
+          backgroundSize: "cover", backgroundPosition: "center 40%",
+        }} />
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(160deg, rgba(12,16,24,0.5) 0%, rgba(12,16,24,0.72) 60%, rgba(12,16,24,0.92) 100%)",
+        }} />
+        <div style={{
+          position: "relative", zIndex: 2, minHeight: 460,
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          textAlign: "center", padding: "80px 40px",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
+            <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
+            <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.45)" }}>
+              Centro de conocimiento
+            </span>
+            <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
           </div>
-          <h1 className="text-4xl lg:text-7xl font-black text-navy tracking-tight leading-tight">
-            Recursos y <span className="text-talentia-blue">Conocimiento</span>
+
+          <h1 className="fm-hero-h1" style={{ fontFamily: SERIF, fontWeight: 400, color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em", margin: "0 0 20px", maxWidth: 680 }}>
+            Recursos para docentes
+            e instituciones.
           </h1>
-          <p className="text-xl text-gray-500 font-medium leading-relaxed">
-            Nuestra misión es elevar los estándares de la educación superior mediante la difusión de mejores prácticas en gestión del talento académico.
+
+          <p style={{ fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.58)", lineHeight: 1.75, margin: "0 0 38px", maxWidth: 480 }}>
+            Guías, estándares y análisis para elevar los criterios de selección
+            de talento académico en la educación superior.
           </p>
-          <div className="relative max-w-lg mx-auto pt-8">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input 
-              type="text" 
-              placeholder="Buscar guías, artículos o estándares..." 
-              className="w-full pl-12 pr-6 py-4 rounded-2xl border border-gray-100 shadow-sm focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
-            />
+
+          <div style={{ display: "flex", gap: 12 }}>
+            <Link href="/signup">
+              <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 32px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+                Publicar mi perfil
+              </button>
+            </Link>
+            <Link href="/signup?intent=institution">
+              <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.8)", border: "1px solid rgba(255,255,255,0.28)", padding: "13px 32px", borderRadius: 6, fontSize: 14, cursor: "pointer" }}>
+                Buscar docentes
+              </button>
+            </Link>
           </div>
         </div>
+      </section>
 
-        {/* Resources Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {resources.map((res, idx) => (
-              <Link key={idx} href={res.href} className="bg-white rounded-[2.5rem] p-10 border border-gray-100 shadow-sm hover:shadow-xl transition-all group flex flex-col relative overflow-hidden cursor-pointer">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-bl-[4rem] -z-10 transition-colors group-hover:bg-blue-50/50"></div>
-              <div className="bg-white shadow-lg shadow-blue-900/5 text-talentia-blue w-14 h-14 rounded-2xl flex items-center justify-center mb-8 border border-gray-50 group-hover:scale-110 transition-transform">
-                <res.icon size={28} strokeWidth={1.5} />
-              </div>
-              <div className="flex items-center gap-4 mb-4">
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-tech-cyan bg-blue-50 px-3 py-1 rounded-full">
-                  {res.tag}
-                </span>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
-                  <Globe size={10} /> {res.readTime} lectura
-                </span>
-              </div>
-              <h3 className="text-2xl font-black text-navy mb-4 leading-tight group-hover:text-talentia-blue transition-colors">
-                {res.title}
-              </h3>
-              <p className="text-gray-500 font-medium leading-relaxed mb-8 flex-1">
-                {res.desc}
-              </p>
-                <span className="inline-flex items-center gap-2 text-talentia-blue font-black text-xs uppercase tracking-widest hover:gap-3 transition-all">
-                  Leer artículo <ArrowRight size={16} />
-                </span>
-              </Link>
-          ))}
-        </div>
-
-        {/* Featured Content */}
-        <section className="bg-white rounded-[3.5rem] p-12 lg:p-20 border border-gray-100 shadow-sm grid lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8">
-            <h2 className="text-3xl lg:text-4xl font-black text-navy leading-tight">
-              Diseñamos la infraestructura del conocimiento conectado.
+      {/* ── ARTÍCULOS ── */}
+      <section style={{ background: C.white }}>
+        <div className="fm-section-pad" style={{ maxWidth: 1080, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 52 }}>
+            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
+              Guías y análisis
+            </div>
+            <h2 style={{ fontFamily: SERIF, fontSize: 32, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 12px", lineHeight: 1.1 }}>
+              Lo que necesitas saber sobre talento académico.
             </h2>
-            <div className="space-y-6">
-              <div className="flex gap-4">
-                <div className="bg-green-50 text-green-600 p-2 rounded-lg h-fit">
-                  <CheckCircle2 size={24} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-navy">Estándar Universitario</h4>
-                  <p className="text-sm text-gray-500 font-medium">Contenido alineado con los requisitos de las agencias de calidad internacional.</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="bg-talentia-blue text-white p-2 rounded-lg h-fit">
-                  <Users size={24} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-navy">Red de Colaboradores</h4>
-                  <p className="text-sm text-gray-500 font-medium">Artículos escritos por decanos y directores de programa en activo.</p>
-                </div>
-              </div>
-            </div>
-            <Button asChild className="bg-navy hover:bg-slate-800 text-white font-bold h-14 px-8 rounded-xl shadow-lg">
-              <a href="mailto:support@facultymatch.app">Contacta con nosotros</a>
-            </Button>
+            <p style={{ fontFamily: SANS, fontSize: 15, color: C.muted, maxWidth: 460, margin: "0 auto" }}>
+              Contenido escrito por directores de programa y especialistas en gestión académica.
+            </p>
           </div>
-              <div className="relative">
-                <div className="aspect-[4/3] bg-gray-50 rounded-[2.5rem] overflow-hidden relative">
-                    <Image
-                        src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1200&auto=format&fit=crop"
-                        alt="Knowledge Center"
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                        className="object-cover"
-                    />
-                </div>
 
-            <div className="absolute -bottom-6 -right-6 bg-energy-orange p-8 rounded-3xl text-white shadow-xl max-w-[240px]">
-                <p className="text-sm font-black uppercase tracking-widest mb-2 opacity-80">Próximo Webinar</p>
-                <p className="font-bold leading-tight">Reclutamiento de perfiles Tech en Educación Superior</p>
-            </div>
+          <div className="fm-grid-3">
+            {RESOURCES.map((r, i) => {
+              const tc = TAG_COLORS[r.tag] ?? { bg: C.cream, text: C.muted };
+              return (
+                <Link key={i} href={r.href} style={{ textDecoration: "none" }}>
+                  <div style={{
+                    background: C.cream, border: `1px solid ${C.border}`,
+                    borderRadius: 12, padding: "28px 26px",
+                    borderTop: `3px solid ${C.brass}`,
+                    height: "100%", display: "flex", flexDirection: "column" as const,
+                    cursor: "pointer",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                      <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: tc.text, background: tc.bg, padding: "3px 10px", borderRadius: 20 }}>
+                        {r.tag}
+                      </span>
+                      <span style={{ fontFamily: SANS, fontSize: 11, color: C.faint }}>
+                        {r.readTime} lectura
+                      </span>
+                    </div>
+                    <h3 style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 400, color: C.ink, lineHeight: 1.35, margin: "0 0 12px" }}>
+                      {r.title}
+                    </h3>
+                    <p style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.75, margin: "0 0 20px", flex: 1 }}>
+                      {r.desc}
+                    </p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: SANS, fontSize: 12, color: C.brass, fontWeight: 500 }}>
+                      Leer artículo
+                      <span style={{ fontSize: 14 }}>→</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Newsletter / CTA */}
-        <section className="relative rounded-[4rem] overflow-hidden shadow-2xl shadow-blue-900/20 min-h-[500px] flex items-center">
-          <div className="absolute inset-0">
-            <Image
-              src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1800"
-              alt="Biblioteca universitaria"
-              fill
-              sizes="100vw"
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-navy/88"></div>
-          </div>
-          <div className="relative z-10 w-full px-10 py-20 lg:px-24 grid lg:grid-cols-2 gap-16 items-center">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-tech-cyan text-xs font-black uppercase tracking-widest">
-                <BookOpen size={14} /> FacultyMatch Monthly
+      {/* ── SOBRE EL KNOWLEDGE CENTER ── */}
+      <section style={{ background: C.cream }}>
+        <div className="fm-section-pad" style={{ maxWidth: 1080, margin: "0 auto" }}>
+          <div className="fm-grid-2">
+            {/* Foto */}
+            <div className="fm-photo-hide" style={{ borderRadius: 14, overflow: "hidden", height: 420 }}>
+              <div style={{
+                width: "100%", height: "100%",
+                backgroundImage: `url(https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=900)`,
+                backgroundSize: "cover", backgroundPosition: "center top",
+              }} />
+            </div>
+
+            {/* Contenido */}
+            <div>
+              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>
+                Por qué publicamos esto
               </div>
-              <h2 className="text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
-                El reporte mensual de la educación superior global.
+              <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 18px", lineHeight: 1.2 }}>
+                La calidad del claustro<br />
+                determina la calidad de la institución.
               </h2>
-              <p className="text-lg text-white/70 font-medium leading-relaxed">
-                Tendencias de reclutamiento, cambios regulatorios, nuevas oportunidades docentes y análisis del mercado académico internacional. Directo a tu correo, una vez al mes.
+              <p style={{ fontFamily: SANS, fontSize: 15, color: C.muted, lineHeight: 1.8, margin: "0 0 20px" }}>
+                Estos recursos ayudan a directores de programa y coordinadores académicos a tomar mejores decisiones sobre su talento docente. Y a los propios docentes, a entender qué valoran las instituciones.
               </p>
-              <div className="flex flex-wrap gap-4 text-xs font-black uppercase tracking-widest text-white/50">
-                <span className="flex items-center gap-1.5"><CheckCircle2 size={12} /> Cero spam</span>
-                <span className="flex items-center gap-1.5"><CheckCircle2 size={12} /> Cancelable siempre</span>
-                <span className="flex items-center gap-1.5"><CheckCircle2 size={12} /> Solo lo relevante</span>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 14, marginBottom: 32 }}>
+                {[
+                  { label: "Estándar universitario", body: "Alineado con los criterios de las agencias de calidad internacionales." },
+                  { label: "Red de colaboradores",   body: "Artículos escritos por decanos y directores de programa en activo." },
+                  { label: "Actualización continua", body: "El contenido se revisa y actualiza con cada cambio regulatorio relevante." },
+                ].map((item, i) => (
+                  <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: C.white, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
+                      <span style={{ fontFamily: SERIF, fontSize: 11, color: C.brass, fontStyle: "italic" }}>{["I", "II", "III"][i]}</span>
+                    </div>
+                    <div>
+                      <h4 style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 400, color: C.ink, margin: "0 0 3px" }}>{item.label}</h4>
+                      <p style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.6, margin: 0 }}>{item.body}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-            <div className="space-y-4">
-              <NewsletterForm />
-              <p className="text-center text-xs font-bold text-white/30 uppercase tracking-widest">Más de 8.000 académicos ya suscritos</p>
+              <Link href="mailto:support@facultymatch.app">
+                <button style={{ fontFamily: SANS, background: "transparent", color: C.navy, border: `1px solid ${C.navy}`, padding: "11px 26px", borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+                  Contactar con el equipo
+                </button>
+              </Link>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
+
+      {/* ── CTA NEWSLETTER ── */}
+      <section style={{ position: "relative", overflow: "hidden" }}>
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage: `url(https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1800)`,
+          backgroundSize: "cover", backgroundPosition: "center 55%",
+        }} />
+        <div style={{ position: "absolute", inset: 0, background: "rgba(12,16,24,0.78)" }} />
+        <div style={{
+          position: "relative", zIndex: 2,
+          maxWidth: 1080, margin: "0 auto",
+          padding: "64px 40px",
+        }}>
+          <div className="fm-grid-2" style={{ gap: 48 }}>
+            <div>
+              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 14 }}>
+                FacultyMatch Monthly
+              </div>
+              <h2 style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 400, color: "#fff", lineHeight: 1.25, margin: "0 0 16px", letterSpacing: "-0.02em" }}>
+                El reporte mensual de la educación superior.
+              </h2>
+              <p style={{ fontFamily: SANS, fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.8, margin: "0 0 20px" }}>
+                Tendencias de reclutamiento, cambios regulatorios y nuevas oportunidades docentes. Una vez al mes. Sin spam.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 8 }}>
+                {["Cero spam", "Cancelable en cualquier momento", "Solo contenido relevante"].map((item, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: C.brass, flexShrink: 0 }} />
+                    <span style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.45)" }}>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" as const, justifyContent: "center", gap: 12 }}>
+              <div style={{ display: "flex", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, overflow: "hidden" }}>
+                <input
+                  type="email"
+                  placeholder="Tu correo electrónico"
+                  style={{
+                    flex: 1, border: "none", outline: "none",
+                    background: "transparent", padding: "13px 18px",
+                    fontFamily: SANS, fontSize: 14,
+                    color: "#fff",
+                  }}
+                />
+                <button style={{ fontFamily: SANS, background: C.brass, color: "#fff", border: "none", padding: "13px 22px", fontSize: 13, fontWeight: 600, cursor: "pointer", flexShrink: 0, borderRadius: "0 7px 7px 0" }}>
+                  Suscribirme
+                </button>
+              </div>
+              <p style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.25)", margin: 0, textAlign: "center" as const }}>
+                Más de 8.000 académicos ya suscritos
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
-
