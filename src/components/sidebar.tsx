@@ -77,7 +77,7 @@ export function Sidebar() {
     <>
       {/* Mobile bottom navigation bar — faculty only, visible below md */}
       {isFaculty && (
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E2E8F0] flex justify-around py-2 z-50 md:hidden">
+        <nav className="fixed bottom-0 left-0 right-0 bg-[#FDFCF9] border-t border-[#E5E1D8] flex justify-around py-2 z-50 md:hidden">
           {facultyBottomNavItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -86,7 +86,7 @@ export function Sidebar() {
                 href={item.href}
                 className={cn(
                   "flex flex-col items-center gap-0.5 px-3 py-1 min-w-0",
-                  isActive ? "text-talentia-blue" : "text-gray-400"
+                  isActive ? "text-[#0D2240]" : "text-gray-400"
                 )}
               >
                 <item.icon size={22} />
@@ -99,7 +99,7 @@ export function Sidebar() {
 
       {/* Tablet hamburger button — visible only on md (not mobile, not desktop) */}
       <button
-        className="hidden md:flex lg:hidden fixed bottom-6 right-6 z-50 bg-talentia-blue text-white p-3 rounded-full shadow-lg items-center justify-center"
+        className="hidden md:flex lg:hidden fixed bottom-6 right-6 z-50 bg-[#0D2240] text-white p-3 rounded-full shadow-lg items-center justify-center"
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -115,7 +115,7 @@ export function Sidebar() {
 
       {/* Sidebar Content — hidden on mobile, collapsible on tablet, static on desktop */}
       <aside className={cn(
-        "fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 flex-col transition-transform duration-300 transform",
+        "fixed lg:static inset-y-0 left-0 z-40 w-64 bg-[#FDFCF9] border-r border-[#E5E1D8] flex-col transition-transform duration-300 transform",
         "hidden md:flex",
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
@@ -134,12 +134,12 @@ export function Sidebar() {
                   onClick={() => setIsOpen(false)}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
-                    isActive 
-                      ? "bg-talentia-blue/10 text-talentia-blue" 
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    isActive
+                      ? "bg-[#0D2240]/10 text-[#0D2240]"
+                      : "text-gray-600 hover:bg-[#F7F5F0] hover:text-[#0D2240]"
                   )}
                 >
-                  <item.icon size={20} className={isActive ? "text-talentia-blue" : "text-gray-400"} />
+                  <item.icon size={20} className={isActive ? "text-[#B8963E]" : "text-gray-400"} />
                   {item.label}
                 </Link>
               );
@@ -147,10 +147,10 @@ export function Sidebar() {
           </nav>
         </div>
 
-        <div className="p-4 border-t border-gray-100">
+        <div className="p-4 border-t border-[#E5E1D8]">
           <a
             href="mailto:support@facultymatch.app"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-[#F7F5F0] transition-colors"
           >
             <HelpCircle size={20} className="text-gray-400" />
             Centro de ayuda

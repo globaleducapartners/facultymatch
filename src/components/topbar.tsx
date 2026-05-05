@@ -140,7 +140,7 @@ export function Topbar({ user, profile }: TopbarProps) {
   };
 
   return (
-    <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
+    <header className="h-20 bg-[#FDFCF9] border-b border-[#E5E1D8] flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
       <div className="flex items-center gap-4">
         <Link href="/" className="flex flex-col">
           <span className="text-2xl font-bold tracking-tight text-navy">FacultyMatch</span>
@@ -201,17 +201,17 @@ export function Topbar({ user, profile }: TopbarProps) {
             >
               <Bell size={22} />
               {notifLoaded && notifications.length > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-energy-orange rounded-full" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#B8963E] rounded-full" />
               )}
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+              <div className="absolute right-0 top-full mt-2 w-80 bg-[#FDFCF9] rounded-2xl shadow-xl border border-[#E5E1D8] z-50 overflow-hidden">
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E1D8]">
                   <span className="text-sm font-black text-navy">Notificaciones</span>
                   {notifications.length > 0 && (
-                    <span className="text-[10px] font-black text-talentia-blue bg-blue-50 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-black text-[#0D2240] bg-[#F7F5F0] px-2 py-0.5 rounded-full border border-[#E5E1D8]">
                       {notifications.length}
                     </span>
                   )}
@@ -243,8 +243,8 @@ export function Topbar({ user, profile }: TopbarProps) {
                           <div
                             className={`mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
                               n.type === "contact"
-                                ? "bg-blue-50 text-talentia-blue"
-                                : "bg-orange-50 text-energy-orange"
+                                ? "bg-[#0D2240]/10 text-[#0D2240]"
+                                : "bg-[#B8963E]/10 text-[#B8963E]"
                             }`}
                           >
                             {n.type === "contact" ? (
@@ -269,10 +269,10 @@ export function Topbar({ user, profile }: TopbarProps) {
                 )}
 
                 {/* Footer */}
-                <div className="border-t border-gray-50 px-4 py-3">
+                <div className="border-t border-[#E5E1D8] px-4 py-3">
                   <Link
                     href="/app/faculty/requests"
-                    className="text-xs font-bold text-talentia-blue hover:underline"
+                    className="text-xs font-bold text-[#0D2240] hover:text-[#B8963E] transition-colors"
                     onClick={() => setShowNotifications(false)}
                   >
                     Ver todas las solicitudes →
@@ -287,7 +287,7 @@ export function Topbar({ user, profile }: TopbarProps) {
             <DropdownMenuTrigger className="flex items-center gap-3 p-1 rounded-full hover:bg-gray-50 transition-all focus:outline-none">
               <Avatar className="h-10 w-10 border border-gray-100 ring-2 ring-gray-50">
                 <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="bg-talentia-blue/10 text-talentia-blue font-bold">
+                <AvatarFallback className="bg-[#0D2240]/10 text-[#0D2240] font-bold">
                   {profile?.full_name
                     ?.split(" ")
                     .map((n: string) => n[0])
