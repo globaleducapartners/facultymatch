@@ -364,111 +364,233 @@ function ProfileCard({ p }: { p: typeof PROFILES[0] }) {
   );
 }
 
-// ─── CÓMO FUNCIONA ────────────────────────────────────────────────────────────
+// ─── CÓMO FUNCIONA — ilustraciones SVG ────────────────────────────────────────
+function IllProfile() {
+  return (
+    <svg viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 80, height: 64 }}>
+      <rect x="4" y="2" width="72" height="60" rx="9" fill={C.paper} stroke={C.border} strokeWidth="1.5"/>
+      <circle cx="28" cy="26" r="12" fill="#DBEAFE"/>
+      <circle cx="28" cy="21" r="5.5" fill="#93C5FD"/>
+      <ellipse cx="28" cy="35" rx="9" ry="5" fill="#93C5FD"/>
+      <rect x="46" y="19" width="24" height="3.5" rx="1.75" fill={C.border}/>
+      <rect x="46" y="26" width="17" height="3" rx="1.5" fill="#E2E8F0"/>
+      <rect x="46" y="33" width="20" height="3" rx="1.5" fill="#E2E8F0"/>
+      <circle cx="68" cy="11" r="9" fill={C.navy}/>
+      <path d="M63.5 11L67 14.5L73 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+function IllSearch() {
+  return (
+    <svg viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 80, height: 64 }}>
+      <rect x="2" y="2" width="34" height="26" rx="5" fill={C.paper} stroke={C.border} strokeWidth="1"/>
+      <circle cx="14" cy="14" r="5" fill={C.border}/>
+      <rect x="22" y="11" width="10" height="2.5" rx="1.25" fill={C.border}/>
+      <rect x="22" y="16" width="7" height="2" rx="1" fill="#E2E8F0"/>
+      <rect x="44" y="2" width="34" height="26" rx="5" fill={C.paper} stroke={C.border} strokeWidth="1"/>
+      <circle cx="56" cy="14" r="5" fill={C.border}/>
+      <rect x="64" y="11" width="10" height="2.5" rx="1.25" fill={C.border}/>
+      <rect x="64" y="16" width="7" height="2" rx="1" fill="#E2E8F0"/>
+      <rect x="2" y="36" width="34" height="26" rx="5" fill="#EFF6FF" stroke="#93C5FD" strokeWidth="1.5"/>
+      <circle cx="14" cy="47" r="5" fill="#93C5FD"/>
+      <rect x="22" y="44" width="10" height="2.5" rx="1.25" fill="#BFDBFE"/>
+      <rect x="22" y="49" width="7" height="2" rx="1" fill="#BFDBFE"/>
+      <circle cx="34" cy="36" r="7" fill={C.brass}/>
+      <path d="M34 31L35.5 35.5H40.5L36.5 38L38 42.5L34 40L30 42.5L31.5 38L27.5 35.5H32.5Z" fill="white" opacity="0.9"/>
+      <rect x="44" y="36" width="34" height="26" rx="5" fill={C.paper} stroke={C.border} strokeWidth="1"/>
+      <circle cx="56" cy="47" r="5" fill={C.border}/>
+      <rect x="64" y="44" width="10" height="2.5" rx="1.25" fill={C.border}/>
+      <rect x="64" y="49" width="7" height="2" rx="1" fill="#E2E8F0"/>
+    </svg>
+  );
+}
+function IllMessage() {
+  return (
+    <svg viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 80, height: 64 }}>
+      <circle cx="13" cy="18" r="11" fill="#DBEAFE"/>
+      <circle cx="13" cy="13" r="5" fill="#93C5FD"/>
+      <ellipse cx="13" cy="26" rx="8" ry="4" fill="#93C5FD"/>
+      <rect x="60" y="6" width="18" height="22" rx="4" fill="#FFFBEB" stroke="#FDE68A" strokeWidth="1.5"/>
+      <rect x="64" y="12" width="10" height="2.5" rx="1.25" fill="#FCD34D"/>
+      <rect x="64" y="18" width="6" height="2" rx="1" fill="#FDE68A"/>
+      <rect x="60" y="25" width="18" height="3" rx="1.5" fill="#FDE68A"/>
+      <rect x="24" y="19" width="38" height="28" rx="7" fill={C.navy}/>
+      <polygon points="28,47 23,57 38,47" fill={C.navy}/>
+      <rect x="30" y="25" width="26" height="3.5" rx="1.75" fill="rgba(255,255,255,0.6)"/>
+      <rect x="30" y="32" width="18" height="3" rx="1.5" fill="rgba(255,255,255,0.35)"/>
+      <rect x="30" y="38" width="13" height="3" rx="1.5" fill="rgba(255,255,255,0.2)"/>
+    </svg>
+  );
+}
+
 function HowItWorks() {
   const isMob = useIsMobile();
+
   const steps = [
     {
-      n: "I",
+      n: "01/",
       title: "Publica tu perfil",
-      faculty: "Describe tu área y disponibilidad. Nuestro equipo verifica cada perfil antes de publicarlo en el directorio.",
-      institution: "Regístrate y accede al directorio verificado desde el primer día. Sin proceso de validación previo.",
+      body: "Describe tu área, experiencia y disponibilidad. Verificamos cada perfil antes de publicarlo en el directorio.",
+      ill: <IllProfile />,
     },
     {
-      n: "II",
-      title: "Aparece en las búsquedas",
-      faculty: "Tu perfil aparece ante las instituciones que buscan exactamente tu área, idioma y disponibilidad.",
-      institution: "Filtra por área de conocimiento, idioma, modalidad y disponibilidad real. Sin palabras clave ni CVs que interpretar.",
+      n: "02/",
+      title: "Apareces ante quien te busca",
+      body: "Las instituciones filtran por área, idioma y disponibilidad real. Tu perfil llega exactamente a quien lo necesita.",
+      ill: <IllSearch />,
     },
     {
-      n: "III",
+      n: "03/",
       title: "Contacto directo",
-      faculty: "La institución da el primer paso. Tú decides si respondes, cuándo y en qué condiciones.",
-      institution: "Escribe directamente al docente. Sin intermediarios, sin comisiones por contratación.",
+      body: "La institución escribe directamente. Sin intermediarios ni comisiones. Tú decides si respondes y en qué condiciones.",
+      ill: <IllMessage />,
     },
   ];
 
   return (
-    <section style={{ background: C.cream, padding: isMob ? "52px 20px 60px" : "72px 40px", overflowX: "hidden" }}>
-      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 52 }}>
+    <section style={{ background: C.cream, padding: isMob ? "56px 20px 64px" : "88px 40px" }}>
+      <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: isMob ? 48 : 72 }}>
           <div style={{
             fontFamily: SANS, fontSize: 10, fontWeight: 700,
-            letterSpacing: "0.14em", textTransform: "uppercase" as const,
-            color: C.brass, marginBottom: 12,
-          }}>
-            Así funciona
-          </div>
+            letterSpacing: "0.15em", textTransform: "uppercase" as const,
+            color: C.brass, marginBottom: 14,
+          }}>Así funciona</div>
           <h2 style={{
-            fontFamily: SERIF, fontSize: isMob ? 26 : 30, fontWeight: 400,
-            color: C.ink, letterSpacing: "-0.025em", margin: "0 0 12px", lineHeight: 1.1,
+            fontFamily: SERIF, fontSize: isMob ? 28 : 38, fontWeight: 400,
+            color: C.ink, letterSpacing: "-0.03em", margin: "0 0 16px", lineHeight: 1.15,
           }}>
-            Un proceso simple que conecta<br />el talento con quien lo necesita.
+            Tres pasos para conectar<br />talento con oportunidad.
           </h2>
-          <p style={{ fontFamily: SANS, fontSize: 15, color: C.muted, maxWidth: 440, margin: "0 auto" }}>
-            Sin intermediarios. Sin comisiones por contratación. Sin procesos innecesarios.
+          <p style={{
+            fontFamily: SANS, fontSize: 15, color: C.muted,
+            margin: "0 auto", maxWidth: 380,
+          }}>
+            Sin intermediarios. Sin comisiones por contratación.
           </p>
         </div>
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: isMob ? "1fr" : "1fr 1fr 1fr",
-          gap: 20,
-        }}>
-          {steps.map((s, i) => (
-            <div key={i} style={{
-              background: C.white, border: `1px solid ${C.border}`,
-              borderRadius: 14, padding: "28px 24px",
-              borderTop: `3px solid ${C.brass}`,
-            }}>
-              <div style={{
-                width: 40, height: 40, borderRadius: 10,
-                background: C.navy, display: "flex", alignItems: "center",
-                justifyContent: "center", marginBottom: 18,
+        {/* Desktop: horizontal workflow */}
+        {!isMob ? (
+          <div style={{ position: "relative" as const }}>
+            {/* Dashed connector line between circles */}
+            <div style={{
+              position: "absolute" as const,
+              top: 47, left: "calc(16.66% + 48px)", right: "calc(16.66% + 48px)",
+              height: 2,
+              backgroundImage: `repeating-linear-gradient(to right, ${C.border} 0, ${C.border} 10px, transparent 10px, transparent 20px)`,
+              zIndex: 0,
+            }} />
+            {/* Chevron arrows on line */}
+            {[33.33, 66.66].map((pct, i) => (
+              <div key={i} style={{
+                position: "absolute" as const,
+                top: 38, left: `${pct}%`,
+                transform: "translateX(-50%)",
+                zIndex: 2,
+                width: 20, height: 20,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: C.cream,
               }}>
-                <span style={{ fontFamily: SERIF, fontSize: 16, color: "#fff", fontStyle: "italic" }}>{s.n}</span>
+                <svg viewBox="0 0 12 12" fill="none" style={{ width: 12, height: 12 }}>
+                  <path d="M3 2L9 6L3 10" stroke={C.brass} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
-              <h3 style={{
-                fontFamily: SERIF, fontSize: 17, fontWeight: 400,
-                color: C.ink, margin: "0 0 18px",
-              }}>
-                {s.title}
-              </h3>
-              <div style={{ display: "flex", flexDirection: "column" as const, gap: 10 }}>
-                <div style={{ background: "#EFF6FF", borderRadius: 8, padding: "10px 14px" }}>
-                  <div style={{
-                    fontFamily: SANS, fontSize: 9, fontWeight: 700,
-                    letterSpacing: "0.1em", textTransform: "uppercase" as const,
-                    color: "#1D4ED8", marginBottom: 5,
-                  }}>
-                    Docente
-                  </div>
-                  <p style={{ fontFamily: SANS, fontSize: 12, color: "#1D4ED8", lineHeight: 1.65, margin: 0 }}>
-                    {s.faculty}
-                  </p>
-                </div>
-                <div style={{ background: "#FEF3C7", borderRadius: 8, padding: "10px 14px" }}>
-                  <div style={{
-                    fontFamily: SANS, fontSize: 9, fontWeight: 700,
-                    letterSpacing: "0.1em", textTransform: "uppercase" as const,
-                    color: "#92400E", marginBottom: 5,
-                  }}>
-                    Institución
-                  </div>
-                  <p style={{ fontFamily: SANS, fontSize: 12, color: "#92400E", lineHeight: 1.65, margin: 0 }}>
-                    {s.institution}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
 
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 44, flexWrap: "wrap" as const }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 0 }}>
+              {steps.map((step, i) => (
+                <div key={i} style={{
+                  display: "flex", flexDirection: "column" as const, alignItems: "center",
+                  textAlign: "center" as const,
+                  padding: "0 36px",
+                  position: "relative" as const, zIndex: 1,
+                }}>
+                  {/* Icon circle */}
+                  <div style={{
+                    width: 96, height: 96, borderRadius: "50%",
+                    background: C.white,
+                    border: `1.5px solid ${C.border}`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    marginBottom: 32, flexShrink: 0,
+                    boxShadow: "0 4px 16px rgba(12,16,24,0.07)",
+                  }}>
+                    {step.ill}
+                  </div>
+
+                  {/* Step number */}
+                  <div style={{
+                    fontFamily: SANS, fontWeight: 800, fontSize: 30,
+                    color: C.brass, letterSpacing: "-0.02em", lineHeight: 1,
+                    marginBottom: 12,
+                  }}>
+                    {step.n}
+                  </div>
+
+                  {/* Title */}
+                  <h3 style={{
+                    fontFamily: SERIF, fontSize: 20, fontWeight: 400,
+                    color: C.ink, margin: "0 0 12px", letterSpacing: "-0.02em", lineHeight: 1.3,
+                  }}>
+                    {step.title}
+                  </h3>
+
+                  {/* Body */}
+                  <p style={{
+                    fontFamily: SANS, fontSize: 13.5, color: C.muted,
+                    lineHeight: 1.8, margin: 0,
+                  }}>
+                    {step.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          /* Mobile: vertical timeline */
+          <div>
+            {steps.map((step, i) => (
+              <div key={i} style={{ display: "flex", gap: 0 }}>
+                <div style={{ display: "flex", flexDirection: "column" as const, alignItems: "center", marginRight: 20, flexShrink: 0 }}>
+                  {i > 0 && <div style={{ width: 2, height: 20, background: C.border }} />}
+                  <div style={{
+                    width: 56, height: 56, borderRadius: "50%",
+                    background: C.white, border: `1.5px solid ${C.border}`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    boxShadow: "0 2px 8px rgba(12,16,24,0.07)",
+                    flexShrink: 0,
+                  }}>
+                    {step.ill}
+                  </div>
+                  {i < steps.length - 1 && <div style={{ width: 2, flex: 1, minHeight: 20, background: C.border }} />}
+                </div>
+                <div style={{ paddingBottom: 36, paddingTop: 4 }}>
+                  <div style={{
+                    fontFamily: SANS, fontSize: 22, fontWeight: 800,
+                    color: C.brass, letterSpacing: "-0.01em", lineHeight: 1,
+                    marginBottom: 8,
+                  }}>{step.n}</div>
+                  <h3 style={{
+                    fontFamily: SERIF, fontSize: 19, fontWeight: 400,
+                    color: C.ink, margin: "0 0 8px", letterSpacing: "-0.02em",
+                  }}>{step.title}</h3>
+                  <p style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.75, margin: 0 }}>
+                    {step.body}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* CTAs */}
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 60, flexWrap: "wrap" as const }}>
           <Link href="/signup">
             <button style={{
               fontFamily: SANS, background: C.navy, color: "#fff",
-              border: "none", padding: "11px 28px", borderRadius: 6,
+              border: "none", padding: "12px 32px", borderRadius: 6,
               fontSize: 13, fontWeight: 600, cursor: "pointer",
             }}>
               Publicar mi perfil
@@ -477,7 +599,7 @@ function HowItWorks() {
           <Link href="/signup?intent=institution">
             <button style={{
               fontFamily: SANS, background: "transparent", color: C.navy,
-              border: `1px solid ${C.navy}`, padding: "11px 28px",
+              border: `1px solid ${C.navy}`, padding: "12px 32px",
               borderRadius: 6, fontSize: 13, cursor: "pointer",
             }}>
               Acceder al directorio
