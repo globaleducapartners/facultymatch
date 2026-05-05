@@ -165,87 +165,101 @@ function Nav() {
 function Hero() {
   const isMob = useIsMobile();
   return (
-    <PhotoBg
-      url="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=85&w=1800"
-      height={isMob ? "auto" : 580}
-      overlay="linear-gradient(160deg,rgba(12,16,24,0.5) 0%,rgba(12,16,24,0.7) 55%,rgba(12,16,24,0.88) 100%)"
-      position="center 40%"
-      fallback="linear-gradient(135deg, #0D2240 0%, #0C1018 60%)"
-    >
+    <div style={{ position: "relative", height: isMob ? "auto" : 580, overflow: "hidden", background: C.navy }}>
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        poster="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=85&w=1800"
+        style={{
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover", objectPosition: "center 40%",
+        }}
+      >
+        <source src="https://assets.mixkit.co/videos/36827/36827-720.mp4" type="video/mp4" />
+      </video>
       <div style={{
-        minHeight: isMob ? 420 : undefined,
-        display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center",
-        textAlign: "center", padding: isMob ? "80px 20px 60px" : "0 40px",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 30 }}>
-          <div style={{ width: 32, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
-          <span style={{
-            fontFamily: SANS, fontSize: 10, fontWeight: 600,
-            letterSpacing: "0.18em", textTransform: "uppercase" as const,
-            color: "rgba(255,255,255,0.45)",
-          }}>
-            Talento para la educación superior
-          </span>
-          <div style={{ width: 32, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
-        </div>
-
-        <h1 style={{
-          fontFamily: SERIF, fontSize: isMob ? 34 : 58, fontWeight: 400,
-          color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em",
-          margin: "0 0 22px", maxWidth: 680,
+        position: "absolute", inset: 0,
+        background: "linear-gradient(160deg,rgba(12,16,24,0.5) 0%,rgba(12,16,24,0.7) 55%,rgba(12,16,24,0.88) 100%)",
+      }} />
+      <div style={{ position: "relative", zIndex: 2, height: isMob ? undefined : "100%" }}>
+        <div style={{
+          minHeight: isMob ? 420 : undefined,
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          textAlign: "center", padding: isMob ? "80px 20px 60px" : "0 40px",
         }}>
-          En la era de la IA, tu experiencia
-          es el conocimiento más demandado.
-        </h1>
-
-        <p style={{
-          fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.58)",
-          lineHeight: 1.75, margin: "0 0 40px", maxWidth: 460,
-        }}>
-          Únete al mayor directorio de docentes, expertos y profesionales que comparten su conocimiento y su experiencia en el aula y generan ingresos. Regístrate gratis y saca partido a tu conocimiento.
-        </p>
-
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const, justifyContent: "center" }}>
-          <Link href="/signup">
-            <button style={{
-              fontFamily: SANS, background: "#fff", color: C.ink,
-              border: "none", padding: "13px 32px", borderRadius: 6,
-              fontSize: 14, fontWeight: 600, cursor: "pointer",
-            }}>
-              Publicar mi perfil
-            </button>
-          </Link>
-          <Link href="/signup?intent=institution">
-            <button style={{
-              fontFamily: SANS, background: "transparent",
-              color: "rgba(255,255,255,0.82)",
-              border: "1px solid rgba(255,255,255,0.28)",
-              padding: "13px 32px", borderRadius: 6,
-              fontSize: 14, cursor: "pointer",
-            }}>
-              Buscar docentes
-            </button>
-          </Link>
-        </div>
-
-        {!isMob && (
-          <div style={{
-            position: "absolute", bottom: 26,
-            display: "flex", flexDirection: "column",
-            alignItems: "center", gap: 7,
-          }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 30 }}>
+            <div style={{ width: 32, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
             <span style={{
-              fontFamily: SANS, fontSize: 9, letterSpacing: "0.16em",
-              textTransform: "uppercase" as const, color: "rgba(255,255,255,0.28)",
+              fontFamily: SANS, fontSize: 10, fontWeight: 600,
+              letterSpacing: "0.18em", textTransform: "uppercase" as const,
+              color: "rgba(255,255,255,0.45)",
             }}>
-              Directorio
+              Talento para la educación superior
             </span>
-            <div style={{ width: "0.5px", height: 24, background: "rgba(255,255,255,0.18)" }} />
+            <div style={{ width: 32, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
           </div>
-        )}
+
+          <h1 style={{
+            fontFamily: SERIF, fontSize: isMob ? 34 : 58, fontWeight: 400,
+            color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em",
+            margin: "0 0 22px", maxWidth: 680,
+          }}>
+            En la era de la IA, tu experiencia
+            es el conocimiento más demandado.
+          </h1>
+
+          <p style={{
+            fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.58)",
+            lineHeight: 1.75, margin: "0 0 40px", maxWidth: 460,
+          }}>
+            Únete al mayor directorio de docentes, expertos y profesionales que comparten su conocimiento y su experiencia en el aula y generan ingresos. Regístrate gratis y saca partido a tu conocimiento.
+          </p>
+
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const, justifyContent: "center" }}>
+            <Link href="/signup">
+              <button style={{
+                fontFamily: SANS, background: "#fff", color: C.ink,
+                border: "none", padding: "13px 32px", borderRadius: 6,
+                fontSize: 14, fontWeight: 600, cursor: "pointer",
+              }}>
+                Publicar mi perfil
+              </button>
+            </Link>
+            <Link href="/signup?intent=institution">
+              <button style={{
+                fontFamily: SANS, background: "transparent",
+                color: "rgba(255,255,255,0.82)",
+                border: "1px solid rgba(255,255,255,0.28)",
+                padding: "13px 32px", borderRadius: 6,
+                fontSize: 14, cursor: "pointer",
+              }}>
+                Buscar docentes
+              </button>
+            </Link>
+          </div>
+
+          {!isMob && (
+            <div style={{
+              position: "absolute", bottom: 26,
+              display: "flex", flexDirection: "column",
+              alignItems: "center", gap: 7,
+            }}>
+              <span style={{
+                fontFamily: SANS, fontSize: 9, letterSpacing: "0.16em",
+                textTransform: "uppercase" as const, color: "rgba(255,255,255,0.28)",
+              }}>
+                Directorio
+              </span>
+              <div style={{ width: "0.5px", height: 24, background: "rgba(255,255,255,0.18)" }} />
+            </div>
+          )}
+        </div>
       </div>
-    </PhotoBg>
+    </div>
   );
 }
 

@@ -64,13 +64,20 @@ export default function FacultyPage() {
         className="fm-hero"
         style={{ position: "relative", overflow: "hidden" }}
       >
-        <div
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=85&w=1800"
           style={{
             position: "absolute", inset: 0,
-            backgroundImage: `url(https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=85&w=1800)`,
-            backgroundSize: "cover", backgroundPosition: "center 40%",
+            width: "100%", height: "100%",
+            objectFit: "cover", objectPosition: "center 40%",
           }}
-        />
+        >
+          <source src="https://assets.mixkit.co/videos/24261/24261-720.mp4" type="video/mp4" />
+        </video>
         <div
           style={{
             position: "absolute", inset: 0,

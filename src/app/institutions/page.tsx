@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "Para instituciones educativas | FacultyMatch",
@@ -20,33 +21,24 @@ const C = {
   muted: "#6B7280", faint: "#9CA3AF", border: "#E5E1D8",
 };
 
-const KIND = {
-  Académica:   { dot: "#2563EB", bg: "#EFF6FF", text: "#1D4ED8" },
-  Experto:     { dot: C.brass,   bg: "#FEF3C7", text: "#92400E" },
-  Profesional: { dot: "#059669", bg: "#F0FDF4", text: "#065F46" },
-};
-
-const SAMPLE_PROFILES = [
-  { init: "MR", name: "Dr. M. Rodríguez", role: "Economía · Política fiscal",      org: "Univ. Autónoma · Madrid", kind: "Académica" as const,   avail: true,  lang: "ES · EN" },
-  { init: "JL", name: "J. Llamas",        role: "Dirección de operaciones",         org: "18 años en empresa",       kind: "Experto" as const,     avail: true,  lang: "ES · EN" },
-  { init: "CR", name: "Dra. C. Ramos",    role: "Derecho Mercantil · Compliance",   org: "UCM · Madrid",             kind: "Académica" as const,   avail: false, lang: "ES · FR" },
-  { init: "PV", name: "P. Velasco",       role: "Marketing digital · Growth",       org: "Ex-Google · Ex-Cabify",    kind: "Profesional" as const, avail: true,  lang: "ES · EN" },
-  { init: "BM", name: "Dra. B. Morales",  role: "Inteligencia Artificial · ML",     org: "UPM Madrid",               kind: "Académica" as const,   avail: true,  lang: "ES · EN" },
-  { init: "AS", name: "A. Sánchez",       role: "Liderazgo · Gestión de equipos",   org: "Consultor independiente",  kind: "Experto" as const,     avail: true,  lang: "ES" },
-];
-
-const FILTERS = [
-  { label: "Área UNESCO",    desc: "Desde Economía hasta Ciencias de la Salud" },
-  { label: "Acreditación",  desc: "ANECA, ORCID, titulación doctoral" },
-  { label: "Idioma",        desc: "Español, inglés, francés y más" },
-  { label: "Modalidad",     desc: "Presencial, online o híbrida" },
-  { label: "Disponibilidad",desc: "Inmediata, próximo semestre, solo online" },
-  { label: "Tipo de perfil",desc: "Académico, profesional o educador independiente" },
+const VALUES = [
+  {
+    title: "Verificado de verdad",
+    desc: "Todos los perfiles son revisados manualmente antes de publicarse. Sin perfiles incompletos ni datos sin comprobar.",
+  },
+  {
+    title: "Disponibilidad real",
+    desc: "Cada docente indica si está activo para nuevas colaboraciones. Sin mensajes sin respuesta ni perfiles abandonados.",
+  },
+  {
+    title: "Contacto directo",
+    desc: "Escribe directamente al docente. Sin intermediarios, sin comisiones por contratación, sin procesos de intermediación.",
+  },
 ];
 
 const HOW = [
   { n: "I",   title: "Registra tu institución",  body: "Acceso al directorio completo desde el primer día. Sin proceso de aprobación previo." },
-  { n: "II",  title: "Busca con filtros reales",  body: "Por área de conocimiento, acreditación, idioma y disponibilidad. Los resultados son exactamente lo que necesitas." },
+  { n: "II",  title: "Busca con filtros reales",  body: "Por área de conocimiento, idioma, modalidad y disponibilidad. Los resultados son exactamente lo que necesitas." },
   { n: "III", title: "Contacta directamente",     body: "Envía una solicitud al docente. Él decide si responde. Sin intermediarios ni comisiones por contratación." },
 ];
 
@@ -55,23 +47,18 @@ export default function InstitutionsPage() {
     <div style={{ background: C.paper, fontFamily: SANS }}>
       <style>{`
         .fm-hero-section { height: 520px; overflow: hidden; position: relative; }
-        .fm-hero-h1 { font-size: 54px; }
+        .fm-hero-h1 { font-size: 52px; }
         .fm-pad { padding: 72px 40px; }
-        .fm-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
-        .fm-grid-2-60 { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-        .fm-grid-2-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 760px; margin: 0 auto; }
-        .fm-grid-2-12 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .fm-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+        .fm-grid-2-eq { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 760px; margin: 0 auto; }
         .fm-cta-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 32px; padding: 64px 40px; max-width: 1080px; margin: 0 auto; width: 100%; }
         @media (max-width: 768px) {
-          .fm-hero-section { height: auto !important; min-height: 440px; padding: 80px 0 60px; }
+          .fm-hero-section { height: auto !important; min-height: 480px; padding: 80px 0 60px; }
           .fm-hero-h1 { font-size: 32px !important; }
           .fm-pad { padding: 48px 20px !important; }
-          .fm-grid-3 { grid-template-columns: 1fr 1fr !important; }
-          .fm-grid-2-60 { grid-template-columns: 1fr !important; gap: 0 !important; }
+          .fm-grid-3 { grid-template-columns: 1fr !important; }
           .fm-grid-2-eq { grid-template-columns: 1fr !important; }
-          .fm-grid-2-12 { grid-template-columns: 1fr !important; }
           .fm-cta-inner { flex-direction: column; align-items: flex-start; padding: 48px 20px !important; }
-          .fm-photo-hide { display: none !important; }
         }
       `}</style>
 
@@ -79,14 +66,23 @@ export default function InstitutionsPage() {
 
       {/* ── HERO ── */}
       <section className="fm-hero-section">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&q=85&w=1800"
+          style={{
+            position: "absolute", inset: 0,
+            width: "100%", height: "100%",
+            objectFit: "cover", objectPosition: "center 40%",
+          }}
+        >
+          <source src="https://assets.mixkit.co/videos/4503/4503-720.mp4" type="video/mp4" />
+        </video>
         <div style={{
           position: "absolute", inset: 0,
-          backgroundImage: `url(https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=85&w=1800)`,
-          backgroundSize: "cover", backgroundPosition: "center 40%",
-        }} />
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(160deg, rgba(12,16,24,0.5) 0%, rgba(12,16,24,0.72) 60%, rgba(12,16,24,0.92) 100%)",
+          background: "rgba(12,16,24,0.65)",
         }} />
         <div style={{
           position: "relative", zIndex: 2,
@@ -97,125 +93,120 @@ export default function InstitutionsPage() {
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
             <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
-            <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.45)" }}>
+            <span style={{
+              fontFamily: SANS, fontSize: 10, fontWeight: 600,
+              letterSpacing: "0.18em", textTransform: "uppercase" as const,
+              color: "rgba(255,255,255,0.45)",
+            }}>
               Para instituciones educativas
             </span>
             <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
           </div>
 
-          <h1 className="fm-hero-h1" style={{ fontFamily: SERIF, fontSize: 54, fontWeight: 400, color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em", margin: "0 0 20px", maxWidth: 700 }}>
-            Los mejores docentes no están
-            buscando trabajo.
-            Están aquí.
+          <h1
+            className="fm-hero-h1"
+            style={{
+              fontFamily: SERIF, fontWeight: 400,
+              color: "#fff", lineHeight: 1.1,
+              letterSpacing: "-0.025em", margin: "0 0 20px", maxWidth: 680,
+            }}
+          >
+            El docente que necesitas no está en LinkedIn. Está aquí.
           </h1>
 
-          <p style={{ fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.58)", lineHeight: 1.75, margin: "0 0 38px", maxWidth: 500 }}>
-            Investigadores en activo, directivos con experiencia real,
-            doctores que combinan su carrera con la docencia.
-            Perfiles que no aparecen en LinkedIn. Contacto directo. Sin comisiones.
+          <p style={{
+            fontFamily: SANS, fontSize: 16,
+            color: C.cream, lineHeight: 1.7,
+            margin: "0 0 38px", maxWidth: 480,
+          }}>
+            Investigadores, doctores y expertos que combinan su carrera con la docencia.
+            Perfiles revisados. Contacto directo.
           </p>
 
-          <div style={{ display: "flex", gap: 12 }}>
-            <Link href="/signup?intent=institution">
-              <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 32px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
-                Acceder al directorio
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const, justifyContent: "center" }}>
+            <Link href="/directory">
+              <button style={{
+                fontFamily: SANS, background: "#fff", color: C.ink,
+                border: "none", padding: "13px 32px", borderRadius: 6,
+                fontSize: 14, fontWeight: 600, cursor: "pointer",
+              }}>
+                Ver el directorio
               </button>
             </Link>
-            <Link href="/login">
-              <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.8)", border: "1px solid rgba(255,255,255,0.28)", padding: "13px 32px", borderRadius: 6, fontSize: 14, cursor: "pointer" }}>
-                Ya tengo cuenta
+            <Link href="/signup?intent=institution">
+              <button style={{
+                fontFamily: SANS, background: "transparent",
+                color: "rgba(255,255,255,0.8)",
+                border: "1px solid rgba(255,255,255,0.28)",
+                padding: "13px 32px", borderRadius: 6,
+                fontSize: 14, cursor: "pointer",
+              }}>
+                Registrar mi institución
               </button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── PREVIEW DEL DIRECTORIO ── */}
-      <section style={{ background: C.cream }}>
-        <div className="fm-pad" style={{ maxWidth: 1080, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap" as const, gap: 20 }}>
-            <div>
-              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 10 }}>
-                Muestra del directorio
-              </div>
-              <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: 0, lineHeight: 1.1 }}>
-                El talento que da clase por vocación,
-                no por necesidad.
-              </h2>
-            </div>
-            <Link href="/signup?intent=institution">
-              <button style={{ fontFamily: SANS, background: C.navy, color: "#fff", border: "none", padding: "10px 22px", borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
-                Ver el directorio completo
-              </button>
-            </Link>
-          </div>
-
-          {/* Grid de perfiles */}
-          <div style={{ marginBottom: 24 }} className="fm-grid-3">
-            {SAMPLE_PROFILES.map((p, i) => {
-              const k = KIND[p.kind];
-              return (
-                <div key={i} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "18px 20px" }}>
-                  <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 8, flexShrink: 0, background: C.cream, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: SERIF, fontSize: 13, color: C.navy }}>
-                      {p.init}
-                    </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
-                        <span style={{ fontFamily: SERIF, fontSize: 13, color: C.ink }}>{p.name}</span>
-                        <div style={{ width: 5, height: 5, borderRadius: "50%", background: p.avail ? "#059669" : C.faint, flexShrink: 0 }} />
-                      </div>
-                      <div style={{ fontFamily: SANS, fontSize: 11, color: C.muted, lineHeight: 1.4 }}>{p.role}</div>
-                      <div style={{ fontFamily: SANS, fontSize: 10, color: C.faint, marginTop: 1 }}>{p.org}</div>
-                    </div>
-                  </div>
-                  <div style={{ paddingTop: 10, borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, color: k.text, background: k.bg, padding: "2px 8px", borderRadius: 20 }}>{p.kind}</span>
-                    <span style={{ fontFamily: SANS, fontSize: 10, color: C.faint }}>{p.lang}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <p style={{ fontFamily: SANS, fontSize: 13, color: C.faint, textAlign: "center" }}>
-            Todos los perfiles son revisados antes de publicarse en el directorio.
-          </p>
-        </div>
-      </section>
-
-      {/* ── FILTROS ── */}
+      {/* ── 3 VALORES ── */}
       <section style={{ background: C.white }}>
-        <div className="fm-pad fm-grid-2-60" style={{ maxWidth: 1080, margin: "0 auto" }}>
-          <div>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>
-              Búsqueda estructurada
-            </div>
-            <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 18px", lineHeight: 1.2 }}>
-              Busca por lo que<br />realmente importa.
-            </h2>
-            <p style={{ fontFamily: SANS, fontSize: 15, color: C.muted, lineHeight: 1.8, margin: "0 0 32px" }}>
-              No hay palabras clave ni CVs que interpretar. El directorio está estructurado
-              por los criterios que usan los directores de programa para seleccionar profesorado.
-            </p>
-            <div className="fm-grid-2-12">
-              {FILTERS.map((f, i) => (
-                <div key={i} style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 16px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
-                    <div style={{ width: 5, height: 5, borderRadius: "50%", background: C.brass }} />
-                    <span style={{ fontFamily: SERIF, fontSize: 14, color: C.ink }}>{f.label}</span>
-                  </div>
-                  <p style={{ fontFamily: SANS, fontSize: 12, color: C.faint, lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Foto */}
-          <div style={{ borderRadius: 14, overflow: "hidden", height: 460 }} className="fm-photo-hide">
+        <div className="fm-pad" style={{ maxWidth: 1080, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 52 }}>
             <div style={{
-              width: "100%", height: "100%",
-              backgroundImage: `url(https://images.unsplash.com/photo-1497366858526-0766568957c7?auto=format&fit=crop&q=80&w=800)`,
-              backgroundSize: "cover", backgroundPosition: "center",
-            }} />
+              fontFamily: SANS, fontSize: 10, fontWeight: 700,
+              letterSpacing: "0.14em", textTransform: "uppercase" as const,
+              color: C.brass, marginBottom: 12,
+            }}>
+              Por qué FacultyMatch
+            </div>
+            <h2 style={{
+              fontFamily: SERIF, fontSize: 30, fontWeight: 400,
+              color: C.ink, letterSpacing: "-0.025em",
+              margin: "0 0 12px", lineHeight: 1.15,
+            }}>
+              El directorio que los responsables de programa<br />
+              llevan años necesitando.
+            </h2>
+          </div>
+
+          <div className="fm-grid-3">
+            {VALUES.map((v, i) => (
+              <div
+                key={i}
+                style={{
+                  background: C.cream, border: `1px solid ${C.border}`,
+                  borderRadius: 12, padding: "28px 26px",
+                  borderTop: `3px solid ${C.brass}`,
+                }}
+              >
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 7,
+                    background: C.white, border: `1px solid ${C.border}`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0, marginTop: 2,
+                  }}>
+                    <span style={{ fontFamily: SERIF, fontSize: 11, color: C.brass, fontStyle: "italic" }}>
+                      {["I", "II", "III"][i]}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 style={{
+                      fontFamily: SERIF, fontSize: 16, fontWeight: 400,
+                      color: C.ink, margin: "0 0 8px",
+                    }}>
+                      {v.title}
+                    </h3>
+                    <p style={{
+                      fontFamily: SANS, fontSize: 13,
+                      color: C.muted, lineHeight: 1.75, margin: 0,
+                    }}>
+                      {v.desc}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -224,19 +215,42 @@ export default function InstitutionsPage() {
       <section style={{ background: C.cream }}>
         <div className="fm-pad" style={{ maxWidth: 1080, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
+            <div style={{
+              fontFamily: SANS, fontSize: 10, fontWeight: 700,
+              letterSpacing: "0.14em", textTransform: "uppercase" as const,
+              color: C.brass, marginBottom: 12,
+            }}>
               Cómo funciona
             </div>
-            <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: 0, lineHeight: 1.15 }}>
-              Registrate hoy. Contacta tu primer perfil esta semana.
+            <h2 style={{
+              fontFamily: SERIF, fontSize: 30, fontWeight: 400,
+              color: C.ink, letterSpacing: "-0.025em", margin: 0, lineHeight: 1.15,
+            }}>
+              Regístrate hoy. Contacta tu primer perfil esta semana.
             </h2>
           </div>
           <div className="fm-grid-3">
             {HOW.map((s, i) => (
-              <div key={i} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "28px 26px", borderTop: `3px solid ${C.brass}` }}>
-                <div style={{ fontFamily: SERIF, fontSize: 24, color: C.brass, opacity: 0.45, marginBottom: 14, letterSpacing: "-0.02em" }}>{s.n}</div>
-                <h3 style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 400, color: C.ink, margin: "0 0 10px" }}>{s.title}</h3>
-                <p style={{ fontFamily: SANS, fontSize: 14, color: C.muted, lineHeight: 1.75, margin: 0 }}>{s.body}</p>
+              <div key={i} style={{
+                background: C.white, border: `1px solid ${C.border}`,
+                borderRadius: 10, padding: "28px 26px",
+                borderTop: `3px solid ${C.brass}`,
+              }}>
+                <div style={{
+                  fontFamily: SERIF, fontSize: 24, color: C.brass,
+                  opacity: 0.45, marginBottom: 14, letterSpacing: "-0.02em",
+                }}>
+                  {s.n}
+                </div>
+                <h3 style={{
+                  fontFamily: SERIF, fontSize: 16, fontWeight: 400,
+                  color: C.ink, margin: "0 0 10px",
+                }}>
+                  {s.title}
+                </h3>
+                <p style={{ fontFamily: SANS, fontSize: 14, color: C.muted, lineHeight: 1.75, margin: 0 }}>
+                  {s.body}
+                </p>
               </div>
             ))}
           </div>
@@ -247,10 +261,17 @@ export default function InstitutionsPage() {
       <section id="precios" style={{ background: C.white }}>
         <div className="fm-pad" style={{ maxWidth: 1080, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
+            <div style={{
+              fontFamily: SANS, fontSize: 10, fontWeight: 700,
+              letterSpacing: "0.14em", textTransform: "uppercase" as const,
+              color: C.brass, marginBottom: 12,
+            }}>
               Precios para instituciones
             </div>
-            <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 10px" }}>
+            <h2 style={{
+              fontFamily: SERIF, fontSize: 30, fontWeight: 400,
+              color: C.ink, letterSpacing: "-0.025em", margin: "0 0 10px",
+            }}>
               Empieza gratis. Escala cuando lo necesites.
             </h2>
             <p style={{ fontFamily: SANS, fontSize: 15, color: C.muted, maxWidth: 460, margin: "0 auto" }}>
@@ -260,16 +281,28 @@ export default function InstitutionsPage() {
 
           <div className="fm-grid-2-eq">
             {/* Essential */}
-            <div style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: 14, padding: "32px 30px" }}>
-              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: C.faint, marginBottom: 16 }}>Plan Essential</div>
-              <div style={{ fontFamily: SERIF, fontSize: 38, color: C.ink, margin: "0 0 4px" }}>0 €</div>
-              <div style={{ fontFamily: SANS, fontSize: 13, color: C.faint, marginBottom: 24 }}>para empezar</div>
+            <div style={{
+              background: C.cream, border: `1px solid ${C.border}`,
+              borderRadius: 14, padding: "32px 30px",
+            }}>
+              <div style={{
+                fontFamily: SANS, fontSize: 10, fontWeight: 700,
+                letterSpacing: "0.12em", textTransform: "uppercase" as const,
+                color: C.faint, marginBottom: 16,
+              }}>
+                Essential
+              </div>
+              <div style={{ fontFamily: SERIF, fontSize: 38, color: C.ink, margin: "0 0 4px" }}>
+                0 €<span style={{ fontSize: 16, color: C.faint }}>/mes</span>
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 13, color: C.faint, marginBottom: 24 }}>
+                para empezar
+              </div>
               <div style={{ display: "flex", flexDirection: "column" as const, gap: 10, marginBottom: 28 }}>
                 {[
                   "Registro gratuito",
                   "2 búsquedas al mes",
-                  "Vista de perfiles básica",
-                  "2 contactos al mes",
+                  "Visualización básica de perfiles",
                 ].map((f, i) => (
                   <div key={i} style={{ display: "flex", gap: 10, alignItems: "center" }}>
                     <div style={{ width: 4, height: 4, borderRadius: "50%", background: C.brass, flexShrink: 0 }} />
@@ -278,7 +311,12 @@ export default function InstitutionsPage() {
                 ))}
               </div>
               <Link href="/signup?intent=institution">
-                <button style={{ fontFamily: SANS, width: "100%", background: "transparent", color: C.navy, border: `1px solid ${C.navy}`, padding: "11px 0", borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+                <button style={{
+                  fontFamily: SANS, width: "100%", background: "transparent",
+                  color: C.navy, border: `1px solid ${C.navy}`,
+                  padding: "11px 0", borderRadius: 6, fontSize: 13,
+                  fontWeight: 500, cursor: "pointer",
+                }}>
                   Registrar mi institución
                 </button>
               </Link>
@@ -286,14 +324,24 @@ export default function InstitutionsPage() {
 
             {/* Professional */}
             <div style={{ background: C.navy, borderRadius: 14, padding: "32px 30px" }}>
-              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>Plan Professional</div>
-              <div style={{ fontFamily: SERIF, fontSize: 38, color: "#fff", margin: "0 0 4px" }}>99 €</div>
-              <div style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>al mes · sin permanencia</div>
+              <div style={{
+                fontFamily: SANS, fontSize: 10, fontWeight: 700,
+                letterSpacing: "0.12em", textTransform: "uppercase" as const,
+                color: C.brass, marginBottom: 16,
+              }}>
+                Professional
+              </div>
+              <div style={{ fontFamily: SERIF, fontSize: 38, color: "#fff", margin: "0 0 4px" }}>
+                99 €<span style={{ fontSize: 16, color: "rgba(255,255,255,0.4)" }}>/mes</span>
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>
+                sin permanencia
+              </div>
               <div style={{ display: "flex", flexDirection: "column" as const, gap: 10, marginBottom: 28 }}>
                 {[
                   "Búsquedas ilimitadas",
                   "Filtros avanzados completos",
-                  "Contactos ilimitados",
+                  "Contacto directo con docentes",
                   "Shortlists y favoritos sin límite",
                   "Hasta 3 usuarios por institución",
                   "Soporte prioritario",
@@ -305,7 +353,11 @@ export default function InstitutionsPage() {
                 ))}
               </div>
               <Link href="/checkout?plan=institution-pro">
-                <button style={{ fontFamily: SANS, width: "100%", background: C.brass, color: "#fff", border: "none", padding: "11px 0", borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                <button style={{
+                  fontFamily: SANS, width: "100%", background: C.brass,
+                  color: "#fff", border: "none", padding: "11px 0",
+                  borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                }}>
                   Activar Professional
                 </button>
               </Link>
@@ -328,7 +380,11 @@ export default function InstitutionsPage() {
         <div style={{ position: "absolute", inset: 0, background: "rgba(12,16,24,0.78)" }} />
         <div className="fm-cta-inner">
           <div style={{ position: "relative", zIndex: 2 }}>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
+            <div style={{
+              fontFamily: SANS, fontSize: 10, fontWeight: 700,
+              letterSpacing: "0.14em", textTransform: "uppercase" as const,
+              color: C.brass, marginBottom: 12,
+            }}>
               Empieza hoy
             </div>
             <p style={{ fontFamily: SERIF, fontSize: 26, color: "rgba(255,255,255,0.9)", lineHeight: 1.35, margin: 0 }}>
@@ -339,20 +395,32 @@ export default function InstitutionsPage() {
               Registro gratuito. Sin proceso de validación previo.
             </p>
           </div>
-          <div style={{ display: "flex", gap: 10, position: "relative", zIndex: 2 }}>
-            <Link href="/signup?intent=institution">
-              <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 28px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
-                Acceder al directorio
+          <div style={{ display: "flex", gap: 10, position: "relative", zIndex: 2, flexWrap: "wrap" as const }}>
+            <Link href="/directory">
+              <button style={{
+                fontFamily: SANS, background: "#fff", color: C.ink,
+                border: "none", padding: "13px 28px", borderRadius: 6,
+                fontSize: 14, fontWeight: 600, cursor: "pointer",
+              }}>
+                Ver el directorio
               </button>
             </Link>
-            <Link href="/signup">
-              <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.22)", padding: "13px 28px", borderRadius: 6, fontSize: 14, cursor: "pointer" }}>
-                Soy docente
+            <Link href="/signup?intent=institution">
+              <button style={{
+                fontFamily: SANS, background: "transparent",
+                color: "rgba(255,255,255,0.7)",
+                border: "1px solid rgba(255,255,255,0.22)",
+                padding: "13px 28px", borderRadius: 6,
+                fontSize: 14, cursor: "pointer",
+              }}>
+                Registrar mi institución
               </button>
             </Link>
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }
