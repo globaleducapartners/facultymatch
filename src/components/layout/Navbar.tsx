@@ -11,7 +11,6 @@ const NAV_LINKS = [
   { name: "Para docentes",      href: "/faculty" },
   { name: "Para instituciones", href: "/institutions" },
   { name: "Recursos",           href: "/resources" },
-  { name: "Cómo funciona",      href: "/faculty#como-funciona" },
 ];
 
 // ─── Estilos inline — consistentes con el sistema universitario ───────────────

@@ -96,11 +96,20 @@ export default function ResourcesPage() {
 
       {/* ── HERO ── */}
       <section style={{ position: "relative", overflow: "hidden" }}>
-        <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: `url(https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1800)`,
-          backgroundSize: "cover", backgroundPosition: "center 40%",
-        }} />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1800"
+          style={{
+            position: "absolute", inset: 0,
+            width: "100%", height: "100%",
+            objectFit: "cover", objectPosition: "center 40%",
+          }}
+        >
+          <source src="https://assets.mixkit.co/videos/6532/6532-720.mp4" type="video/mp4" />
+        </video>
         <div style={{
           position: "absolute", inset: 0,
           background: "linear-gradient(160deg, rgba(12,16,24,0.5) 0%, rgba(12,16,24,0.72) 60%, rgba(12,16,24,0.92) 100%)",

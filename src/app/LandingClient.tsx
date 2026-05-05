@@ -114,28 +114,35 @@ function Nav() {
         maxWidth: 1080, margin: "0 auto", padding: "0 40px",
         height: 58, display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 30 }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 9 }}>
-            <div style={{
-              width: 26, height: 26, borderRadius: 5, background: C.navy,
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <span style={{ color: "#fff", fontSize: 10, fontWeight: 700, fontFamily: SANS }}>FM</span>
-            </div>
-            <span style={{ fontFamily: SERIF, fontSize: 17, color: C.ink, letterSpacing: "-0.01em" }}>
-              FacultyMatch
-            </span>
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "baseline", gap: 9 }}>
+          <div style={{
+            width: 26, height: 26, borderRadius: 5, background: C.navy,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <span style={{ color: "#fff", fontSize: 10, fontWeight: 700, fontFamily: SANS }}>FM</span>
           </div>
-          {[
-            { label: "Para docentes",      href: "/faculty" },
-            { label: "Para instituciones", href: "/institutions" },
-            { label: "Recursos",           href: "/resources" },
-          ].map((l) => (
-            <Link key={l.href} href={l.href} style={{ fontFamily: SANS, fontSize: 13, color: C.muted, textDecoration: "none", cursor: "pointer", display: isMob ? "none" : "inline" }}>
-              {l.label}
-            </Link>
-          ))}
+          <span style={{ fontFamily: SERIF, fontSize: 17, color: C.ink, letterSpacing: "-0.01em" }}>
+            FacultyMatch
+          </span>
         </div>
+
+        {/* Nav links — centro, solo desktop */}
+        {!isMob && (
+          <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
+            {[
+              { label: "Para docentes",      href: "/faculty" },
+              { label: "Para instituciones", href: "/institutions" },
+              { label: "Recursos",           href: "/resources" },
+            ].map((l) => (
+              <Link key={l.href} href={l.href} style={{ fontFamily: SANS, fontSize: 13, color: C.muted, textDecoration: "none", cursor: "pointer" }}>
+                {l.label}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Auth */}
         <div style={{ display: "flex", gap: 8 }}>
           <Link href="/login">
             <button style={{
