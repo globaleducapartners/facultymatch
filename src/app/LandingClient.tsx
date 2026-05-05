@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Footer } from "@/components/layout/Footer";
 
 // ─── Tokens de diseño ─────────────────────────────────────────────────────────
 const SERIF = `var(--font-serif, 'Georgia', 'Times New Roman', serif)`;
@@ -182,76 +183,84 @@ function Hero() {
         style={{
           position: "absolute", inset: 0,
           width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "center 40%",
+          objectFit: "cover", objectPosition: "center 30%",
         }}
       >
         <source src="https://assets.mixkit.co/videos/36827/36827-720.mp4" type="video/mp4" />
       </video>
+      {/* Gradient: heavy left → transparent right so video is visible on right side */}
       <div style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(160deg,rgba(12,16,24,0.5) 0%,rgba(12,16,24,0.7) 55%,rgba(12,16,24,0.88) 100%)",
+        background: isMob
+          ? "rgba(12,16,24,0.72)"
+          : "linear-gradient(to right, rgba(12,16,24,0.97) 0%, rgba(12,16,24,0.92) 38%, rgba(12,16,24,0.5) 62%, rgba(12,16,24,0.08) 100%)",
       }} />
       <div style={{ position: "relative", zIndex: 2, height: isMob ? undefined : "100%" }}>
         <div style={{
-          minHeight: isMob ? 420 : undefined,
+          maxWidth: 1080, margin: "0 auto",
+          height: isMob ? undefined : "100%",
           display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center",
-          textAlign: "center", padding: isMob ? "80px 20px 60px" : "0 40px",
+          alignItems: "flex-start", justifyContent: "center",
+          minHeight: isMob ? 500 : undefined,
+          padding: isMob ? "80px 24px 64px" : "0 40px",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 30 }}>
-            <div style={{ width: 32, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
-            <span style={{
-              fontFamily: SANS, fontSize: 10, fontWeight: 600,
-              letterSpacing: "0.18em", textTransform: "uppercase" as const,
-              color: "rgba(255,255,255,0.45)",
+          <div style={{ maxWidth: isMob ? "100%" : 520 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+              <div style={{ width: 20, height: "0.5px", background: "rgba(255,255,255,0.4)" }} />
+              <span style={{
+                fontFamily: SANS, fontSize: 10, fontWeight: 600,
+                letterSpacing: "0.18em", textTransform: "uppercase" as const,
+                color: "rgba(255,255,255,0.5)",
+              }}>
+                Talento para la educación superior
+              </span>
+            </div>
+
+            <h1 style={{
+              fontFamily: SERIF, fontSize: isMob ? 34 : 54, fontWeight: 400,
+              color: "#fff", lineHeight: 1.08, letterSpacing: "-0.03em",
+              margin: "0 0 20px",
             }}>
-              Talento para la educación superior
-            </span>
-            <div style={{ width: 32, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
-          </div>
+              En la era de la IA,<br />
+              tu experiencia es el<br />
+              conocimiento más demandado.
+            </h1>
 
-          <h1 style={{
-            fontFamily: SERIF, fontSize: isMob ? 34 : 58, fontWeight: 400,
-            color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em",
-            margin: "0 0 22px", maxWidth: 680,
-          }}>
-            En la era de la IA, tu experiencia
-            es el conocimiento más demandado.
-          </h1>
+            <p style={{
+              fontFamily: SANS, fontSize: 15, color: "rgba(255,255,255,0.62)",
+              lineHeight: 1.78, margin: "0 0 36px", maxWidth: 420,
+            }}>
+              Directorio de docentes, investigadores y expertos para la educación superior.
+              Perfiles verificados. Contacto directo. Sin intermediarios.
+            </p>
 
-          <p style={{
-            fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.58)",
-            lineHeight: 1.75, margin: "0 0 40px", maxWidth: 460,
-          }}>
-            Únete al mayor directorio de docentes, expertos y profesionales que comparten su conocimiento y su experiencia en el aula y generan ingresos. Regístrate gratis y saca partido a tu conocimiento.
-          </p>
-
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const, justifyContent: "center" }}>
-            <Link href="/signup">
-              <button style={{
-                fontFamily: SANS, background: "#fff", color: C.ink,
-                border: "none", padding: "13px 32px", borderRadius: 6,
-                fontSize: 14, fontWeight: 600, cursor: "pointer",
-              }}>
-                Publicar mi perfil
-              </button>
-            </Link>
-            <Link href="/signup?intent=institution">
-              <button style={{
-                fontFamily: SANS, background: "transparent",
-                color: "rgba(255,255,255,0.82)",
-                border: "1px solid rgba(255,255,255,0.28)",
-                padding: "13px 32px", borderRadius: 6,
-                fontSize: 14, cursor: "pointer",
-              }}>
-                Buscar docentes
-              </button>
-            </Link>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const }}>
+              <Link href="/signup">
+                <button style={{
+                  fontFamily: SANS, background: "#fff", color: C.ink,
+                  border: "none", padding: "13px 32px", borderRadius: 6,
+                  fontSize: 14, fontWeight: 600, cursor: "pointer",
+                }}>
+                  Publicar mi perfil
+                </button>
+              </Link>
+              <Link href="/signup?intent=institution">
+                <button style={{
+                  fontFamily: SANS, background: "transparent",
+                  color: "rgba(255,255,255,0.82)",
+                  border: "1px solid rgba(255,255,255,0.28)",
+                  padding: "13px 32px", borderRadius: 6,
+                  fontSize: 14, cursor: "pointer",
+                }}>
+                  Buscar docentes
+                </button>
+              </Link>
+            </div>
           </div>
 
           {!isMob && (
             <div style={{
-              position: "absolute", bottom: 26,
+              position: "absolute", bottom: 26, left: "50%", transform: "translateX(-50%)",
               display: "flex", flexDirection: "column",
               alignItems: "center", gap: 7,
             }}>
@@ -355,142 +364,125 @@ function ProfileCard({ p }: { p: typeof PROFILES[0] }) {
   );
 }
 
-// ─── DIRECTORY ────────────────────────────────────────────────────────────────
-function Directory() {
+// ─── CÓMO FUNCIONA ────────────────────────────────────────────────────────────
+function HowItWorks() {
   const isMob = useIsMobile();
-  const [q, setQ] = useState("");
-  const [focus, setFocus] = useState(false);
-  const [filter, setFilter] = useState<string | null>(null);
-
-  const visibleProfiles = isMob ? PROFILES.slice(0, 4) : PROFILES;
+  const steps = [
+    {
+      n: "I",
+      title: "Publica tu perfil",
+      faculty: "Describe tu área y disponibilidad. Nuestro equipo verifica cada perfil antes de publicarlo en el directorio.",
+      institution: "Regístrate y accede al directorio verificado desde el primer día. Sin proceso de validación previo.",
+    },
+    {
+      n: "II",
+      title: "Aparece en las búsquedas",
+      faculty: "Tu perfil aparece ante las instituciones que buscan exactamente tu área, idioma y disponibilidad.",
+      institution: "Filtra por área de conocimiento, idioma, modalidad y disponibilidad real. Sin palabras clave ni CVs que interpretar.",
+    },
+    {
+      n: "III",
+      title: "Contacto directo",
+      faculty: "La institución da el primer paso. Tú decides si respondes, cuándo y en qué condiciones.",
+      institution: "Escribe directamente al docente. Sin intermediarios, sin comisiones por contratación.",
+    },
+  ];
 
   return (
-    <section style={{ background: C.cream, padding: isMob ? "48px 20px 56px" : "64px 40px 72px", overflowX: "hidden" }}>
+    <section style={{ background: C.cream, padding: isMob ? "52px 20px 60px" : "72px 40px", overflowX: "hidden" }}>
       <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-        <div style={{
-          display: "flex",
-          alignItems: isMob ? "flex-start" : "flex-end",
-          flexDirection: isMob ? "column" : "row",
-          justifyContent: "space-between",
-          marginBottom: 32, gap: 16,
-        }}>
-          <div>
-            <div style={{
-              fontFamily: SANS, fontSize: 10, fontWeight: 700,
-              letterSpacing: "0.14em", textTransform: "uppercase" as const,
-              color: C.brass, marginBottom: 10,
-            }}>
-              Directorio
-            </div>
-            <h2 style={{
-              fontFamily: SERIF, fontSize: 30, fontWeight: 400,
-              color: C.ink, letterSpacing: "-0.025em", margin: 0, lineHeight: 1.1,
-            }}>
-              Perfiles que no encontrarás en ningún otro sitio.
-            </h2>
-          </div>
+        <div style={{ textAlign: "center", marginBottom: 52 }}>
           <div style={{
-            display: "flex", alignItems: "center", gap: 8,
-            background: C.white,
-            border: `1px solid ${focus ? C.navy : C.border}`,
-            borderRadius: 8, padding: "0 10px 0 16px",
-            width: isMob ? "100%" : undefined, minWidth: isMob ? 0 : 260,
-            boxShadow: focus ? "0 0 0 3px rgba(13,34,64,0.07)" : "none",
-            transition: "all 0.15s", boxSizing: "border-box" as const,
+            fontFamily: SANS, fontSize: 10, fontWeight: 700,
+            letterSpacing: "0.14em", textTransform: "uppercase" as const,
+            color: C.brass, marginBottom: 12,
           }}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <circle cx="6.5" cy="6.5" r="4.5" stroke={C.faint} strokeWidth="1.4" />
-              <path d="M10 10l2 2" stroke={C.faint} strokeWidth="1.4" strokeLinecap="round" />
-            </svg>
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onFocus={() => setFocus(true)}
-              onBlur={() => setFocus(false)}
-              placeholder="Área de conocimiento..."
-              style={{
-                flex: 1, border: "none", outline: "none",
-                fontFamily: SANS, fontSize: 14, color: C.ink,
-                padding: "11px 0", background: "transparent", minWidth: 0,
-              }}
-            />
+            Así funciona
           </div>
-        </div>
-
-        <div style={{ display: "flex", gap: 6, marginBottom: 22, flexWrap: "wrap" as const, alignItems: "center" }}>
-          <span style={{ fontFamily: SANS, fontSize: 11, color: C.faint, marginRight: 4 }}>
-            Filtrar por:
-          </span>
-          {["Área", "Modalidad", "Idioma", "Disponibilidad"].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(filter === f ? null : f)}
-              style={{
-                fontFamily: SANS, fontSize: 11, fontWeight: 500,
-                background: filter === f ? C.navy : C.white,
-                color: filter === f ? "#fff" : C.muted,
-                border: `1px solid ${filter === f ? C.navy : C.border}`,
-                padding: "4px 14px", borderRadius: 20, cursor: "pointer",
-                transition: "all 0.12s",
-              }}
-            >
-              {f}
-            </button>
-          ))}
-          {!isMob && (
-            <div style={{ marginLeft: "auto", display: "flex", gap: 14, alignItems: "center" }}>
-              {Object.entries(KIND_STYLE).map(([k, v]) => (
-                <div key={k} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: v.dot }} />
-                  <span style={{ fontFamily: SANS, fontSize: 11, color: C.faint }}>{k}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          <h2 style={{
+            fontFamily: SERIF, fontSize: isMob ? 26 : 30, fontWeight: 400,
+            color: C.ink, letterSpacing: "-0.025em", margin: "0 0 12px", lineHeight: 1.1,
+          }}>
+            Un proceso simple que conecta<br />el talento con quien lo necesita.
+          </h2>
+          <p style={{ fontFamily: SANS, fontSize: 15, color: C.muted, maxWidth: 440, margin: "0 auto" }}>
+            Sin intermediarios. Sin comisiones por contratación. Sin procesos innecesarios.
+          </p>
         </div>
 
         <div style={{
           display: "grid",
-          gridTemplateColumns: isMob ? "1fr 1fr" : "repeat(3,1fr)",
-          gap: 14, marginBottom: 32,
+          gridTemplateColumns: isMob ? "1fr" : "1fr 1fr 1fr",
+          gap: 20,
         }}>
-          {visibleProfiles.map((p, i) => <ProfileCard key={i} p={p} />)}
+          {steps.map((s, i) => (
+            <div key={i} style={{
+              background: C.white, border: `1px solid ${C.border}`,
+              borderRadius: 14, padding: "28px 24px",
+              borderTop: `3px solid ${C.brass}`,
+            }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: 10,
+                background: C.navy, display: "flex", alignItems: "center",
+                justifyContent: "center", marginBottom: 18,
+              }}>
+                <span style={{ fontFamily: SERIF, fontSize: 16, color: "#fff", fontStyle: "italic" }}>{s.n}</span>
+              </div>
+              <h3 style={{
+                fontFamily: SERIF, fontSize: 17, fontWeight: 400,
+                color: C.ink, margin: "0 0 18px",
+              }}>
+                {s.title}
+              </h3>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 10 }}>
+                <div style={{ background: "#EFF6FF", borderRadius: 8, padding: "10px 14px" }}>
+                  <div style={{
+                    fontFamily: SANS, fontSize: 9, fontWeight: 700,
+                    letterSpacing: "0.1em", textTransform: "uppercase" as const,
+                    color: "#1D4ED8", marginBottom: 5,
+                  }}>
+                    Docente
+                  </div>
+                  <p style={{ fontFamily: SANS, fontSize: 12, color: "#1D4ED8", lineHeight: 1.65, margin: 0 }}>
+                    {s.faculty}
+                  </p>
+                </div>
+                <div style={{ background: "#FEF3C7", borderRadius: 8, padding: "10px 14px" }}>
+                  <div style={{
+                    fontFamily: SANS, fontSize: 9, fontWeight: 700,
+                    letterSpacing: "0.1em", textTransform: "uppercase" as const,
+                    color: "#92400E", marginBottom: 5,
+                  }}>
+                    Institución
+                  </div>
+                  <p style={{ fontFamily: SANS, fontSize: 12, color: "#92400E", lineHeight: 1.65, margin: 0 }}>
+                    {s.institution}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div style={{
-          paddingTop: 24, borderTop: `1px solid ${C.border}`,
-          display: "flex",
-          alignItems: isMob ? "stretch" : "center",
-          flexDirection: isMob ? "column" : "row",
-          justifyContent: "space-between", gap: 12,
-        }}>
-          {!isMob && (
-            <p style={{ fontFamily: SANS, fontSize: 13, color: C.faint, margin: 0 }}>
-              Todos los perfiles son revisados antes de publicarse.
-            </p>
-          )}
-          <div style={{ display: "flex", gap: 10, flexDirection: isMob ? "column" : "row" }}>
-            <Link href="/signup">
-              <button style={{
-                fontFamily: SANS, background: C.navy, color: "#fff",
-                border: "none", padding: "10px 22px", borderRadius: 6,
-                fontSize: 13, fontWeight: 500, cursor: "pointer",
-                width: isMob ? "100%" : undefined,
-              }}>
-                Publicar mi perfil
-              </button>
-            </Link>
-            <Link href="/signup?intent=institution" style={{ width: isMob ? "100%" : undefined }}>
-              <button style={{
-                fontFamily: SANS, background: "transparent", color: C.navy,
-                border: `1px solid ${C.navy}`, padding: "10px 22px",
-                borderRadius: 6, fontSize: 13, cursor: "pointer",
-                width: isMob ? "100%" : undefined,
-              }}>
-                Acceder al directorio completo
-              </button>
-            </Link>
-          </div>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 44, flexWrap: "wrap" as const }}>
+          <Link href="/signup">
+            <button style={{
+              fontFamily: SANS, background: C.navy, color: "#fff",
+              border: "none", padding: "11px 28px", borderRadius: 6,
+              fontSize: 13, fontWeight: 600, cursor: "pointer",
+            }}>
+              Publicar mi perfil
+            </button>
+          </Link>
+          <Link href="/signup?intent=institution">
+            <button style={{
+              fontFamily: SANS, background: "transparent", color: C.navy,
+              border: `1px solid ${C.navy}`, padding: "11px 28px",
+              borderRadius: 6, fontSize: 13, cursor: "pointer",
+            }}>
+              Acceder al directorio
+            </button>
+          </Link>
         </div>
       </div>
     </section>
@@ -675,10 +667,10 @@ function Feature() {
     <section style={{ background: C.white, borderTop: `1px solid ${C.border}`, overflow: "hidden" }}>
       <div style={{ maxWidth: 1080, margin: "0 auto", display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", minHeight: 380 }}>
         <PhotoBg
-          url="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=700"
+          url="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=700"
           height={isMob ? 240 : 380}
-          overlay="rgba(12,16,24,0.08)"
-          position="center top"
+          overlay="rgba(12,16,24,0.06)"
+          position="center center"
           fallback="linear-gradient(160deg, #1C2030 0%, #0D2240 100%)"
         />
         <div style={{ padding: isMob ? "28px 20px" : "52px 48px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
@@ -694,151 +686,32 @@ function Feature() {
             color: C.ink, letterSpacing: "-0.02em", lineHeight: 1.2,
             margin: "0 0 16px",
           }}>
-            Tu empresa no tiene<br /><em>por qué saberlo.</em>
+            Tú decides a quién<br /><em>mostrar tu perfil.</em>
           </h2>
           <p style={{ fontFamily: SANS, fontSize: 14, color: C.muted, lineHeight: 1.8, margin: "0 0 12px" }}>
-            La mayoría de nuestros docentes combinan su actividad profesional con la formación sin que nadie en su entorno actual lo sepa. Es algo habitual, y lo hemos diseñado así desde el principio.
+            FacultyMatch ha sido diseñado con la privacidad como criterio fundamental. Tu perfil es visible únicamente para las instituciones que tú autorices, y permanece oculto para las que expresamente excluyas.
           </p>
           <p style={{ fontFamily: SANS, fontSize: 14, color: C.muted, lineHeight: 1.8, margin: "0 0 28px" }}>
-            Puedes bloquear organizaciones concretas por nombre. Tu perfil aparece solo donde tú lo decidas. Sin sorpresas.
+            Es habitual que directivos, investigadores y académicos combinen su actividad profesional con la docencia de forma discreta. Nuestra plataforma está diseñada para que esto sea posible, sin comprometer su posición actual.
           </p>
-          <button style={{
-            fontFamily: SANS, background: "transparent", color: C.navy,
-            border: `1px solid ${C.navy}`, padding: "10px 22px",
-            borderRadius: 6, fontSize: 13, cursor: "pointer",
-            alignSelf: "flex-start",
-          }}>
-            Más información sobre privacidad
-          </button>
+          <Link href="/signup">
+            <button style={{
+              fontFamily: SANS, background: "transparent", color: C.navy,
+              border: `1px solid ${C.navy}`, padding: "10px 22px",
+              borderRadius: 6, fontSize: 13, cursor: "pointer",
+              alignSelf: "flex-start",
+            }}>
+              Controlar mi visibilidad
+            </button>
+          </Link>
         </div>
       </div>
     </section>
   );
 }
 
-// ─── CAMPUS CTA ───────────────────────────────────────────────────────────────
-function CampusCTA() {
-  const isMob = useIsMobile();
-  return (
-    <PhotoBg
-      url="https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&q=80&w=1800"
-      height={isMob ? "auto" : 200}
-      overlay="rgba(12,16,24,0.74)"
-      position="center 50%"
-      fallback="linear-gradient(135deg, #0D2240 0%, #0C1018 100%)"
-    >
-      <div style={{
-        display: "flex", alignItems: "center",
-        justifyContent: isMob ? "center" : "space-between",
-        flexDirection: isMob ? "column" as const : "row" as const,
-        textAlign: isMob ? "center" as const : "left" as const,
-        padding: isMob ? "40px 20px" : "0 60px",
-        minHeight: isMob ? 200 : undefined,
-        maxWidth: 1080, margin: "0 auto", width: "100%",
-        flexWrap: "wrap" as const, gap: 28,
-      }}>
-        <div>
-          <p style={{
-            fontFamily: SERIF, fontSize: 22,
-            color: "rgba(255,255,255,0.9)", lineHeight: 1.35,
-            margin: "0 0 6px",
-          }}>
-            Saca partido a todo lo que sabes.
-          </p>
-          <p style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.45)", margin: 0 }}>
-            Gratuito para docentes y expertos. Sin permanencia.
-          </p>
-        </div>
-        <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
-          <Link href="/signup">
-            <button style={{
-              fontFamily: SANS, background: "#fff", color: C.ink,
-              border: "none", padding: "12px 28px", borderRadius: 6,
-              fontSize: 13, fontWeight: 600, cursor: "pointer",
-            }}>
-              Saca partido a tu experiencia
-            </button>
-          </Link>
-          <Link href="/signup?intent=institution">
-            <button style={{
-              fontFamily: SANS, background: "transparent",
-              color: "rgba(255,255,255,0.7)",
-              border: "1px solid rgba(255,255,255,0.22)",
-              padding: "12px 28px", borderRadius: 6,
-              fontSize: 13, cursor: "pointer",
-            }}>
-              Soy institución
-            </button>
-          </Link>
-        </div>
-      </div>
-    </PhotoBg>
-  );
-}
 
-// ─── FOOTER PROPIO (la landing tiene el suyo, el global está desactivado) ─────
-function LandingFooter() {
-  const isMob = useIsMobile();
-  const links = [
-    { label: "Para docentes",      href: "/faculty" },
-    { label: "Para instituciones", href: "/institutions" },
-    { label: "Recursos",           href: "/resources" },
-    { label: "Privacidad",         href: "/privacy" },
-    { label: "Términos",           href: "/terms" },
-    { label: "Contacto",           href: "mailto:info@facultymatch.app" },
-  ];
-  return (
-    <footer style={{ background: C.ink }}>
-      <div style={{
-        maxWidth: 1080, margin: "0 auto",
-        padding: isMob ? "36px 20px 32px" : "40px 40px 36px",
-        borderTop: `1px solid rgba(255,255,255,0.08)`,
-      }}>
-        {/* Brand row */}
-        <div style={{
-          display: "flex", alignItems: "center",
-          justifyContent: "space-between", flexWrap: "wrap" as const,
-          gap: 20, marginBottom: isMob ? 24 : 28,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{
-              width: 24, height: 24, borderRadius: 5, background: "rgba(255,255,255,0.12)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 9, fontWeight: 700, fontFamily: SANS }}>FM</span>
-            </div>
-            <span style={{ fontFamily: SERIF, fontSize: 16, color: "rgba(255,255,255,0.82)", letterSpacing: "-0.01em" }}>
-              FacultyMatch
-            </span>
-          </div>
-          <span style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.2)" }}>
-            Grupo Global Educa SL · 2026
-          </span>
-        </div>
-        {/* Links row */}
-        <div style={{
-          display: "flex", flexWrap: "wrap" as const,
-          gap: isMob ? "10px 20px" : "8px 28px",
-          borderTop: `1px solid rgba(255,255,255,0.06)`,
-          paddingTop: 20,
-        }}>
-          {links.map((l) => (
-            <Link key={l.label} href={l.href}>
-              <span style={{
-                fontFamily: SANS, fontSize: 12,
-                color: "rgba(255,255,255,0.38)",
-                cursor: "pointer",
-                letterSpacing: "0.01em",
-              }}>
-                {l.label}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </footer>
-  );
-}
+
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 export default function LandingClient() {
@@ -847,13 +720,12 @@ export default function LandingClient() {
       <Nav />
       <Hero />
       <Ticker />
-      <Directory />
+      <HowItWorks />
       <TwoColumns />
       <PullQuote />
       <Process />
       <Feature />
-      <CampusCTA />
-      <LandingFooter />
+      <Footer />
     </div>
   );
 }

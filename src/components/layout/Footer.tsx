@@ -74,7 +74,6 @@ export function Footer() {
               {[
                 { label: "Para docentes",      href: "/faculty" },
                 { label: "Para instituciones", href: "/institutions" },
-                { label: "Cómo funciona",      href: "/faculty#como-funciona" },
                 { label: "Precios",            href: "/faculty#precios" },
                 { label: "Recursos",           href: "/resources" },
               ].map((l) => (

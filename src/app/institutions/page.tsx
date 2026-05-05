@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "Para instituciones educativas | FacultyMatch",
@@ -420,7 +419,6 @@ export default function InstitutionsPage() {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 }
