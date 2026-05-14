@@ -249,7 +249,7 @@ function Hero() {
       <div style={{
         position: "relative", zIndex: 2,
         maxWidth: 1120, margin: "0 auto",
-        padding: isMob ? "120px 24px 80px" : "0 32px",
+        padding: isMob ? "120px 24px 80px" : "96px 32px 80px",
         width: "100%",
         display: "grid",
         gridTemplateColumns: isMob ? "1fr" : "1fr 1fr",

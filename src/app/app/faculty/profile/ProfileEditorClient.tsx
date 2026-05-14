@@ -121,12 +121,13 @@ function ProfilePreview({ data, avatarUrl }: { data: PreviewState; avatarUrl?: s
       background: D.white, borderRadius: 20,
       border: `1px solid ${D.border}`,
       boxShadow: "0 4px 24px rgba(7,19,38,0.07)",
-      overflow: "hidden", fontFamily: SANS,
+      overflow: "visible", fontFamily: SANS,
     }}>
       {/* Cover band */}
       <div style={{
         height: 80,
         background: `linear-gradient(135deg, ${D.navy} 0%, ${D.blue} 100%)`,
+        borderRadius: "20px 20px 0 0",
         position: "relative",
       }} />
 
@@ -804,7 +805,7 @@ export function ProfileEditorClient({
         </div>
 
         {/* ── RIGHT: Sticky preview ── */}
-        <div style={{ position: "sticky", top: 80 }}>
+        <div style={{ position: "sticky", top: 24 }}>
           {/* Preview label */}
           <div style={{
             display: "flex", alignItems: "center", gap: 7,
