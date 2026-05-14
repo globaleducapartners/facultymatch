@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import { Suspense } from "react";
+import { Logo } from "@/components/ui/Logo";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
@@ -263,17 +263,7 @@ function SignupForm() {
         display: "flex", flexDirection: "column", justifyContent: "space-between",
       }}>
         {/* Logo */}
-        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 7, background: D.blue,
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <span style={{ color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: "-0.03em" }}>FM</span>
-          </div>
-          <span style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em" }}>
-            FacultyMatch
-          </span>
-        </Link>
+        <Logo variant="light" />
 
         <div>
           <div style={{

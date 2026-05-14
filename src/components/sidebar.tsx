@@ -108,15 +108,10 @@ export function Sidebar() {
       )}>
         {/* Brand header */}
         <div className="flex items-center gap-2.5 px-5 py-5 border-b border-[#E2E8F0]">
-          <div className="w-8 h-8 rounded-lg bg-[#0D2240] flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-xs font-black">FM</span>
+          <div className="w-[34px] h-[34px] rounded-lg bg-[#1B4FD8] flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-[13px] font-black tracking-tight">FM</span>
           </div>
-          <div>
-            <span className="text-[15px] font-bold text-[#080F1E] tracking-tight">FacultyMatch</span>
-            <div className="text-[9px] text-gray-400 font-semibold uppercase tracking-widest leading-none mt-0.5">
-              Plataforma
-            </div>
-          </div>
+          <span className="text-[18px] font-bold text-[#080F1E] tracking-tight" style={{ letterSpacing: "-0.03em" }}>FacultyMatch</span>
         </div>
 
         {/* Nav items */}

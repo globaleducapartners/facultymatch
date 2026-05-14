@@ -2,26 +2,42 @@ import Link from "next/link";
 
 interface LogoProps {
   className?: string;
+  /** "dark" = logo on light background (dark text). "light" = logo on dark background (white text). */
   variant?: "dark" | "light";
   href?: string;
 }
 
 export function Logo({ className = "", variant = "dark", href = "/" }: LogoProps) {
-  const titleColor = variant === "light" ? "#ffffff" : "#0C1018";
+  const textColor = variant === "light" ? "#ffffff" : "#0C1018";
 
   return (
-    <Link href={href} style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }} className={className}>
+    <Link
+      href={href}
+      style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}
+      className={className}
+    >
+      {/* Badge */}
       <div style={{
-        width: 32, height: 32, borderRadius: 7,
+        width: 34, height: 34, borderRadius: 8,
         background: "#1B4FD8",
         display: "flex", alignItems: "center", justifyContent: "center",
         flexShrink: 0,
       }}>
-        <span style={{ color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: "-0.03em", fontFamily: "system-ui, sans-serif" }}>FM</span>
+        <span style={{
+          color: "#ffffff", fontSize: 13, fontWeight: 800,
+          letterSpacing: "-0.03em",
+          fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+        }}>
+          FM
+        </span>
       </div>
+
+      {/* Wordmark */}
       <span style={{
-        fontSize: 17, fontWeight: 700, color: titleColor,
-        letterSpacing: "-0.03em", fontFamily: "system-ui, sans-serif",
+        fontSize: 18, fontWeight: 700,
+        color: textColor,
+        letterSpacing: "-0.03em",
+        fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
         lineHeight: 1,
       }}>
         FacultyMatch

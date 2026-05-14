@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import { Mail, CheckCircle2, Loader2 } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 
 const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
 const D = {
@@ -18,22 +19,6 @@ const D = {
   muted:  "#6B7280",
   border: "#D8E2EF",
 };
-
-function FMLogo() {
-  return (
-    <Link href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}>
-      <div style={{
-        width: 34, height: 34, borderRadius: 8, background: D.blue,
-        display: "flex", alignItems: "center", justifyContent: "center",
-      }}>
-        <span style={{ color: "#fff", fontSize: 12, fontWeight: 800, letterSpacing: "-0.03em", fontFamily: SANS }}>FM</span>
-      </div>
-      <span style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: D.ink, letterSpacing: "-0.03em" }}>
-        FacultyMatch
-      </span>
-    </Link>
-  );
-}
 
 function ConfirmContent() {
   const searchParams = useSearchParams();
@@ -64,7 +49,7 @@ function ConfirmContent() {
       <div style={{ width: "100%", maxWidth: 440 }}>
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <FMLogo />
+          <Logo />
         </div>
 
         {/* Card */}

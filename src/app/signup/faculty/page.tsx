@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
+import { Logo } from "@/components/ui/Logo";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
@@ -133,15 +134,9 @@ export default function SignupFacultyPage() {
         <div style={{ maxWidth: 440, width: "100%", margin: "0 auto" }}>
 
           {/* Logo */}
-          <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10, marginBottom: 36 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 7, background: D.blue,
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <span style={{ color: D.white, fontSize: 11, fontWeight: 800, letterSpacing: "-0.03em" }}>FM</span>
-            </div>
-            <span style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: D.ink, letterSpacing: "-0.03em" }}>FacultyMatch</span>
-          </Link>
+          <div style={{ marginBottom: 36 }}>
+            <Logo />
+          </div>
 
           <h1 style={{ fontFamily: SANS, fontSize: 26, fontWeight: 900, color: D.ink, margin: "0 0 6px", letterSpacing: "-0.04em" }}>
             Crea tu perfil docente

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import { Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { Logo } from "@/components/ui/Logo";
 
 const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
 const D = {
@@ -74,17 +75,7 @@ export default function UpdatePasswordPage() {
 
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <Link href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 7, background: D.blue,
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <span style={{ color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: "-0.03em" }}>FM</span>
-            </div>
-            <span style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: D.ink, letterSpacing: "-0.03em" }}>
-              FacultyMatch
-            </span>
-          </Link>
+          <Logo />
         </div>
 
         {done ? (

@@ -112,7 +112,7 @@ function Nav() {
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
             <div style={{
               width: 34, height: 34, borderRadius: 8,
-              background: D.navy,
+              background: D.blue,
               display: "flex", alignItems: "center", justifyContent: "center",
               flexShrink: 0,
             }}>

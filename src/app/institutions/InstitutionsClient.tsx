@@ -156,14 +156,14 @@ export default function InstitutionsClient() {
       }}>
         <video
           autoPlay muted loop playsInline
-          poster="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=85&w=1800"
+          poster="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=85&w=1800"
           style={{
             position: "absolute", inset: 0,
             width: "100%", height: "100%",
-            objectFit: "cover", objectPosition: "center 40%",
+            objectFit: "cover", objectPosition: "center 30%",
           }}
         >
-          <source src="https://assets.mixkit.co/videos/4069/4069-720.mp4" type="video/mp4" />
+          <source src="https://assets.mixkit.co/videos/48165/48165-720.mp4" type="video/mp4" />
         </video>
         <div style={{
           position: "absolute", inset: 0,
