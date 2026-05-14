@@ -251,7 +251,7 @@ export function ProfileEditorClient({
             {/* Avatar + identity */}
             <div style={{ padding: "0 24px 24px" }}>
               {/* Avatar */}
-              <div style={{ marginTop: -60, marginBottom: 14 }}>
+              <div style={{ marginTop: -60, marginBottom: 14, position: "relative", zIndex: 2 }}>
                 <div style={{
                   width: 120, height: 120, borderRadius: "50%",
                   background: avatarUrl ? "transparent" : D.navy,

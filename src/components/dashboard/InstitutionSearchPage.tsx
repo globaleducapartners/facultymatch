@@ -394,19 +394,20 @@ export function InstitutionSearchPage({
 
       {/* ── Cards grid ── */}
       {initialEducators.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {initialEducators.map((educator) => (
             <div
               key={educator.id}
               onClick={() => openEducator(educator.id)}
               className={`rounded-2xl transition-all ${
-                selectedId === educator.id ? "ring-2 ring-talentia-blue shadow-md" : ""
+                selectedId === educator.id ? "ring-2 ring-[#1B4FD8] shadow-md" : ""
               }`}
             >
               <EducatorCard
                 educator={educator}
                 institutionId={institutionId}
                 isFavorite={favorites.includes(educator.id)}
+                canContact={canContact}
                 compact
               />
             </div>

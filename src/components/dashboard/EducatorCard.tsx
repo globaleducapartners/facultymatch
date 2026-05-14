@@ -4,20 +4,31 @@ import { useState } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, ChevronRight, CheckCircle2, MapPin, Globe, Award, Mail } from "lucide-react";
+import { Star, ChevronRight, CheckCircle2, MapPin, Globe, Award, Mail, Briefcase, Lock } from "lucide-react";
 import Link from "next/link";
 import { ContactModal } from "./ContactModal";
 import { toggleFavorite } from "@/app/auth/actions";
 import { toast } from "sonner";
+
+const AVAIL_LABELS: Record<string, { label: string; color: string; bg: string }> = {
+  open:          { label: "Disponible ahora",     color: "#059669", bg: "#F0FDF4" },
+  next_semester: { label: "Próximo semestre",      color: "#0891B2", bg: "#EFF9FF" },
+  occasional:    { label: "Asignaturas puntuales", color: "#7C3AED", bg: "#F5F3FF" },
+  weekends:      { label: "Fines de semana",       color: "#D97706", bg: "#FFFBEB" },
+  online_only:   { label: "Solo online",           color: "#1B4FD8", bg: "#EFF6FF" },
+  limited:       { label: "En 6 meses",            color: "#6B7280", bg: "#F3F4F6" },
+  invite_only:   { label: "Por invitación",        color: "#0D2240", bg: "#EEF4FF" },
+};
 
 interface EducatorCardProps {
   educator: any;
   institutionId: string;
   isFavorite?: boolean;
   compact?: boolean;
+  canContact?: boolean;
 }
 
-export function EducatorCard({ educator, institutionId, isFavorite: initialIsFavorite, compact }: EducatorCardProps) {
+export function EducatorCard({ educator, institutionId, isFavorite: initialIsFavorite, compact, canContact = true }: EducatorCardProps) {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite || false);
 
@@ -33,15 +44,10 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
     }
   };
 
-  // Derived display values
   const mainArea = educator.expertise?.[0]
-    ? (typeof educator.expertise[0].area === "string"
-        ? educator.expertise[0].area
-        : educator.expertise[0].area?.name ?? null)
+    ? (typeof educator.expertise[0].area === "string" ? educator.expertise[0].area : educator.expertise[0].area?.name ?? null)
     : educator.faculty_areas?.[0]
-    ? (typeof educator.faculty_areas[0] === "string"
-        ? educator.faculty_areas[0]
-        : educator.faculty_areas[0]?.name ?? null)
+    ? (typeof educator.faculty_areas[0] === "string" ? educator.faculty_areas[0] : educator.faculty_areas[0]?.name ?? null)
     : null;
 
   const mainLanguage =
@@ -52,79 +58,145 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
       : null;
 
   const isVerified = educator.verified && educator.verified !== "none";
+  const avail = educator.availability ? (AVAIL_LABELS[educator.availability] || AVAIL_LABELS.open) : null;
+  const initials = educator.full_name?.substring(0, 2).toUpperCase() || "??";
+  const locationStr = [educator.city, educator.country || educator.location].filter(Boolean).join(", ");
 
-  // ─── Compact card (grid mode) ────────────────────────────────────────────
+  // ─── LinkedIn-style compact card ─────────────────────────────────────────
   if (compact) {
     return (
-      <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all cursor-pointer group flex flex-col gap-3 h-full relative">
-        {/* Pro indicator */}
+      <div className="bg-white rounded-2xl border border-[#D8E2EF] shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-pointer flex flex-col overflow-hidden h-full relative group">
+        {/* Pro badge */}
         {educator.is_pro && (
-          <span className="absolute top-3 right-3 bg-amber-50 text-amber-600 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">
+          <span className="absolute top-3 right-3 z-10 bg-amber-50 text-amber-600 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">
             Pro
           </span>
         )}
 
-        {/* Avatar */}
-        <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0">
-          {educator.avatar_url ? (
-            <Image
-              src={educator.avatar_url}
-              alt={educator.full_name}
-              width={48}
-              height={48}
-              className="object-cover w-full h-full"
-            />
-          ) : (
-            <div className="w-full h-full bg-talentia-blue/10 flex items-center justify-center">
-              <span className="text-sm font-black text-talentia-blue">
-                {educator.full_name?.substring(0, 2).toUpperCase()}
+        {/* Cover + Avatar */}
+        <div className="relative">
+          {/* Cover strip */}
+          <div className="h-16 bg-gradient-to-br from-[#0D2240] to-[#1B4FD8]" />
+          {/* Avatar */}
+          <div className="absolute left-1/2 -translate-x-1/2 -bottom-8">
+            <div className="w-16 h-16 rounded-full border-[3px] border-white overflow-hidden shadow-lg bg-[#0D2240] flex items-center justify-center">
+              {educator.avatar_url ? (
+                <Image src={educator.avatar_url} alt={educator.full_name} width={64} height={64} className="object-cover w-full h-full" />
+              ) : (
+                <span className="text-white text-base font-black">{initials}</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="pt-10 px-4 pb-4 flex flex-col gap-2 flex-1 text-center">
+          {/* Name */}
+          <div className="flex items-center justify-center gap-1.5 flex-wrap">
+            <h3 className="text-sm font-black text-[#0C1018] leading-tight group-hover:text-[#1B4FD8] transition-colors">
+              {educator.full_name}
+            </h3>
+            {educator.is_phd && (
+              <span className="text-[9px] font-black text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded-full border border-purple-200">PhD</span>
+            )}
+            {isVerified && <CheckCircle2 size={12} className="text-[#1B4FD8] flex-shrink-0" />}
+          </div>
+
+          {/* Headline */}
+          <p className="text-xs text-[#6B7280] font-medium line-clamp-2 leading-snug">
+            {educator.headline || "Docente académico"}
+          </p>
+
+          {/* Location */}
+          {locationStr && (
+            <div className="flex items-center justify-center gap-1 text-[#9CA3AF]">
+              <MapPin size={10} />
+              <span className="text-[11px] font-medium truncate">{locationStr}</span>
+            </div>
+          )}
+
+          {/* Availability */}
+          {avail && (
+            <div className="flex justify-center">
+              <span
+                className="text-[10px] font-black px-2.5 py-1 rounded-full"
+                style={{ color: avail.color, background: avail.bg }}
+              >
+                {avail.label}
               </span>
             </div>
           )}
-        </div>
 
-        {/* Name + verified */}
-        <div className="min-w-0">
-          <div className="flex items-center gap-1.5 flex-wrap pr-8">
-            <h3 className="text-sm font-bold text-navy group-hover:text-talentia-blue transition-colors leading-tight">
-              {educator.full_name}
-            </h3>
-            {isVerified && (
-              <CheckCircle2 size={13} className="text-talentia-blue flex-shrink-0" />
+          {/* Main area + years */}
+          <div className="flex items-center justify-center flex-wrap gap-1 mt-1">
+            {mainArea && (
+              <span className="text-[10px] font-bold text-[#1B4FD8] bg-[#EFF6FF] px-2 py-0.5 rounded-lg truncate max-w-[120px]">
+                {mainArea}
+              </span>
+            )}
+            {educator.experience_years > 0 && (
+              <span className="text-[10px] font-bold text-[#6B7280] bg-[#F2F6FC] border border-[#D8E2EF] px-2 py-0.5 rounded-lg flex items-center gap-1">
+                <Briefcase size={8} />
+                {educator.experience_years}a
+              </span>
+            )}
+            {educator.aneca_accreditation && (
+              <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                <Award size={8} />
+                ANECA
+              </span>
             )}
           </div>
-          <p className="text-xs text-gray-500 font-medium line-clamp-2 mt-0.5 leading-snug">
-            {educator.headline || "Docente"}
-          </p>
-        </div>
 
-        {/* Main area badge */}
-        {mainArea && (
-          <Badge className="bg-blue-50 text-talentia-blue border-none text-[10px] font-bold px-2 py-0.5 rounded-lg w-fit max-w-full truncate">
-            {mainArea}
-          </Badge>
-        )}
-
-        {/* Attribute badges */}
-        <div className="flex flex-wrap gap-1 mt-auto">
+          {/* Language */}
           {mainLanguage && (
-            <Badge className="bg-gray-50 text-gray-500 border border-gray-100 text-[10px] font-bold px-2 py-0.5 rounded-lg flex items-center gap-1">
-              <Globe size={9} />
-              {mainLanguage}
-            </Badge>
+            <div className="flex items-center justify-center gap-1 text-[#9CA3AF]">
+              <Globe size={10} />
+              <span className="text-[11px] font-medium">{mainLanguage}</span>
+            </div>
           )}
-          {educator.modality && (
-            <Badge className="bg-gray-50 text-gray-500 border border-gray-100 text-[10px] font-bold px-2 py-0.5 rounded-lg capitalize">
-              {educator.modality}
-            </Badge>
-          )}
-          {educator.aneca_accreditation && (
-            <Badge className="bg-orange-50 text-orange-600 border-none text-[10px] font-bold px-2 py-0.5 rounded-lg flex items-center gap-1">
-              <Award size={9} />
-              ANECA
-            </Badge>
-          )}
+
+          {/* Spacer */}
+          <div className="flex-1" />
+
+          {/* Action buttons */}
+          <div className="flex gap-2 pt-2 mt-auto">
+            <button
+              onClick={handleToggleFavorite}
+              className={`flex-shrink-0 w-9 h-9 rounded-xl border flex items-center justify-center transition-all ${
+                isFavorite
+                  ? "text-amber-500 bg-amber-50 border-amber-100"
+                  : "text-[#9CA3AF] border-[#D8E2EF] hover:text-amber-500 hover:bg-amber-50"
+              }`}
+            >
+              <Star size={14} className={isFavorite ? "fill-current" : ""} />
+            </button>
+            {canContact ? (
+              <button
+                onClick={(e) => { e.stopPropagation(); setIsContactModalOpen(true); }}
+                className="flex-1 bg-[#1B4FD8] hover:bg-[#0D2240] text-white text-xs font-bold h-9 rounded-xl flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <Mail size={12} /> Contactar
+              </button>
+            ) : (
+              <Link
+                href="/app/institution/billing"
+                onClick={(e) => e.stopPropagation()}
+                className="flex-1 bg-[#F2F6FC] text-[#6B7280] text-xs font-bold h-9 rounded-xl flex items-center justify-center gap-1.5 border border-[#D8E2EF]"
+              >
+                <Lock size={12} /> Ver más
+              </Link>
+            )}
+          </div>
         </div>
+
+        <ContactModal
+          isOpen={isContactModalOpen}
+          onClose={() => setIsContactModalOpen(false)}
+          facultyId={educator.id}
+          facultyName={educator.full_name}
+          institutionId={institutionId}
+        />
       </div>
     );
   }
@@ -138,7 +210,7 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
             <Image src={educator.avatar_url} alt={educator.full_name} fill sizes="96px" className="object-cover" />
           ) : (
             <div className="bg-talentia-blue/10 text-talentia-blue w-full h-full flex items-center justify-center">
-              <span className="text-2xl font-black">{educator.full_name?.substring(0, 2).toUpperCase()}</span>
+              <span className="text-2xl font-black">{initials}</span>
             </div>
           )}
         </div>
@@ -146,7 +218,7 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
         <div className="flex-1 space-y-4">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <h3 className="text-xl font-bold text-navy group-hover:text-talentia-blue transition-colors">
                   {educator.full_name}
                 </h3>
@@ -162,7 +234,6 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
                 )}
               </div>
               <p className="text-sm font-bold text-gray-600 mt-1">{educator.headline}</p>
-
               <div className="flex flex-wrap items-center gap-4 mt-3">
                 <span className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-widest">
                   <MapPin size={14} className="text-gray-300" />
@@ -198,13 +269,6 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
             {educator.bio || "Este docente aún no ha completado su biografía profesional."}
           </p>
 
-          {educator.research_publications && (
-            <div className="flex items-start gap-2 text-xs text-gray-400 bg-gray-50/50 p-2 rounded-lg border border-gray-100">
-              <Globe size={14} className="mt-0.5 shrink-0" />
-              <p className="italic line-clamp-1">{educator.research_publications}</p>
-            </div>
-          )}
-
           <div className="flex flex-wrap gap-2 pt-2">
             {educator.expertise?.length > 0
               ? educator.expertise.slice(0, 3).map((exp: any) => {
@@ -212,7 +276,7 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
                   const subareaLabel = typeof exp.subarea === "string" ? exp.subarea : (exp.subarea?.name ?? "");
                   const label = [areaLabel, subareaLabel].filter(Boolean).join(": ");
                   return label ? (
-                    <Badge key={exp.id ?? label} variant="secondary" className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-xs font-bold border-none max-w-[200px] truncate" title={label}>
+                    <Badge key={exp.id ?? label} variant="secondary" className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-xs font-bold border-none max-w-[200px] truncate">
                       {label}
                     </Badge>
                   ) : null;
@@ -220,16 +284,11 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
               : educator.faculty_areas?.slice(0, 3).map((area: any) => {
                   const label = typeof area === "string" ? area : (area?.name ?? "");
                   return label ? (
-                    <Badge key={label} variant="secondary" className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-xs font-bold border-none max-w-[200px] truncate" title={label}>
+                    <Badge key={label} variant="secondary" className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-xs font-bold border-none max-w-[200px] truncate">
                       {label}
                     </Badge>
                   ) : null;
                 })}
-            {educator.expertise?.length > 3 && (
-              <Badge variant="secondary" className="bg-gray-50 text-gray-400 px-3 py-1 rounded-lg text-xs font-bold border-none">
-                +{educator.expertise.length - 3} más
-              </Badge>
-            )}
           </div>
         </div>
       </div>
