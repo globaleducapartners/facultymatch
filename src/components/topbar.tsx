@@ -140,27 +140,27 @@ export function Topbar({ user, profile }: TopbarProps) {
   };
 
   return (
-    <header className="h-20 bg-[#FDFCF9] border-b border-[#E5E1D8] flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
+    <header className="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
       <div className="flex items-center gap-4">
-        <Link href="/" className="flex flex-col">
-          <span className="text-2xl font-bold tracking-tight text-navy">FacultyMatch</span>
-          <span className="text-[10px] text-gray-400 font-medium uppercase tracking-widest leading-none">
-            Red Global de Talento Académico
-          </span>
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-[#0D2240] flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-xs font-black">FM</span>
+          </div>
+          <span className="text-[17px] font-bold tracking-tight text-[#080F1E]">FacultyMatch</span>
         </Link>
       </div>
 
       {/* ── Role switcher (dual-role users only) ── */}
       {profile?.can_switch_role && (
-        <div className="hidden md:flex items-center bg-gray-100 rounded-xl p-1 gap-0.5">
+        <div className="hidden md:flex items-center bg-[#F2F6FC] border border-[#D8E2EF] rounded-xl p-1 gap-0.5">
           <form action={switchActiveMode}>
             <input type="hidden" name="mode" value="faculty" />
             <button
               type="submit"
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 profile.active_mode === "faculty"
-                  ? "bg-white text-navy shadow-sm"
-                  : "text-gray-500 hover:text-gray-800"
+                  ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
+                  : "text-[#4B5A7A] hover:text-[#080F1E]"
               }`}
             >
               <GraduationCap size={13} />
@@ -173,8 +173,8 @@ export function Topbar({ user, profile }: TopbarProps) {
               type="submit"
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 profile.active_mode === "institution"
-                  ? "bg-white text-navy shadow-sm"
-                  : "text-gray-500 hover:text-gray-800"
+                  ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
+                  : "text-[#4B5A7A] hover:text-[#080F1E]"
               }`}
             >
               <Building2 size={13} />
@@ -201,17 +201,17 @@ export function Topbar({ user, profile }: TopbarProps) {
             >
               <Bell size={22} />
               {notifLoaded && notifications.length > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#B8963E] rounded-full" />
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-[#1B4FD8] text-white text-[9px] font-black rounded-full flex items-center justify-center px-1">{notifications.length}</span>
               )}
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-[#FDFCF9] rounded-2xl shadow-xl border border-[#E5E1D8] z-50 overflow-hidden">
+              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-[#D8E2EF] z-50 overflow-hidden" style={{ boxShadow: "0 8px 40px rgba(7,19,38,0.14)" }}>
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-[#E5E1D8]">
-                  <span className="text-sm font-black text-navy">Notificaciones</span>
+                <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E8F0]">
+                  <span className="text-sm font-black text-[#080F1E]">Notificaciones</span>
                   {notifications.length > 0 && (
-                    <span className="text-[10px] font-black text-[#0D2240] bg-[#F7F5F0] px-2 py-0.5 rounded-full border border-[#E5E1D8]">
+                    <span className="text-[10px] font-black text-white bg-[#1B4FD8] px-2 py-0.5 rounded-full">
                       {notifications.length}
                     </span>
                   )}
@@ -244,7 +244,7 @@ export function Topbar({ user, profile }: TopbarProps) {
                             className={`mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
                               n.type === "contact"
                                 ? "bg-[#0D2240]/10 text-[#0D2240]"
-                                : "bg-[#B8963E]/10 text-[#B8963E]"
+                                : "bg-[#E9A030]/10 text-[#E9A030]"
                             }`}
                           >
                             {n.type === "contact" ? (
@@ -269,10 +269,10 @@ export function Topbar({ user, profile }: TopbarProps) {
                 )}
 
                 {/* Footer */}
-                <div className="border-t border-[#E5E1D8] px-4 py-3">
+                <div className="border-t border-[#E2E8F0] px-4 py-3">
                   <Link
                     href="/app/faculty/requests"
-                    className="text-xs font-bold text-[#0D2240] hover:text-[#B8963E] transition-colors"
+                    className="text-xs font-bold text-[#1B4FD8] hover:text-[#0D2240] transition-colors"
                     onClick={() => setShowNotifications(false)}
                   >
                     Ver todas las solicitudes →
@@ -285,9 +285,9 @@ export function Topbar({ user, profile }: TopbarProps) {
           {/* ── User dropdown ── */}
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-3 p-1 rounded-full hover:bg-gray-50 transition-all focus:outline-none">
-              <Avatar className="h-10 w-10 border border-gray-100 ring-2 ring-gray-50">
+              <Avatar className="h-9 w-9 border-2 border-[#E2E8F0]">
                 <AvatarImage src={profile?.avatar_url} />
-                <AvatarFallback className="bg-[#0D2240]/10 text-[#0D2240] font-bold">
+                <AvatarFallback className="bg-[#EEF4FF] text-[#1B4FD8] font-bold text-sm">
                   {profile?.full_name
                     ?.split(" ")
                     .map((n: string) => n[0])
@@ -295,10 +295,10 @@ export function Topbar({ user, profile }: TopbarProps) {
                 </AvatarFallback>
               </Avatar>
               <div className="hidden md:flex flex-col items-start mr-1">
-                <span className="text-sm font-semibold text-navy leading-none mb-0.5">
+                <span className="text-sm font-bold text-[#080F1E] leading-none mb-0.5">
                   {profile?.full_name}
                 </span>
-                <span className="text-xs text-gray-400 font-medium capitalize">
+                <span className="text-xs text-[#4B5A7A] font-medium capitalize">
                   {profile?.role === "faculty"
                     ? "Docente"
                     : profile?.role === "institution"

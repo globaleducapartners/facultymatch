@@ -1,46 +1,24 @@
 "use client";
-import { useState, useEffect } from "react";
+// src/app/institutions/InstitutionsClient.tsx — FacultyMatch v2
+
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 
-const SERIF = `var(--font-serif, 'Georgia', 'Times New Roman', serif)`;
-const SANS  = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
+const SANS = `'Inter', system-ui, -apple-system, sans-serif`;
 
-const C = {
-  ink: "#0C1018", navy: "#0D2240", brass: "#B8963E",
-  cream: "#F7F5F0", paper: "#FDFCF9", white: "#FFFFFF",
-  muted: "#6B7280", faint: "#9CA3AF", border: "#E5E1D8",
+const D = {
+  dark:   "#071326",
+  navy:   "#0D2240",
+  blue:   "#1B4FD8",
+  gold:   "#E9A030",
+  white:  "#FFFFFF",
+  surf:   "#F2F6FC",
+  border: "#D8E2EF",
+  ink:    "#080F1E",
+  muted:  "#4B5A7A",
+  faint:  "#8896B0",
 };
-
-const KIND = {
-  Académica:   { dot: "#2563EB", bg: "#EFF6FF", text: "#1D4ED8" },
-  Experto:     { dot: C.brass,   bg: "#FEF3C7", text: "#92400E" },
-  Profesional: { dot: "#059669", bg: "#F0FDF4", text: "#065F46" },
-};
-
-const SAMPLE_PROFILES = [
-  { init: "MR", name: "Dr. M. Rodríguez", role: "Economía · Política fiscal",      org: "Univ. Autónoma · Madrid", kind: "Académica" as const,   avail: true,  lang: "ES · EN" },
-  { init: "JL", name: "J. Llamas",        role: "Dirección de operaciones",         org: "18 años en empresa",       kind: "Experto" as const,     avail: true,  lang: "ES · EN" },
-  { init: "CR", name: "Dra. C. Ramos",    role: "Derecho Mercantil · Compliance",   org: "UCM · Madrid",             kind: "Académica" as const,   avail: false, lang: "ES · FR" },
-  { init: "PV", name: "P. Velasco",       role: "Marketing digital · Growth",       org: "Ex-Google · Ex-Cabify",    kind: "Profesional" as const, avail: true,  lang: "ES · EN" },
-  { init: "BM", name: "Dra. B. Morales",  role: "Inteligencia Artificial · ML",     org: "UPM Madrid",               kind: "Académica" as const,   avail: true,  lang: "ES · EN" },
-  { init: "AS", name: "A. Sánchez",       role: "Liderazgo · Gestión de equipos",   org: "Consultor independiente",  kind: "Experto" as const,     avail: true,  lang: "ES" },
-];
-
-const FILTERS = [
-  { label: "Área UNESCO",    desc: "Desde Economía hasta Ciencias de la Salud" },
-  { label: "Acreditación",  desc: "ANECA, ORCID, titulación doctoral" },
-  { label: "Idioma",        desc: "Español, inglés, francés y más" },
-  { label: "Modalidad",     desc: "Presencial, online o híbrida" },
-  { label: "Disponibilidad",desc: "Inmediata, próximo semestre, solo online" },
-  { label: "Tipo de perfil",desc: "Académico, profesional o educador independiente" },
-];
-
-const HOW = [
-  { n: "I",   title: "Registra tu institución",  body: "Acceso al directorio completo desde el primer día. Sin proceso de aprobación previo." },
-  { n: "II",  title: "Busca con filtros reales",  body: "Por área de conocimiento, acreditación, idioma y disponibilidad. Los resultados son exactamente lo que necesitas." },
-  { n: "III", title: "Contacta directamente",     body: "Envía una solicitud al docente. Él decide si responde. Sin intermediarios ni comisiones por contratación." },
-];
 
 function useIsMobile() {
   const [mob, setMob] = useState(false);
@@ -53,66 +31,205 @@ function useIsMobile() {
   return mob;
 }
 
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); obs.disconnect(); } },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return { ref, inView };
+}
+
+const KIND_STYLE: Record<string, { bg: string; text: string; border: string }> = {
+  Académica:   { bg: "#EFF6FF", text: "#1D4ED8", border: "#BFDBFE" },
+  Experto:     { bg: "#FEF3C7", text: "#92400E", border: "#FDE68A" },
+  Profesional: { bg: "#F0FDF4", text: "#065F46", border: "#BBF7D0" },
+};
+
+const AVATAR_COLORS: string[] = [
+  "#1B4FD8", "#0D2240", "#059669", "#7C3AED", "#DC2626", "#0891B2",
+];
+
+const SAMPLE_PROFILES = [
+  {
+    init: "MR", name: "Dr. Miguel Rodríguez", role: "Economía · Política fiscal",
+    org: "Universidad Autónoma · Madrid", kind: "Académica" as const,
+    avail: true, lang: "ES · EN", area: "Economía", years: "12 años exp.",
+    color: AVATAR_COLORS[0],
+  },
+  {
+    init: "JL", name: "Javier Llamas", role: "Director de Operaciones",
+    org: "Ex-Amazon · Ex-Inditex", kind: "Experto" as const,
+    avail: true, lang: "ES · EN · FR", area: "Operaciones", years: "18 años exp.",
+    color: AVATAR_COLORS[1],
+  },
+  {
+    init: "CR", name: "Dra. Carmen Ramos", role: "Derecho Mercantil · Compliance",
+    org: "UCM · Abogada en activo", kind: "Académica" as const,
+    avail: false, lang: "ES · FR", area: "Derecho", years: "9 años exp.",
+    color: AVATAR_COLORS[2],
+  },
+  {
+    init: "PV", name: "Pablo Velasco", role: "Marketing Digital · Growth",
+    org: "Ex-Google · Ex-Cabify", kind: "Profesional" as const,
+    avail: true, lang: "ES · EN", area: "Marketing", years: "14 años exp.",
+    color: AVATAR_COLORS[3],
+  },
+  {
+    init: "BM", name: "Dra. Beatriz Morales", role: "Inteligencia Artificial · ML",
+    org: "UPM · Investigadora senior", kind: "Académica" as const,
+    avail: true, lang: "ES · EN", area: "IA & Datos", years: "8 años exp.",
+    color: AVATAR_COLORS[4],
+  },
+  {
+    init: "AS", name: "Ana Sánchez", role: "Liderazgo · Gestión de personas",
+    org: "Directora RRHH · Multinacional", kind: "Experto" as const,
+    avail: true, lang: "ES · EN", area: "Liderazgo", years: "16 años exp.",
+    color: AVATAR_COLORS[5],
+  },
+];
+
+const FILTERS = [
+  { label: "Área UNESCO",      desc: "Desde Economía hasta Ciencias de la Salud" },
+  { label: "Acreditación",     desc: "ANECA, ORCID, titulación doctoral" },
+  { label: "Idioma",           desc: "Español, inglés, francés y más" },
+  { label: "Modalidad",        desc: "Presencial, online o híbrida" },
+  { label: "Disponibilidad",   desc: "Inmediata, próximo semestre, solo online" },
+  { label: "Tipo de perfil",   desc: "Académico, profesional o educador independiente" },
+];
+
+const HOW = [
+  {
+    n: "I",
+    title: "Registra tu institución",
+    body: "Acceso al directorio completo desde el primer día. Sin proceso de aprobación previo. En cinco minutos estás dentro.",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={D.blue} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+      </svg>
+    ),
+  },
+  {
+    n: "II",
+    title: "Busca con filtros reales",
+    body: "Por área de conocimiento, acreditación, idioma y disponibilidad. Los resultados son exactamente lo que necesitas para tu programa.",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={D.blue} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+      </svg>
+    ),
+  },
+  {
+    n: "III",
+    title: "Contacta directamente",
+    body: "Envía una solicitud al docente. Él decide si responde. Sin intermediarios ni comisiones por contratación. Tú negociais directamente.",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={D.blue} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+    ),
+  },
+];
+
 export default function InstitutionsClient() {
   const isMob = useIsMobile();
-  const pad = isMob ? "48px 20px" : "72px 40px";
+  const pad = isMob ? "64px 24px" : "88px 32px";
+  const { ref: directoryRef, inView: directoryVisible } = useInView(0.1);
+  const { ref: howRef, inView: howVisible } = useInView(0.1);
 
   return (
-    <div style={{ background: C.paper, fontFamily: SANS }}>
+    <div style={{ background: D.white, fontFamily: SANS }}>
       <Navbar />
 
       {/* ── HERO ── */}
       <section style={{
         position: "relative", overflow: "hidden",
-        height: isMob ? "auto" : 520,
-        minHeight: isMob ? 440 : undefined,
-        paddingTop: isMob ? 80 : 0,
-        paddingBottom: isMob ? 60 : 0,
+        minHeight: isMob ? "90svh" : 580,
+        display: "flex", alignItems: "center",
       }}>
+        <video
+          autoPlay muted loop playsInline
+          poster="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=85&w=1800"
+          style={{
+            position: "absolute", inset: 0,
+            width: "100%", height: "100%",
+            objectFit: "cover", objectPosition: "center 40%",
+          }}
+        >
+          <source src="https://assets.mixkit.co/videos/4069/4069-720.mp4" type="video/mp4" />
+        </video>
         <div style={{
           position: "absolute", inset: 0,
-          backgroundImage: `url(https://images.unsplash.com/photo-1607237138185-eedd9c632b0b?auto=format&fit=crop&q=85&w=1800)`,
-          backgroundSize: "cover", backgroundPosition: "center 40%",
-        }} />
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(160deg, rgba(12,16,24,0.5) 0%, rgba(12,16,24,0.72) 60%, rgba(12,16,24,0.92) 100%)",
+          background: "linear-gradient(160deg, rgba(7,19,38,0.78) 0%, rgba(7,19,38,0.88) 60%, rgba(7,19,38,0.96) 100%)",
         }} />
         <div style={{
           position: "relative", zIndex: 2,
-          display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center",
-          minHeight: "inherit",
+          maxWidth: 1120, margin: "0 auto", width: "100%",
+          padding: isMob ? "80px 24px 64px" : "0 32px",
+          display: "flex", flexDirection: "column", alignItems: "center",
           textAlign: "center",
-          padding: isMob ? "0 20px" : "0 40px",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
-            <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
-            <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.45)" }}>
-              Para instituciones educativas
+          <div className="fm-animate-up" style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            background: "rgba(27,79,216,0.2)", border: "1px solid rgba(27,79,216,0.4)",
+            borderRadius: 999, padding: "5px 14px", marginBottom: 28,
+          }}>
+            <div style={{ width: 6, height: 6, borderRadius: "50%", background: D.gold }} />
+            <span style={{
+              fontFamily: SANS, fontSize: 10, fontWeight: 700,
+              letterSpacing: "0.16em", textTransform: "uppercase" as const,
+              color: "rgba(255,255,255,0.8)",
+            }}>
+              Para universidades y escuelas de negocio
             </span>
-            <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
           </div>
 
-          <h1 style={{ fontFamily: SERIF, fontSize: isMob ? 32 : 54, fontWeight: 400, color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em", margin: "0 0 20px", maxWidth: 700 }}>
-            El directorio que busca lo que
-            ningún portal de empleo tiene.
+          <h1 className="fm-animate-up fm-animate-up-delay-1" style={{
+            fontFamily: SANS,
+            fontSize: isMob ? 32 : "clamp(36px, 4.8vw, 58px)",
+            fontWeight: 900,
+            color: "#fff", lineHeight: 1.06, letterSpacing: "-0.04em",
+            margin: "0 0 20px", maxWidth: 760,
+          }}>
+            El directorio que ningún<br />portal de empleo puede tener.
           </h1>
 
-          <p style={{ fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.58)", lineHeight: 1.75, margin: "0 0 38px", maxWidth: 500 }}>
-            Docentes universitarios, investigadores y expertos de empresa
-            que no publican su CV en ningún sitio. Aquí están, revisados y
-            estructurados. Contacto directo. Sin comisiones.
+          <p className="fm-animate-up fm-animate-up-delay-2" style={{
+            fontFamily: SANS, fontSize: isMob ? 15 : 17,
+            color: "rgba(255,255,255,0.6)", lineHeight: 1.75,
+            margin: "0 0 40px", maxWidth: 540,
+          }}>
+            Médicos en activo, investigadores, directivos y especialistas
+            que nunca publican su CV en LinkedIn. Aquí están disponibles,
+            verificados, con contacto directo y sin comisiones de contratación.
           </p>
 
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const, justifyContent: "center" }}>
+          <div className="fm-animate-up fm-animate-up-delay-3" style={{
+            display: "flex", gap: 12, flexWrap: "wrap" as const, justifyContent: "center",
+          }}>
             <Link href="/signup?intent=institution">
-              <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 32px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+              <button style={{
+                fontFamily: SANS, background: D.white, color: D.ink,
+                border: "none", padding: "14px 34px", borderRadius: 10,
+                fontSize: 15, fontWeight: 700, cursor: "pointer",
+              }}>
                 Acceder al directorio
               </button>
             </Link>
             <Link href="/login">
-              <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.8)", border: "1px solid rgba(255,255,255,0.28)", padding: "13px 32px", borderRadius: 6, fontSize: 14, cursor: "pointer" }}>
+              <button style={{
+                fontFamily: SANS, background: "transparent",
+                color: "rgba(255,255,255,0.82)",
+                border: "1px solid rgba(255,255,255,0.28)",
+                padding: "14px 34px", borderRadius: 10, fontSize: 15, cursor: "pointer",
+              }}>
                 Ya tengo cuenta
               </button>
             </Link>
@@ -120,119 +237,239 @@ export default function InstitutionsClient() {
         </div>
       </section>
 
-      {/* ── PREVIEW DEL DIRECTORIO ── */}
-      <section style={{ background: C.cream }}>
-        <div style={{ padding: pad, maxWidth: 1080, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap" as const, gap: 20 }}>
+      {/* ── PREVIEW DIRECTORIO ── */}
+      <section style={{ background: D.surf, padding: pad }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <div style={{
+            display: "flex", alignItems: "flex-end",
+            justifyContent: "space-between",
+            marginBottom: 40, flexWrap: "wrap" as const, gap: 20,
+          }}>
             <div>
-              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 10 }}>
+              <div style={{
+                fontFamily: SANS, fontSize: 11, fontWeight: 700,
+                letterSpacing: "0.16em", textTransform: "uppercase" as const,
+                color: D.gold, marginBottom: 12,
+              }}>
                 Muestra del directorio
               </div>
-              <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: 0, lineHeight: 1.1 }}>
-                Perfiles que no están en LinkedIn.
+              <h2 style={{
+                fontFamily: SANS,
+                fontSize: isMob ? 24 : "clamp(26px, 2.8vw, 36px)",
+                fontWeight: 800,
+                color: D.ink, letterSpacing: "-0.04em", margin: 0, lineHeight: 1.1,
+              }}>
+                Una muestra real de los perfiles disponibles.
               </h2>
             </div>
             <Link href="/signup?intent=institution">
-              <button style={{ fontFamily: SANS, background: C.navy, color: "#fff", border: "none", padding: "10px 22px", borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+              <button style={{
+                fontFamily: SANS, background: D.blue, color: "#fff",
+                border: "none", padding: "11px 24px", borderRadius: 10,
+                fontSize: 13, fontWeight: 700, cursor: "pointer", flexShrink: 0,
+              }}>
                 Ver el directorio completo
               </button>
             </Link>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "repeat(3,1fr)", gap: 14, marginBottom: 24 }}>
+          <div ref={directoryRef} style={{
+            display: "grid",
+            gridTemplateColumns: isMob ? "1fr" : "repeat(3,1fr)",
+            gap: 14, marginBottom: 20,
+          }}>
             {SAMPLE_PROFILES.map((p, i) => {
-              const k = KIND[p.kind];
+              const k = KIND_STYLE[p.kind];
               return (
-                <div key={i} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "18px 20px" }}>
-                  <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 8, flexShrink: 0, background: C.cream, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: SERIF, fontSize: 13, color: C.navy }}>
+                <div key={i} style={{
+                  background: D.white, border: `1px solid ${D.border}`,
+                  borderRadius: 16, padding: "20px 20px 16px",
+                  boxShadow: "0 2px 12px rgba(7,19,38,0.06)",
+                  opacity: directoryVisible ? 1 : 0,
+                  transform: directoryVisible ? "translateY(0)" : "translateY(20px)",
+                  transition: `opacity 0.5s ease ${i * 0.08}s, transform 0.5s ease ${i * 0.08}s`,
+                  display: "flex", flexDirection: "column" as const, gap: 14,
+                }}>
+                  {/* Header row */}
+                  <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <div style={{
+                      width: 46, height: 46, borderRadius: 12, flexShrink: 0,
+                      background: p.color,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontFamily: SANS, fontSize: 14, fontWeight: 800, color: "#fff",
+                      letterSpacing: "-0.02em",
+                    }}>
                       {p.init}
                     </div>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
-                        <span style={{ fontFamily: SERIF, fontSize: 13, color: C.ink }}>{p.name}</span>
-                        <div style={{ width: 5, height: 5, borderRadius: "50%", background: p.avail ? "#059669" : C.faint, flexShrink: 0 }} />
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, marginBottom: 2 }}>
+                        <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: D.ink, letterSpacing: "-0.02em" }}>{p.name}</span>
+                        <div style={{
+                          display: "flex", alignItems: "center", gap: 4, flexShrink: 0,
+                          background: p.avail ? "#F0FDF4" : "#F3F4F6",
+                          borderRadius: 20, padding: "2px 8px",
+                        }}>
+                          <div style={{ width: 5, height: 5, borderRadius: "50%", background: p.avail ? "#059669" : D.faint }} />
+                          <span style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, color: p.avail ? "#059669" : D.faint, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>
+                            {p.avail ? "Disponible" : "No disponible"}
+                          </span>
+                        </div>
                       </div>
-                      <div style={{ fontFamily: SANS, fontSize: 11, color: C.muted, lineHeight: 1.4 }}>{p.role}</div>
-                      <div style={{ fontFamily: SANS, fontSize: 10, color: C.faint, marginTop: 1 }}>{p.org}</div>
+                      <div style={{ fontFamily: SANS, fontSize: 12, color: D.muted, lineHeight: 1.4 }}>{p.role}</div>
+                      <div style={{ fontFamily: SANS, fontSize: 11, color: D.faint, marginTop: 2 }}>{p.org}</div>
                     </div>
                   </div>
-                  <div style={{ paddingTop: 10, borderTop: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, color: k.text, background: k.bg, padding: "2px 8px", borderRadius: 20 }}>{p.kind}</span>
-                    <span style={{ fontFamily: SANS, fontSize: 10, color: C.faint }}>{p.lang}</span>
+
+                  {/* Tags row */}
+                  <div style={{
+                    display: "flex", gap: 6, flexWrap: "wrap" as const,
+                    paddingTop: 10, borderTop: `1px solid ${D.border}`,
+                  }}>
+                    <span style={{
+                      fontFamily: SANS, fontSize: 10, fontWeight: 700,
+                      color: k.text, background: k.bg, border: `1px solid ${k.border}`,
+                      padding: "3px 9px", borderRadius: 999,
+                    }}>
+                      {p.kind}
+                    </span>
+                    <span style={{
+                      fontFamily: SANS, fontSize: 10, fontWeight: 600,
+                      color: D.muted, background: D.surf, border: `1px solid ${D.border}`,
+                      padding: "3px 9px", borderRadius: 999,
+                    }}>
+                      {p.area}
+                    </span>
+                    <span style={{
+                      fontFamily: SANS, fontSize: 10, color: D.faint,
+                      background: D.surf, border: `1px solid ${D.border}`,
+                      padding: "3px 9px", borderRadius: 999, marginLeft: "auto",
+                    }}>
+                      {p.years}
+                    </span>
+                  </div>
+
+                  {/* Language */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={D.faint} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span style={{ fontFamily: SANS, fontSize: 11, color: D.faint }}>{p.lang}</span>
                   </div>
                 </div>
               );
             })}
           </div>
-          <p style={{ fontFamily: SANS, fontSize: 13, color: C.faint, textAlign: "center" }}>
-            Todos los perfiles son revisados antes de publicarse en el directorio.
+          <p style={{ fontFamily: SANS, fontSize: 13, color: D.faint, textAlign: "center" }}>
+            Todos los perfiles son revisados manualmente antes de publicarse en el directorio.
           </p>
         </div>
       </section>
 
       {/* ── FILTROS ── */}
-      <section style={{ background: C.white }}>
-        <div style={{
-          padding: pad, maxWidth: 1080, margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: isMob ? "1fr" : "1fr 1fr",
-          gap: isMob ? 0 : 60,
-          alignItems: "center",
-        }}>
-          <div>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>
-              Búsqueda estructurada
-            </div>
-            <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 18px", lineHeight: 1.2 }}>
-              Busca por lo que<br />realmente importa.
-            </h2>
-            <p style={{ fontFamily: SANS, fontSize: 15, color: C.muted, lineHeight: 1.8, margin: "0 0 32px" }}>
-              No hay palabras clave ni CVs que interpretar. El directorio está estructurado
-              por los criterios que usan los directores de programa para seleccionar profesorado.
-            </p>
-            <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", gap: 12 }}>
-              {FILTERS.map((f, i) => (
-                <div key={i} style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 16px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
-                    <div style={{ width: 5, height: 5, borderRadius: "50%", background: C.brass }} />
-                    <span style={{ fontFamily: SERIF, fontSize: 14, color: C.ink }}>{f.label}</span>
-                  </div>
-                  <p style={{ fontFamily: SANS, fontSize: 12, color: C.faint, lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Foto — oculta en mobile */}
-          {!isMob && (
-            <div style={{ borderRadius: 14, overflow: "hidden", height: 460 }}>
+      <section style={{ background: D.white, padding: pad }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMob ? "1fr" : "1fr 1fr",
+            gap: isMob ? 0 : 72, alignItems: "center",
+          }}>
+            <div>
               <div style={{
-                width: "100%", height: "100%",
-                backgroundImage: `url(https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800)`,
-                backgroundSize: "cover", backgroundPosition: "center",
-              }} />
+                fontFamily: SANS, fontSize: 11, fontWeight: 700,
+                letterSpacing: "0.16em", textTransform: "uppercase" as const,
+                color: D.gold, marginBottom: 16,
+              }}>
+                Búsqueda estructurada
+              </div>
+              <h2 style={{
+                fontFamily: SANS,
+                fontSize: isMob ? 26 : "clamp(26px, 2.8vw, 36px)",
+                fontWeight: 800,
+                color: D.ink, letterSpacing: "-0.04em",
+                margin: "0 0 18px", lineHeight: 1.1,
+              }}>
+                Búsqueda pensada para<br />quien contrata, no para<br />quien busca trabajo.
+              </h2>
+              <p style={{ fontFamily: SANS, fontSize: 15, color: D.muted, lineHeight: 1.8, margin: "0 0 32px" }}>
+                No hay keywords que interpretar ni CVs confusos. El directorio
+                está estructurado exactamente con los criterios que usan los
+                directores de programa al seleccionar profesorado.
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                {FILTERS.map((f, i) => (
+                  <div key={i} style={{
+                    background: D.surf, border: `1px solid ${D.border}`,
+                    borderRadius: 10, padding: "12px 16px",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
+                      <div style={{ width: 5, height: 5, borderRadius: "50%", background: D.gold, flexShrink: 0 }} />
+                      <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 600, color: D.ink }}>{f.label}</span>
+                    </div>
+                    <p style={{ fontFamily: SANS, fontSize: 12, color: D.faint, lineHeight: 1.5, margin: 0 }}>{f.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
+            {!isMob && (
+              <div style={{ borderRadius: 20, overflow: "hidden", height: 480 }}>
+                <div style={{
+                  width: "100%", height: "100%",
+                  backgroundImage: `url(https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800)`,
+                  backgroundSize: "cover", backgroundPosition: "center",
+                }} />
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
       {/* ── CÓMO FUNCIONA ── */}
-      <section style={{ background: C.cream }}>
-        <div style={{ padding: pad, maxWidth: 1080, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
+      <section style={{ background: D.surf, padding: pad }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: isMob ? 44 : 60 }}>
+            <div style={{
+              fontFamily: SANS, fontSize: 11, fontWeight: 700,
+              letterSpacing: "0.16em", textTransform: "uppercase" as const,
+              color: D.gold, marginBottom: 14,
+            }}>
               Cómo funciona
             </div>
-            <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: 0, lineHeight: 1.15 }}>
-              Tres pasos. Sin proceso de selección previo.
+            <h2 style={{
+              fontFamily: SANS,
+              fontSize: isMob ? 26 : "clamp(28px, 3vw, 40px)",
+              fontWeight: 800,
+              color: D.ink, letterSpacing: "-0.04em", margin: 0, lineHeight: 1.1,
+            }}>
+              Tres pasos. Sin proceso<br />de selección previo.
             </h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "repeat(3,1fr)", gap: 18 }}>
+          <div ref={howRef} style={{
+            display: "grid",
+            gridTemplateColumns: isMob ? "1fr" : "repeat(3,1fr)",
+            gap: 20,
+          }}>
             {HOW.map((s, i) => (
-              <div key={i} style={{ background: C.white, border: `1px solid ${C.border}`, borderRadius: 10, padding: "28px 26px", borderTop: `3px solid ${C.brass}` }}>
-                <div style={{ fontFamily: SERIF, fontSize: 24, color: C.brass, opacity: 0.45, marginBottom: 14, letterSpacing: "-0.02em" }}>{s.n}</div>
-                <h3 style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 400, color: C.ink, margin: "0 0 10px" }}>{s.title}</h3>
-                <p style={{ fontFamily: SANS, fontSize: 14, color: C.muted, lineHeight: 1.75, margin: 0 }}>{s.body}</p>
+              <div key={i} style={{
+                background: D.white, border: `1px solid ${D.border}`,
+                borderRadius: 16, padding: "28px 26px",
+                borderTop: `3px solid ${D.blue}`,
+                opacity: howVisible ? 1 : 0,
+                transform: howVisible ? "translateY(0)" : "translateY(20px)",
+                transition: `opacity 0.6s ease ${i * 0.12}s, transform 0.6s ease ${i * 0.12}s`,
+              }}>
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12,
+                  background: "rgba(27,79,216,0.08)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  marginBottom: 16,
+                }}>
+                  {s.icon}
+                </div>
+                <div style={{ fontFamily: SANS, fontSize: 28, fontWeight: 900, color: D.gold, opacity: 0.5, marginBottom: 10, letterSpacing: "-0.03em", lineHeight: 1 }}>
+                  {s.n}
+                </div>
+                <h3 style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: D.ink, margin: "0 0 10px" }}>{s.title}</h3>
+                <p style={{ fontFamily: SANS, fontSize: 14, color: D.muted, lineHeight: 1.75, margin: 0 }}>{s.body}</p>
               </div>
             ))}
           </div>
@@ -240,80 +477,138 @@ export default function InstitutionsClient() {
       </section>
 
       {/* ── PRECIOS ── */}
-      <section id="precios" style={{ background: C.white }}>
-        <div style={{ padding: pad, maxWidth: 1080, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
+      <section id="precios" style={{ background: D.white, padding: pad }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 52 }}>
+            <div style={{
+              fontFamily: SANS, fontSize: 11, fontWeight: 700,
+              letterSpacing: "0.16em", textTransform: "uppercase" as const,
+              color: D.gold, marginBottom: 14,
+            }}>
               Precios para instituciones
             </div>
-            <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 10px" }}>
+            <h2 style={{
+              fontFamily: SANS,
+              fontSize: isMob ? 26 : "clamp(28px, 3vw, 40px)",
+              fontWeight: 800,
+              color: D.ink, letterSpacing: "-0.04em", margin: "0 0 12px",
+            }}>
               Empieza gratis. Escala cuando lo necesites.
             </h2>
-            <p style={{ fontFamily: SANS, fontSize: 15, color: C.muted, maxWidth: 460, margin: "0 auto" }}>
+            <p style={{ fontFamily: SANS, fontSize: 16, color: D.muted, maxWidth: 460, margin: "0 auto" }}>
               Sin comisiones por contratación. Pagas por acceso al directorio, no por cada perfil que encuentres.
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", gap: 20, maxWidth: 760, margin: "0 auto" }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMob ? "1fr" : "1fr 1fr",
+            gap: 20, maxWidth: 780, margin: "0 auto",
+          }}>
             {/* Essential */}
-            <div style={{ background: C.cream, border: `1px solid ${C.border}`, borderRadius: 14, padding: "32px 30px" }}>
-              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: C.faint, marginBottom: 16 }}>Plan Essential</div>
-              <div style={{ fontFamily: SERIF, fontSize: 38, color: C.ink, margin: "0 0 4px" }}>0 €</div>
-              <div style={{ fontFamily: SANS, fontSize: 13, color: C.faint, marginBottom: 24 }}>para empezar</div>
-              <div style={{ display: "flex", flexDirection: "column" as const, gap: 10, marginBottom: 28 }}>
-                {["Registro gratuito", "2 búsquedas al mes", "Vista de perfiles básica", "2 contactos al mes"].map((f, i) => (
+            <div style={{
+              background: D.surf, border: `1px solid ${D.border}`,
+              borderRadius: 20, padding: "36px 32px",
+            }}>
+              <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: D.faint, marginBottom: 18 }}>
+                Plan Essential
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 48, fontWeight: 900, color: D.ink, letterSpacing: "-0.05em", margin: "0 0 4px", lineHeight: 1 }}>
+                0 €
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 13, color: D.faint, marginBottom: 28 }}>para empezar</div>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 12, marginBottom: 32 }}>
+                {[
+                  "Registro gratuito",
+                  "2 búsquedas al mes",
+                  "Vista de perfil básica",
+                  "2 contactos al mes",
+                ].map((f, i) => (
                   <div key={i} style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: C.brass, flexShrink: 0 }} />
-                    <span style={{ fontFamily: SANS, fontSize: 13, color: C.muted }}>{f}</span>
+                    <div style={{ width: 18, height: 18, borderRadius: 5, background: "rgba(233,160,48,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 6l3 3 5-5" stroke={D.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <span style={{ fontFamily: SANS, fontSize: 14, color: D.muted }}>{f}</span>
                   </div>
                 ))}
               </div>
               <Link href="/signup?intent=institution">
-                <button style={{ fontFamily: SANS, width: "100%", background: "transparent", color: C.navy, border: `1px solid ${C.navy}`, padding: "11px 0", borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+                <button style={{
+                  fontFamily: SANS, width: "100%", background: "transparent",
+                  color: D.navy, border: `1.5px solid ${D.navy}`,
+                  padding: "13px 0", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer",
+                }}>
                   Registrar mi institución
                 </button>
               </Link>
             </div>
 
             {/* Professional */}
-            <div style={{ background: C.navy, borderRadius: 14, padding: "32px 30px" }}>
-              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>Plan Professional</div>
-              <div style={{ fontFamily: SERIF, fontSize: 38, color: "#fff", margin: "0 0 4px" }}>99 €</div>
-              <div style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 24 }}>al mes · sin permanencia</div>
-              <div style={{ display: "flex", flexDirection: "column" as const, gap: 10, marginBottom: 28 }}>
-                {["Búsquedas ilimitadas", "Filtros avanzados completos", "Contactos ilimitados", "Shortlists y favoritos sin límite", "Hasta 3 usuarios por institución", "Soporte prioritario"].map((f, i) => (
+            <div style={{ background: D.navy, borderRadius: 20, padding: "36px 32px", position: "relative" as const }}>
+              <div style={{
+                position: "absolute", top: 20, right: 20,
+                background: D.gold, color: D.ink,
+                fontFamily: SANS, fontSize: 10, fontWeight: 800,
+                letterSpacing: "0.08em", textTransform: "uppercase" as const,
+                padding: "4px 10px", borderRadius: 999,
+              }}>
+                Más usado
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: D.gold, marginBottom: 18 }}>
+                Plan Professional
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 48, fontWeight: 900, color: "#fff", letterSpacing: "-0.05em", margin: "0 0 4px", lineHeight: 1 }}>
+                99 €
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 28 }}>
+                al mes · sin permanencia
+              </div>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 12, marginBottom: 32 }}>
+                {[
+                  "Búsquedas ilimitadas",
+                  "Filtros avanzados completos",
+                  "Contactos ilimitados",
+                  "Shortlists y favoritos sin límite",
+                  "Hasta 3 usuarios por institución",
+                  "Soporte prioritario",
+                ].map((f, i) => (
                   <div key={i} style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: C.brass, flexShrink: 0 }} />
-                    <span style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>{f}</span>
+                    <div style={{ width: 18, height: 18, borderRadius: 5, background: "rgba(233,160,48,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 6l3 3 5-5" stroke={D.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <span style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.65)" }}>{f}</span>
                   </div>
                 ))}
               </div>
               <Link href="/checkout?plan=institution-pro">
-                <button style={{ fontFamily: SANS, width: "100%", background: C.brass, color: "#fff", border: "none", padding: "11px 0", borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                <button style={{
+                  fontFamily: SANS, width: "100%", background: D.gold,
+                  color: D.ink, border: "none",
+                  padding: "13px 0", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer",
+                }}>
                   Activar Professional
                 </button>
               </Link>
             </div>
           </div>
 
-          <p style={{ fontFamily: SANS, fontSize: 12, color: C.faint, textAlign: "center", marginTop: 20 }}>
+          <p style={{ fontFamily: SANS, fontSize: 12, color: D.faint, textAlign: "center", marginTop: 22 }}>
             Sin comisiones por contratación. Sin permanencia. Cancela cuando quieras.
           </p>
         </div>
       </section>
 
       {/* ── CTA FINAL ── */}
-      <section style={{ position: "relative", overflow: "hidden" }}>
+      <section style={{
+        background: `linear-gradient(135deg, ${D.dark} 0%, ${D.navy} 100%)`,
+      }}>
         <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: `url(https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1800)`,
-          backgroundSize: "cover", backgroundPosition: "center 50%",
-        }} />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(12,16,24,0.78)" }} />
-        <div style={{
-          position: "relative", zIndex: 2,
-          maxWidth: 1080, margin: "0 auto",
-          padding: isMob ? "48px 20px" : "64px 40px",
+          maxWidth: 1120, margin: "0 auto",
+          padding: isMob ? "64px 24px" : "72px 32px",
           display: "flex",
           flexDirection: isMob ? "column" as const : "row" as const,
           alignItems: isMob ? "flex-start" : "center",
@@ -321,25 +616,39 @@ export default function InstitutionsClient() {
           gap: 32,
         }}>
           <div>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
+            <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase" as const, color: D.gold, marginBottom: 12 }}>
               Empieza hoy
             </div>
-            <p style={{ fontFamily: SERIF, fontSize: 26, color: "rgba(255,255,255,0.9)", lineHeight: 1.35, margin: 0 }}>
-              El directorio está disponible.<br />
-              Tu próximo docente, también.
-            </p>
-            <p style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "8px 0 0" }}>
-              Registro gratuito. Sin proceso de validación previo.
+            <h2 style={{
+              fontFamily: SANS,
+              fontSize: isMob ? 24 : "clamp(24px, 2.8vw, 36px)",
+              fontWeight: 800,
+              color: "#fff", letterSpacing: "-0.04em", lineHeight: 1.1, margin: 0,
+            }}>
+              Tu próximo experto lleva
+              <br />años esperando esta llamada.
+            </h2>
+            <p style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "10px 0 0" }}>
+              Registro gratuito. Sin validación previa. Sin comisiones si contratas.
             </p>
           </div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" as const }}>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const, flexShrink: 0 }}>
             <Link href="/signup?intent=institution">
-              <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 28px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+              <button style={{
+                fontFamily: SANS, background: D.white, color: D.ink,
+                border: "none", padding: "14px 30px", borderRadius: 10,
+                fontSize: 14, fontWeight: 700, cursor: "pointer",
+              }}>
                 Acceder al directorio
               </button>
             </Link>
             <Link href="/signup">
-              <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.22)", padding: "13px 28px", borderRadius: 6, fontSize: 14, cursor: "pointer" }}>
+              <button style={{
+                fontFamily: SANS, background: "transparent",
+                color: "rgba(255,255,255,0.75)",
+                border: "1.5px solid rgba(255,255,255,0.25)",
+                padding: "14px 30px", borderRadius: 10, fontSize: 14, cursor: "pointer",
+              }}>
                 Soy docente
               </button>
             </Link>

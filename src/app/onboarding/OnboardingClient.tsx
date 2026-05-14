@@ -215,9 +215,9 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
   const progress = step === 1 ? 50 : 100;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F2F6FC] flex flex-col font-sans">
       {/* Top Navigation & Progress */}
-      <header className="bg-white border-b border-gray-100 py-4 px-6 lg:px-12 sticky top-0 z-50">
+      <header className="bg-white border-b border-[#E2E8F0] py-4 px-6 lg:px-12 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
           <Logo />
 
@@ -228,7 +228,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
             </div>
             <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-talentia-blue"
+                className="h-full bg-[#1B4FD8]"
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.5, ease: "circOut" }}
@@ -253,7 +253,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                 variant="ghost"
                 size="sm"
                 onClick={() => { window.location.href = "/app/faculty"; }}
-                className="text-gray-400 font-bold text-xs hover:text-navy"
+                className="text-gray-400 font-bold text-xs hover:text-[#0D2240]"
               >
                 Saltar
               </Button>
@@ -275,12 +275,12 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                   className="space-y-10"
                 >
                   <div className="space-y-3">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-talentia-blue text-[10px] font-black uppercase tracking-widest">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#1B4FD8] text-[10px] font-black uppercase tracking-widest">
                       <Sparkles size={12} />
                       Primeros Pasos
                     </div>
-                    <h1 className="text-4xl font-black text-navy tracking-tight leading-tight">
-                      Configura tu perfil <span className="text-talentia-blue">profesional</span>
+                    <h1 className="text-4xl font-black text-[#0D2240] tracking-tight leading-tight">
+                      Configura tu perfil <span className="text-[#1B4FD8]">profesional</span>
                     </h1>
                     <p className="text-gray-500 font-medium text-lg">
                       Los campos marcados con * son imprescindibles.
@@ -292,48 +292,48 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                     <div className="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
                       <div className="space-y-1.5">
                         <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
-                          <UserCircle size={14} className="text-talentia-blue" />
+                          <UserCircle size={14} className="text-[#1B4FD8]" />
                           Nombre Completo *
                         </label>
                         <input
                           {...register("full_name", { required: true })}
                           placeholder="Tu nombre y apellidos"
-                          className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-talentia-blue/10 focus:border-talentia-blue outline-none transition-all font-bold text-navy"
+                          className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-[#1B4FD8]/10 focus:border-[#1B4FD8] outline-none transition-all font-bold text-[#0D2240]"
                         />
                       </div>
 
                       <div className="space-y-1.5">
                         <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
-                          <Target size={14} className="text-talentia-blue" />
+                          <Target size={14} className="text-[#1B4FD8]" />
                           Titular Académico *
                         </label>
                         <input
                           {...register("headline", { required: true })}
                           placeholder="Ej: PhD en Inteligencia Artificial aplicada a Finanzas"
-                          className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-talentia-blue/10 focus:border-talentia-blue outline-none transition-all font-bold text-navy"
+                          className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-[#1B4FD8]/10 focus:border-[#1B4FD8] outline-none transition-all font-bold text-[#0D2240]"
                         />
                       </div>
 
                       <div className="grid sm:grid-cols-2 gap-6">
                         <div className="space-y-1.5">
                           <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
-                            <MapPin size={14} className="text-talentia-blue" />
+                            <MapPin size={14} className="text-[#1B4FD8]" />
                             Ubicación *
                           </label>
                           <input
                             {...register("location", { required: true })}
                             placeholder="Ej: Madrid, España"
-                            className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-talentia-blue/10 focus:border-talentia-blue outline-none transition-all font-bold text-navy text-sm"
+                            className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-[#1B4FD8]/10 focus:border-[#1B4FD8] outline-none transition-all font-bold text-[#0D2240] text-sm"
                           />
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
-                            <Eye size={14} className="text-talentia-blue" />
+                            <Eye size={14} className="text-[#1B4FD8]" />
                             Visibilidad
                           </label>
                           <select
                             {...register("visibility")}
-                            className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-talentia-blue/10 focus:border-talentia-blue outline-none transition-all font-bold text-navy text-sm appearance-none cursor-pointer"
+                            className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-[#1B4FD8]/10 focus:border-[#1B4FD8] outline-none transition-all font-bold text-[#0D2240] text-sm appearance-none cursor-pointer"
                           >
                             <option value="public">Público</option>
                             <option value="hidden">Privado</option>
@@ -348,11 +348,11 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                         <input
                           type="checkbox"
                           {...register("terms_accepted", { required: true })}
-                          className="mt-0.5 w-4 h-4 rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue cursor-pointer"
+                          className="mt-0.5 w-4 h-4 rounded border-gray-300 text-[#1B4FD8] focus:ring-[#1B4FD8] cursor-pointer"
                         />
                         <span className="text-xs font-medium text-gray-500 leading-tight">
                           Acepto los{" "}
-                          <Link href="/terms" className="text-talentia-blue hover:underline font-bold">
+                          <Link href="/terms" className="text-[#1B4FD8] hover:underline font-bold">
                             Términos y Condiciones
                           </Link>{" "}
                           *
@@ -362,11 +362,11 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                         <input
                           type="checkbox"
                           {...register("privacy_accepted", { required: true })}
-                          className="mt-0.5 w-4 h-4 rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue cursor-pointer"
+                          className="mt-0.5 w-4 h-4 rounded border-gray-300 text-[#1B4FD8] focus:ring-[#1B4FD8] cursor-pointer"
                         />
                         <span className="text-xs font-medium text-gray-500 leading-tight">
                           Acepto la{" "}
-                          <Link href="/privacy" className="text-talentia-blue hover:underline font-bold">
+                          <Link href="/privacy" className="text-[#1B4FD8] hover:underline font-bold">
                             Política de Privacidad
                           </Link>{" "}
                           (GDPR) *
@@ -378,7 +378,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                     <div className="space-y-4">
                       <div className="flex items-center justify-between px-2">
                         <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                          <Languages size={14} className="text-talentia-blue" />
+                          <Languages size={14} className="text-[#1B4FD8]" />
                           Idiomas *
                         </label>
                         <Button
@@ -386,7 +386,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                           variant="ghost"
                           size="sm"
                           onClick={() => appendLanguage({ language: "", level: "Nativo" })}
-                          className="text-talentia-blue font-black text-[10px] uppercase tracking-tighter hover:bg-blue-50 rounded-full h-8"
+                          className="text-[#1B4FD8] font-black text-[10px] uppercase tracking-tighter hover:bg-blue-50 rounded-full h-8"
                         >
                           <Plus size={14} className="mr-1" /> Añadir otro
                         </Button>
@@ -402,7 +402,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                           >
                             <select
                               {...register(`languages.${idx}.language` as const, { required: true })}
-                              className="flex-1 px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none font-bold text-navy text-sm appearance-none cursor-pointer"
+                              className="flex-1 px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-[#1B4FD8] outline-none font-bold text-[#0D2240] text-sm appearance-none cursor-pointer"
                             >
                               <option value="">Idioma...</option>
                               {LANGUAGES_OPTIONS.map((l) => (
@@ -411,7 +411,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                             </select>
                             <select
                               {...register(`languages.${idx}.level` as const)}
-                              className="w-32 px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none font-bold text-navy text-sm appearance-none cursor-pointer text-center"
+                              className="w-32 px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-[#1B4FD8] outline-none font-bold text-[#0D2240] text-sm appearance-none cursor-pointer text-center"
                             >
                               <option value="Nativo">Nativo</option>
                               <option value="C2">C2</option>
@@ -444,12 +444,12 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                   className="space-y-10"
                 >
                   <div className="space-y-3">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-talentia-blue text-[10px] font-black uppercase tracking-widest">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#1B4FD8] text-[10px] font-black uppercase tracking-widest">
                       <Sparkles size={12} />
                       Perfil Enriquecido
                     </div>
-                    <h1 className="text-4xl font-black text-navy tracking-tight leading-tight">
-                      Tu <span className="text-talentia-blue">experiencia</span> marca la diferencia
+                    <h1 className="text-4xl font-black text-[#0D2240] tracking-tight leading-tight">
+                      Tu <span className="text-[#1B4FD8]">experiencia</span> marca la diferencia
                     </h1>
                     <p className="text-gray-500 font-medium text-lg">
                       Esta información es opcional pero ayuda a las instituciones a encontrarte.
@@ -460,38 +460,38 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                     {/* Bio */}
                     <div className="space-y-3">
                       <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
-                        <FileText size={14} className="text-talentia-blue" />
+                        <FileText size={14} className="text-[#1B4FD8]" />
                         Biografía Profesional
                       </label>
                       <textarea
                         {...register("bio")}
                         rows={5}
                         placeholder="Resume tu trayectoria académica y logros..."
-                        className="w-full px-6 py-5 rounded-[24px] border border-gray-100 bg-white focus:ring-4 focus:ring-talentia-blue/10 focus:border-talentia-blue outline-none transition-all font-medium text-navy resize-none leading-relaxed shadow-sm"
+                        className="w-full px-6 py-5 rounded-[24px] border border-gray-100 bg-white focus:ring-4 focus:ring-[#1B4FD8]/10 focus:border-[#1B4FD8] outline-none transition-all font-medium text-[#0D2240] resize-none leading-relaxed shadow-sm"
                       />
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-8">
                       <div className="space-y-1.5">
                         <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
-                          <Linkedin size={14} className="text-talentia-blue" />
+                          <Linkedin size={14} className="text-[#1B4FD8]" />
                           LinkedIn URL
                         </label>
                         <input
                           {...register("linkedin_url")}
                           placeholder="https://linkedin.com/in/..."
-                          className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-white focus:ring-4 focus:ring-talentia-blue/10 focus:border-talentia-blue outline-none transition-all font-bold text-navy text-sm shadow-sm"
+                          className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-white focus:ring-4 focus:ring-[#1B4FD8]/10 focus:border-[#1B4FD8] outline-none transition-all font-bold text-[#0D2240] text-sm shadow-sm"
                         />
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
-                          <Globe size={14} className="text-talentia-blue" />
+                          <Globe size={14} className="text-[#1B4FD8]" />
                           Disponibilidad
                         </label>
                         <input
                           {...register("availability")}
                           placeholder="Ej: Inmediata, Tardes..."
-                          className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-white focus:ring-4 focus:ring-talentia-blue/10 focus:border-talentia-blue outline-none transition-all font-bold text-navy text-sm shadow-sm"
+                          className="w-full px-5 py-4 rounded-2xl border border-gray-100 bg-white focus:ring-4 focus:ring-[#1B4FD8]/10 focus:border-[#1B4FD8] outline-none transition-all font-bold text-[#0D2240] text-sm shadow-sm"
                         />
                       </div>
                     </div>
@@ -499,7 +499,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                     {/* Modalities */}
                     <div className="space-y-4">
                       <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
-                        <MapPin size={14} className="text-talentia-blue" />
+                        <MapPin size={14} className="text-[#1B4FD8]" />
                         Modalidades
                       </label>
                       <div className="flex flex-wrap gap-3">
@@ -510,8 +510,8 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                             onClick={() => toggleModality(mod.id)}
                             className={`px-6 py-3 rounded-2xl text-sm font-black transition-all border-2 ${
                               selectedModalities.includes(mod.id)
-                                ? "bg-talentia-blue border-talentia-blue text-white shadow-lg shadow-blue-200"
-                                : "bg-white border-gray-100 text-gray-400 hover:border-talentia-blue hover:text-talentia-blue"
+                                ? "bg-[#1B4FD8] border-[#1B4FD8] text-white shadow-lg shadow-blue-200"
+                                : "bg-white border-gray-100 text-gray-400 hover:border-[#1B4FD8] hover:text-[#1B4FD8]"
                             }`}
                           >
                             {mod.label}
@@ -523,7 +523,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                     {/* Areas */}
                     <div className="space-y-4">
                       <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
-                        <Target size={14} className="text-talentia-blue" />
+                        <Target size={14} className="text-[#1B4FD8]" />
                         Áreas de Especialidad
                       </label>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -533,15 +533,15 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                             onClick={() => toggleArea(area)}
                             className={`flex items-center gap-4 p-4 border-2 rounded-2xl cursor-pointer transition-all group ${
                               selectedAreas.includes(area)
-                                ? "border-talentia-blue bg-blue-50/50"
-                                : "bg-white border-gray-100 hover:border-talentia-blue"
+                                ? "border-[#1B4FD8] bg-blue-50/50"
+                                : "bg-white border-gray-100 hover:border-[#1B4FD8]"
                             }`}
                           >
                             <div
                               className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all ${
                                 selectedAreas.includes(area)
-                                  ? "bg-talentia-blue border-talentia-blue text-white"
-                                  : "border-gray-200 group-hover:border-talentia-blue"
+                                  ? "bg-[#1B4FD8] border-[#1B4FD8] text-white"
+                                  : "border-gray-200 group-hover:border-[#1B4FD8]"
                               }`}
                             >
                               {selectedAreas.includes(area) && <CheckCircle2 size={12} />}
@@ -549,8 +549,8 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                             <span
                               className={`font-bold transition-colors text-sm ${
                                 selectedAreas.includes(area)
-                                  ? "text-talentia-blue"
-                                  : "text-navy group-hover:text-talentia-blue"
+                                  ? "text-[#1B4FD8]"
+                                  : "text-[#0D2240] group-hover:text-[#1B4FD8]"
                               }`}
                             >
                               {area}
@@ -564,7 +564,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                     <div className="space-y-6">
                       <div className="flex items-center justify-between px-2">
                         <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                          <GraduationCap size={14} className="text-talentia-blue" />
+                          <GraduationCap size={14} className="text-[#1B4FD8]" />
                           Titulaciones Académicas
                         </label>
                         <Button
@@ -572,7 +572,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                           variant="ghost"
                           size="sm"
                           onClick={() => appendDegree("")}
-                          className="text-talentia-blue font-black text-[10px] uppercase tracking-tighter hover:bg-blue-50 rounded-full h-8"
+                          className="text-[#1B4FD8] font-black text-[10px] uppercase tracking-tighter hover:bg-blue-50 rounded-full h-8"
                         >
                           <Plus size={14} className="mr-1" /> Añadir otra
                         </Button>
@@ -589,7 +589,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                             <input
                               {...register(`degrees.${idx}` as any)}
                               placeholder="Ej: PhD en Inteligencia Artificial (MIT)"
-                              className="flex-1 px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none font-bold text-navy text-sm"
+                              className="flex-1 px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-[#1B4FD8] outline-none font-bold text-[#0D2240] text-sm"
                             />
                             {degreeFields.length > 1 && (
                               <button
@@ -609,7 +609,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                     <div className="space-y-6">
                       <div className="flex items-center justify-between px-2">
                         <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
-                          <History size={14} className="text-talentia-blue" />
+                          <History size={14} className="text-[#1B4FD8]" />
                           Historial Docente
                         </label>
                         <Button
@@ -617,7 +617,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                           variant="ghost"
                           size="sm"
                           onClick={() => appendHistory({ institution: "", role: "", from: "", to: "" })}
-                          className="text-talentia-blue font-black text-[10px] uppercase tracking-tighter hover:bg-blue-50 rounded-full h-8"
+                          className="text-[#1B4FD8] font-black text-[10px] uppercase tracking-tighter hover:bg-blue-50 rounded-full h-8"
                         >
                           <Plus size={14} className="mr-1" /> Añadir institución
                         </Button>
@@ -644,7 +644,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                                 <input
                                   {...register(`history.${idx}.institution` as const)}
                                   placeholder="Nombre de la universidad"
-                                  className="w-full px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none font-bold text-navy text-sm"
+                                  className="w-full px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-[#1B4FD8] outline-none font-bold text-[#0D2240] text-sm"
                                 />
                               </div>
                               <div className="space-y-1">
@@ -652,7 +652,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                                 <input
                                   {...register(`history.${idx}.role` as const)}
                                   placeholder="Ej: Profesor Titular"
-                                  className="w-full px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none font-bold text-navy text-sm"
+                                  className="w-full px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-[#1B4FD8] outline-none font-bold text-[#0D2240] text-sm"
                                 />
                               </div>
                             </div>
@@ -661,14 +661,14 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
                                 type="number"
                                 {...register(`history.${idx}.from` as const)}
                                 placeholder="Desde"
-                                className="w-full px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none font-bold text-navy text-sm text-center"
+                                className="w-full px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-[#1B4FD8] outline-none font-bold text-[#0D2240] text-sm text-center"
                               />
                               <span className="text-gray-300 font-bold">—</span>
                               <input
                                 type="number"
                                 {...register(`history.${idx}.to` as const)}
                                 placeholder="Hasta"
-                                className="w-full px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none font-bold text-navy text-sm text-center"
+                                className="w-full px-4 py-2.5 rounded-xl border-none bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-[#1B4FD8] outline-none font-bold text-[#0D2240] text-sm text-center"
                               />
                             </div>
                           </motion.div>
@@ -691,7 +691,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
             variant="ghost"
             onClick={() => setStep(1)}
             disabled={step === 1 || loading}
-            className="font-black text-gray-400 hover:text-navy disabled:opacity-0 transition-all flex items-center gap-2 px-6 h-12 rounded-2xl"
+            className="font-black text-gray-400 hover:text-[#0D2240] disabled:opacity-0 transition-all flex items-center gap-2 px-6 h-12 rounded-2xl"
           >
             <ArrowLeft size={18} />
             Atrás
@@ -707,7 +707,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
               type="button"
               onClick={handleSubmit(onSubmit)}
               disabled={loading}
-              className="bg-talentia-blue hover:bg-navy text-white px-10 h-14 rounded-[20px] font-black text-base shadow-xl shadow-blue-200 flex items-center gap-3 group transition-all"
+              className="bg-[#1B4FD8] hover:bg-[#0D2240] text-white px-10 h-14 rounded-[20px] font-black text-base shadow-xl shadow-blue-200 flex items-center gap-3 group transition-all"
             >
               {loading ? (
                 <Loader2 size={20} className="animate-spin" />

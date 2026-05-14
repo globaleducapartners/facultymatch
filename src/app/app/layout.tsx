@@ -33,12 +33,12 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F5F0] flex flex-col">
+    <div className="min-h-screen bg-[#F2F6FC] flex flex-col">
       <Topbar user={{ id: user.id, email: user.email }} profile={profile} />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          <div className="max-w-6xl mx-auto space-y-8">
+          <div className="max-w-7xl mx-auto space-y-6">
             {children}
           </div>
         </main>

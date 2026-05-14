@@ -1,28 +1,31 @@
 import Link from "next/link";
-import { GraduationCap } from "lucide-react";
 
 interface LogoProps {
   className?: string;
   variant?: "dark" | "light";
+  href?: string;
 }
 
-export function Logo({ className = "", variant = "dark" }: LogoProps) {
-  const titleColor = variant === "light" ? "text-white" : "text-navy";
-  const subtitleColor = variant === "light" ? "text-white/40" : "text-gray-400";
+export function Logo({ className = "", variant = "dark", href = "/" }: LogoProps) {
+  const titleColor = variant === "light" ? "#ffffff" : "#0C1018";
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <div className="bg-talentia-blue p-2 rounded-xl text-white">
-        <GraduationCap size={24} />
+    <Link href={href} style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }} className={className}>
+      <div style={{
+        width: 32, height: 32, borderRadius: 7,
+        background: "#1B4FD8",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        flexShrink: 0,
+      }}>
+        <span style={{ color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: "-0.03em", fontFamily: "system-ui, sans-serif" }}>FM</span>
       </div>
-      <div className="flex flex-col">
-        <span className={`text-xl font-black tracking-tighter leading-none ${titleColor}`}>
-          FACULTY <span className="text-talentia-blue">MATCH</span>
-        </span>
-        <span className={`text-[8px] font-bold uppercase tracking-[0.2em] leading-none mt-1 ${subtitleColor}`}>
-          Conectando Talento Académico
-        </span>
-      </div>
-    </div>
+      <span style={{
+        fontSize: 17, fontWeight: 700, color: titleColor,
+        letterSpacing: "-0.03em", fontFamily: "system-ui, sans-serif",
+        lineHeight: 1,
+      }}>
+        FacultyMatch
+      </span>
+    </Link>
   );
 }

@@ -10,22 +10,29 @@ export const metadata: Metadata = {
     "recursos académicos, guías docentes, reclutamiento universitario, estándares académicos, educación superior",
 };
 
-const SERIF = `var(--font-serif, 'Georgia', 'Times New Roman', serif)`;
-const SANS  = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
+const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
 
-const C = {
-  ink: "#0C1018", navy: "#0D2240", brass: "#B8963E",
-  cream: "#F7F5F0", paper: "#FDFCF9", white: "#FFFFFF",
-  muted: "#6B7280", faint: "#9CA3AF", border: "#E5E1D8",
+const D = {
+  dark:   "#071326",
+  navy:   "#0D2240",
+  blue:   "#1B4FD8",
+  gold:   "#E9A030",
+  surf:   "#F2F6FC",
+  white:  "#FFFFFF",
+  ink:    "#0C1018",
+  muted:  "#6B7280",
+  faint:  "#9CA3AF",
+  border: "#D8E2EF",
 };
 
 const RESOURCES = [
   {
     tag: "Instituciones",
     title: "Cómo construir un claustro docente de alto impacto",
-    desc: "Guía práctica para instituciones sobre selección, diversificación y fidelización de talento académico. Aprende a equilibrar perfiles investigadores con expertos profesionales.",
+    desc: "Guía práctica para instituciones sobre selección, diversificación y fidelización de talento académico. Equilibra perfiles investigadores con expertos profesionales.",
     readTime: "8 min",
     href: "/resources/claustro-docente",
+    tagColor: "#1B4FD8", tagBg: "#EFF6FF",
   },
   {
     tag: "Calidad",
@@ -33,20 +40,23 @@ const RESOURCES = [
     desc: "Conoce los criterios y el proceso de auditoría que aplicamos para validar credenciales académicas, títulos de doctorado y experiencia profesional verificada.",
     readTime: "5 min",
     href: "/resources/estandares-verificacion",
+    tagColor: "#065F46", tagBg: "#F0FDF4",
   },
   {
     tag: "Tendencias",
     title: "El futuro de la docencia online y microcredenciales",
-    desc: "Análisis de las tendencias pedagógicas en entornos virtuales y cómo los docentes expertos pueden posicionarse en el mercado de las microcredenciales internacionales.",
+    desc: "Análisis de las tendencias pedagógicas en entornos virtuales y cómo los docentes expertos pueden posicionarse en el mercado de microcredenciales internacionales.",
     readTime: "12 min",
     href: "/resources/docencia-online-microcredenciales",
+    tagColor: "#92400E", tagBg: "#FEF3C7",
   },
   {
     tag: "Docentes",
     title: "Guía: Optimiza tu perfil docente en FacultyMatch",
-    desc: "Mejores prácticas para destacar tu trayectoria académica. Cómo estructurar tus áreas de conocimiento y generar confianza en las instituciones.",
+    desc: "Mejores prácticas para destacar tu trayectoria académica. Cómo estructurar áreas de conocimiento y generar confianza en las instituciones.",
     readTime: "6 min",
     href: "/resources/optimiza-perfil-docente",
+    tagColor: "#1B4FD8", tagBg: "#EFF6FF",
   },
   {
     tag: "Estructura",
@@ -54,6 +64,7 @@ const RESOURCES = [
     desc: "Cómo clasificamos las disciplinas y sub-áreas siguiendo estándares internacionales. Una herramienta clave para el matching preciso entre oferta y demanda.",
     readTime: "10 min",
     href: "/resources/taxonomia-academica",
+    tagColor: "#5B21B6", tagBg: "#F5F3FF",
   },
   {
     tag: "Gestión",
@@ -61,24 +72,16 @@ const RESOURCES = [
     desc: "Plan de acción para directores académicos: desde la identificación de necesidades hasta la firma de la colaboración docente.",
     readTime: "15 min",
     href: "/resources/reclutamiento-90-dias",
+    tagColor: "#9A3412", tagBg: "#FFF7ED",
   },
 ];
 
-const TAG_COLORS: Record<string, { bg: string; text: string }> = {
-  Instituciones: { bg: "#EFF6FF", text: "#1D4ED8" },
-  Calidad:       { bg: "#F0FDF4", text: "#065F46" },
-  Tendencias:    { bg: "#FEF3C7", text: "#92400E" },
-  Docentes:      { bg: "#EFF6FF", text: "#1D4ED8" },
-  Estructura:    { bg: "#F5F3FF", text: "#5B21B6" },
-  Gestión:       { bg: "#FFF7ED", text: "#9A3412" },
-};
-
 export default function ResourcesPage() {
   return (
-    <div style={{ background: C.paper, fontFamily: SANS }}>
+    <div style={{ background: D.surf, fontFamily: SANS }}>
       <style>{`
         .fm-hero-h1 { font-size: 54px; }
-        .fm-section-pad { padding: 72px 40px; }
+        .fm-section-pad { padding: 80px 40px; }
         .fm-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
         .fm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
         .fm-cta-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 32px; }
@@ -97,55 +100,51 @@ export default function ResourcesPage() {
       {/* ── HERO ── */}
       <section style={{ position: "relative", overflow: "hidden" }}>
         <video
-          autoPlay
-          muted
-          loop
-          playsInline
+          autoPlay muted loop playsInline
           poster="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1800"
-          style={{
-            position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover", objectPosition: "center 40%",
-          }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%" }}
         >
           <source src="https://assets.mixkit.co/videos/6532/6532-720.mp4" type="video/mp4" />
         </video>
+        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(160deg, rgba(7,19,38,0.55) 0%, rgba(7,19,38,0.75) 60%, rgba(7,19,38,0.94) 100%)` }} />
         <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(160deg, rgba(12,16,24,0.5) 0%, rgba(12,16,24,0.72) 60%, rgba(12,16,24,0.92) 100%)",
-        }} />
-        <div style={{
-          position: "relative", zIndex: 2, minHeight: 460,
+          position: "relative", zIndex: 2, minHeight: 500,
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
           textAlign: "center", padding: "80px 40px",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
-            <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
-            <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.45)" }}>
+          {/* Eyebrow */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            background: "rgba(233,160,48,0.15)", border: "1px solid rgba(233,160,48,0.35)",
+            borderRadius: 20, padding: "5px 14px", marginBottom: 24,
+          }}>
+            <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.gold }}>
               Centro de conocimiento
             </span>
-            <div style={{ width: 28, height: "0.5px", background: "rgba(255,255,255,0.28)" }} />
           </div>
 
-          <h1 className="fm-hero-h1" style={{ fontFamily: SERIF, fontWeight: 400, color: "#fff", lineHeight: 1.1, letterSpacing: "-0.025em", margin: "0 0 20px", maxWidth: 680 }}>
-            Recursos para docentes
-            e instituciones.
+          <h1 className="fm-hero-h1" style={{
+            fontFamily: SANS, fontWeight: 900, color: "#fff",
+            lineHeight: 1.05, letterSpacing: "-0.04em",
+            margin: "0 0 20px", maxWidth: 680,
+          }}>
+            Recursos para docentes<br />e instituciones.
           </h1>
 
-          <p style={{ fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.58)", lineHeight: 1.75, margin: "0 0 38px", maxWidth: 480 }}>
+          <p style={{ fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.6)", lineHeight: 1.75, margin: "0 0 36px", maxWidth: 480 }}>
             Guías, estándares y análisis para elevar los criterios de selección
             de talento académico en la educación superior.
           </p>
 
-          <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const, justifyContent: "center" }}>
             <Link href="/signup">
-              <button style={{ fontFamily: SANS, background: "#fff", color: C.ink, border: "none", padding: "13px 32px", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+              <button style={{ fontFamily: SANS, background: D.white, color: D.ink, border: "none", padding: "13px 30px", borderRadius: 7, fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: "-0.01em" }}>
                 Publicar mi perfil
               </button>
             </Link>
             <Link href="/signup?intent=institution">
-              <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.8)", border: "1px solid rgba(255,255,255,0.28)", padding: "13px 32px", borderRadius: 6, fontSize: 14, cursor: "pointer" }}>
+              <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.8)", border: "1px solid rgba(255,255,255,0.28)", padding: "13px 30px", borderRadius: 7, fontSize: 14, cursor: "pointer" }}>
                 Buscar docentes
               </button>
             </Link>
@@ -154,64 +153,71 @@ export default function ResourcesPage() {
       </section>
 
       {/* ── ARTÍCULOS ── */}
-      <section style={{ background: C.white }}>
-        <div className="fm-section-pad" style={{ maxWidth: 1080, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 52 }}>
-            <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 12 }}>
-              Guías y análisis
+      <section style={{ background: D.white }}>
+        <div className="fm-section-pad" style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              background: "rgba(27,79,216,0.08)", border: "1px solid rgba(27,79,216,0.2)",
+              borderRadius: 20, padding: "4px 14px", marginBottom: 16,
+            }}>
+              <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.blue }}>
+                Guías y análisis
+              </span>
             </div>
-            <h2 style={{ fontFamily: SERIF, fontSize: 32, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 12px", lineHeight: 1.1 }}>
+            <h2 style={{ fontFamily: SANS, fontSize: 32, fontWeight: 900, color: D.ink, letterSpacing: "-0.04em", margin: "0 0 12px", lineHeight: 1.1 }}>
               Lo que necesitas saber sobre talento académico.
             </h2>
-            <p style={{ fontFamily: SANS, fontSize: 15, color: C.muted, maxWidth: 460, margin: "0 auto" }}>
+            <p style={{ fontFamily: SANS, fontSize: 15, color: D.muted, maxWidth: 460, margin: "0 auto", lineHeight: 1.7 }}>
               Contenido escrito por directores de programa y especialistas en gestión académica.
             </p>
           </div>
 
           <div className="fm-grid-3">
-            {RESOURCES.map((r, i) => {
-              const tc = TAG_COLORS[r.tag] ?? { bg: C.cream, text: C.muted };
-              return (
-                <Link key={i} href={r.href} style={{ textDecoration: "none" }}>
-                  <div style={{
-                    background: C.cream, border: `1px solid ${C.border}`,
-                    borderRadius: 12, padding: "28px 26px",
-                    borderTop: `3px solid ${C.brass}`,
-                    height: "100%", display: "flex", flexDirection: "column" as const,
-                    cursor: "pointer",
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                      <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: tc.text, background: tc.bg, padding: "3px 10px", borderRadius: 20 }}>
-                        {r.tag}
-                      </span>
-                      <span style={{ fontFamily: SANS, fontSize: 11, color: C.faint }}>
-                        {r.readTime} lectura
-                      </span>
-                    </div>
-                    <h3 style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 400, color: C.ink, lineHeight: 1.35, margin: "0 0 12px" }}>
-                      {r.title}
-                    </h3>
-                    <p style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.75, margin: "0 0 20px", flex: 1 }}>
-                      {r.desc}
-                    </p>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: SANS, fontSize: 12, color: C.brass, fontWeight: 500 }}>
-                      Leer artículo
-                      <span style={{ fontSize: 14 }}>→</span>
-                    </div>
+            {RESOURCES.map((r, i) => (
+              <Link key={i} href={r.href} style={{ textDecoration: "none" }}>
+                <div style={{
+                  background: D.white, border: `1px solid ${D.border}`,
+                  borderRadius: 14, padding: "28px 24px",
+                  borderTop: `3px solid ${D.blue}`,
+                  height: "100%", display: "flex", flexDirection: "column" as const,
+                  cursor: "pointer", transition: "box-shadow 0.2s",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                    <span style={{
+                      fontFamily: SANS, fontSize: 10, fontWeight: 700,
+                      letterSpacing: "0.1em", textTransform: "uppercase" as const,
+                      color: r.tagColor, background: r.tagBg,
+                      padding: "3px 10px", borderRadius: 20,
+                    }}>
+                      {r.tag}
+                    </span>
+                    <span style={{ fontFamily: SANS, fontSize: 11, color: D.faint }}>
+                      {r.readTime} lectura
+                    </span>
                   </div>
-                </Link>
-              );
-            })}
+                  <h3 style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: D.ink, lineHeight: 1.4, margin: "0 0 12px", letterSpacing: "-0.02em" }}>
+                    {r.title}
+                  </h3>
+                  <p style={{ fontFamily: SANS, fontSize: 13, color: D.muted, lineHeight: 1.75, margin: "0 0 20px", flex: 1 }}>
+                    {r.desc}
+                  </p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: SANS, fontSize: 12, color: D.blue, fontWeight: 600 }}>
+                    Leer artículo <span style={{ fontSize: 14 }}>→</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ── SOBRE EL KNOWLEDGE CENTER ── */}
-      <section style={{ background: C.cream }}>
-        <div className="fm-section-pad" style={{ maxWidth: 1080, margin: "0 auto" }}>
+      <section style={{ background: D.surf }}>
+        <div className="fm-section-pad" style={{ maxWidth: 1100, margin: "0 auto" }}>
           <div className="fm-grid-2">
-            {/* Foto */}
-            <div className="fm-photo-hide" style={{ borderRadius: 14, overflow: "hidden", height: 420 }}>
+            {/* Imagen */}
+            <div className="fm-photo-hide" style={{ borderRadius: 16, overflow: "hidden", height: 420 }}>
               <div style={{
                 width: "100%", height: "100%",
                 backgroundImage: `url(https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=900)`,
@@ -221,35 +227,45 @@ export default function ResourcesPage() {
 
             {/* Contenido */}
             <div>
-              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>
-                Por qué publicamos esto
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                background: "rgba(233,160,48,0.12)", border: "1px solid rgba(233,160,48,0.25)",
+                borderRadius: 20, padding: "4px 14px", marginBottom: 20,
+              }}>
+                <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.gold }}>
+                  Por qué publicamos esto
+                </span>
               </div>
-              <h2 style={{ fontFamily: SERIF, fontSize: 30, fontWeight: 400, color: C.ink, letterSpacing: "-0.025em", margin: "0 0 18px", lineHeight: 1.2 }}>
+              <h2 style={{ fontFamily: SANS, fontSize: 30, fontWeight: 900, color: D.ink, letterSpacing: "-0.04em", margin: "0 0 18px", lineHeight: 1.15 }}>
                 La calidad del claustro<br />
                 determina la calidad de la institución.
               </h2>
-              <p style={{ fontFamily: SANS, fontSize: 15, color: C.muted, lineHeight: 1.8, margin: "0 0 20px" }}>
+              <p style={{ fontFamily: SANS, fontSize: 15, color: D.muted, lineHeight: 1.8, margin: "0 0 24px" }}>
                 Estos recursos ayudan a directores de programa y coordinadores académicos a tomar mejores decisiones sobre su talento docente. Y a los propios docentes, a entender qué valoran las instituciones.
               </p>
-              <div style={{ display: "flex", flexDirection: "column" as const, gap: 14, marginBottom: 32 }}>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 16, marginBottom: 32 }}>
                 {[
                   { label: "Estándar universitario", body: "Alineado con los criterios de las agencias de calidad internacionales." },
                   { label: "Red de colaboradores",   body: "Artículos escritos por decanos y directores de programa en activo." },
                   { label: "Actualización continua", body: "El contenido se revisa y actualiza con cada cambio regulatorio relevante." },
                 ].map((item, i) => (
                   <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: C.white, border: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
-                      <span style={{ fontFamily: SERIF, fontSize: 11, color: C.brass, fontStyle: "italic" }}>{["I", "II", "III"][i]}</span>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: 8,
+                      background: "rgba(27,79,216,0.1)", border: "1px solid rgba(27,79,216,0.2)",
+                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                    }}>
+                      <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: D.blue }}>0{i + 1}</span>
                     </div>
                     <div>
-                      <h4 style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 400, color: C.ink, margin: "0 0 3px" }}>{item.label}</h4>
-                      <p style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.6, margin: 0 }}>{item.body}</p>
+                      <h4 style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: D.ink, margin: "0 0 3px", letterSpacing: "-0.02em" }}>{item.label}</h4>
+                      <p style={{ fontFamily: SANS, fontSize: 13, color: D.muted, lineHeight: 1.6, margin: 0 }}>{item.body}</p>
                     </div>
                   </div>
                 ))}
               </div>
               <Link href="mailto:support@facultymatch.app">
-                <button style={{ fontFamily: SANS, background: "transparent", color: C.navy, border: `1px solid ${C.navy}`, padding: "11px 26px", borderRadius: 6, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
+                <button style={{ fontFamily: SANS, background: "transparent", color: D.navy, border: `1px solid ${D.border}`, padding: "11px 26px", borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                   Contactar con el equipo
                 </button>
               </Link>
@@ -265,45 +281,59 @@ export default function ResourcesPage() {
           backgroundImage: `url(https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1800)`,
           backgroundSize: "cover", backgroundPosition: "center 55%",
         }} />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(12,16,24,0.78)" }} />
-        <div style={{
-          position: "relative", zIndex: 2,
-          maxWidth: 1080, margin: "0 auto",
-          padding: "64px 40px",
-        }}>
-          <div className="fm-grid-2" style={{ gap: 48 }}>
+        <div style={{ position: "absolute", inset: 0, background: "rgba(7,19,38,0.82)" }} />
+        <div style={{ position: "relative", zIndex: 2, maxWidth: 1100, margin: "0 auto", padding: "72px 40px" }}>
+          <div className="fm-grid-2" style={{ gap: 56 }}>
             <div>
-              <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 14 }}>
-                FacultyMatch Monthly
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 6,
+                background: "rgba(233,160,48,0.15)", border: "1px solid rgba(233,160,48,0.3)",
+                borderRadius: 20, padding: "4px 14px", marginBottom: 20,
+              }}>
+                <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.gold }}>
+                  FacultyMatch Monthly
+                </span>
               </div>
-              <h2 style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 400, color: "#fff", lineHeight: 1.25, margin: "0 0 16px", letterSpacing: "-0.02em" }}>
+              <h2 style={{ fontFamily: SANS, fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1.15, margin: "0 0 16px", letterSpacing: "-0.04em" }}>
                 El reporte mensual de la educación superior.
               </h2>
               <p style={{ fontFamily: SANS, fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.8, margin: "0 0 20px" }}>
                 Tendencias de reclutamiento, cambios regulatorios y nuevas oportunidades docentes. Una vez al mes. Sin spam.
               </p>
-              <div style={{ display: "flex", flexDirection: "column" as const, gap: 8 }}>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 10 }}>
                 {["Cero spam", "Cancelable en cualquier momento", "Solo contenido relevante"].map((item, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: C.brass, flexShrink: 0 }} />
-                    <span style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.45)" }}>{item}</span>
+                    <div style={{
+                      width: 18, height: 18, borderRadius: "50%",
+                      background: "rgba(27,79,216,0.2)", border: "1px solid rgba(27,79,216,0.3)",
+                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                    }}>
+                      <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+                        <path d="M1 3L3 5L7 1" stroke="#1B4FD8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <span style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{item}</span>
                   </div>
                 ))}
               </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column" as const, justifyContent: "center", gap: 12 }}>
-              <div style={{ display: "flex", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, overflow: "hidden" }}>
+              <div style={{ display: "flex", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 9, overflow: "hidden" }}>
                 <input
                   type="email"
                   placeholder="Tu correo electrónico"
                   style={{
                     flex: 1, border: "none", outline: "none",
-                    background: "transparent", padding: "13px 18px",
-                    fontFamily: SANS, fontSize: 14,
-                    color: "#fff",
+                    background: "transparent", padding: "14px 18px",
+                    fontFamily: SANS, fontSize: 14, color: "#fff",
                   }}
                 />
-                <button style={{ fontFamily: SANS, background: C.brass, color: "#fff", border: "none", padding: "13px 22px", fontSize: 13, fontWeight: 600, cursor: "pointer", flexShrink: 0, borderRadius: "0 7px 7px 0" }}>
+                <button style={{
+                  fontFamily: SANS, background: D.blue, color: "#fff",
+                  border: "none", padding: "14px 22px",
+                  fontSize: 13, fontWeight: 700, cursor: "pointer",
+                  flexShrink: 0, letterSpacing: "-0.01em",
+                }}>
                   Suscribirme
                 </button>
               </div>

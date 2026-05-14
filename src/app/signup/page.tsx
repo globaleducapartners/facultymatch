@@ -1,5 +1,4 @@
 "use client";
-// src/app/signup/page.tsx  ← archivo nuevo (o reemplaza si existe)
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -7,17 +6,24 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import { Suspense } from "react";
 
-// ─── Tokens ───────────────────────────────────────────────────────────────────
-const SERIF = `var(--font-serif, 'Georgia', 'Times New Roman', serif)`;
-const SANS  = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
-const C = {
-  ink: "#0C1018", navy: "#0D2240", brass: "#B8963E",
-  cream: "#F7F5F0", white: "#FFFFFF",
-  muted: "#6B7280", faint: "#9CA3AF", border: "#E5E1D8",
-  error: "#DC2626", errorBg: "#FEF2F2",
+// ─── Design tokens ────────────────────────────────────────────────────────────
+const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
+const D = {
+  dark:   "#071326",
+  navy:   "#0D2240",
+  blue:   "#1B4FD8",
+  gold:   "#E9A030",
+  surf:   "#F2F6FC",
+  white:  "#FFFFFF",
+  ink:    "#0C1018",
+  muted:  "#6B7280",
+  faint:  "#9CA3AF",
+  border: "#D8E2EF",
+  error:  "#DC2626",
+  errBg:  "#FEF2F2",
 };
 
-// ─── Opciones — solo las que alimentan filtros de búsqueda ────────────────────
+// ─── Opciones ─────────────────────────────────────────────────────────────────
 const AREAS = [
   "Business & Management", "Economía & Finanzas",
   "Derecho & Ciencias Políticas", "Ingeniería & Tecnología",
@@ -59,19 +65,19 @@ const INSTITUTION_TYPES = [
 
 // ─── UI helpers ───────────────────────────────────────────────────────────────
 const inp = (err = false): React.CSSProperties => ({
-  fontFamily: SANS, width: "100%", fontSize: 14, color: C.ink,
-  background: C.white, border: `1px solid ${err ? C.error : C.border}`,
+  fontFamily: SANS, width: "100%", fontSize: 14, color: D.ink,
+  background: D.white, border: `1px solid ${err ? D.error : D.border}`,
   borderRadius: 8, padding: "10px 14px", outline: "none",
   boxSizing: "border-box" as const,
 });
 
 const lbl: React.CSSProperties = {
   fontFamily: SANS, fontSize: 13, fontWeight: 500,
-  color: C.ink, display: "block", marginBottom: 6,
+  color: D.ink, display: "block", marginBottom: 6,
 };
 
-const err: React.CSSProperties = {
-  fontFamily: SANS, fontSize: 12, color: C.error, marginTop: 4,
+const errStyle: React.CSSProperties = {
+  fontFamily: SANS, fontSize: 12, color: D.error, marginTop: 4,
 };
 
 function Chips({ options, selected, onToggle }: {
@@ -86,9 +92,9 @@ function Chips({ options, selected, onToggle }: {
           <button key={o} type="button" onClick={() => onToggle(o)} style={{
             fontFamily: SANS, fontSize: 13, padding: "6px 14px",
             borderRadius: 20, cursor: "pointer",
-            border: `1px solid ${active ? C.navy : C.border}`,
-            background: active ? C.navy : C.white,
-            color: active ? C.white : C.muted,
+            border: `1px solid ${active ? D.blue : D.border}`,
+            background: active ? D.blue : D.white,
+            color: active ? D.white : D.muted,
             transition: "all 0.12s",
           }}>{o}</button>
         );
@@ -101,15 +107,15 @@ function toggle(arr: string[], val: string) {
   return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val];
 }
 
-// ─── Paso labels ──────────────────────────────────────────────────────────────
+// ─── Step labels ──────────────────────────────────────────────────────────────
 const STEPS = [
-  { title: "Crea tu cuenta.",        sub: "Solo lo esencial para empezar." },
-  { title: "Tu perfil académico.",   sub: "Determina en qué búsquedas apareces." },
-  { title: "Cómo trabajas.",         sub: "Los filtros que usan los directores de programa." },
-  { title: "Casi listo.",            sub: "Un último paso antes de entrar al directorio." },
+  { title: "Crea tu cuenta",       sub: "Solo lo esencial para empezar." },
+  { title: "Tu perfil académico",  sub: "Determina en qué búsquedas apareces." },
+  { title: "Cómo trabajas",        sub: "Los filtros que usan los directores de programa." },
+  { title: "Casi listo",           sub: "Un último paso antes de entrar al directorio." },
 ];
 
-// ─── Formulario interno ───────────────────────────────────────────────────────
+// ─── Formulario ───────────────────────────────────────────────────────────────
 function SignupForm() {
   const router       = useRouter();
   const searchParams = useSearchParams();
@@ -138,18 +144,17 @@ function SignupForm() {
   const [modalities,   setModalities]   = useState<string[]>([]);
   const [availability, setAvailability] = useState("");
 
-  // Paso 4 — institución (dual-role)
+  // Paso 4
   const [wantsInst, setWantsInst] = useState(isInstitution);
   const [instName,  setInstName]  = useState("");
   const [instType,  setInstType]  = useState("");
   const [terms,     setTerms]     = useState(false);
 
-  // Pre-expand si viene con intent=institution
   useEffect(() => {
     if (isInstitution) setWantsInst(true);
   }, [isInstitution]);
 
-  // ── Validaciones ─────────────────────────────────────────────────────────
+  // ── Validaciones ──────────────────────────────────────────────────────────
   const v1 = () => {
     const e: Record<string, string> = {};
     if (!firstName.trim()) e.firstName = "Indica tu nombre.";
@@ -185,7 +190,7 @@ function SignupForm() {
     setStep(s => s + 1);
   };
 
-  // ── Submit ────────────────────────────────────────────────────────────────
+  // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
     if (!v4()) return;
     setLoading(true);
@@ -204,12 +209,10 @@ function SignupForm() {
         options: {
           emailRedirectTo: `${siteUrl}/auth/callback`,
           data: {
-            // Identidad
             full_name:    `${firstName.trim()} ${lastName.trim()}`,
             first_name:   firstName.trim(),
             last_name:    lastName.trim(),
             role:         "faculty",
-            // Perfil docente — alimenta los filtros del buscador
             knowledge_areas:     areas,
             country,
             is_phd:              isPhd,
@@ -217,12 +220,10 @@ function SignupForm() {
             languages:           languages.map(l => ({ lang: l, level: "Fluido" })),
             modalities,
             availability,
-            // Institución — trigger SQL·05 la crea si está presente
             ...(wantsInst && instName.trim() ? {
               institution_name: instName.trim(),
               institution_type: instType || null,
             } : {}),
-            // Sistema
             onboarding_completed: true,
             terms_accepted:       true,
             privacy_accepted:     true,
@@ -243,11 +244,7 @@ function SignupForm() {
         return;
       }
 
-      // Redirigir a la confirmación correcta
-      router.push(wantsInst
-        ? "/signup/institution/confirm"
-        : "/signup/faculty/confirm"
-      );
+      router.push(wantsInst ? "/signup/institution/confirm" : "/signup/faculty/confirm");
     } catch {
       setServerError("Error de red. Inténtalo de nuevo.");
       setLoading(false);
@@ -259,20 +256,36 @@ function SignupForm() {
   return (
     <div style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "2fr 3fr", fontFamily: SANS }}>
 
-      {/* ── Panel izquierdo ── */}
-      <div style={{ background: C.navy, padding: "48px 44px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "baseline", gap: 8 }}>
-          <div style={{ width: 26, height: 26, borderRadius: 5, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: "#fff", fontSize: 10, fontWeight: 700 }}>FM</span>
+      {/* ── Panel izquierdo — dark ── */}
+      <div style={{
+        background: `linear-gradient(160deg, ${D.dark} 0%, ${D.navy} 100%)`,
+        padding: "48px 44px",
+        display: "flex", flexDirection: "column", justifyContent: "space-between",
+      }}>
+        {/* Logo */}
+        <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 7, background: D.blue,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <span style={{ color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: "-0.03em" }}>FM</span>
           </div>
-          <span style={{ fontFamily: SERIF, fontSize: 16, color: "#fff" }}>FacultyMatch</span>
+          <span style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em" }}>
+            FacultyMatch
+          </span>
         </Link>
 
         <div>
-          <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" as const, color: C.brass, marginBottom: 16 }}>
-            Directorio de talento educativo
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 6,
+            background: "rgba(233,160,48,0.15)", border: "1px solid rgba(233,160,48,0.3)",
+            borderRadius: 20, padding: "4px 12px", marginBottom: 20,
+          }}>
+            <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.gold }}>
+              Directorio académico global
+            </span>
           </div>
-          <h2 style={{ fontFamily: SERIF, fontSize: 26, fontWeight: 400, color: "#fff", lineHeight: 1.3, margin: "0 0 28px", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontFamily: SANS, fontSize: 26, fontWeight: 900, color: "#fff", lineHeight: 1.2, margin: "0 0 24px", letterSpacing: "-0.04em" }}>
             Un perfil para todo lo que sabes hacer.
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -283,32 +296,44 @@ function SignupForm() {
               "Gratuito siempre para docentes y expertos",
             ].map((t, i) => (
               <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <div style={{ width: 5, height: 5, borderRadius: "50%", background: C.brass, flexShrink: 0, marginTop: 6 }} />
-                <span style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.58)", lineHeight: 1.55 }}>{t}</span>
+                <div style={{
+                  width: 18, height: 18, borderRadius: "50%",
+                  background: "rgba(27,79,216,0.25)", border: "1px solid rgba(27,79,216,0.4)",
+                  flexShrink: 0, marginTop: 1,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+                    <path d="M1 3L3 5L7 1" stroke="#1B4FD8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <span style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.65)", lineHeight: 1.55 }}>{t}</span>
               </div>
             ))}
           </div>
 
-          {/* Progress visual en el panel izquierdo */}
-          <div style={{ marginTop: 40, display: "flex", flexDirection: "column", gap: 10 }}>
-            {STEPS.map((s, i) => (
-              <div key={i} style={{ display: "flex", gap: 10, alignItems: "center", opacity: i + 1 === step ? 1 : i + 1 < step ? 0.5 : 0.25 }}>
-                <div style={{
-                  width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
-                  background: i + 1 < step ? C.brass : i + 1 === step ? "rgba(255,255,255,0.15)" : "transparent",
-                  border: `1px solid ${i + 1 <= step ? C.brass : "rgba(255,255,255,0.2)"}`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  {i + 1 < step
-                    ? <span style={{ color: C.navy, fontSize: 11, fontWeight: 700 }}>✓</span>
-                    : <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>{i + 1}</span>
-                  }
+          {/* Step tracker */}
+          <div style={{ marginTop: 36, display: "flex", flexDirection: "column", gap: 10 }}>
+            {STEPS.map((s, i) => {
+              const state = i + 1 === step ? "active" : i + 1 < step ? "done" : "pending";
+              return (
+                <div key={i} style={{ display: "flex", gap: 10, alignItems: "center", opacity: state === "pending" ? 0.3 : 1 }}>
+                  <div style={{
+                    width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
+                    background: state === "done" ? D.gold : state === "active" ? "rgba(255,255,255,0.15)" : "transparent",
+                    border: `1px solid ${state === "pending" ? "rgba(255,255,255,0.2)" : D.gold}`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    {state === "done"
+                      ? <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3L3 5L7 1" stroke={D.navy} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      : <span style={{ color: "rgba(255,255,255,0.6)", fontSize: 11 }}>{i + 1}</span>
+                    }
+                  </div>
+                  <span style={{ fontFamily: SANS, fontSize: 13, color: state === "active" ? "#fff" : "rgba(255,255,255,0.5)" }}>
+                    {s.title}
+                  </span>
                 </div>
-                <span style={{ fontFamily: SANS, fontSize: 13, color: i + 1 === step ? "#fff" : "rgba(255,255,255,0.5)" }}>
-                  {s.title.replace(".", "")}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -318,39 +343,39 @@ function SignupForm() {
       </div>
 
       {/* ── Panel derecho ── */}
-      <div style={{ background: C.cream, padding: "48px 56px", overflowY: "auto" }}>
+      <div style={{ background: D.surf, padding: "48px 56px", overflowY: "auto" }}>
         <div style={{ maxWidth: 480, margin: "0 auto" }}>
 
-          {/* Barra de progreso */}
+          {/* Progress bar */}
           <div style={{ display: "flex", gap: 5, marginBottom: 36 }}>
             {Array.from({ length: TOTAL }).map((_, i) => (
               <div key={i} style={{
                 flex: 1, height: 3, borderRadius: 2,
-                background: i < step ? C.navy : C.border,
+                background: i < step ? D.blue : D.border,
                 transition: "background 0.2s",
               }} />
             ))}
           </div>
 
-          {/* Cabecera del paso */}
+          {/* Step header */}
           <div style={{ marginBottom: 28 }}>
-            <p style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: C.faint, margin: "0 0 8px" }}>
+            <p style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.faint, margin: "0 0 8px" }}>
               Paso {step} de {TOTAL}
             </p>
-            <h1 style={{ fontFamily: SERIF, fontSize: 26, fontWeight: 400, color: C.ink, margin: 0, letterSpacing: "-0.02em" }}>
+            <h1 style={{ fontFamily: SANS, fontSize: 26, fontWeight: 900, color: D.ink, margin: 0, letterSpacing: "-0.04em" }}>
               {STEPS[step - 1].title}
             </h1>
-            <p style={{ fontFamily: SANS, fontSize: 14, color: C.muted, margin: "6px 0 0" }}>
+            <p style={{ fontFamily: SANS, fontSize: 14, color: D.muted, margin: "6px 0 0" }}>
               {STEPS[step - 1].sub}
             </p>
           </div>
 
-          {/* Error de servidor */}
+          {/* Server error */}
           {serverError && (
-            <div style={{ background: C.errorBg, border: "1px solid #FCA5A5", borderRadius: 8, padding: "12px 14px", marginBottom: 20 }}>
-              <p style={{ fontFamily: SANS, fontSize: 13, color: C.error, margin: 0 }}>
+            <div style={{ background: D.errBg, border: "1px solid #FCA5A5", borderRadius: 8, padding: "12px 14px", marginBottom: 20 }}>
+              <p style={{ fontFamily: SANS, fontSize: 13, color: D.error, margin: 0 }}>
                 {serverError === "duplicate"
-                  ? <>Este email ya está registrado. <Link href="/login" style={{ fontWeight: 600, color: C.error }}>Acceder →</Link></>
+                  ? <>Este email ya está registrado. <Link href="/login" style={{ fontWeight: 600, color: D.error }}>Acceder →</Link></>
                   : serverError
                 }
               </p>
@@ -362,26 +387,26 @@ function SignupForm() {
             <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 <div>
-                  <label style={lbl}>Nombre <span style={{ color: C.error }}>*</span></label>
+                  <label style={lbl}>Nombre <span style={{ color: D.error }}>*</span></label>
                   <input style={inp(!!errors.firstName)} value={firstName}
                     onChange={e => setFirstName(e.target.value)} placeholder="María" />
-                  {errors.firstName && <p style={err}>{errors.firstName}</p>}
+                  {errors.firstName && <p style={errStyle}>{errors.firstName}</p>}
                 </div>
                 <div>
-                  <label style={lbl}>Apellidos <span style={{ color: C.error }}>*</span></label>
+                  <label style={lbl}>Apellidos <span style={{ color: D.error }}>*</span></label>
                   <input style={inp(!!errors.lastName)} value={lastName}
                     onChange={e => setLastName(e.target.value)} placeholder="García" />
-                  {errors.lastName && <p style={err}>{errors.lastName}</p>}
+                  {errors.lastName && <p style={errStyle}>{errors.lastName}</p>}
                 </div>
               </div>
               <div>
-                <label style={lbl}>Email <span style={{ color: C.error }}>*</span></label>
+                <label style={lbl}>Email <span style={{ color: D.error }}>*</span></label>
                 <input type="email" style={inp(!!errors.email)} value={email}
                   onChange={e => setEmail(e.target.value)} placeholder="tu@email.com" />
-                {errors.email && <p style={err}>{errors.email}</p>}
+                {errors.email && <p style={errStyle}>{errors.email}</p>}
               </div>
               <div>
-                <label style={lbl}>Contraseña <span style={{ color: C.error }}>*</span></label>
+                <label style={lbl}>Contraseña <span style={{ color: D.error }}>*</span></label>
                 <div style={{ position: "relative" }}>
                   <input type={showPwd ? "text" : "password"}
                     style={{ ...inp(!!errors.password), paddingRight: 48 }}
@@ -390,10 +415,10 @@ function SignupForm() {
                   <button type="button" onClick={() => setShowPwd(!showPwd)} style={{
                     position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
                     background: "none", border: "none", cursor: "pointer",
-                    fontFamily: SANS, fontSize: 12, color: C.faint,
+                    fontFamily: SANS, fontSize: 12, color: D.faint,
                   }}>{showPwd ? "Ocultar" : "Ver"}</button>
                 </div>
-                {errors.password && <p style={err}>{errors.password}</p>}
+                {errors.password && <p style={errStyle}>{errors.password}</p>}
               </div>
             </div>
           )}
@@ -402,23 +427,23 @@ function SignupForm() {
           {step === 2 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
               <div>
-                <label style={lbl}>Áreas de conocimiento <span style={{ color: C.error }}>*</span></label>
-                <p style={{ fontFamily: SANS, fontSize: 12, color: C.faint, margin: "0 0 10px" }}>
+                <label style={lbl}>Áreas de conocimiento <span style={{ color: D.error }}>*</span></label>
+                <p style={{ fontFamily: SANS, fontSize: 12, color: D.faint, margin: "0 0 10px" }}>
                   Selecciona las que mejor describen lo que enseñas
                 </p>
                 <Chips options={AREAS} selected={areas} onToggle={v => setAreas(toggle(areas, v))} />
-                {errors.areas && <p style={err}>{errors.areas}</p>}
+                {errors.areas && <p style={errStyle}>{errors.areas}</p>}
               </div>
               <div>
-                <label style={lbl}>País de residencia <span style={{ color: C.error }}>*</span></label>
+                <label style={lbl}>País de residencia <span style={{ color: D.error }}>*</span></label>
                 <select style={inp(!!errors.country)} value={country} onChange={e => setCountry(e.target.value)}>
                   <option value="">Selecciona tu país...</option>
                   {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
-                {errors.country && <p style={err}>{errors.country}</p>}
+                {errors.country && <p style={errStyle}>{errors.country}</p>}
               </div>
               <div>
-                <label style={lbl}>Acreditaciones <span style={{ fontFamily: SANS, fontSize: 12, color: C.faint, fontWeight: 400 }}>(opcional)</span></label>
+                <label style={lbl}>Acreditaciones <span style={{ fontFamily: SANS, fontSize: 12, color: D.faint, fontWeight: 400 }}>(opcional)</span></label>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {[
                     { val: isPhd,    set: setIsPhd,    label: "Soy Doctor/a o tengo título de PhD" },
@@ -426,8 +451,8 @@ function SignupForm() {
                   ].map(({ val, set, label }) => (
                     <label key={label} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
                       <input type="checkbox" checked={val} onChange={e => set(e.target.checked)}
-                        style={{ width: 16, height: 16, accentColor: C.navy }} />
-                      <span style={{ fontFamily: SANS, fontSize: 14, color: C.ink }}>{label}</span>
+                        style={{ width: 16, height: 16, accentColor: D.blue }} />
+                      <span style={{ fontFamily: SANS, fontSize: 14, color: D.ink }}>{label}</span>
                     </label>
                   ))}
                 </div>
@@ -439,22 +464,22 @@ function SignupForm() {
           {step === 3 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
               <div>
-                <label style={lbl}>Idiomas en los que puedes enseñar <span style={{ color: C.error }}>*</span></label>
+                <label style={lbl}>Idiomas en los que puedes enseñar <span style={{ color: D.error }}>*</span></label>
                 <Chips options={LANGUAGES.map(l => l.label)} selected={languages} onToggle={v => setLanguages(toggle(languages, v))} />
-                {errors.languages && <p style={err}>{errors.languages}</p>}
+                {errors.languages && <p style={errStyle}>{errors.languages}</p>}
               </div>
               <div>
-                <label style={lbl}>Modalidad <span style={{ color: C.error }}>*</span></label>
+                <label style={lbl}>Modalidad <span style={{ color: D.error }}>*</span></label>
                 <Chips options={MODALITIES} selected={modalities} onToggle={v => setModalities(toggle(modalities, v))} />
-                {errors.modalities && <p style={err}>{errors.modalities}</p>}
+                {errors.modalities && <p style={errStyle}>{errors.modalities}</p>}
               </div>
               <div>
-                <label style={lbl}>Disponibilidad <span style={{ color: C.error }}>*</span></label>
+                <label style={lbl}>Disponibilidad <span style={{ color: D.error }}>*</span></label>
                 <select style={inp(!!errors.availability)} value={availability} onChange={e => setAvailability(e.target.value)}>
                   <option value="">Selecciona una opción...</option>
                   {AVAILABILITY.map(a => <option key={a} value={a}>{a}</option>)}
                 </select>
-                {errors.availability && <p style={err}>{errors.availability}</p>}
+                {errors.availability && <p style={errStyle}>{errors.availability}</p>}
               </div>
             </div>
           )}
@@ -462,57 +487,57 @@ function SignupForm() {
           {/* ── PASO 4 — Institución + términos ── */}
           {step === 4 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-
-              {/* Check institución */}
-              <div style={{ background: C.white, border: `1px solid ${wantsInst ? C.navy : C.border}`, borderRadius: 12, overflow: "hidden", transition: "border-color 0.2s" }}>
+              <div style={{
+                background: D.white,
+                border: `1px solid ${wantsInst ? D.blue : D.border}`,
+                borderRadius: 12, overflow: "hidden", transition: "border-color 0.2s",
+              }}>
                 <label style={{ display: "flex", gap: 14, padding: "18px 20px", cursor: "pointer", alignItems: "flex-start" }}>
                   <input type="checkbox" checked={wantsInst} onChange={e => setWantsInst(e.target.checked)}
-                    style={{ width: 18, height: 18, accentColor: C.navy, flexShrink: 0, marginTop: 2 }} />
+                    style={{ width: 18, height: 18, accentColor: D.blue, flexShrink: 0, marginTop: 2 }} />
                   <div>
-                    <div style={{ fontFamily: SERIF, fontSize: 16, color: C.ink, marginBottom: 4 }}>
+                    <div style={{ fontFamily: SANS, fontSize: 16, fontWeight: 600, color: D.ink, marginBottom: 4 }}>
                       También represento a una institución educativa
                     </div>
-                    <div style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.5 }}>
-                      Podrás buscar docentes en el directorio y tendrás acceso dual a ambos perfiles desde tu cuenta.
+                    <div style={{ fontFamily: SANS, fontSize: 13, color: D.muted, lineHeight: 1.5 }}>
+                      Podrás buscar docentes en el directorio y tendrás acceso dual desde tu cuenta.
                     </div>
                   </div>
                 </label>
 
-                {/* Campos de institución — solo si el check está activo */}
                 {wantsInst && (
-                  <div style={{ padding: "0 20px 20px", borderTop: `1px solid ${C.border}`, display: "flex", flexDirection: "column", gap: 14 }}>
+                  <div style={{ padding: "0 20px 20px", borderTop: `1px solid ${D.border}`, display: "flex", flexDirection: "column", gap: 14 }}>
                     <div style={{ paddingTop: 16 }}>
-                      <label style={lbl}>Nombre de la institución <span style={{ color: C.error }}>*</span></label>
+                      <label style={lbl}>Nombre de la institución <span style={{ color: D.error }}>*</span></label>
                       <input style={inp(!!errors.instName)} value={instName}
                         onChange={e => setInstName(e.target.value)}
                         placeholder="Universidad / Escuela de Negocios..." />
-                      {errors.instName && <p style={err}>{errors.instName}</p>}
+                      {errors.instName && <p style={errStyle}>{errors.instName}</p>}
                     </div>
                     <div>
-                      <label style={lbl}>Tipo de centro <span style={{ color: C.error }}>*</span></label>
+                      <label style={lbl}>Tipo de centro <span style={{ color: D.error }}>*</span></label>
                       <select style={inp(!!errors.instType)} value={instType} onChange={e => setInstType(e.target.value)}>
                         <option value="">Selecciona el tipo...</option>
                         {INSTITUTION_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                       </select>
-                      {errors.instType && <p style={err}>{errors.instType}</p>}
+                      {errors.instType && <p style={errStyle}>{errors.instType}</p>}
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Términos */}
               <div style={{ paddingTop: 4 }}>
                 <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
                   <input type="checkbox" checked={terms} onChange={e => setTerms(e.target.checked)}
-                    style={{ width: 16, height: 16, accentColor: C.navy, marginTop: 2, flexShrink: 0 }} />
-                  <span style={{ fontFamily: SANS, fontSize: 13, color: C.muted, lineHeight: 1.6 }}>
+                    style={{ width: 16, height: 16, accentColor: D.blue, marginTop: 2, flexShrink: 0 }} />
+                  <span style={{ fontFamily: SANS, fontSize: 13, color: D.muted, lineHeight: 1.6 }}>
                     He leído y acepto los{" "}
-                    <Link href="/terms" target="_blank" style={{ color: C.navy }}>Términos y condiciones</Link>
+                    <Link href="/terms" target="_blank" style={{ color: D.blue }}>Términos y condiciones</Link>
                     {" "}y la{" "}
-                    <Link href="/privacy" target="_blank" style={{ color: C.navy }}>Política de privacidad</Link>
+                    <Link href="/privacy" target="_blank" style={{ color: D.blue }}>Política de privacidad</Link>
                   </span>
                 </label>
-                {errors.terms && <p style={err}>{errors.terms}</p>}
+                {errors.terms && <p style={errStyle}>{errors.terms}</p>}
               </div>
             </div>
           )}
@@ -521,33 +546,33 @@ function SignupForm() {
           <div style={{ marginTop: 28, display: "flex", gap: 10 }}>
             {step > 1 && (
               <button type="button" onClick={() => setStep(s => s - 1)} style={{
-                fontFamily: SANS, background: C.white, color: C.muted,
-                border: `1px solid ${C.border}`, padding: "12px 22px",
+                fontFamily: SANS, background: D.white, color: D.muted,
+                border: `1px solid ${D.border}`, padding: "12px 22px",
                 borderRadius: 8, fontSize: 14, cursor: "pointer",
               }}>← Atrás</button>
             )}
             {step < TOTAL ? (
               <button type="button" onClick={next} style={{
-                fontFamily: SANS, flex: 1, background: C.navy, color: C.white,
+                fontFamily: SANS, flex: 1, background: D.blue, color: D.white,
                 border: "none", padding: "12px 22px", borderRadius: 8,
-                fontSize: 14, fontWeight: 600, cursor: "pointer",
+                fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: "-0.01em",
               }}>Continuar →</button>
             ) : (
               <button type="button" onClick={handleSubmit} disabled={loading} style={{
                 fontFamily: SANS, flex: 1,
-                background: loading ? C.muted : C.navy,
-                color: C.white, border: "none", padding: "12px 22px",
-                borderRadius: 8, fontSize: 14, fontWeight: 600,
-                cursor: loading ? "default" : "pointer",
+                background: loading ? D.muted : D.blue,
+                color: D.white, border: "none", padding: "12px 22px",
+                borderRadius: 8, fontSize: 14, fontWeight: 700,
+                cursor: loading ? "default" : "pointer", letterSpacing: "-0.01em",
               }}>
                 {loading ? "Creando perfil..." : "Crear mi perfil"}
               </button>
             )}
           </div>
 
-          <p style={{ fontFamily: SANS, fontSize: 13, color: C.faint, textAlign: "center", marginTop: 18 }}>
+          <p style={{ fontFamily: SANS, fontSize: 13, color: D.faint, textAlign: "center", marginTop: 18 }}>
             ¿Ya tienes cuenta?{" "}
-            <Link href="/login" style={{ color: C.navy, fontWeight: 500 }}>Acceder</Link>
+            <Link href="/login" style={{ color: D.blue, fontWeight: 500 }}>Acceder</Link>
           </p>
         </div>
       </div>
@@ -555,12 +580,12 @@ function SignupForm() {
   );
 }
 
-// ─── Export con Suspense (necesario por useSearchParams) ──────────────────────
+// ─── Export ───────────────────────────────────────────────────────────────────
 export default function SignupPage() {
   return (
     <Suspense fallback={
-      <div style={{ minHeight: "100vh", background: "#0D2240", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ fontFamily: "var(--font-serif, Georgia, serif)", fontSize: 18, color: "rgba(255,255,255,0.5)" }}>
+      <div style={{ minHeight: "100vh", background: D.dark, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ fontFamily: SANS, fontSize: 18, color: "rgba(255,255,255,0.4)" }}>
           Cargando...
         </div>
       </div>

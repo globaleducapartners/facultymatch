@@ -42,56 +42,63 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   
-  /* Talentia specific colors */
-  --color-navy: #0B1220;
-  --color-talentia-blue: #2563EB;
+  /* Brand colors — mapped to new design system */
+  --color-navy: #0D2240;
+  --color-talentia-blue: #1B4FD8;
   --color-tech-cyan: #06B6D4;
-  --color-energy-orange: #F97316;
+  --color-energy-orange: #E9A030;
 
-  /* FacultyMatch design system */
-  --color-fm-ink:    #0C1018;
+  /* FacultyMatch v2 - Modern Design System */
+  --color-fm-dark:   #071326;
   --color-fm-navy:   #0D2240;
-  --color-fm-brass:  #B8963E;
-  --color-fm-cream:  #F7F5F0;
-  --color-fm-paper:  #FDFCF9;
-  --color-fm-border: #E5E1D8;
-  --color-fm-muted:  #6B7280;
-  --color-fm-faint:  #9CA3AF;
+  --color-fm-blue:   #1B4FD8;
+  --color-fm-gold:   #E9A030;
+  --color-fm-white:  #FFFFFF;
+  --color-fm-surface:#F2F6FC;
+  --color-fm-border: #D8E2EF;
+  --color-fm-ink:    #080F1E;
+  --color-fm-muted:  #4B5A7A;
+  /* Legacy compat */
+  --color-fm-brass:  #E9A030;
+  --color-fm-cream:  #F2F6FC;
+  --color-fm-paper:  #F2F6FC;
+  --color-fm-faint:  #8896B0;
 }
 
 :root {
-  --radius: 1rem; /* 16px as per design */
-  --background: #F8FAFC;
-  --foreground: #334155;
+  --radius: 1rem;
+  --background: #F2F6FC;
+  --foreground: #080F1E;
   --card: #FFFFFF;
-  --card-foreground: #334155;
+  --card-foreground: #080F1E;
   --popover: #FFFFFF;
-  --popover-foreground: #334155;
-  --primary: #2563EB;
+  --popover-foreground: #080F1E;
+  --primary: #1B4FD8;
   --primary-foreground: #FFFFFF;
   --secondary: #E2E8F0;
-  --secondary-foreground: #0B1220;
-  --muted: #F1F5F9;
-  --muted-foreground: #64748B;
-  --accent: #F97316;
+  --secondary-foreground: #0D2240;
+  --muted: #EEF4FF;
+  --muted-foreground: #4B5A7A;
+  --accent: #E9A030;
   --accent-foreground: #FFFFFF;
   --destructive: #EF4444;
-  --border: #E2E8F0;
-  --input: #E2E8F0;
-  --ring: #2563EB;
-  --chart-1: #2563EB;
-  --chart-2: #06B6D4;
-  --chart-3: #F97316;
-  --chart-4: #0B1220;
-  --chart-5: #64748B;
+  --border: #D8E2EF;
+  --input: #D8E2EF;
+  --ring: #1B4FD8;
+  --chart-1: #1B4FD8;
+  --chart-2: #E9A030;
+  --chart-3: #06B6D4;
+  --chart-4: #0D2240;
+  --chart-5: #4B5A7A;
+  /* App sidebar */
   --sidebar: #FFFFFF;
-  --sidebar-foreground: #334155;
-  --sidebar-primary: #2563EB;
+  --sidebar-foreground: #080F1E;
+  --sidebar-primary: #0D2240;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F8FAFC;
-  --sidebar-accent-foreground: #2563EB;
+  --sidebar-accent: #EEF4FF;
+  --sidebar-accent-foreground: #1B4FD8;
   --sidebar-border: #E2E8F0;
-  --sidebar-ring: #2563EB;
+  --sidebar-ring: #1B4FD8;
 }
 
 .dark {
@@ -136,3 +143,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ── FacultyMatch animations ─────────────────────────────────────────────── */
+@keyframes fm-tick {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes fm-fade-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fm-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fm-counter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fm-animate-up {
+  animation: fm-fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+}
+.fm-animate-up-delay-1 { animation-delay: 0.1s; }
+.fm-animate-up-delay-2 { animation-delay: 0.2s; }
+.fm-animate-up-delay-3 { animation-delay: 0.35s; }
+.fm-animate-up-delay-4 { animation-delay: 0.5s; }

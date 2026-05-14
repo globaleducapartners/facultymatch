@@ -3,18 +3,36 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import { Logo } from "@/components/ui/Logo";
 import { Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
+const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
+const D = {
+  dark:   "#071326",
+  navy:   "#0D2240",
+  blue:   "#1B4FD8",
+  surf:   "#F2F6FC",
+  white:  "#FFFFFF",
+  ink:    "#0C1018",
+  muted:  "#6B7280",
+  border: "#D8E2EF",
+  error:  "#DC2626",
+};
+
+const inputStyle: React.CSSProperties = {
+  fontFamily: SANS, width: "100%", fontSize: 14, color: D.ink,
+  background: D.white, border: `1px solid ${D.border}`,
+  borderRadius: 8, padding: "12px 14px", outline: "none",
+  boxSizing: "border-box" as const,
+};
+
 export default function UpdatePasswordPage() {
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const [password,     setPassword]     = useState("");
+  const [confirm,      setConfirm]      = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading,      setLoading]      = useState(false);
+  const [done,         setDone]         = useState(false);
+  const [error,        setError]        = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,7 +56,7 @@ export default function UpdatePasswordPage() {
     const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      setError("No se pudo actualizar la contraseña. El enlace puede haber expirado. Solicita uno nuevo.");
+      setError("No se pudo actualizar la contraseña. El enlace puede haber expirado.");
       setLoading(false);
     } else {
       setDone(true);
@@ -47,98 +65,129 @@ export default function UpdatePasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8FAFC] px-6 py-12">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <Link href="/" className="inline-block mb-8"><Logo /></Link>
+    <div style={{
+      minHeight: "100vh", display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      background: D.surf, padding: "48px 24px", fontFamily: SANS,
+    }}>
+      <div style={{ width: "100%", maxWidth: 420 }}>
+
+        {/* Logo */}
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <Link href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 7, background: D.blue,
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <span style={{ color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: "-0.03em" }}>FM</span>
+            </div>
+            <span style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: D.ink, letterSpacing: "-0.03em" }}>
+              FacultyMatch
+            </span>
+          </Link>
         </div>
 
         {done ? (
-          <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center space-y-4 shadow-sm">
-            <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto">
-              <CheckCircle2 size={32} className="text-green-500" />
+          <div style={{
+            background: D.white, borderRadius: 16, border: `1px solid ${D.border}`,
+            padding: "40px 36px", textAlign: "center",
+            display: "flex", flexDirection: "column", gap: 12, alignItems: "center",
+          }}>
+            <div style={{
+              width: 60, height: 60, borderRadius: 14,
+              background: "#F0FDF4", display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <CheckCircle2 size={28} color="#16A34A" />
             </div>
-            <h1 className="text-2xl font-black text-navy">¡Contraseña actualizada!</h1>
-            <p className="text-gray-500 font-medium">Redirigiendo al acceso...</p>
+            <h1 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: D.ink, letterSpacing: "-0.04em", margin: 0 }}>
+              ¡Contraseña actualizada!
+            </h1>
+            <p style={{ fontFamily: SANS, fontSize: 14, color: D.muted, margin: 0 }}>
+              Redirigiendo al acceso...
+            </p>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-100 p-10 space-y-6 shadow-sm">
+          <div style={{
+            background: D.white, borderRadius: 16, border: `1px solid ${D.border}`,
+            padding: "40px 36px", display: "flex", flexDirection: "column", gap: 24,
+          }}>
             <div>
-              <h1 className="text-2xl font-black text-navy">Nueva contraseña</h1>
-              <p className="text-gray-500 font-medium mt-1">
+              <h1 style={{ fontFamily: SANS, fontSize: 24, fontWeight: 900, color: D.ink, letterSpacing: "-0.04em", margin: "0 0 8px" }}>
+                Nueva contraseña
+              </h1>
+              <p style={{ fontFamily: SANS, fontSize: 14, color: D.muted, margin: 0 }}>
                 Elige una contraseña segura para tu cuenta.
               </p>
             </div>
 
             {error && (
-              <div className="p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-bold">
-                {error}
-                {error.includes("expirado") && (
-                  <Link href="/reset-password" className="block mt-2 underline">
-                    Solicitar nuevo enlace
-                  </Link>
-                )}
+              <div style={{ background: "#FEF2F2", border: "1px solid #FCA5A5", borderRadius: 8, padding: "12px 14px" }}>
+                <p style={{ fontFamily: SANS, fontSize: 13, color: D.error, margin: 0 }}>
+                  {error}
+                  {error.includes("expirado") && (
+                    <span>{" "}<Link href="/reset-password" style={{ color: D.error, fontWeight: 600 }}>Solicitar nuevo enlace</Link></span>
+                  )}
+                </p>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-500">
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <label style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: D.muted, display: "block", marginBottom: 8 }}>
                   Nueva contraseña
                 </label>
-                <div className="relative">
+                <div style={{ position: "relative" }}>
                   <input
                     type={showPassword ? "text" : "password"}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    required value={password}
+                    onChange={e => setPassword(e.target.value)}
                     placeholder="Mínimo 8 caracteres"
-                    className="w-full px-5 py-4 rounded-xl border border-gray-200 bg-white
-                               focus:ring-2 focus:ring-talentia-blue focus:border-transparent
-                               outline-none transition-all font-medium text-navy shadow-sm pr-12"
+                    style={{ ...inputStyle, paddingRight: 48 }}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} style={{
+                    position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
+                    background: "none", border: "none", cursor: "pointer", color: D.muted,
+                    display: "flex", alignItems: "center",
+                  }}>
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-500">
+              <div>
+                <label style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: D.muted, display: "block", marginBottom: 8 }}>
                   Confirmar contraseña
                 </label>
                 <input
                   type={showPassword ? "text" : "password"}
-                  required
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
+                  required value={confirm}
+                  onChange={e => setConfirm(e.target.value)}
                   placeholder="Repite la contraseña"
-                  className="w-full px-5 py-4 rounded-xl border border-gray-200 bg-white
-                             focus:ring-2 focus:ring-talentia-blue focus:border-transparent
-                             outline-none transition-all font-medium text-navy shadow-sm"
+                  style={inputStyle}
                 />
               </div>
 
-              <Button
+              <button
                 type="submit"
                 disabled={loading || !password || !confirm}
-                className="w-full bg-talentia-blue hover:bg-blue-700 text-white
-                           py-7 rounded-xl font-bold transition-all shadow-lg shadow-blue-100"
+                style={{
+                  fontFamily: SANS, width: "100%",
+                  background: loading || !password || !confirm ? "#94A3B8" : D.blue,
+                  color: D.white, border: "none",
+                  padding: "14px 22px", borderRadius: 8,
+                  fontSize: 14, fontWeight: 700, letterSpacing: "-0.01em",
+                  cursor: loading || !password || !confirm ? "default" : "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                }}
               >
-                {loading ? (
-                  <Loader2 className="animate-spin" size={20} />
-                ) : (
-                  "Guardar nueva contraseña"
-                )}
-              </Button>
+                {loading ? <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Guardando...</> : "Guardar nueva contraseña"}
+              </button>
             </form>
           </div>
         )}
       </div>
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>
     </div>
   );
 }

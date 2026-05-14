@@ -4,15 +4,43 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
-import { Logo } from "@/components/ui/Logo";
 import { Mail, CheckCircle2, Loader2 } from "lucide-react";
+
+const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
+const D = {
+  dark:   "#071326",
+  navy:   "#0D2240",
+  blue:   "#1B4FD8",
+  gold:   "#E9A030",
+  surf:   "#F2F6FC",
+  white:  "#FFFFFF",
+  ink:    "#0C1018",
+  muted:  "#6B7280",
+  border: "#D8E2EF",
+};
+
+function FMLogo() {
+  return (
+    <Link href="/" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}>
+      <div style={{
+        width: 34, height: 34, borderRadius: 8, background: D.blue,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        <span style={{ color: "#fff", fontSize: 12, fontWeight: 800, letterSpacing: "-0.03em", fontFamily: SANS }}>FM</span>
+      </div>
+      <span style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: D.ink, letterSpacing: "-0.03em" }}>
+        FacultyMatch
+      </span>
+    </Link>
+  );
+}
 
 function ConfirmContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
 
   const [resending, setResending] = useState(false);
-  const [resent, setResent] = useState(false);
+  const [resent,    setResent]    = useState(false);
 
   const handleResend = async () => {
     if (!email) return;
@@ -28,72 +56,119 @@ function ConfirmContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC] px-6 py-12">
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <Link href="/" className="inline-block mb-8">
-            <Logo />
-          </Link>
+    <div style={{
+      minHeight: "100vh", display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      background: D.surf, padding: "48px 24px", fontFamily: SANS,
+    }}>
+      <div style={{ width: "100%", maxWidth: 440 }}>
+        {/* Logo */}
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <FMLogo />
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 space-y-6">
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto">
-              <Mail size={32} className="text-talentia-blue" />
+        {/* Card */}
+        <div style={{
+          background: D.white, borderRadius: 20,
+          border: `1px solid ${D.border}`,
+          boxShadow: "0 4px 24px rgba(7,19,38,0.06)",
+          padding: "40px 36px",
+          display: "flex", flexDirection: "column", gap: 24,
+        }}>
+          {/* Icon + heading */}
+          <div style={{ textAlign: "center" }}>
+            <div style={{
+              width: 64, height: 64, borderRadius: 16,
+              background: "#EFF6FF", border: "1px solid #BFDBFE",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              margin: "0 auto 20px",
+            }}>
+              <Mail size={30} color={D.blue} />
             </div>
-            <h1 className="text-2xl font-black text-navy">Confirma tu email</h1>
-            <p className="text-gray-500 font-medium">Hemos enviado un email de verificación a:</p>
-            {email && <p className="text-navy font-black text-lg break-all">{email}</p>}
-            <p className="text-gray-500 text-sm font-medium leading-relaxed">
-              Haz clic en el enlace del email para activar tu cuenta y acceder a tu perfil.
-              El enlace expira en 24 horas.
+            <h1 style={{
+              fontFamily: SANS, fontSize: 24, fontWeight: 900,
+              color: D.ink, letterSpacing: "-0.04em", margin: "0 0 8px",
+            }}>
+              Confirma tu email
+            </h1>
+            <p style={{ fontFamily: SANS, fontSize: 14, color: D.muted, margin: 0 }}>
+              Hemos enviado un email de verificación a:
+            </p>
+            {email && (
+              <p style={{
+                fontFamily: SANS, fontSize: 15, fontWeight: 700,
+                color: D.navy, margin: "8px 0 0", wordBreak: "break-all",
+              }}>
+                {email}
+              </p>
+            )}
+          </div>
+
+          {/* Info box — warning */}
+          <div style={{
+            background: "#FFFBEB", border: "1px solid #FDE68A",
+            borderRadius: 12, padding: "14px 16px",
+          }}>
+            <p style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: "#92400E", margin: "0 0 4px" }}>
+              Antes de acceder, confirma tu email
+            </p>
+            <p style={{ fontFamily: SANS, fontSize: 12, color: "#B45309", margin: 0, lineHeight: 1.5 }}>
+              Haz clic en el enlace del email para activar tu cuenta. Expira en 24 horas.
             </p>
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-            <p className="text-sm font-bold text-amber-800">
-              ⚠️ Antes de acceder, confirma tu email
-            </p>
-            <p className="text-xs text-amber-600 mt-1">
-              Hemos enviado un enlace de verificación a tu correo.
-              Debes hacer click en él antes de poder acceder con tu contraseña.
-            </p>
-          </div>
-
-          <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
-            <p className="text-sm font-medium text-navy leading-relaxed">
-              Una vez confirmado tu email, podrás acceder y completar tu perfil.
+          {/* Info box — next step */}
+          <div style={{
+            background: "#EFF6FF", border: "1px solid #BFDBFE",
+            borderRadius: 12, padding: "14px 16px",
+          }}>
+            <p style={{ fontFamily: SANS, fontSize: 13, color: D.navy, margin: 0, lineHeight: 1.5 }}>
+              Una vez confirmado podrás acceder y completar tu perfil docente.
             </p>
           </div>
 
-          <div className="space-y-3">
+          {/* Actions */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <button
               onClick={handleResend}
               disabled={resending || resent}
-              className="w-full py-3 rounded-xl border border-gray-200 text-sm font-bold text-navy hover:bg-gray-50 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+              style={{
+                fontFamily: SANS, width: "100%",
+                background: D.white, color: D.navy,
+                border: `1px solid ${D.border}`,
+                padding: "12px", borderRadius: 10,
+                fontSize: 14, fontWeight: 700, cursor: resending || resent ? "default" : "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                opacity: resending || resent ? 0.6 : 1,
+                transition: "opacity 0.2s",
+              }}
             >
               {resending ? (
-                <><Loader2 size={16} className="animate-spin" /> Enviando...</>
+                <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Enviando...</>
               ) : resent ? (
-                <><CheckCircle2 size={16} className="text-green-500" /> Email reenviado ✓</>
+                <><CheckCircle2 size={16} color="#059669" /> Email reenviado ✓</>
               ) : (
                 "Reenviar email de verificación"
               )}
             </button>
 
-            <p className="text-center text-xs text-gray-400">
-              <Link href="/signup/faculty" className="hover:underline text-gray-500">
+            <p style={{ fontFamily: SANS, fontSize: 12, color: D.muted, textAlign: "center", margin: 0 }}>
+              <Link href="/signup/faculty" style={{ color: D.muted, textDecoration: "underline" }}>
                 ¿Email incorrecto? Volver al registro
               </Link>
             </p>
 
-            <Link href="/login"
-              className="block text-center text-sm font-bold text-talentia-blue hover:underline">
+            <Link href="/login" style={{
+              fontFamily: SANS, display: "block", textAlign: "center",
+              fontSize: 14, fontWeight: 700, color: D.blue, textDecoration: "none",
+            }}>
               ¿Ya confirmaste? Acceder →
             </Link>
           </div>
         </div>
       </div>
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>
     </div>
   );
 }
@@ -101,8 +176,8 @@ function ConfirmContent() {
 export default function FacultyConfirmPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
-        <Loader2 className="animate-spin text-talentia-blue" size={32} />
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: D.surf }}>
+        <Loader2 size={32} color={D.blue} style={{ animation: "spin 1s linear infinite" }} />
       </div>
     }>
       <ConfirmContent />
