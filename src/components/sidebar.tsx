@@ -16,6 +16,7 @@ const educatorItems = [
   { label: "Inicio",               href: "/app/faculty",              icon: Home },
   { label: "Mi perfil",            href: "/app/faculty/profile",      icon: User },
   { label: "Especialidades",       href: "/app/faculty/specialties",  icon: Award },
+  { label: "Directorio",           href: "/app/faculty/directory",    icon: Search },
   { label: "Visibilidad",          href: "/app/faculty/privacy",      icon: ShieldCheck },
   { label: "Solicitudes",          href: "/app/faculty/requests",     icon: Mail },
   { label: "Invita y Gana",        href: "/app/faculty/referrals",    icon: Gift },
@@ -26,8 +27,8 @@ const educatorItems = [
 const facultyBottomNavItems = [
   { label: "Inicio",       href: "/app/faculty",             icon: Home },
   { label: "Perfil",       href: "/app/faculty/profile",     icon: User },
+  { label: "Directorio",   href: "/app/faculty/directory",   icon: Search },
   { label: "Especialidades",href: "/app/faculty/specialties",icon: Award },
-  { label: "Privacidad",   href: "/app/faculty/privacy",     icon: ShieldCheck },
   { label: "Ajustes",      href: "/app/faculty/settings",    icon: Settings },
 ];
 

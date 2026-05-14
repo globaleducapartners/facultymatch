@@ -5,11 +5,12 @@ import { Resend } from "resend";
 import {
   Building2, Globe, MapPin, Phone, Mail, Users, Calendar,
   Link as LinkIcon, Save, ShieldCheck, Download,
-  AlertTriangle, Clock,
+  AlertTriangle, Clock, Search, ArrowRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 import { InstitutionLogoUpload } from "@/components/dashboard/InstitutionLogoUpload";
 import { SecuritySettingsSection } from "@/components/settings/SecuritySettingsSection";
 import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton";
@@ -156,6 +157,37 @@ export default async function InstitutionDashboardPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+
+      {/* Search CTA hero */}
+      <Link
+        href="/app/institution/search"
+        className="block group"
+      >
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0D2240] to-[#1B4FD8] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 transition-all duration-300">
+          {/* Background decoration */}
+          <div className="absolute right-0 top-0 w-64 h-full opacity-10 pointer-events-none"
+            style={{ background: "radial-gradient(circle at 80% 50%, #fff 0%, transparent 70%)" }}
+          />
+          <div className="relative flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-white/20 transition-colors">
+              <Search size={22} className="text-white" />
+            </div>
+            <div>
+              <p className="text-white/70 text-xs font-black uppercase tracking-widest mb-0.5">Directorio de docentes</p>
+              <h2 className="text-white text-xl font-black leading-tight">Buscar profesorado</h2>
+              <p className="text-white/60 text-sm font-medium mt-0.5 hidden sm:block">
+                Encuentra docentes por especialidad, idioma, país o acreditación ANECA.
+              </p>
+            </div>
+          </div>
+          <div className="relative flex-shrink-0">
+            <span className="inline-flex items-center gap-2 bg-white text-[#1B4FD8] font-black px-5 py-2.5 rounded-xl text-sm group-hover:bg-blue-50 transition-colors">
+              Buscar ahora <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+            </span>
+          </div>
+        </div>
+      </Link>
+
       {/* Pending banner */}
       {isPending && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">

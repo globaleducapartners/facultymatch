@@ -39,6 +39,10 @@ interface InstitutionSearchPageProps {
   isPro: boolean;
   searchLimitReached: boolean;
   monthlyContactsUsed: number;
+  /** When true: faculty browsing mode — contact locked, no plan/limit UI */
+  isReadOnly?: boolean;
+  /** Base URL for search form and filter chip links */
+  searchPath?: string;
 }
 
 // ─── Filter chip helpers ──────────────────────────────────────────────────────
@@ -61,7 +65,7 @@ function getChipLabel(key: string, value: string): string {
   return `${FILTER_LABELS[key] ?? key}: ${value}`;
 }
 
-function buildUrlWithout(params: Record<string, any>, removeKey: string, removeValue: string): string {
+function buildUrlWithout(params: Record<string, any>, removeKey: string, removeValue: string, base: string): string {
   const p = new URLSearchParams();
   FILTER_KEYS.forEach((k) => {
     if (k === removeKey) return;
@@ -71,7 +75,7 @@ function buildUrlWithout(params: Record<string, any>, removeKey: string, removeV
     else p.append(k, v as string);
   });
   const str = p.toString();
-  return `/app/institution/search${str ? `?${str}` : ""}`;
+  return `${base}${str ? `?${str}` : ""}`;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -84,7 +88,10 @@ export function InstitutionSearchPage({
   isPro,
   searchLimitReached,
   monthlyContactsUsed,
+  isReadOnly = false,
+  searchPath,
 }: InstitutionSearchPageProps) {
+  const basePath = searchPath ?? (isReadOnly ? "/app/faculty/directory" : "/app/institution/search");
   // Open drawer from URL param on first render
   const [selectedId, setSelectedId] = useState<string | null>(() => {
     const fid = searchParams.faculty as string | undefined;
@@ -96,7 +103,7 @@ export function InstitutionSearchPage({
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [usedContacts, setUsedContacts] = useState(monthlyContactsUsed);
 
-  const canContact = isPro || usedContacts < FREE_CONTACTS_LIMIT;
+  const canContact = !isReadOnly && (isPro || usedContacts < FREE_CONTACTS_LIMIT);
 
   const selectedEducator = initialEducators.find((e) => e.id === selectedId);
 
@@ -159,30 +166,61 @@ export function InstitutionSearchPage({
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-navy">Buscar docentes</h1>
-          <p className="text-gray-500 font-medium">Encuentra el profesorado adecuado para tus programas.</p>
+          <h1 className="text-3xl font-bold text-navy">
+            {isReadOnly ? "Directorio de docentes" : "Buscar docentes"}
+          </h1>
+          <p className="text-gray-500 font-medium">
+            {isReadOnly
+              ? "Explora los perfiles del profesorado disponible en la plataforma."
+              : "Encuentra el profesorado adecuado para tus programas."}
+          </p>
         </div>
-        <div className="flex items-center gap-3 flex-wrap">
-          <Badge
-            variant="outline"
-            className={`font-bold px-4 py-1.5 rounded-full ${isPro ? "bg-blue-50 text-talentia-blue border-blue-100" : "bg-gray-50 text-gray-500 border-gray-200"}`}
-          >
-            {isPro ? "Plan Professional" : "Plan Essential"}
-          </Badge>
-          <Button variant="outline" asChild className="rounded-full border-gray-200 font-bold">
-            <Link href="/app/institution/favorites" className="flex items-center gap-2">
-              <Star size={16} className="text-energy-orange fill-energy-orange" />
-              Favoritos
-            </Link>
-          </Button>
-          <Button variant="outline" asChild className="rounded-full border-gray-200 font-bold hidden sm:flex">
-            <Link href="/app/institution/contacts">Contactos</Link>
-          </Button>
-        </div>
+        {!isReadOnly && (
+          <div className="flex items-center gap-3 flex-wrap">
+            <Badge
+              variant="outline"
+              className={`font-bold px-4 py-1.5 rounded-full ${isPro ? "bg-blue-50 text-talentia-blue border-blue-100" : "bg-gray-50 text-gray-500 border-gray-200"}`}
+            >
+              {isPro ? "Plan Professional" : "Plan Essential"}
+            </Badge>
+            <Button variant="outline" asChild className="rounded-full border-gray-200 font-bold">
+              <Link href="/app/institution/favorites" className="flex items-center gap-2">
+                <Star size={16} className="text-energy-orange fill-energy-orange" />
+                Favoritos
+              </Link>
+            </Button>
+            <Button variant="outline" asChild className="rounded-full border-gray-200 font-bold hidden sm:flex">
+              <Link href="/app/institution/contacts">Contactos</Link>
+            </Button>
+          </div>
+        )}
       </div>
 
+      {/* ── Read-only banner (faculty mode) ── */}
+      {isReadOnly && (
+        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <Search size={16} className="text-blue-600" />
+            </div>
+            <div>
+              <p className="font-black text-blue-900 text-sm">Modo exploración — solo lectura</p>
+              <p className="text-blue-700 text-sm font-medium mt-0.5">
+                Puedes ver todos los perfiles, pero necesitas una cuenta de institución para contactar docentes.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/app/institution"
+            className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
+          >
+            <Zap size={14} /> Registrar institución
+          </Link>
+        </div>
+      )}
+
       {/* ── Search limit banner ── */}
-      {searchLimitReached && (
+      {!isReadOnly && searchLimitReached && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
@@ -206,7 +244,7 @@ export function InstitutionSearchPage({
 
       {/* ── Filter bar ── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <form action="/app/institution/search" method="get" className="p-4">
+        <form action={basePath} method="get" className="p-4">
           {/* Primary row */}
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Keyword */}
@@ -369,7 +407,7 @@ export function InstitutionSearchPage({
             {activeChips.map(({ key, value, label }) => (
               <Link
                 key={`${key}-${value}`}
-                href={buildUrlWithout(searchParams, key, value)}
+                href={buildUrlWithout(searchParams, key, value, basePath)}
                 className="inline-flex items-center gap-1.5 bg-blue-50 text-talentia-blue text-xs font-bold px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors"
               >
                 {label}
@@ -377,7 +415,7 @@ export function InstitutionSearchPage({
               </Link>
             ))}
             <Link
-              href="/app/institution/search"
+              href={basePath}
               className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-full hover:bg-gray-200 transition-colors"
             >
               Limpiar filtros
@@ -468,7 +506,14 @@ export function InstitutionSearchPage({
                   {/* Actions */}
                   <div className="space-y-2">
                     <div className="flex gap-3">
-                      {canContact ? (
+                      {isReadOnly ? (
+                        <Link
+                          href="/app/institution"
+                          className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold h-11 rounded-xl transition-colors text-sm"
+                        >
+                          <Lock size={15} /> Regístrate como institución para contactar
+                        </Link>
+                      ) : canContact ? (
                         <Button
                           onClick={() => setIsContactModalOpen(true)}
                           className="flex-1 bg-energy-orange hover:bg-orange-600 text-white font-bold h-11 rounded-xl shadow-lg shadow-orange-100"
@@ -483,28 +528,30 @@ export function InstitutionSearchPage({
                           <Lock size={15} /> Actualiza a Pro para más contactos
                         </Link>
                       )}
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={(e) => handleToggleFavorite(e, selectedEducator.id)}
-                        className={`h-11 w-11 rounded-xl flex-shrink-0 transition-all ${
-                          favorites.includes(selectedEducator.id)
-                            ? "text-energy-orange bg-orange-50 border-orange-100"
-                            : "text-gray-400 border-gray-200 hover:text-energy-orange hover:bg-orange-50"
-                        }`}
-                      >
-                        <Star
-                          size={18}
-                          className={favorites.includes(selectedEducator.id) ? "fill-current" : ""}
-                        />
-                      </Button>
+                      {!isReadOnly && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={(e) => handleToggleFavorite(e, selectedEducator.id)}
+                          className={`h-11 w-11 rounded-xl flex-shrink-0 transition-all ${
+                            favorites.includes(selectedEducator.id)
+                              ? "text-energy-orange bg-orange-50 border-orange-100"
+                              : "text-gray-400 border-gray-200 hover:text-energy-orange hover:bg-orange-50"
+                          }`}
+                        >
+                          <Star
+                            size={18}
+                            className={favorites.includes(selectedEducator.id) ? "fill-current" : ""}
+                          />
+                        </Button>
+                      )}
                     </div>
-                    {!isPro && usedContacts < FREE_CONTACTS_LIMIT && (
+                    {!isReadOnly && !isPro && usedContacts < FREE_CONTACTS_LIMIT && (
                       <p className="text-xs text-gray-400 text-center">
                         {usedContacts} de {FREE_CONTACTS_LIMIT} contactos gratuitos usados este mes
                       </p>
                     )}
-                    {!isPro && usedContacts >= FREE_CONTACTS_LIMIT && (
+                    {!isReadOnly && !isPro && usedContacts >= FREE_CONTACTS_LIMIT && (
                       <p className="text-xs text-amber-500 text-center font-medium">
                         Límite mensual alcanzado · <Link href="/app/institution/billing" className="underline">Actualiza a Pro</Link>
                       </p>
