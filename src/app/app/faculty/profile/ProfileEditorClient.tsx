@@ -2,10 +2,10 @@
 
 import { useState, useTransition } from "react";
 import {
-  User, Globe, MapPin, Briefcase, GraduationCap, FileText,
-  Bell, Mail, Phone, Link as LinkIcon, BookOpen, Languages,
-  Eye, CheckCircle2, Clock, Building2, Star, ChevronRight,
-  Pencil, Check, ExternalLink,
+  Globe, MapPin, Briefcase, GraduationCap, FileText,
+  Bell, BookOpen, Languages,
+  Eye, CheckCircle2, Clock, Building2, ChevronRight,
+  Pencil, Check, X, ExternalLink, Award,
 } from "lucide-react";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { LanguageEditor } from "@/components/profile/LanguageEditor";
@@ -14,20 +14,20 @@ import { InstitutionsTaughtEditor } from "@/components/profile/InstitutionsTaugh
 import { CVUpload } from "@/components/profile/CVUpload";
 import { InstitutionSelector } from "@/components/profile/InstitutionSelector";
 
-// ─── Design tokens ────────────────────────────────────────────────────────────
+// ─── Design tokens ─────────────────────────────────────────────────────────────
 const SANS = `'Inter', system-ui, -apple-system, sans-serif`;
 const D = {
-  blue:   "#1B4FD8",
-  navy:   "#0D2240",
-  gold:   "#E9A030",
-  surf:   "#F2F6FC",
-  white:  "#FFFFFF",
-  ink:    "#0C1018",
-  muted:  "#6B7280",
-  faint:  "#9CA3AF",
-  border: "#D8E2EF",
-  green:  "#059669",
-  greenBg:"#F0FDF4",
+  blue:    "#1B4FD8",
+  navy:    "#0D2240",
+  gold:    "#E9A030",
+  surf:    "#F2F6FC",
+  white:   "#FFFFFF",
+  ink:     "#0C1018",
+  muted:   "#6B7280",
+  faint:   "#9CA3AF",
+  border:  "#D8E2EF",
+  green:   "#059669",
+  greenBg: "#F0FDF4",
 };
 
 const inp: React.CSSProperties = {
@@ -43,37 +43,17 @@ const lbl: React.CSSProperties = {
   color: D.faint, display: "block", marginBottom: 6,
 };
 
-const saveBtn: React.CSSProperties = {
-  fontFamily: SANS, background: D.blue, color: "#fff",
-  border: "none", padding: "11px 28px", borderRadius: 10,
-  fontSize: 14, fontWeight: 700, cursor: "pointer",
-  display: "inline-flex", alignItems: "center", gap: 8,
-  transition: "opacity 0.2s",
-};
-
-// ─── Section config ────────────────────────────────────────────────────────────
-const SECTIONS = [
-  { id: "basic",       icon: User,        label: "Datos básicos"    },
-  { id: "experience",  icon: Briefcase,   label: "Experiencia"      },
-  { id: "formacion",   icon: GraduationCap,label: "Formación"       },
-  { id: "idiomas",     icon: Languages,   label: "Idiomas"          },
-  { id: "research",    icon: BookOpen,    label: "Investigación"    },
-  { id: "documents",   icon: FileText,    label: "Documentos"       },
-  { id: "links",       icon: Globe,       label: "Enlaces"          },
-  { id: "preferences", icon: Bell,        label: "Contacto"         },
-];
-
 const AVAIL_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  open:            { label: "Disponible ahora",      color: D.green,  bg: D.greenBg },
-  next_semester:   { label: "Próximo semestre",       color: "#0891B2",bg: "#EFF9FF" },
-  occasional:      { label: "Asignaturas puntuales",  color: "#7C3AED",bg: "#F5F3FF" },
-  weekends:        { label: "Fines de semana",        color: "#D97706",bg: "#FFFBEB" },
-  online_only:     { label: "Solo online",            color: D.blue,   bg: "#EFF6FF" },
-  limited:         { label: "En 6 meses",             color: D.muted,  bg: "#F3F4F6" },
-  invite_only:     { label: "Por invitación",         color: D.navy,   bg: "#EEF4FF" },
+  open:          { label: "Disponible ahora",     color: D.green,   bg: D.greenBg },
+  next_semester: { label: "Próximo semestre",      color: "#0891B2", bg: "#EFF9FF" },
+  occasional:    { label: "Asignaturas puntuales", color: "#7C3AED", bg: "#F5F3FF" },
+  weekends:      { label: "Fines de semana",       color: "#D97706", bg: "#FFFBEB" },
+  online_only:   { label: "Solo online",           color: D.blue,    bg: "#EFF6FF" },
+  limited:       { label: "En 6 meses",            color: D.muted,   bg: "#F3F4F6" },
+  invite_only:   { label: "Por invitación",        color: D.navy,    bg: "#EEF4FF" },
 };
 
-// ─── Completeness helper ───────────────────────────────────────────────────────
+// ─── Completeness ──────────────────────────────────────────────────────────────
 function calcCompleteness(fp: any, p: any, meta: any): number {
   const fields = [
     fp?.headline, fp?.bio, fp?.country, fp?.city,
@@ -84,8 +64,7 @@ function calcCompleteness(fp: any, p: any, meta: any): number {
     p?.avatar_url || fp?.avatar_url,
     p?.full_name || meta?.full_name,
   ];
-  const filled = fields.filter(Boolean).length;
-  return Math.round((filled / fields.length) * 100);
+  return Math.round((fields.filter(Boolean).length / fields.length) * 100);
 }
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -97,7 +76,6 @@ interface Props {
   documents: any[];
   viewCount: number;
   saved: boolean;
-  // Server actions
   saveBasicInfo: (fd: FormData) => Promise<void>;
   saveExperience: (fd: FormData) => Promise<void>;
   saveFormacion: (fd: FormData) => Promise<void>;
@@ -107,195 +85,95 @@ interface Props {
   updateContactPreferences: (fd: FormData) => Promise<void>;
 }
 
-// ─── Live Preview Card ─────────────────────────────────────────────────────────
-function ProfilePreview({ data, avatarUrl }: { data: PreviewState; avatarUrl?: string }) {
-  const avail = AVAIL_LABELS[data.availability] || AVAIL_LABELS.open;
-  const initials = (data.fullName || "?")
-    .split(" ")
-    .slice(0, 2)
-    .map((w: string) => w[0]?.toUpperCase() ?? "")
-    .join("");
-
+// ─── Section card ──────────────────────────────────────────────────────────────
+function SectionCard({
+  icon, title, isEditing, onToggleEdit, children, form,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  isEditing: boolean;
+  onToggleEdit: () => void;
+  children: React.ReactNode;
+  form: React.ReactNode;
+}) {
   return (
     <div style={{
-      background: D.white, borderRadius: 20,
-      border: `1px solid ${D.border}`,
-      boxShadow: "0 4px 24px rgba(7,19,38,0.07)",
-      overflow: "visible", fontFamily: SANS,
+      background: D.white, border: `1px solid ${D.border}`,
+      borderRadius: 16, overflow: "hidden", marginBottom: 12,
     }}>
-      {/* Cover band */}
       <div style={{
-        height: 80,
-        background: `linear-gradient(135deg, ${D.navy} 0%, ${D.blue} 100%)`,
-        borderRadius: "20px 20px 0 0",
-        position: "relative",
-      }} />
-
-      {/* Avatar */}
-      <div style={{ padding: "0 24px", marginTop: -36 }}>
+        display: "flex", alignItems: "center", padding: "18px 22px",
+        borderBottom: isEditing ? `1px solid ${D.border}` : "none",
+      }}>
         <div style={{
-          width: 72, height: 72, borderRadius: 16,
-          background: avatarUrl ? "transparent" : D.blue,
-          border: `3px solid ${D.white}`,
+          width: 36, height: 36, borderRadius: 8,
+          background: isEditing ? "#EFF6FF" : D.surf,
           display: "flex", alignItems: "center", justifyContent: "center",
-          overflow: "hidden",
-          boxShadow: "0 2px 12px rgba(7,19,38,0.12)",
+          flexShrink: 0, marginRight: 12,
         }}>
-          {avatarUrl
-            ? <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            : <span style={{ color: "#fff", fontSize: 20, fontWeight: 800 }}>{initials}</span>
-          }
+          {icon}
         </div>
+        <span style={{
+          fontFamily: SANS, fontSize: 16, fontWeight: 800, color: D.ink,
+          letterSpacing: "-0.02em", flex: 1,
+        }}>{title}</span>
+        <button
+          onClick={onToggleEdit}
+          style={{
+            display: "flex", alignItems: "center", gap: 6,
+            padding: "7px 14px", borderRadius: 20,
+            border: `1px solid ${isEditing ? D.blue : D.border}`,
+            background: isEditing ? "#EFF6FF" : D.white,
+            color: isEditing ? D.blue : D.muted,
+            fontFamily: SANS, fontSize: 12, fontWeight: 600, cursor: "pointer",
+          }}
+        >
+          {isEditing ? <X size={13} /> : <Pencil size={13} />}
+          {isEditing ? "Cancelar" : "Editar"}
+        </button>
       </div>
-
-      {/* Info */}
-      <div style={{ padding: "12px 24px 20px" }}>
-        {/* Name + PhD badge */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-          <h3 style={{ fontFamily: SANS, fontSize: 17, fontWeight: 800, color: D.ink, letterSpacing: "-0.03em", margin: 0 }}>
-            {data.fullName || "Tu nombre completo"}
-          </h3>
-          {data.isPhd && (
-            <span style={{
-              fontFamily: SANS, fontSize: 10, fontWeight: 700,
-              color: "#7C3AED", background: "#F5F3FF",
-              border: "1px solid #DDD6FE",
-              padding: "2px 7px", borderRadius: 999,
-            }}>PhD</span>
-          )}
-        </div>
-
-        {/* Headline */}
-        <p style={{ fontFamily: SANS, fontSize: 13, color: D.muted, margin: "0 0 10px", lineHeight: 1.5 }}>
-          {data.headline || <span style={{ color: D.faint, fontStyle: "italic" }}>Titular académico...</span>}
-        </p>
-
-        {/* Location + Institution */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 12 }}>
-          {(data.city || data.country) && (
-            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <MapPin size={12} color={D.faint} />
-              <span style={{ fontFamily: SANS, fontSize: 12, color: D.muted }}>
-                {[data.city, data.country].filter(Boolean).join(", ")}
-              </span>
-            </div>
-          )}
-          {data.currentInstitution && (
-            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <Building2 size={12} color={D.faint} />
-              <span style={{ fontFamily: SANS, fontSize: 12, color: D.muted }}>{data.currentInstitution}</span>
-            </div>
-          )}
-          {data.yearsExperience > 0 && (
-            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-              <Briefcase size={12} color={D.faint} />
-              <span style={{ fontFamily: SANS, fontSize: 12, color: D.muted }}>{data.yearsExperience} años de experiencia</span>
-            </div>
-          )}
-        </div>
-
-        {/* Availability badge */}
-        <div style={{ marginBottom: 12 }}>
-          <span style={{
-            fontFamily: SANS, fontSize: 11, fontWeight: 700,
-            color: avail.color, background: avail.bg,
-            padding: "4px 10px", borderRadius: 999,
-            display: "inline-block",
-          }}>
-            {avail.label}
-          </span>
-        </div>
-
-        {/* Bio */}
-        {data.bio && (
-          <p style={{
-            fontFamily: SANS, fontSize: 12, color: D.muted,
-            lineHeight: 1.6, margin: "0 0 14px",
-            borderTop: `1px solid ${D.border}`, paddingTop: 12,
-            display: "-webkit-box", WebkitLineClamp: 4,
-            WebkitBoxOrient: "vertical" as const, overflow: "hidden",
-          }}>
-            {data.bio}
-          </p>
-        )}
-
-        {/* Languages */}
-        {data.languages.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 5, marginBottom: 12 }}>
-            {data.languages.map((l: any, i: number) => (
-              <span key={i} style={{
-                fontFamily: SANS, fontSize: 11, color: D.ink,
-                background: D.surf, border: `1px solid ${D.border}`,
-                padding: "3px 9px", borderRadius: 999,
-              }}>
-                {typeof l === "string" ? l : `${l.language || l.name} ${l.level ? `· ${l.level}` : ""}`}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Links */}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, paddingTop: 12, borderTop: `1px solid ${D.border}` }}>
-          {data.linkedinUrl && (
-            <span style={{
-              fontFamily: SANS, fontSize: 11, color: D.blue,
-              display: "flex", alignItems: "center", gap: 4,
-            }}>
-              <ExternalLink size={11} /> LinkedIn
-            </span>
-          )}
-          {data.website && (
-            <span style={{
-              fontFamily: SANS, fontSize: 11, color: D.blue,
-              display: "flex", alignItems: "center", gap: 4,
-            }}>
-              <Globe size={11} /> Web personal
-            </span>
-          )}
-        </div>
-
-        {/* CTA preview */}
-        <div style={{
-          marginTop: 16,
-          display: "flex", gap: 8,
-          padding: "12px", background: D.surf,
-          borderRadius: 12, alignItems: "center",
-          justifyContent: "center",
-        }}>
-          <Lock size={13} color={D.faint} />
-          <span style={{ fontFamily: SANS, fontSize: 11, color: D.faint }}>
-            Vista previa — los botones de contacto son visibles para instituciones
-          </span>
-        </div>
-      </div>
+      {isEditing
+        ? <div style={{ padding: "22px 24px" }}>{form}</div>
+        : <div style={{ padding: "4px 22px 20px" }}>{children}</div>
+      }
     </div>
   );
 }
 
-// We need Lock for preview CTA
-function Lock({ size, color }: { size: number; color: string }) {
+// ─── Small helpers ─────────────────────────────────────────────────────────────
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-    </svg>
+    <div>
+      <label style={lbl}>{label}</label>
+      {children}
+    </div>
   );
 }
 
-// ─── Preview state ─────────────────────────────────────────────────────────────
-interface PreviewState {
-  fullName: string;
-  headline: string;
-  bio: string;
-  country: string;
-  city: string;
-  isPhd: boolean;
-  availability: string;
-  currentInstitution: string;
-  yearsExperience: number;
-  languages: any[];
-  linkedinUrl: string;
-  website: string;
+function EmptyState({ text }: { text: string }) {
+  return (
+    <p style={{ fontFamily: SANS, fontSize: 13, color: D.faint, fontStyle: "italic", margin: "12px 0 0" }}>
+      {text}
+    </p>
+  );
+}
+
+function SaveButton({ pending, label = "Guardar cambios" }: { pending?: boolean; label?: string }) {
+  return (
+    <button type="submit" disabled={pending} style={{
+      fontFamily: SANS, background: D.blue, color: "#fff",
+      border: "none", padding: "11px 28px", borderRadius: 10,
+      fontSize: 14, fontWeight: 700, cursor: "pointer",
+      display: "inline-flex", alignItems: "center", gap: 8,
+      opacity: pending ? 0.6 : 1, transition: "opacity 0.2s",
+    }}>
+      {pending
+        ? <><span style={{ animation: "spin 1s linear infinite", display: "inline-block" }}>↻</span> Guardando…</>
+        : <><Check size={15} /> {label}</>
+      }
+      <style>{`@keyframes spin { from { transform:rotate(0deg) } to { transform:rotate(360deg) } }`}</style>
+    </button>
+  );
 }
 
 // ─── Main component ────────────────────────────────────────────────────────────
@@ -304,110 +182,28 @@ export function ProfileEditorClient({
   saveBasicInfo, saveExperience, saveFormacion, saveLanguages,
   saveResearch, saveLinks, updateContactPreferences,
 }: Props) {
-  const [activeSection, setActiveSection] = useState("basic");
-  const [isPending, startTransition] = useTransition();
+  const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [isPending] = useTransition();
 
   const avatarUrl = profile?.avatar_url || facultyProfile?.avatar_url;
   const completeness = calcCompleteness(facultyProfile, profile, userMeta);
 
-  const [preview, setPreview] = useState<PreviewState>({
-    fullName:           profile?.full_name || userMeta?.full_name || "",
-    headline:           facultyProfile?.headline || "",
-    bio:                facultyProfile?.bio || "",
-    country:            facultyProfile?.country || userMeta?.country || "",
-    city:               facultyProfile?.city || userMeta?.city || "",
-    isPhd:              facultyProfile?.is_phd ?? false,
-    availability:       facultyProfile?.availability || "open",
-    currentInstitution: facultyProfile?.current_institution || "",
-    yearsExperience:    facultyProfile?.years_experience || 0,
-    languages:          (facultyProfile?.languages as any[]) || [],
-    linkedinUrl:        facultyProfile?.linkedin_url || "",
-    website:            facultyProfile?.website || "",
-  });
+  const fullName    = profile?.full_name || userMeta?.full_name || "";
+  const headline    = facultyProfile?.headline || "";
+  const city        = facultyProfile?.city || userMeta?.city || "";
+  const country     = facultyProfile?.country || userMeta?.country || "";
+  const availability = facultyProfile?.availability || "open";
+  const avail       = AVAIL_LABELS[availability] || AVAIL_LABELS.open;
+  const locationStr = [city, country].filter(Boolean).join(", ");
+  const initials    = fullName.split(" ").slice(0, 2).map((w: string) => w[0]?.toUpperCase() ?? "").join("");
 
-  const avail = AVAIL_LABELS[preview.availability] || AVAIL_LABELS.open;
+  const toggle = (id: string) => setEditingSection(prev => prev === id ? null : id);
+  const isEditing = (id: string) => editingSection === id;
 
   return (
     <div style={{ fontFamily: SANS }}>
 
-      {/* ── Page header ── */}
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontFamily: SANS, fontSize: 24, fontWeight: 900, color: D.ink, letterSpacing: "-0.04em", margin: "0 0 4px" }}>
-          Mi perfil
-        </h1>
-        <p style={{ fontFamily: SANS, fontSize: 14, color: D.muted, margin: 0 }}>
-          Gestiona tu identidad académica y profesional.
-        </p>
-      </div>
-
-      {/* ── Stats strip ── */}
-      <div style={{
-        display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 12, marginBottom: 24,
-      }}>
-        {/* Views */}
-        <div style={{
-          background: D.white, border: `1px solid ${D.border}`,
-          borderRadius: 14, padding: "16px 20px",
-          display: "flex", alignItems: "center", gap: 12,
-        }}>
-          <div style={{
-            width: 40, height: 40, borderRadius: 10,
-            background: "#EFF6FF", display: "flex",
-            alignItems: "center", justifyContent: "center", flexShrink: 0,
-          }}>
-            <Eye size={18} color={D.blue} />
-          </div>
-          <div>
-            <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: D.ink, letterSpacing: "-0.04em", lineHeight: 1 }}>
-              {viewCount.toLocaleString()}
-            </div>
-            <div style={{ fontFamily: SANS, fontSize: 11, color: D.muted, marginTop: 2 }}>Visualizaciones</div>
-          </div>
-        </div>
-
-        {/* Completeness */}
-        <div style={{
-          background: D.white, border: `1px solid ${D.border}`,
-          borderRadius: 14, padding: "16px 20px",
-        }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <div style={{ fontFamily: SANS, fontSize: 11, color: D.muted }}>Completitud</div>
-            <div style={{ fontFamily: SANS, fontSize: 16, fontWeight: 800, color: completeness >= 80 ? D.green : D.blue, letterSpacing: "-0.03em" }}>
-              {completeness}%
-            </div>
-          </div>
-          <div style={{ height: 6, background: D.surf, borderRadius: 999, overflow: "hidden" }}>
-            <div style={{
-              height: "100%",
-              width: `${completeness}%`,
-              background: completeness >= 80 ? D.green : D.blue,
-              borderRadius: 999, transition: "width 0.5s ease",
-            }} />
-          </div>
-        </div>
-
-        {/* Visibility */}
-        <div style={{
-          background: D.white, border: `1px solid ${D.border}`,
-          borderRadius: 14, padding: "16px 20px",
-          display: "flex", alignItems: "center", gap: 12,
-        }}>
-          <div style={{
-            width: 40, height: 40, borderRadius: 10,
-            background: avail.bg, display: "flex",
-            alignItems: "center", justifyContent: "center", flexShrink: 0,
-          }}>
-            <Clock size={18} color={avail.color} />
-          </div>
-          <div>
-            <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: avail.color }}>{avail.label}</div>
-            <div style={{ fontFamily: SANS, fontSize: 11, color: D.muted, marginTop: 2 }}>Disponibilidad</div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Saved banner ── */}
+      {/* Saved banner */}
       {saved && (
         <div style={{
           background: D.greenBg, border: "1px solid #A7F3D0",
@@ -419,475 +215,816 @@ export function ProfileEditorClient({
         </div>
       )}
 
-      {/* ── Split view ── */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "minmax(0,1fr) 320px",
-        gap: 20, alignItems: "start",
-      }}>
+      {/* Two-column layout */}
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 290px", gap: 20, alignItems: "start" }}>
 
-        {/* ── LEFT: Editor ── */}
+        {/* ── LEFT column ── */}
         <div>
-          {/* Avatar card */}
+
+          {/* ── Profile Header Card ── */}
           <div style={{
             background: D.white, border: `1px solid ${D.border}`,
-            borderRadius: 16, padding: "20px 24px",
-            marginBottom: 16,
-            display: "flex", alignItems: "center", gap: 20,
+            borderRadius: 16, overflow: "hidden", marginBottom: 12,
           }}>
-            <AvatarUpload
-              userId={user.id}
-              currentAvatarUrl={avatarUrl}
-              name={preview.fullName}
-            />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: SANS, fontSize: 18, fontWeight: 800, color: D.ink, letterSpacing: "-0.03em" }}>
-                {preview.fullName || <span style={{ color: D.faint }}>Tu nombre</span>}
-              </div>
-              <div style={{ fontFamily: SANS, fontSize: 13, color: D.muted, marginTop: 2 }}>
-                {preview.headline || <span style={{ color: D.faint, fontStyle: "italic" }}>Añade tu titular...</span>}
-              </div>
-              <div style={{ fontFamily: SANS, fontSize: 12, color: D.faint, marginTop: 4 }}>{user.email}</div>
-            </div>
-          </div>
-
-          {/* Section nav pills */}
-          <div style={{
-            display: "flex", gap: 6, flexWrap: "wrap" as const,
-            marginBottom: 16,
-          }}>
-            {SECTIONS.map(({ id, icon: Icon, label }) => (
+            {/* Cover banner */}
+            <div style={{
+              height: 168,
+              background: `linear-gradient(135deg, ${D.navy} 0%, ${D.blue} 55%, #4F7FE8 100%)`,
+              position: "relative",
+            }}>
               <button
-                key={id}
-                onClick={() => setActiveSection(id)}
+                onClick={() => toggle("basic")}
                 style={{
-                  fontFamily: SANS, fontSize: 13, fontWeight: 600,
-                  padding: "7px 14px", borderRadius: 20,
-                  border: `1px solid ${activeSection === id ? D.blue : D.border}`,
-                  background: activeSection === id ? "#EFF6FF" : D.white,
-                  color: activeSection === id ? D.blue : D.muted,
-                  cursor: "pointer", transition: "all 0.15s",
+                  position: "absolute", top: 14, right: 14,
                   display: "flex", alignItems: "center", gap: 6,
+                  background: "rgba(255,255,255,0.18)",
+                  border: "1px solid rgba(255,255,255,0.35)",
+                  borderRadius: 8, padding: "6px 13px",
+                  color: "#fff", fontFamily: SANS, fontSize: 12, fontWeight: 600,
+                  cursor: "pointer", backdropFilter: "blur(6px)",
                 }}
               >
-                <Icon size={13} /> {label}
+                <Pencil size={12} /> Editar perfil
               </button>
-            ))}
-          </div>
+            </div>
 
-          {/* Section form */}
-          <div style={{
-            background: D.white, border: `1px solid ${D.border}`,
-            borderRadius: 16, padding: "28px 28px 24px",
-          }}>
+            {/* Avatar + identity */}
+            <div style={{ padding: "0 24px 24px" }}>
+              {/* Avatar */}
+              <div style={{ marginTop: -60, marginBottom: 14 }}>
+                <div style={{
+                  width: 120, height: 120, borderRadius: "50%",
+                  background: avatarUrl ? "transparent" : D.navy,
+                  border: `4px solid ${D.white}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  overflow: "hidden",
+                  boxShadow: "0 4px 20px rgba(7,19,38,0.18)",
+                }}>
+                  {avatarUrl
+                    ? <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : <span style={{ color: "#fff", fontSize: 34, fontWeight: 800 }}>{initials || "?"}</span>
+                  }
+                </div>
+              </div>
 
-            {/* ── BÁSICOS ── */}
-            {activeSection === "basic" && (
-              <div>
-                <SectionHeader icon={<User size={18} color={D.blue} />} title="Datos básicos" desc="Primera impresión para las instituciones" />
+              {/* Name + PhD */}
+              <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" as const, gap: 8, marginBottom: 6 }}>
+                <h1 style={{ fontFamily: SANS, fontSize: 23, fontWeight: 900, color: D.ink, letterSpacing: "-0.04em", margin: 0 }}>
+                  {fullName || <span style={{ color: D.faint, fontWeight: 400 }}>Tu nombre completo</span>}
+                </h1>
+                {facultyProfile?.is_phd && (
+                  <span style={{
+                    fontFamily: SANS, fontSize: 11, fontWeight: 700,
+                    color: "#7C3AED", background: "#F5F3FF",
+                    border: "1px solid #DDD6FE", padding: "2px 8px", borderRadius: 999,
+                  }}>PhD</span>
+                )}
+              </div>
+
+              {/* Headline */}
+              {headline
+                ? <p style={{ fontFamily: SANS, fontSize: 15, color: D.ink, margin: "0 0 12px", lineHeight: 1.5 }}>{headline}</p>
+                : <p style={{ fontFamily: SANS, fontSize: 15, color: D.faint, fontStyle: "italic", margin: "0 0 12px" }}>Añade tu titular académico…</p>
+              }
+
+              {/* Meta row */}
+              <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 14, marginBottom: 14 }}>
+                {facultyProfile?.current_institution && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <Building2 size={14} color={D.muted} />
+                    <span style={{ fontFamily: SANS, fontSize: 13, color: D.ink, fontWeight: 600 }}>
+                      {facultyProfile.current_institution}
+                    </span>
+                  </div>
+                )}
+                {locationStr && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <MapPin size={14} color={D.muted} />
+                    <span style={{ fontFamily: SANS, fontSize: 13, color: D.muted }}>{locationStr}</span>
+                  </div>
+                )}
+                {facultyProfile?.years_experience > 0 && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <Briefcase size={14} color={D.muted} />
+                    <span style={{ fontFamily: SANS, fontSize: 13, color: D.muted }}>
+                      {facultyProfile.years_experience} años de experiencia
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Views + availability */}
+              <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap" as const, gap: 12, marginBottom: 18 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <Eye size={14} color={D.blue} />
+                  <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: D.blue }}>
+                    {viewCount.toLocaleString()} visualizaciones
+                  </span>
+                </div>
+                <span style={{
+                  fontFamily: SANS, fontSize: 12, fontWeight: 700,
+                  color: avail.color, background: avail.bg,
+                  padding: "3px 10px", borderRadius: 999,
+                }}>
+                  {avail.label}
+                </span>
+              </div>
+
+              {/* Action buttons */}
+              <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8 }}>
+                <button
+                  onClick={() => toggle("basic")}
+                  style={{
+                    fontFamily: SANS, fontSize: 13, fontWeight: 700,
+                    padding: "8px 18px", borderRadius: 20,
+                    background: D.blue, color: D.white, border: "none",
+                    cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+                  }}
+                >
+                  <Pencil size={13} /> Editar perfil
+                </button>
+                <button
+                  onClick={() => toggle("documents")}
+                  style={{
+                    fontFamily: SANS, fontSize: 13, fontWeight: 700,
+                    padding: "8px 18px", borderRadius: 20,
+                    background: D.white, color: D.ink, border: `1.5px solid ${D.border}`,
+                    cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+                  }}
+                >
+                  <FileText size={13} /> CV
+                </button>
+                {facultyProfile?.linkedin_url && (
+                  <a
+                    href={facultyProfile.linkedin_url}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{
+                      fontFamily: SANS, fontSize: 13, fontWeight: 700,
+                      padding: "8px 18px", borderRadius: 20,
+                      background: D.white, color: D.ink, border: `1.5px solid ${D.border}`,
+                      cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+                      textDecoration: "none",
+                    }}
+                  >
+                    <ExternalLink size={13} /> LinkedIn
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* Inline basic-info edit form */}
+            {isEditing("basic") && (
+              <div style={{ borderTop: `1px solid ${D.border}`, padding: "24px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+                  <span style={{ fontFamily: SANS, fontSize: 15, fontWeight: 800, color: D.ink }}>Información básica</span>
+                  <button onClick={() => setEditingSection(null)} style={{ background: "none", border: "none", cursor: "pointer", color: D.faint }}>
+                    <X size={18} />
+                  </button>
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                  <label style={lbl}>Foto de perfil</label>
+                  <AvatarUpload userId={user.id} currentAvatarUrl={avatarUrl} name={fullName} />
+                </div>
                 <form action={saveBasicInfo} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                     <Field label="Nombre completo">
-                      <input
-                        name="fullName" style={inp} required
-                        defaultValue={profile?.full_name || userMeta?.full_name}
-                        onChange={e => setPreview(p => ({ ...p, fullName: e.target.value }))}
-                      />
+                      <input name="fullName" style={inp} required
+                        defaultValue={profile?.full_name || userMeta?.full_name} />
                     </Field>
                     <Field label="Titular académico">
-                      <input
-                        name="headline" style={inp}
-                        placeholder="Dr. | Economía | MBA"
-                        defaultValue={facultyProfile?.headline}
-                        onChange={e => setPreview(p => ({ ...p, headline: e.target.value }))}
-                      />
+                      <input name="headline" style={inp} placeholder="Dr. | Economía | MBA"
+                        defaultValue={facultyProfile?.headline} />
                     </Field>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                     <Field label="País">
-                      <input
-                        name="country" style={inp}
-                        placeholder="España"
-                        defaultValue={facultyProfile?.country || userMeta?.country}
-                        onChange={e => setPreview(p => ({ ...p, country: e.target.value }))}
-                      />
+                      <input name="country" style={inp} placeholder="España"
+                        defaultValue={facultyProfile?.country || userMeta?.country} />
                     </Field>
                     <Field label="Ciudad">
-                      <input
-                        name="city" style={inp}
-                        placeholder="Madrid"
-                        defaultValue={facultyProfile?.city || userMeta?.city}
-                        onChange={e => setPreview(p => ({ ...p, city: e.target.value }))}
-                      />
+                      <input name="city" style={inp} placeholder="Madrid"
+                        defaultValue={facultyProfile?.city || userMeta?.city} />
                     </Field>
                   </div>
-                  <Field label="Biografía profesional">
-                    <textarea
-                      name="bio"
-                      rows={5}
-                      style={{ ...inp, resize: "vertical" as const }}
-                      placeholder="Describe tu trayectoria, especialidad y valor como docente..."
-                      defaultValue={facultyProfile?.bio}
-                      onChange={e => setPreview(p => ({ ...p, bio: e.target.value }))}
-                    />
+                  <Field label="Sobre mí">
+                    <textarea name="bio" rows={5} style={{ ...inp, resize: "vertical" as const }}
+                      placeholder="Describe tu trayectoria, especialidad y valor como docente…"
+                      defaultValue={facultyProfile?.bio} />
                   </Field>
-                  <SaveButton pending={isPending} />
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <SaveButton pending={isPending} />
+                    <button type="button" onClick={() => setEditingSection(null)} style={{
+                      fontFamily: SANS, fontSize: 14, fontWeight: 600, padding: "11px 20px",
+                      borderRadius: 10, border: `1px solid ${D.border}`, background: D.white,
+                      color: D.muted, cursor: "pointer",
+                    }}>Cancelar</button>
+                  </div>
                 </form>
               </div>
             )}
+          </div>
 
-            {/* ── EXPERIENCIA ── */}
-            {activeSection === "experience" && (
+          {/* ── Sobre mí (standalone, only when bio exists and not editing basic) ── */}
+          {!isEditing("basic") && facultyProfile?.bio && (
+            <div style={{
+              background: D.white, border: `1px solid ${D.border}`,
+              borderRadius: 16, padding: "18px 22px", marginBottom: 12,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                <span style={{ fontFamily: SANS, fontSize: 16, fontWeight: 800, color: D.ink }}>Sobre mí</span>
+                <button onClick={() => toggle("basic")} style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  padding: "6px 12px", borderRadius: 20,
+                  border: `1px solid ${D.border}`, background: D.white,
+                  color: D.muted, fontFamily: SANS, fontSize: 12, fontWeight: 600, cursor: "pointer",
+                }}>
+                  <Pencil size={12} /> Editar
+                </button>
+              </div>
+              <p style={{ fontFamily: SANS, fontSize: 14, color: D.ink, lineHeight: 1.75, margin: 0 }}>
+                {facultyProfile.bio}
+              </p>
+            </div>
+          )}
+
+          {/* ── EXPERIENCIA ── */}
+          <SectionCard
+            icon={<Briefcase size={16} color={D.blue} />}
+            title="Experiencia"
+            isEditing={isEditing("experience")}
+            onToggleEdit={() => toggle("experience")}
+            children={
               <div>
-                <SectionHeader icon={<Briefcase size={18} color={D.blue} />} title="Experiencia" desc="Tu trayectoria profesional y docente" />
-                <form action={saveExperience} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                    <Field label="Institución actual">
-                      <InstitutionSelector
-                        name="currentInstitution"
-                        initialValue={facultyProfile?.current_institution || ""}
-                        placeholder="Buscar institución..."
-                      />
-                    </Field>
-                    <Field label="Años de experiencia">
-                      <input
-                        name="yearsExperience" type="number" min={0}
-                        style={inp}
-                        defaultValue={facultyProfile?.years_experience ?? ""}
-                        onChange={e => setPreview(p => ({ ...p, yearsExperience: parseInt(e.target.value) || 0 }))}
-                      />
-                    </Field>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                    <Field label="Nivel académico máximo">
-                      <select name="academicLevel" style={{ ...inp, appearance: "none" as const }}
-                        defaultValue={facultyProfile?.academic_level || ""}>
-                        <option value="">Sin especificar</option>
-                        <option value="Grado">Grado / Licenciatura</option>
-                        <option value="Master">Máster</option>
-                        <option value="Doctorado">Doctorado (PhD)</option>
-                        <option value="Postdoctorado">Postdoctorado</option>
-                        <option value="Catedratico">Catedrático</option>
-                      </select>
-                    </Field>
-                    <Field label="Disponibilidad">
-                      <select
-                        name="availability"
-                        style={{ ...inp, appearance: "none" as const }}
-                        defaultValue={facultyProfile?.availability || "open"}
-                        onChange={e => setPreview(p => ({ ...p, availability: e.target.value }))}
-                      >
-                        <option value="open">Disponible inmediatamente</option>
-                        <option value="next_semester">Próximo semestre</option>
-                        <option value="occasional">Asignaturas puntuales</option>
-                        <option value="weekends">Solo fines de semana</option>
-                        <option value="online_only">Solo online</option>
-                        <option value="limited">En 6 meses</option>
-                        <option value="invite_only">Solo por invitación</option>
-                      </select>
-                    </Field>
-                  </div>
-
-                  {/* PhD toggle */}
-                  <label style={{
-                    display: "flex", alignItems: "center", gap: 14,
-                    padding: "14px 16px", borderRadius: 12,
-                    border: `1px solid ${D.border}`, cursor: "pointer",
-                    background: D.surf,
-                  }}>
-                    <input
-                      type="checkbox" name="isPhd"
-                      style={{ width: 18, height: 18, accentColor: D.blue, flexShrink: 0, cursor: "pointer" }}
-                      defaultChecked={facultyProfile?.is_phd ?? false}
-                      onChange={e => setPreview(p => ({ ...p, isPhd: e.target.checked }))}
-                    />
+                {facultyProfile?.current_institution ? (
+                  <div style={{ display: "flex", gap: 14, marginTop: 12 }}>
+                    <div style={{
+                      width: 46, height: 46, borderRadius: 8, background: D.surf,
+                      border: `1px solid ${D.border}`, display: "flex", alignItems: "center",
+                      justifyContent: "center", flexShrink: 0,
+                    }}>
+                      <Building2 size={22} color={D.navy} />
+                    </div>
                     <div>
-                      <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: D.ink }}>Soy Doctor/a (PhD)</div>
-                      <div style={{ fontFamily: SANS, fontSize: 12, color: D.muted, marginTop: 2 }}>
-                        Aparecerá el badge PhD en tu perfil y en el directorio
+                      <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: D.ink }}>
+                        {facultyProfile.current_institution}
+                      </div>
+                      {facultyProfile?.academic_level && (
+                        <div style={{ fontFamily: SANS, fontSize: 13, color: D.muted, marginTop: 2 }}>
+                          {facultyProfile.academic_level}
+                        </div>
+                      )}
+                      <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" as const }}>
+                        {facultyProfile?.years_experience > 0 && (
+                          <span style={{
+                            fontFamily: SANS, fontSize: 11, color: D.muted,
+                            background: D.surf, border: `1px solid ${D.border}`,
+                            padding: "2px 8px", borderRadius: 999,
+                          }}>{facultyProfile.years_experience} años</span>
+                        )}
+                        <span style={{
+                          fontFamily: SANS, fontSize: 11, fontWeight: 700,
+                          color: avail.color, background: avail.bg,
+                          padding: "2px 8px", borderRadius: 999,
+                        }}>{avail.label}</span>
                       </div>
                     </div>
-                  </label>
-
-                  <Field label="Instituciones donde has impartido docencia">
-                    <InstitutionsTaughtEditor
-                      initialInstitutions={(facultyProfile?.institutions_taught as string[] | null) || []}
-                    />
-                  </Field>
-
-                  <SaveButton pending={isPending} />
-                </form>
-              </div>
-            )}
-
-            {/* ── FORMACIÓN ── */}
-            {activeSection === "formacion" && (
-              <div>
-                <SectionHeader icon={<GraduationCap size={18} color={D.blue} />} title="Formación académica" desc="Títulos y certificaciones" />
-                <form action={saveFormacion} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                  <DegreeEditor initialDegrees={(facultyProfile?.degrees as any[] | null) || []} />
-                  <SaveButton pending={isPending} label="Guardar formación" />
-                </form>
-              </div>
-            )}
-
-            {/* ── IDIOMAS ── */}
-            {activeSection === "idiomas" && (
-              <div>
-                <SectionHeader icon={<Languages size={18} color={D.blue} />} title="Idiomas" desc="Idiomas en los que puedes impartir docencia" />
-                <form action={saveLanguages} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                  <LanguageEditor
-                    initialLanguages={(facultyProfile?.languages as any[] | null) || []}
-                  />
-                  <SaveButton pending={isPending} label="Guardar idiomas" />
-                </form>
-              </div>
-            )}
-
-            {/* ── INVESTIGACIÓN ── */}
-            {activeSection === "research" && (
-              <div>
-                <SectionHeader icon={<BookOpen size={18} color={D.blue} />} title="Perfil investigador" desc="Acreditaciones y métricas académicas" />
-                <form action={saveResearch} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                  <div>
-                    <label style={{ ...lbl, marginBottom: 10 }}>Acreditaciones</label>
-                    <label style={{
-                      display: "flex", alignItems: "center", gap: 14,
-                      padding: "14px 16px", borderRadius: 12,
-                      border: `1px solid ${D.border}`, cursor: "pointer",
-                      background: D.surf, marginBottom: 10,
-                    }}>
-                      <input
-                        type="checkbox" name="hasAneca"
-                        style={{ width: 18, height: 18, accentColor: D.blue, flexShrink: 0 }}
-                        defaultChecked={!!(facultyProfile?.aneca_accreditation?.includes("ANECA"))}
-                      />
-                      <div>
-                        <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: D.ink }}>Acreditación ANECA — Titular de Universidad</div>
-                        <div style={{ fontFamily: SANS, fontSize: 12, color: D.muted, marginTop: 2 }}>
-                          Para Titular de Universidad o Catedrático
-                        </div>
-                      </div>
-                    </label>
-                    <Field label="Otra acreditación (AQU, ANECA Ayudante Doctor...)">
-                      <input
-                        name="otherAccreditation" style={inp}
-                        placeholder="Ej: Acreditación AQU, ANECA Ayudante Doctor..."
-                        defaultValue={
-                          facultyProfile?.aneca_accreditation
-                            ?.replace("Titular de Universidad (ANECA)", "").replace(" · ", "").trim() || ""
-                        }
-                      />
-                    </Field>
                   </div>
-                  <Field label="Publicaciones relevantes">
-                    <textarea
-                      name="researchPublications" rows={4}
-                      style={{ ...inp, resize: "vertical" as const }}
-                      placeholder="Lista tus publicaciones principales..."
-                      defaultValue={facultyProfile?.research_publications}
-                    />
-                  </Field>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                    <Field label="Google Scholar ID">
-                      <input name="googleScholarId" style={inp} placeholder="XXXXXXX"
-                        defaultValue={facultyProfile?.google_scholar_id} />
-                    </Field>
-                    <Field label="ORCID iD">
-                      <input name="orcidId" style={inp} placeholder="0000-0000-0000-0000"
-                        defaultValue={facultyProfile?.orcid_id} />
-                    </Field>
-                  </div>
-                  <SaveButton pending={isPending} />
-                </form>
-              </div>
-            )}
-
-            {/* ── DOCUMENTOS ── */}
-            {activeSection === "documents" && (
-              <div>
-                <SectionHeader icon={<FileText size={18} color={D.blue} />} title="Curriculum Vitae" desc="Sube tu CV actualizado" />
-                <CVUpload facultyId={user.id} existingDocs={documents} />
-              </div>
-            )}
-
-            {/* ── ENLACES ── */}
-            {activeSection === "links" && (
-              <div>
-                <SectionHeader icon={<Globe size={18} color={D.blue} />} title="Presencia digital" desc="Perfiles profesionales y web" />
-                <form action={saveLinks} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                    <Field label="LinkedIn URL">
-                      <input name="linkedinUrl" style={inp}
-                        placeholder="https://linkedin.com/in/..."
-                        defaultValue={facultyProfile?.linkedin_url}
-                        onChange={e => setPreview(p => ({ ...p, linkedinUrl: e.target.value }))}
-                      />
-                    </Field>
-                    <Field label="Web personal">
-                      <input name="website" style={inp}
-                        placeholder="https://..."
-                        defaultValue={facultyProfile?.website}
-                        onChange={e => setPreview(p => ({ ...p, website: e.target.value }))}
-                      />
-                    </Field>
-                  </div>
-                  <Field label="Teléfono">
-                    <input name="phone" style={inp} placeholder="+34 600 000 000"
-                      defaultValue={facultyProfile?.phone} />
-                  </Field>
-                  <SaveButton pending={isPending} />
-                </form>
-              </div>
-            )}
-
-            {/* ── CONTACTO ── */}
-            {activeSection === "preferences" && (
-              <div>
-                <SectionHeader icon={<Bell size={18} color={D.blue} />} title="Preferencias de contacto" desc="Cómo quieres que te contacten las instituciones" />
-                <form action={updateContactPreferences} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                  <Field label="Método preferido">
-                    <select name="preferredContact" style={{ ...inp, appearance: "none" as const }}
-                      defaultValue={facultyProfile?.preferred_contact_method || "email"}>
-                      <option value="email">Por email</option>
-                      <option value="whatsapp">Por WhatsApp</option>
-                      <option value="linkedin">Por LinkedIn</option>
-                      <option value="platform">Solo plataforma</option>
-                    </select>
-                  </Field>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                    <Field label="Email de contacto">
-                      <input name="contactEmail" type="email" style={inp}
-                        placeholder="tu@email.com"
-                        defaultValue={facultyProfile?.contact_email || user.email || ""} />
-                    </Field>
-                    <Field label="WhatsApp">
-                      <input name="contactWhatsapp" style={inp}
-                        placeholder="+34 600 000 000"
-                        defaultValue={facultyProfile?.contact_whatsapp} />
-                    </Field>
-                  </div>
-                  <Field label="LinkedIn para contacto">
-                    <input name="contactLinkedin" style={inp}
-                      placeholder="https://linkedin.com/in/..."
-                      defaultValue={facultyProfile?.contact_linkedin || facultyProfile?.linkedin_url} />
-                  </Field>
-
-                  {/* Notification toggles */}
-                  <div>
-                    <label style={{ ...lbl, marginBottom: 10 }}>Notificaciones</label>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      {[
-                        { name: "notifyNewOffers", label: "Nuevas oportunidades de instituciones", checked: facultyProfile?.notify_new_offers ?? true },
-                        { name: "notifyMessages", label: "Mensajes directos", checked: facultyProfile?.notify_messages ?? true },
-                        { name: "notifyWeeklyDigest", label: "Resumen semanal de actividad", checked: facultyProfile?.notify_weekly_digest ?? false },
-                      ].map(({ name, label, checked }) => (
-                        <label key={name} style={{
-                          display: "flex", alignItems: "center", justifyContent: "space-between",
-                          padding: "12px 16px", borderRadius: 10,
-                          border: `1px solid ${D.border}`, cursor: "pointer",
-                          background: D.surf,
-                        }}>
-                          <span style={{ fontFamily: SANS, fontSize: 13, color: D.ink }}>{label}</span>
-                          <input type="checkbox" name={name} defaultChecked={checked}
-                            style={{ width: 16, height: 16, accentColor: D.blue, cursor: "pointer" }} />
-                        </label>
+                ) : (
+                  <EmptyState text="Añade tu institución actual y experiencia docente" />
+                )}
+                {(facultyProfile?.institutions_taught as string[] | null)?.length > 0 && (
+                  <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${D.border}` }}>
+                    <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: D.muted, marginBottom: 8 }}>
+                      También ha impartido en:
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 6 }}>
+                      {(facultyProfile.institutions_taught as string[]).map((inst: string, i: number) => (
+                        <span key={i} style={{
+                          fontFamily: SANS, fontSize: 12, color: D.ink,
+                          background: D.surf, border: `1px solid ${D.border}`,
+                          padding: "3px 10px", borderRadius: 999,
+                        }}>{inst}</span>
                       ))}
                     </div>
                   </div>
-
-                  <SaveButton pending={isPending} label="Guardar preferencias" />
-                </form>
+                )}
               </div>
-            )}
-
-          </div>
-        </div>
-
-        {/* ── RIGHT: Sticky preview ── */}
-        <div style={{ position: "sticky", top: 24 }}>
-          {/* Preview label */}
-          <div style={{
-            display: "flex", alignItems: "center", gap: 7,
-            marginBottom: 10,
-          }}>
-            <Eye size={14} color={D.muted} />
-            <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: D.muted }}>
-              Vista previa del perfil
-            </span>
-          </div>
-
-          <ProfilePreview data={preview} avatarUrl={avatarUrl} />
-
-          {/* Profile completion tips */}
-          {completeness < 80 && (
-            <div style={{
-              marginTop: 14, background: D.white,
-              border: `1px solid ${D.border}`,
-              borderRadius: 14, padding: "16px 18px",
-            }}>
-              <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: D.navy, marginBottom: 8 }}>
-                Mejora tu visibilidad
-              </div>
-              {[
-                !facultyProfile?.headline && "Añade un titular profesional",
-                !facultyProfile?.bio && "Escribe tu biografía",
-                !facultyProfile?.current_institution && "Indica tu institución actual",
-                !(facultyProfile?.languages?.length) && "Añade los idiomas que hablas",
-                !(facultyProfile?.degrees?.length) && "Añade tu formación académica",
-              ].filter(Boolean).slice(0, 3).map((tip, i) => (
-                <div key={i} style={{
-                  display: "flex", alignItems: "center", gap: 8,
-                  fontFamily: SANS, fontSize: 12, color: D.muted, marginTop: 6,
-                }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: D.gold, flexShrink: 0 }} />
-                  {tip}
+            }
+            form={
+              <form action={saveExperience} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <Field label="Institución actual">
+                    <InstitutionSelector name="currentInstitution"
+                      initialValue={facultyProfile?.current_institution || ""}
+                      placeholder="Buscar institución…" />
+                  </Field>
+                  <Field label="Años de experiencia">
+                    <input name="yearsExperience" type="number" min={0} style={inp}
+                      defaultValue={facultyProfile?.years_experience ?? ""} />
+                  </Field>
                 </div>
-              ))}
-            </div>
-          )}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <Field label="Nivel académico máximo">
+                    <select name="academicLevel" style={{ ...inp, appearance: "none" as const }}
+                      defaultValue={facultyProfile?.academic_level || ""}>
+                      <option value="">Sin especificar</option>
+                      <option value="Grado">Grado / Licenciatura</option>
+                      <option value="Master">Máster</option>
+                      <option value="Doctorado">Doctorado (PhD)</option>
+                      <option value="Postdoctorado">Postdoctorado</option>
+                      <option value="Catedratico">Catedrático</option>
+                    </select>
+                  </Field>
+                  <Field label="Disponibilidad">
+                    <select name="availability" style={{ ...inp, appearance: "none" as const }}
+                      defaultValue={facultyProfile?.availability || "open"}>
+                      <option value="open">Disponible inmediatamente</option>
+                      <option value="next_semester">Próximo semestre</option>
+                      <option value="occasional">Asignaturas puntuales</option>
+                      <option value="weekends">Solo fines de semana</option>
+                      <option value="online_only">Solo online</option>
+                      <option value="limited">En 6 meses</option>
+                      <option value="invite_only">Solo por invitación</option>
+                    </select>
+                  </Field>
+                </div>
+                <label style={{
+                  display: "flex", alignItems: "center", gap: 14,
+                  padding: "14px 16px", borderRadius: 12,
+                  border: `1px solid ${D.border}`, cursor: "pointer", background: D.surf,
+                }}>
+                  <input type="checkbox" name="isPhd"
+                    style={{ width: 18, height: 18, accentColor: D.blue, flexShrink: 0, cursor: "pointer" }}
+                    defaultChecked={facultyProfile?.is_phd ?? false} />
+                  <div>
+                    <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: D.ink }}>Soy Doctor/a (PhD)</div>
+                    <div style={{ fontFamily: SANS, fontSize: 12, color: D.muted, marginTop: 2 }}>
+                      Aparecerá el badge PhD en tu perfil y en el directorio
+                    </div>
+                  </div>
+                </label>
+                <Field label="Instituciones donde has impartido docencia">
+                  <InstitutionsTaughtEditor
+                    initialInstitutions={(facultyProfile?.institutions_taught as string[] | null) || []} />
+                </Field>
+                <SaveButton pending={isPending} />
+              </form>
+            }
+          />
+
+          {/* ── FORMACIÓN ── */}
+          <SectionCard
+            icon={<GraduationCap size={16} color={D.blue} />}
+            title="Formación académica"
+            isEditing={isEditing("formacion")}
+            onToggleEdit={() => toggle("formacion")}
+            children={
+              <div>
+                {(facultyProfile?.degrees as any[] | null)?.length > 0 ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 12 }}>
+                    {(facultyProfile.degrees as any[]).map((deg: any, i: number) => (
+                      <div key={i} style={{ display: "flex", gap: 14 }}>
+                        <div style={{
+                          width: 46, height: 46, borderRadius: 8, background: "#F5F3FF",
+                          border: "1px solid #DDD6FE", display: "flex", alignItems: "center",
+                          justifyContent: "center", flexShrink: 0,
+                        }}>
+                          <GraduationCap size={22} color="#7C3AED" />
+                        </div>
+                        <div>
+                          <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: D.ink }}>
+                            {deg.title || deg.degree || "Titulación"}
+                          </div>
+                          <div style={{ fontFamily: SANS, fontSize: 13, color: D.muted, marginTop: 1 }}>
+                            {deg.institution || deg.school || ""}
+                          </div>
+                          {deg.year && (
+                            <div style={{ fontFamily: SANS, fontSize: 12, color: D.faint, marginTop: 2 }}>{deg.year}</div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState text="Añade tu formación académica y titulaciones" />
+                )}
+              </div>
+            }
+            form={
+              <form action={saveFormacion} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <DegreeEditor initialDegrees={(facultyProfile?.degrees as any[] | null) || []} />
+                <SaveButton pending={isPending} label="Guardar formación" />
+              </form>
+            }
+          />
+
+          {/* ── IDIOMAS ── */}
+          <SectionCard
+            icon={<Languages size={16} color={D.blue} />}
+            title="Idiomas"
+            isEditing={isEditing("idiomas")}
+            onToggleEdit={() => toggle("idiomas")}
+            children={
+              <div>
+                {(facultyProfile?.languages as any[] | null)?.length > 0 ? (
+                  <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8, marginTop: 12 }}>
+                    {(facultyProfile.languages as any[]).map((l: any, i: number) => (
+                      <span key={i} style={{
+                        fontFamily: SANS, fontSize: 13, color: D.ink, fontWeight: 600,
+                        background: D.surf, border: `1px solid ${D.border}`,
+                        padding: "5px 12px", borderRadius: 999,
+                      }}>
+                        {typeof l === "string" ? l : `${l.language || l.name}${l.level ? ` · ${l.level}` : ""}`}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState text="Indica los idiomas en que puedes impartir docencia" />
+                )}
+              </div>
+            }
+            form={
+              <form action={saveLanguages} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <LanguageEditor initialLanguages={(facultyProfile?.languages as any[] | null) || []} />
+                <SaveButton pending={isPending} label="Guardar idiomas" />
+              </form>
+            }
+          />
+
+          {/* ── INVESTIGACIÓN ── */}
+          <SectionCard
+            icon={<BookOpen size={16} color={D.blue} />}
+            title="Perfil investigador"
+            isEditing={isEditing("research")}
+            onToggleEdit={() => toggle("research")}
+            children={
+              <div>
+                {facultyProfile?.aneca_accreditation || facultyProfile?.google_scholar_id || facultyProfile?.orcid_id || facultyProfile?.research_publications ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 12 }}>
+                    {facultyProfile?.aneca_accreditation && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <Award size={15} color={D.gold} />
+                        <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: D.ink }}>
+                          {facultyProfile.aneca_accreditation}
+                        </span>
+                      </div>
+                    )}
+                    {facultyProfile?.google_scholar_id && (
+                      <div style={{ fontFamily: SANS, fontSize: 13, color: D.muted }}>
+                        Google Scholar: <span style={{ color: D.blue, fontWeight: 600 }}>{facultyProfile.google_scholar_id}</span>
+                      </div>
+                    )}
+                    {facultyProfile?.orcid_id && (
+                      <div style={{ fontFamily: SANS, fontSize: 13, color: D.muted }}>
+                        ORCID: <span style={{ color: D.blue, fontWeight: 600 }}>{facultyProfile.orcid_id}</span>
+                      </div>
+                    )}
+                    {facultyProfile?.research_publications && (
+                      <p style={{ fontFamily: SANS, fontSize: 13, color: D.muted, lineHeight: 1.65, margin: 0 }}>
+                        {facultyProfile.research_publications}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <EmptyState text="Añade tus acreditaciones, publicaciones e IDs académicos" />
+                )}
+              </div>
+            }
+            form={
+              <form action={saveResearch} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <div>
+                  <label style={{ ...lbl, marginBottom: 10 }}>Acreditaciones</label>
+                  <label style={{
+                    display: "flex", alignItems: "center", gap: 14, padding: "14px 16px", borderRadius: 12,
+                    border: `1px solid ${D.border}`, cursor: "pointer", background: D.surf, marginBottom: 10,
+                  }}>
+                    <input type="checkbox" name="hasAneca"
+                      style={{ width: 18, height: 18, accentColor: D.blue, flexShrink: 0 }}
+                      defaultChecked={!!(facultyProfile?.aneca_accreditation?.includes("ANECA"))} />
+                    <div>
+                      <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: D.ink }}>
+                        Acreditación ANECA — Titular de Universidad
+                      </div>
+                      <div style={{ fontFamily: SANS, fontSize: 12, color: D.muted, marginTop: 2 }}>
+                        Para Titular de Universidad o Catedrático
+                      </div>
+                    </div>
+                  </label>
+                  <Field label="Otra acreditación (AQU, ANECA Ayudante Doctor...)">
+                    <input name="otherAccreditation" style={inp}
+                      placeholder="Ej: Acreditación AQU, ANECA Ayudante Doctor…"
+                      defaultValue={
+                        facultyProfile?.aneca_accreditation
+                          ?.replace("Titular de Universidad (ANECA)", "").replace(" · ", "").trim() || ""
+                      } />
+                  </Field>
+                </div>
+                <Field label="Publicaciones relevantes">
+                  <textarea name="researchPublications" rows={4}
+                    style={{ ...inp, resize: "vertical" as const }}
+                    placeholder="Lista tus publicaciones principales…"
+                    defaultValue={facultyProfile?.research_publications} />
+                </Field>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <Field label="Google Scholar ID">
+                    <input name="googleScholarId" style={inp} placeholder="XXXXXXX"
+                      defaultValue={facultyProfile?.google_scholar_id} />
+                  </Field>
+                  <Field label="ORCID iD">
+                    <input name="orcidId" style={inp} placeholder="0000-0000-0000-0000"
+                      defaultValue={facultyProfile?.orcid_id} />
+                  </Field>
+                </div>
+                <SaveButton pending={isPending} />
+              </form>
+            }
+          />
+
+          {/* ── DOCUMENTOS ── */}
+          <SectionCard
+            icon={<FileText size={16} color={D.blue} />}
+            title="Curriculum Vitae"
+            isEditing={isEditing("documents")}
+            onToggleEdit={() => toggle("documents")}
+            children={
+              <div>
+                {documents.length > 0 ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12 }}>
+                    {documents.map((doc: any) => (
+                      <div key={doc.id} style={{
+                        display: "flex", alignItems: "center", gap: 12,
+                        padding: "10px 14px", borderRadius: 10,
+                        background: D.surf, border: `1px solid ${D.border}`,
+                      }}>
+                        <FileText size={16} color={D.blue} />
+                        <span style={{ fontFamily: SANS, fontSize: 13, color: D.ink, flex: 1 }}>
+                          {doc.file_name || "CV.pdf"}
+                        </span>
+                        <a href={doc.file_url} target="_blank" rel="noopener noreferrer"
+                          style={{ color: D.blue, display: "flex", alignItems: "center" }}>
+                          <ExternalLink size={14} />
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState text="Sube tu CV actualizado en formato PDF" />
+                )}
+              </div>
+            }
+            form={<CVUpload facultyId={user.id} existingDocs={documents} />}
+          />
+
+          {/* ── PRESENCIA DIGITAL ── */}
+          <SectionCard
+            icon={<Globe size={16} color={D.blue} />}
+            title="Presencia digital"
+            isEditing={isEditing("links")}
+            onToggleEdit={() => toggle("links")}
+            children={
+              <div>
+                {facultyProfile?.linkedin_url || facultyProfile?.website || facultyProfile?.phone ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 12 }}>
+                    {facultyProfile?.linkedin_url && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{
+                          width: 34, height: 34, borderRadius: 6, background: "#0A66C2",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                          <ExternalLink size={14} color="#fff" />
+                        </div>
+                        <a href={facultyProfile.linkedin_url} target="_blank" rel="noopener noreferrer"
+                          style={{ fontFamily: SANS, fontSize: 13, color: D.blue, textDecoration: "none", fontWeight: 600 }}>
+                          LinkedIn
+                        </a>
+                      </div>
+                    )}
+                    {facultyProfile?.website && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{
+                          width: 34, height: 34, borderRadius: 6, background: D.surf,
+                          border: `1px solid ${D.border}`, display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                          <Globe size={14} color={D.navy} />
+                        </div>
+                        <a href={facultyProfile.website} target="_blank" rel="noopener noreferrer"
+                          style={{ fontFamily: SANS, fontSize: 13, color: D.blue, textDecoration: "none" }}>
+                          {facultyProfile.website.replace(/^https?:\/\//, "")}
+                        </a>
+                      </div>
+                    )}
+                    {facultyProfile?.phone && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{
+                          width: 34, height: 34, borderRadius: 6, background: D.surf,
+                          border: `1px solid ${D.border}`, display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                          <Bell size={14} color={D.navy} />
+                        </div>
+                        <span style={{ fontFamily: SANS, fontSize: 13, color: D.muted }}>{facultyProfile.phone}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <EmptyState text="Añade tu LinkedIn, web personal o teléfono" />
+                )}
+              </div>
+            }
+            form={
+              <form action={saveLinks} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <Field label="LinkedIn URL">
+                    <input name="linkedinUrl" style={inp} placeholder="https://linkedin.com/in/…"
+                      defaultValue={facultyProfile?.linkedin_url} />
+                  </Field>
+                  <Field label="Web personal">
+                    <input name="website" style={inp} placeholder="https://…"
+                      defaultValue={facultyProfile?.website} />
+                  </Field>
+                </div>
+                <Field label="Teléfono">
+                  <input name="phone" style={inp} placeholder="+34 600 000 000"
+                    defaultValue={facultyProfile?.phone} />
+                </Field>
+                <SaveButton pending={isPending} />
+              </form>
+            }
+          />
+
+          {/* ── CONTACTO ── */}
+          <SectionCard
+            icon={<Bell size={16} color={D.blue} />}
+            title="Preferencias de contacto"
+            isEditing={isEditing("preferences")}
+            onToggleEdit={() => toggle("preferences")}
+            children={
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
+                <div style={{ padding: "12px 14px", background: D.surf, borderRadius: 10, border: `1px solid ${D.border}` }}>
+                  <div style={{ fontFamily: SANS, fontSize: 11, color: D.faint, marginBottom: 4 }}>Método preferido</div>
+                  <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: D.ink, textTransform: "capitalize" as const }}>
+                    {facultyProfile?.preferred_contact_method || "Email"}
+                  </div>
+                </div>
+                <div style={{ padding: "12px 14px", background: D.surf, borderRadius: 10, border: `1px solid ${D.border}` }}>
+                  <div style={{ fontFamily: SANS, fontSize: 11, color: D.faint, marginBottom: 4 }}>Email de contacto</div>
+                  <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: D.ink, overflow: "hidden", textOverflow: "ellipsis" as const, whiteSpace: "nowrap" as const }}>
+                    {facultyProfile?.contact_email || user.email || "—"}
+                  </div>
+                </div>
+              </div>
+            }
+            form={
+              <form action={updateContactPreferences} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                <Field label="Método preferido">
+                  <select name="preferredContact" style={{ ...inp, appearance: "none" as const }}
+                    defaultValue={facultyProfile?.preferred_contact_method || "email"}>
+                    <option value="email">Por email</option>
+                    <option value="whatsapp">Por WhatsApp</option>
+                    <option value="linkedin">Por LinkedIn</option>
+                    <option value="platform">Solo plataforma</option>
+                  </select>
+                </Field>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <Field label="Email de contacto">
+                    <input name="contactEmail" type="email" style={inp}
+                      placeholder="tu@email.com"
+                      defaultValue={facultyProfile?.contact_email || user.email || ""} />
+                  </Field>
+                  <Field label="WhatsApp">
+                    <input name="contactWhatsapp" style={inp} placeholder="+34 600 000 000"
+                      defaultValue={facultyProfile?.contact_whatsapp} />
+                  </Field>
+                </div>
+                <Field label="LinkedIn para contacto">
+                  <input name="contactLinkedin" style={inp}
+                    placeholder="https://linkedin.com/in/…"
+                    defaultValue={facultyProfile?.contact_linkedin || facultyProfile?.linkedin_url} />
+                </Field>
+                <div>
+                  <label style={{ ...lbl, marginBottom: 10 }}>Notificaciones</label>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {[
+                      { name: "notifyNewOffers",    label: "Nuevas oportunidades de instituciones", checked: facultyProfile?.notify_new_offers ?? true },
+                      { name: "notifyMessages",     label: "Mensajes directos",                     checked: facultyProfile?.notify_messages ?? true },
+                      { name: "notifyWeeklyDigest", label: "Resumen semanal de actividad",           checked: facultyProfile?.notify_weekly_digest ?? false },
+                    ].map(({ name, label, checked }) => (
+                      <label key={name} style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        padding: "12px 16px", borderRadius: 10,
+                        border: `1px solid ${D.border}`, cursor: "pointer", background: D.surf,
+                      }}>
+                        <span style={{ fontFamily: SANS, fontSize: 13, color: D.ink }}>{label}</span>
+                        <input type="checkbox" name={name} defaultChecked={checked}
+                          style={{ width: 16, height: 16, accentColor: D.blue, cursor: "pointer" }} />
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <SaveButton pending={isPending} label="Guardar preferencias" />
+              </form>
+            }
+          />
+
         </div>
 
-      </div>
-    </div>
-  );
-}
+        {/* ── RIGHT sidebar ── */}
+        <div style={{ position: "sticky", top: 24 }}>
 
-// ─── Small helpers ─────────────────────────────────────────────────────────────
-function SectionHeader({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-      <div style={{
-        width: 40, height: 40, borderRadius: 10,
-        background: "#EFF6FF", display: "flex",
-        alignItems: "center", justifyContent: "center", flexShrink: 0,
-      }}>
-        {icon}
-      </div>
-      <div>
-        <div style={{ fontFamily: SANS, fontSize: 16, fontWeight: 800, color: D.ink, letterSpacing: "-0.03em" }}>{title}</div>
-        <div style={{ fontFamily: SANS, fontSize: 12, color: D.muted, marginTop: 1 }}>{desc}</div>
-      </div>
-    </div>
-  );
-}
+          {/* Completeness card */}
+          <div style={{
+            background: D.white, border: `1px solid ${D.border}`,
+            borderRadius: 16, padding: "20px", marginBottom: 12,
+          }}>
+            <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: D.ink, letterSpacing: "-0.02em", marginBottom: 14 }}>
+              Completitud del perfil
+            </div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+              <span style={{ fontFamily: SANS, fontSize: 12, color: D.muted }}>
+                {completeness < 60 ? "Empieza a completar tu perfil" : completeness < 80 ? "Casi completo" : "Perfil completo"}
+              </span>
+              <span style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: completeness >= 80 ? D.green : D.blue, letterSpacing: "-0.04em" }}>
+                {completeness}%
+              </span>
+            </div>
+            <div style={{ height: 8, background: D.surf, borderRadius: 999, overflow: "hidden" }}>
+              <div style={{
+                height: "100%", width: `${completeness}%`,
+                background: completeness >= 80 ? D.green : D.blue,
+                borderRadius: 999, transition: "width 0.5s ease",
+              }} />
+            </div>
+          </div>
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label style={lbl}>{label}</label>
-      {children}
-    </div>
-  );
-}
+          {/* Visibility card */}
+          <div style={{
+            background: D.white, border: `1px solid ${D.border}`,
+            borderRadius: 16, padding: "20px", marginBottom: 12,
+          }}>
+            <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: D.ink, letterSpacing: "-0.02em", marginBottom: 14 }}>
+              Visibilidad
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 8, background: avail.bg,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <Clock size={16} color={avail.color} />
+              </div>
+              <div>
+                <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: avail.color }}>{avail.label}</div>
+                <div style={{ fontFamily: SANS, fontSize: 11, color: D.faint, marginTop: 2 }}>Estado actual</div>
+              </div>
+            </div>
+            <div style={{ paddingTop: 14, borderTop: `1px solid ${D.border}` }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Eye size={14} color={D.blue} />
+                <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: D.blue }}>
+                  {viewCount.toLocaleString()} visualizaciones
+                </span>
+              </div>
+            </div>
+          </div>
 
-function SaveButton({ pending, label = "Guardar cambios" }: { pending?: boolean; label?: string }) {
-  return (
-    <div style={{ paddingTop: 4 }}>
-      <button type="submit" disabled={pending} style={{ ...saveBtn, opacity: pending ? 0.6 : 1 }}>
-        {pending ? <><span style={{ animation: "spin 1s linear infinite", display: "inline-block" }}>↻</span> Guardando...</> : <><Check size={15} /> {label}</>}
-      </button>
-      <style>{`@keyframes spin { from { transform:rotate(0deg) } to { transform:rotate(360deg) } }`}</style>
+          {/* Tips card */}
+          {completeness < 80 && (() => {
+            const tips = [
+              !facultyProfile?.headline          && { label: "Añade un titular profesional",  section: "basic"      },
+              !facultyProfile?.bio               && { label: "Escribe tu biografía",            section: "basic"      },
+              !facultyProfile?.current_institution && { label: "Indica tu institución actual", section: "experience" },
+              !(facultyProfile?.languages?.length) && { label: "Añade los idiomas que hablas", section: "idiomas"    },
+              !(facultyProfile?.degrees?.length)   && { label: "Añade tu formación académica", section: "formacion"  },
+            ].filter(Boolean).slice(0, 4) as { label: string; section: string }[];
+
+            if (!tips.length) return null;
+            return (
+              <div style={{
+                background: D.white, border: `1px solid ${D.border}`,
+                borderRadius: 16, padding: "20px",
+              }}>
+                <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: D.navy, marginBottom: 14 }}>
+                  Mejora tu visibilidad
+                </div>
+                {tips.map((tip, i) => (
+                  <button key={i} onClick={() => setEditingSection(tip.section)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 10, width: "100%",
+                      fontFamily: SANS, fontSize: 13, color: D.ink, textAlign: "left" as const,
+                      background: "none", border: "none", cursor: "pointer",
+                      padding: "9px 0",
+                      borderBottom: i < tips.length - 1 ? `1px solid ${D.border}` : "none",
+                    }}
+                  >
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: D.gold, flexShrink: 0 }} />
+                    <span style={{ flex: 1 }}>{tip.label}</span>
+                    <ChevronRight size={13} color={D.faint} />
+                  </button>
+                ))}
+              </div>
+            );
+          })()}
+
+        </div>
+      </div>
     </div>
   );
 }
