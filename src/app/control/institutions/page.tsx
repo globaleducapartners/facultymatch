@@ -1,6 +1,7 @@
 import { ApproveButtons } from "./ApproveButtons";
+import { InstitutionActions } from "./InstitutionActions";
 import { createAdminClient } from "@/lib/supabase-server";
-import { Building2, Globe, Mail, Phone, MapPin, Calendar, CheckCircle2, XCircle, Clock, Trash2 } from "lucide-react";
+import { Building2, Globe, Mail, Phone, MapPin, Calendar, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 async function toggleInstitutionStatus(formData: FormData) {
@@ -21,8 +22,37 @@ async function deleteInstitution(formData: FormData) {
   const { revalidatePath } = await import("next/cache");
   const admin = createAdminClient();
   const id = formData.get("id") as string;
-  // Delete from auth.users — cascades to user_profiles → institutions → contacts/favorites
-  await admin.auth.admin.deleteUser(id);
+
+  // Look up the institution to get the owner's user_id
+  const { data: inst } = await admin
+    .from("institutions")
+    .select("user_id")
+    .eq("id", id)
+    .single();
+
+  // Delete the institution record first
+  await admin.from("institutions").delete().eq("id", id);
+
+  if (inst?.user_id) {
+    // Check if the owner is a dual-mode faculty user or a pure institution user
+    const { data: profile } = await admin
+      .from("user_profiles")
+      .select("role")
+      .eq("id", inst.user_id)
+      .single();
+
+    if (profile?.role === "faculty") {
+      // Dual-mode user: just reset their institution access, keep the faculty account
+      await admin.from("user_profiles").update({
+        can_switch_role: false,
+        active_mode: "faculty",
+      }).eq("id", inst.user_id);
+    } else {
+      // Pure institution account: delete the auth user (cascades to profiles)
+      await admin.auth.admin.deleteUser(inst.user_id);
+    }
+  }
+
   revalidatePath("/control/institutions");
 }
 
@@ -246,32 +276,11 @@ export default async function ControlInstitutionsPage() {
                           <Mail size={12} /> Contactar
                         </a>
                       )}
-                      <form action={toggleInstitutionStatus}>
-                        <input type="hidden" name="id" value={inst.id} />
-                        <input type="hidden" name="currentStatus" value={inst.status || "active"} />
-                        <button
-                          type="submit"
-                          className={`text-xs font-bold px-4 py-2 rounded-xl transition-colors ${
-                            inst.status === "blocked"
-                              ? "bg-green-50 text-green-700 hover:bg-green-100 border border-green-100"
-                              : "bg-red-50 text-red-600 hover:bg-red-100 border border-red-100"
-                          }`}
-                        >
-                          {inst.status === "blocked" ? "Reactivar" : "Bloquear"}
-                        </button>
-                      </form>
-                      <form action={deleteInstitution} onSubmit={(e) => {
-                        if (!confirm(`¿Eliminar permanentemente "${inst.name}"? Esta acción no se puede deshacer.`)) e.preventDefault();
-                      }}>
-                        <input type="hidden" name="id" value={inst.id} />
-                        <button
-                          type="submit"
-                          className="text-xs font-bold p-2 rounded-xl transition-colors bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 border border-gray-100"
-                          title="Eliminar institución (duplicada o inválida)"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </form>
+                      <InstitutionActions
+                        inst={{ id: inst.id, name: inst.name, status: inst.status }}
+                        toggleAction={toggleInstitutionStatus}
+                        deleteAction={deleteInstitution}
+                      />
                     </div>
                   </div>
                 </div>

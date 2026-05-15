@@ -162,7 +162,6 @@ export default async function InstitutionDashboardPage() {
     online: "Universidad online", research: "Centro de investigación", other: "Centro educativo",
   };
   const typeLabel = instTypeLabel[(institution as any)?.institution_type] || (institution as any)?.institution_type || "Institución";
-  const instInitials = (institution?.name || "?").split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase();
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -215,21 +214,12 @@ export default async function InstitutionDashboardPage() {
             </div>
             <CardContent className="pt-0 pb-5 px-6">
               {/* Logo overlapping cover */}
-              <div className="flex items-end justify-between" style={{ marginTop: -40 }}>
-                <div className="relative z-10">
-                  <div className="w-20 h-20 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-white flex items-center justify-center">
-                    {institution?.logo_url
-                      ? <img src={institution.logo_url} alt={institution.name} className="w-full h-full object-cover" />
-                      : <span className="text-2xl font-black text-[#0D2240]">{instInitials}</span>
-                    }
-                  </div>
-                  {/* Logo upload hint */}
-                  <div className="mt-1">
-                    <InstitutionLogoUpload
-                      institutionId={institution?.id ?? ""}
-                      currentLogoUrl={institution?.logo_url ?? null}
-                    />
-                  </div>
+              <div className="flex items-end justify-between" style={{ marginTop: -44 }}>
+                <div className="relative z-10 p-1 bg-white rounded-2xl shadow-md">
+                  <InstitutionLogoUpload
+                    institutionId={institution?.id ?? ""}
+                    currentLogoUrl={institution?.logo_url ?? null}
+                  />
                 </div>
                 <div className="flex items-center gap-2 pb-1">
                   {institution?.status === "approved" && (
