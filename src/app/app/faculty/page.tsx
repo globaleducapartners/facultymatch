@@ -16,10 +16,6 @@ import {
   Sparkles,
   CalendarDays,
   Gift,
-  BookOpen,
-  TrendingUp,
-  Users,
-  Building2,
   Globe,
   Zap,
   Star,
@@ -97,8 +93,8 @@ export default async function EducatorDashboard() {
     { data: facultyProfile },
     { data: recentRequests },
     { data: expertiseData },
-    { count: totalFaculty },
-    { count: totalInstitutions },
+    { count: favoritesCount },
+    { count: contactsCount },
   ] = await Promise.all([
     supabase.from("faculty_profiles").select("*").eq("id", user.id).maybeSingle(),
     supabase
@@ -108,8 +104,8 @@ export default async function EducatorDashboard() {
       .order("created_at", { ascending: false })
       .limit(3),
     supabase.from("faculty_expertise").select("id").eq("faculty_id", user.id).limit(1),
-    admin.from("faculty_profiles").select("*", { count: "exact", head: true }).in("visibility", ["public", "private"]),
-    admin.from("institutions").select("*", { count: "exact", head: true }),
+    admin.from("favorites").select("*", { count: "exact", head: true }).eq("faculty_id", user.id),
+    admin.from("contacts").select("*", { count: "exact", head: true }).eq("faculty_id", user.id),
   ]);
 
   const userMeta = user.user_metadata || {};
@@ -298,12 +294,12 @@ export default async function EducatorDashboard() {
             </div>
           )}
 
-          {/* Platform stats bar */}
+          {/* Personal stats */}
           <div className="grid grid-cols-3 gap-4">
             {[
-              { icon: Users, label: "Docentes en plataforma", value: (totalFaculty ?? 0).toLocaleString("es-ES"), color: "text-talentia-blue", bg: "bg-blue-50" },
-              { icon: Building2, label: "Instituciones activas", value: (totalInstitutions ?? 0).toLocaleString("es-ES"), color: "text-green-600", bg: "bg-green-50" },
-              { icon: Globe, label: "Tus idiomas", value: languages.length > 0 ? languages.map((l: any) => (typeof l === "string" ? l : l.lang ?? "")).filter(Boolean).join(", ") : "—", color: "text-purple-600", bg: "bg-purple-50" },
+              { icon: Star, label: "En favoritos", value: (favoritesCount ?? 0).toString(), color: "text-energy-orange", bg: "bg-orange-50" },
+              { icon: Mail, label: "Solicitudes recibidas", value: (contactsCount ?? 0).toString(), color: "text-talentia-blue", bg: "bg-blue-50" },
+              { icon: Globe, label: "Idiomas", value: languages.length > 0 ? languages.map((l: any) => (typeof l === "string" ? l : l.lang ?? "")).filter(Boolean).join(", ") : "—", color: "text-purple-600", bg: "bg-purple-50" },
             ].map((stat) => (
               <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-2">
                 <div className={`w-9 h-9 ${stat.bg} rounded-xl flex items-center justify-center`}>

@@ -10,6 +10,10 @@ import { redirect } from "next/navigation";
 interface ContactRequest {
   id: string;
   message: string;
+  subject: string | null;
+  modality: string | null;
+  dates: string | null;
+  contract_type: string | null;
   status: string;
   created_at: string;
   institution: {
@@ -17,6 +21,27 @@ interface ContactRequest {
     country: string;
   };
 }
+
+const SUBJECT_LABELS: Record<string, string> = {
+  profesor_adjunto: "Profesor Adjunto / Invitado",
+  conferenciante: "Conferenciante",
+  tutor_tfm: "Tutor de TFM / Tesis",
+  diseno_curricular: "Diseño Curricular",
+  otro: "Otro",
+};
+
+const CONTRACT_LABELS: Record<string, string> = {
+  docencia_plena: "Docencia plena",
+  docencia_semiplena: "Docencia semiplena",
+  por_creditos: "Por créditos",
+  asignatura_invitada: "Asignatura invitada",
+};
+
+const MODALITY_LABELS: Record<string, string> = {
+  online: "Online",
+  presencial: "Presencial",
+  hibrida: "Híbrida",
+};
 
 export default async function RequestsPage() {
   const supabase = await createClient();
@@ -82,16 +107,33 @@ export default async function RequestsPage() {
                         <div className="bg-gray-100 p-3 rounded-2xl group-hover:bg-white transition-colors">
                           <Building2 size={24} className="text-gray-400" />
                         </div>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <h4 className="text-base font-bold text-navy">{req.institution?.name}</h4>
-                            <Badge variant="secondary" className="bg-blue-50 text-talentia-blue font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 border-blue-100">
-                              Institución
-                            </Badge>
+                            {req.subject && (
+                              <Badge variant="secondary" className="bg-blue-50 text-talentia-blue font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 border-blue-100">
+                                {SUBJECT_LABELS[req.subject] ?? req.subject}
+                              </Badge>
+                            )}
+                            {req.contract_type && (
+                              <Badge variant="secondary" className="bg-purple-50 text-purple-600 font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 border-purple-100">
+                                {CONTRACT_LABELS[req.contract_type] ?? req.contract_type}
+                              </Badge>
+                            )}
                           </div>
-                          <p className="text-sm font-bold text-gray-700">{req.message?.substring(0, 100)}...</p>
-                          <div className="flex items-center gap-4 pt-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                            <span className="flex items-center gap-1"><MapPin size={12} /> {req.institution?.country}</span>
+                          {req.message && (
+                            <p className="text-sm font-medium text-gray-600 line-clamp-2">{req.message}</p>
+                          )}
+                          <div className="flex items-center gap-4 pt-1 text-[10px] text-gray-400 font-bold uppercase tracking-widest flex-wrap">
+                            {req.institution?.country && (
+                              <span className="flex items-center gap-1"><MapPin size={12} /> {req.institution.country}</span>
+                            )}
+                            {req.modality && (
+                              <span className="flex items-center gap-1"><Clock size={12} /> {MODALITY_LABELS[req.modality] ?? req.modality}</span>
+                            )}
+                            {req.dates && (
+                              <span className="flex items-center gap-1"><Clock size={12} /> {req.dates}</span>
+                            )}
                             <span className="flex items-center gap-1"><Clock size={12} /> {new Date(req.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}</span>
                           </div>
                         </div>
@@ -137,9 +179,16 @@ export default async function RequestsPage() {
                         <div className="bg-gray-100 p-3 rounded-2xl">
                           <Building2 size={24} className="text-gray-400" />
                         </div>
-                        <div className="space-y-1">
-                          <h4 className="text-base font-bold text-navy">{req.institution?.name}</h4>
-                          <p className="text-sm text-gray-600">{req.message?.substring(0, 100)}...</p>
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h4 className="text-base font-bold text-navy">{req.institution?.name}</h4>
+                            {req.subject && (
+                              <Badge variant="secondary" className="bg-blue-50 text-talentia-blue font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 border-blue-100">
+                                {SUBJECT_LABELS[req.subject] ?? req.subject}
+                              </Badge>
+                            )}
+                          </div>
+                          {req.message && <p className="text-sm text-gray-500 line-clamp-1">{req.message}</p>}
                         </div>
                       </div>
                       <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 uppercase text-[9px] font-black tracking-widest px-3 py-1">Respondida</Badge>

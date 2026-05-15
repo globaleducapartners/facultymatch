@@ -691,7 +691,15 @@ export function InstitutionSearchPage({
               </div>
 
               {/* Footer */}
-              <div className="p-5 border-t border-gray-100 flex-shrink-0 bg-gray-50/50">
+              <div className="p-5 border-t border-gray-100 flex-shrink-0 bg-gray-50/50 flex items-center justify-between">
+                <Link
+                  href={`/app/faculty/${selectedEducator.id}`}
+                  className="inline-flex items-center gap-2 text-sm font-bold text-talentia-blue hover:text-navy transition-colors"
+                  onClick={closeDrawer}
+                >
+                  <ExternalLink size={14} />
+                  Ver perfil completo
+                </Link>
               </div>
             </>
           )}

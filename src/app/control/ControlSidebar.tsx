@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
-import { Home, Clock, CheckCircle2, XCircle, Building2, Settings, Menu, X, BarChart2 } from "lucide-react";
+import { Home, Clock, CheckCircle2, XCircle, Building2, Settings, Menu, X, BarChart2, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AdminLogoutButton } from "./AdminLogoutButton";
 import { useState } from "react";
@@ -23,6 +23,7 @@ export default function ControlSidebar({ pendingCount, adminName }: Props) {
     { label: "Rechazados", href: "/control/rejected", icon: XCircle },
     { label: "Instituciones", href: "/control/institutions", icon: Building2 },
     { label: "Métricas", href: "/control/metrics", icon: BarChart2 },
+    { label: "Mailing", href: "/control/mailing", icon: Mail },
     { label: "Configuración", href: "/control/settings", icon: Settings },
   ];
 

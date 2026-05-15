@@ -161,7 +161,20 @@ export default async function InstitutionDashboardPage() {
     business_school: "Business School", polytechnic: "Escuela Politécnica",
     online: "Universidad online", research: "Centro de investigación", other: "Centro educativo",
   };
-  const typeLabel = instTypeLabel[(institution as any)?.institution_type] || (institution as any)?.institution_type || "Institución";
+  // Map old Spanish text values (stored from signup form) to the select option keys
+  const legacyTypeMap: Record<string, string> = {
+    "Universidad pública": "university",
+    "Universidad privada": "private_university",
+    "Business School": "business_school",
+    "Centro de FP Superior": "polytechnic",
+    "Centro online": "online",
+    "Academia / Instituto": "other",
+    "Empresa con formación interna": "other",
+    "Otro": "other",
+  };
+  const rawInstType = (institution as any)?.institution_type as string | null | undefined;
+  const normalizedInstType = rawInstType ? (legacyTypeMap[rawInstType] ?? rawInstType) : "university";
+  const typeLabel = instTypeLabel[normalizedInstType] || rawInstType || "Institución";
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -238,7 +251,7 @@ export default async function InstitutionDashboardPage() {
               <div className="mt-3">
                 <h1 className="text-2xl font-black text-[#0C1018] leading-tight">{institution?.name || "Mi Institución"}</h1>
                 <p className="text-sm text-gray-500 font-medium mt-0.5">
-                  {typeLabel}{[institution?.city, institution?.country].filter(Boolean).length > 0 && " · "}
+                  {typeLabel || "Institución"}{[institution?.city, institution?.country].filter(Boolean).length > 0 && " · "}
                   {[institution?.city, institution?.country].filter(Boolean).join(", ")}
                   {(institution as any)?.modality && ` · ${(institution as any).modality}`}
                 </p>
@@ -272,7 +285,7 @@ export default async function InstitutionDashboardPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-black uppercase tracking-widest text-gray-400">Tipo de institución</label>
-                <select name="institutionType" defaultValue={(institution as any)?.institution_type || "university"}
+                <select name="institutionType" defaultValue={normalizedInstType}
                   className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium appearance-none">
                   <option value="university">Universidad pública</option>
                   <option value="private_university">Universidad privada</option>

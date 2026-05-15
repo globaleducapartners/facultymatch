@@ -71,6 +71,23 @@ export default async function ControlInstitutionsPage() {
     .eq("status", "pending")
     .order("created_at", { ascending: true });
 
+  // Build fallback email map: institution user_id → auth email
+  const allInsts = [...(institutions ?? []), ...(pendingInstitutions ?? [])];
+  const allUserIds = allInsts.map(i => i.user_id || i.id).filter(Boolean);
+  const authEmailMap: Record<string, string> = {};
+  if (allUserIds.length > 0) {
+    const { data: authData } = await admin.auth.admin.listUsers({ perPage: 1000 });
+    if (authData?.users) {
+      const idSet = new Set(allUserIds);
+      authData.users.forEach(u => {
+        if (idSet.has(u.id) && u.email) authEmailMap[u.id] = u.email;
+      });
+    }
+  }
+  function getEmail(inst: any): string | null {
+    return inst.contact_email || authEmailMap[inst.user_id || inst.id] || null;
+  }
+
   if (error) {
     return (
       <div className="p-8">
@@ -156,9 +173,9 @@ export default async function ControlInstitutionsPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  {inst.contact_email && (
+                  {getEmail(inst) && (
                     <a
-                      href={`mailto:${inst.contact_email}?subject=Tu solicitud en FacultyMatch`}
+                      href={`mailto:${getEmail(inst)}?subject=Tu solicitud en FacultyMatch`}
                       className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors bg-white"
                     >
                       <Mail size={12} /> Contactar
@@ -267,9 +284,9 @@ export default async function ControlInstitutionsPage() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      {inst.contact_email && (
+                      {getEmail(inst) && (
                         <a
-                          href={`mailto:${inst.contact_email}?subject=Comunicación desde FacultyMatch`}
+                          href={`mailto:${getEmail(inst)}?subject=Comunicación desde FacultyMatch`}
                           className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
                           title={`Contactar con ${inst.name}`}
                         >

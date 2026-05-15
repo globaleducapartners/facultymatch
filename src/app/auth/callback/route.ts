@@ -1,6 +1,11 @@
 import { createClient } from '@/lib/supabase-server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = process.env.RESEND_FROM_EMAIL || 'FacultyMatch <noreply@facultymatch.app>';
+const ADMIN_NOTIFY_EMAIL = 'director@globaleducapartners.com';
 
 // Admin client to read faculty_leads (bypasses RLS — leads have no SELECT policy)
 const supabaseAdmin = createAdminClient(
@@ -241,6 +246,59 @@ export async function GET(request: Request) {
     } catch (e) {
       console.warn('[callback] profile recovery failed:', e);
     }
+  }
+
+  // Notify admin on new registrations (signup type only, not login)
+  if (type === 'signup' || searchParams.get('type') === 'signup') {
+    try {
+      const role = profile?.role ?? user.user_metadata?.role ?? 'faculty';
+      const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Nuevo usuario';
+      const instName = user.user_metadata?.institution_name;
+      resend.emails.send({
+        from: FROM,
+        to: [ADMIN_NOTIFY_EMAIL],
+        subject: `🎉 Nuevo registro en FacultyMatch: ${userName}`,
+        html: `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;max-width:600px;">
+  <tr><td style="background:#0B1220;padding:24px 40px;text-align:center;">
+    <span style="color:#fff;font-size:20px;font-weight:900;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+  </td></tr>
+  <tr><td style="padding:36px 40px;">
+    <h2 style="margin:0 0 16px;color:#0B1220;font-size:22px;font-weight:900;">Nuevo registro 🎉</h2>
+    <table cellpadding="0" cellspacing="0" width="100%" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:24px;">
+      <tr><td style="padding:16px 20px;border-bottom:1px solid #e2e8f0;">
+        <p style="margin:0;font-size:11px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">Nombre</p>
+        <p style="margin:4px 0 0;font-size:15px;font-weight:700;color:#0B1220;">${userName}</p>
+      </td></tr>
+      <tr><td style="padding:16px 20px;border-bottom:1px solid #e2e8f0;">
+        <p style="margin:0;font-size:11px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">Email</p>
+        <p style="margin:4px 0 0;font-size:15px;font-weight:700;color:#0B1220;">${user.email ?? '—'}</p>
+      </td></tr>
+      <tr><td style="padding:16px 20px;border-bottom:${instName ? '1px solid #e2e8f0' : 'none'};">
+        <p style="margin:0;font-size:11px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">Tipo</p>
+        <p style="margin:4px 0 0;font-size:15px;font-weight:700;color:#0B1220;">${role === 'institution' ? 'Institución' : 'Docente'}</p>
+      </td></tr>
+      ${instName ? `<tr><td style="padding:16px 20px;">
+        <p style="margin:0;font-size:11px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">Institución</p>
+        <p style="margin:4px 0 0;font-size:15px;font-weight:700;color:#0B1220;">${instName}</p>
+      </td></tr>` : ''}
+    </table>
+    <a href="https://www.facultymatch.app/control" style="display:inline-block;background:#2563EB;color:#fff;padding:12px 24px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;">
+      Ver en el panel de administración →
+    </a>
+  </td></tr>
+  <tr><td style="background:#f8fafc;padding:16px 40px;text-align:center;border-top:1px solid #e2e8f0;">
+    <p style="margin:0;font-size:11px;color:#94a3b8;">FacultyMatch · www.facultymatch.app</p>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>`,
+      }).catch(() => {});
+    } catch { /* graceful fail — never block auth flow */ }
   }
 
   // Always use role-based routing — send users to the right dashboard

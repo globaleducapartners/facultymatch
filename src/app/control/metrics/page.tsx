@@ -1,7 +1,8 @@
 import { createAdminClient } from "@/lib/supabase-server";
 import {
   Users, Building2, GraduationCap, Clock, CheckCircle2, XCircle,
-  TrendingUp, Mail, UserPlus, Repeat2, Eye,
+  TrendingUp, Mail, UserPlus, Repeat2, Award, Globe, MapPin,
+  BookOpen,
 } from "lucide-react";
 
 function StatCard({
@@ -45,7 +46,6 @@ export default async function MetricsPage() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const last7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-  const last30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
   const [
     { count: totalFaculty },
@@ -59,6 +59,8 @@ export default async function MetricsPage() {
     { count: instThisMonth },
     { count: dualModeUsers },
     { count: totalUsers },
+    { count: phdCount },
+    { count: anecaCount },
   ] = await Promise.all([
     admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("role", "faculty"),
     admin.from("institutions").select("*", { count: "exact", head: true }),
@@ -71,21 +73,43 @@ export default async function MetricsPage() {
     admin.from("institutions").select("*", { count: "exact", head: true }).gte("created_at", startOfMonth.toISOString()),
     admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("can_switch_role", true),
     admin.from("user_profiles").select("*", { count: "exact", head: true }),
+    admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("role", "faculty").eq("is_phd", true),
+    admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("role", "faculty").eq("aneca_accreditation", true),
   ]);
 
-  // Recent signups (last 10)
-  const { data: recentFaculty } = await admin
-    .from("user_profiles")
-    .select("id, full_name, created_at, role")
-    .eq("role", "faculty")
-    .order("created_at", { ascending: false })
-    .limit(10);
+  // Recent signups
+  const [{ data: recentFaculty }, { data: recentInstitutions }] = await Promise.all([
+    admin.from("user_profiles").select("id, full_name, created_at, role").eq("role", "faculty")
+      .order("created_at", { ascending: false }).limit(10),
+    admin.from("institutions").select("id, name, country, created_at, status")
+      .order("created_at", { ascending: false }).limit(10),
+  ]);
 
-  const { data: recentInstitutions } = await admin
-    .from("institutions")
-    .select("id, name, country, created_at, status")
-    .order("created_at", { ascending: false })
-    .limit(10);
+  // Richer analytics: faculty profiles for areas/countries
+  const { data: facultyProfiles } = await admin
+    .from("faculty_profiles")
+    .select("faculty_areas, country")
+    .limit(500);
+
+  // Count by area
+  const areaCounts: Record<string, number> = {};
+  (facultyProfiles ?? []).forEach((fp: any) => {
+    (fp.faculty_areas ?? []).forEach((area: string) => {
+      if (area) areaCounts[area] = (areaCounts[area] ?? 0) + 1;
+    });
+  });
+  const topAreas = Object.entries(areaCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
+
+  // Count by country
+  const countryCounts: Record<string, number> = {};
+  (facultyProfiles ?? []).forEach((fp: any) => {
+    if (fp.country) countryCounts[fp.country] = (countryCounts[fp.country] ?? 0) + 1;
+  });
+  const topCountries = Object.entries(countryCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
 
   function fmtDate(iso: string | null | undefined) {
     if (!iso) return "—";
@@ -102,45 +126,107 @@ export default async function MetricsPage() {
   const conversionRate = totalFaculty
     ? `${Math.round(((dualModeUsers ?? 0) / (totalFaculty ?? 1)) * 100)}%`
     : "—";
+  const phdPct = totalFaculty && totalFaculty > 0
+    ? `${Math.round(((phdCount ?? 0) / totalFaculty) * 100)}%`
+    : "—";
+  const anecaPct = totalFaculty && totalFaculty > 0
+    ? `${Math.round(((anecaCount ?? 0) / totalFaculty) * 100)}%`
+    : "—";
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
-        <h1 className="text-3xl font-black text-navy tracking-tight">Métricas</h1>
-        <p className="text-gray-500 font-medium mt-1">Resumen de actividad de la plataforma.</p>
+        <h1 className="text-3xl font-black text-navy tracking-tight">Panel operacional</h1>
+        <p className="text-gray-500 font-medium mt-1">Métricas y actividad de la plataforma en tiempo real.</p>
       </div>
 
       {/* Platform overview */}
       <section className="space-y-3">
         <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Resumen global</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard icon={Users}        label="Usuarios totales"       value={totalUsers ?? 0}      color="blue" />
-          <StatCard icon={GraduationCap} label="Docentes registrados"  value={totalFaculty ?? 0}    color="purple" />
+          <StatCard icon={Users}        label="Usuarios totales"       value={totalUsers ?? 0}        color="blue" />
+          <StatCard icon={GraduationCap} label="Docentes registrados"  value={totalFaculty ?? 0}      color="purple" />
           <StatCard icon={Building2}    label="Instituciones"          value={totalInstitutions ?? 0} color="orange" sub={`${activeInstitutions ?? 0} activas`} />
-          <StatCard icon={Mail}         label="Contactos totales"      value={totalContacts ?? 0}   color="green" sub={`${contactsMonth ?? 0} este mes`} />
+          <StatCard icon={Mail}         label="Contactos totales"      value={totalContacts ?? 0}     color="green" sub={`${contactsMonth ?? 0} este mes`} />
         </div>
       </section>
 
-      {/* Growth this month */}
+      {/* Growth */}
       <section className="space-y-3">
         <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Crecimiento</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard icon={UserPlus}   label="Docentes esta semana"     value={facultyThisWeek ?? 0}  color="blue" />
-          <StatCard icon={TrendingUp} label="Docentes este mes"        value={facultyThisMonth ?? 0} color="purple" />
-          <StatCard icon={Building2}  label="Instituciones este mes"   value={instThisMonth ?? 0}    color="orange" />
-          <StatCard icon={Clock}      label="Instituciones pendientes" value={pendingInstitutions ?? 0} color="red" sub="Esperando aprobación" />
+          <StatCard icon={UserPlus}   label="Docentes esta semana"     value={facultyThisWeek ?? 0}      color="blue" />
+          <StatCard icon={TrendingUp} label="Docentes este mes"        value={facultyThisMonth ?? 0}     color="purple" />
+          <StatCard icon={Building2}  label="Instituciones este mes"   value={instThisMonth ?? 0}        color="orange" />
+          <StatCard icon={Clock}      label="Pendientes aprobación"    value={pendingInstitutions ?? 0}  color="red" sub="Instituciones" />
         </div>
       </section>
 
-      {/* Conversion */}
+      {/* Academic credentials */}
       <section className="space-y-3">
-        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Conversión docente → institución</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          <StatCard icon={Repeat2}       label="Docentes con perfil institución" value={dualModeUsers ?? 0}  color="blue" sub="Usuarios dual-mode" />
-          <StatCard icon={TrendingUp}    label="Tasa de conversión"              value={conversionRate}       color="green" sub="Del total de docentes" />
-          <StatCard icon={CheckCircle2}  label="Instituciones activas"           value={activeInstitutions ?? 0} color="green" />
+        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Perfil académico del directorio</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard icon={GraduationCap} label="Doctores / PhD"           value={phdCount ?? 0}      color="blue"   sub={`${phdPct} del total`} />
+          <StatCard icon={Award}         label="Acreditación ANECA"       value={anecaCount ?? 0}    color="purple" sub={`${anecaPct} del total`} />
+          <StatCard icon={Repeat2}       label="Usuarios dual-mode"       value={dualModeUsers ?? 0} color="green"  sub="Docente + institución" />
+          <StatCard icon={TrendingUp}    label="Tasa de conversión"       value={conversionRate}      color="orange" sub="Docentes → institución" />
         </div>
       </section>
+
+      {/* Areas & Nationalities */}
+      <div className="grid lg:grid-cols-2 gap-6">
+
+        {/* Top knowledge areas */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+            <BookOpen size={16} className="text-talentia-blue" />
+            <h3 className="text-sm font-black text-navy">Áreas de conocimiento (top 8)</h3>
+          </div>
+          <div className="p-5 space-y-3">
+            {topAreas.length > 0 ? topAreas.map(([area, count]) => {
+              const pct = facultyProfiles?.length ? Math.round((count / facultyProfiles.length) * 100) : 0;
+              return (
+                <div key={area} className="space-y-1">
+                  <div className="flex items-center justify-between text-xs font-bold">
+                    <span className="text-navy truncate flex-1 mr-3">{area}</span>
+                    <span className="text-gray-400 flex-shrink-0">{count} ({pct}%)</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-talentia-blue rounded-full" style={{ width: `${Math.max(4, pct)}%` }} />
+                  </div>
+                </div>
+              );
+            }) : <p className="text-sm text-gray-400 text-center py-4">Sin datos aún</p>}
+          </div>
+        </div>
+
+        {/* Top nationalities */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+            <Globe size={16} className="text-talentia-blue" />
+            <h3 className="text-sm font-black text-navy">Principales países (top 8)</h3>
+          </div>
+          <div className="p-5 space-y-3">
+            {topCountries.length > 0 ? topCountries.map(([country, count]) => {
+              const pct = facultyProfiles?.length ? Math.round((count / facultyProfiles.length) * 100) : 0;
+              return (
+                <div key={country} className="space-y-1">
+                  <div className="flex items-center justify-between text-xs font-bold">
+                    <span className="text-navy flex items-center gap-1.5 flex-1 mr-3 truncate">
+                      <MapPin size={10} className="text-gray-400 flex-shrink-0" />
+                      {country}
+                    </span>
+                    <span className="text-gray-400 flex-shrink-0">{count} ({pct}%)</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-energy-orange rounded-full" style={{ width: `${Math.max(4, pct)}%` }} />
+                  </div>
+                </div>
+              );
+            }) : <p className="text-sm text-gray-400 text-center py-4">Sin datos aún</p>}
+          </div>
+        </div>
+      </div>
 
       {/* Recent activity */}
       <div className="grid lg:grid-cols-2 gap-6">

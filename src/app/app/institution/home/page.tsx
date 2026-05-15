@@ -336,7 +336,7 @@ export default async function InstitutionHomePage() {
               <p className="text-xs font-medium text-gray-600 leading-relaxed">
                 Búsquedas y contactos ilimitados. Encuentra el profesorado ideal para todos tus programas.
               </p>
-              <div className="text-lg font-black text-navy">79€ <span className="text-xs text-gray-400 font-bold">/ año</span></div>
+              <div className="text-lg font-black text-navy">99€ <span className="text-xs text-gray-400 font-bold">/ mes</span></div>
               <Link
                 href="/app/institution/billing"
                 className="inline-flex items-center gap-2 w-full justify-center bg-energy-orange hover:bg-orange-600 text-white font-black py-2.5 px-4 rounded-xl text-xs transition-colors"

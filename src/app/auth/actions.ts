@@ -395,6 +395,7 @@ export async function contactFaculty(formData: FormData) {
   const reason = formData.get("reason") as string;
   const modality = formData.get("modality") as string;
   const dates = formData.get("dates") as string;
+  const contractType = formData.get("contract_type") as string;
 
   if (!institutionId || !facultyId) {
     return { error: 'Datos incompletos para crear el contacto' };
@@ -410,6 +411,7 @@ export async function contactFaculty(formData: FormData) {
     subject: reason,
     modality,
     dates,
+    contract_type: contractType || null,
     status: 'pending'
   });
 
@@ -459,11 +461,13 @@ export async function contactFaculty(formData: FormData) {
                 </p>
                 <div style="background:#f1f5f9;border-radius:8px;padding:20px;margin-bottom:24px;">
                   <p style="margin:0 0 8px;font-size:14px;color:#64748b;">
-                    <strong>Motivo:</strong> ${reason || 'No especificado'}
+                    <strong>Tipo de colaboración:</strong> ${reason || 'No especificado'}
                   </p>
+                  ${contractType ? `<p style="margin:0 0 8px;font-size:14px;color:#64748b;"><strong>Tipo de contrato:</strong> ${contractType}</p>` : ''}
                   <p style="margin:0 0 8px;font-size:14px;color:#64748b;">
                     <strong>Modalidad:</strong> ${modality || 'No especificada'}
                   </p>
+                  ${dates ? `<p style="margin:0 0 8px;font-size:14px;color:#64748b;"><strong>Fechas:</strong> ${dates}</p>` : ''}
                   ${message ? `<p style="margin:0;font-size:14px;color:#64748b;"><strong>Mensaje:</strong> ${message}</p>` : ''}
                 </div>
                 <a href="https://www.facultymatch.app/app/faculty"

@@ -80,22 +80,37 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
 
             <form onSubmit={handleSubmit} className="space-y-6 mt-4">
               <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
-                    <BookOpen size={14} /> Tipo de colaboración
-                  </label>
-                  <select
-                    name="reason"
-                    required
-                    className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium text-sm appearance-none"
-                  >
-                    <option value="">Seleccionar tipo...</option>
-                    <option value="profesor_adjunto">Profesor Adjunto / Invitado</option>
-                    <option value="conferenciante">Conferenciante</option>
-                    <option value="tutor_tfm">Tutor de TFM / Tesis</option>
-                    <option value="diseno_curricular">Diseño Curricular</option>
-                    <option value="otro">Otro</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
+                      <BookOpen size={14} /> Tipo de colaboración
+                    </label>
+                    <select
+                      name="reason"
+                      required
+                      className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium text-sm appearance-none"
+                    >
+                      <option value="">Seleccionar...</option>
+                      <option value="profesor_adjunto">Profesor Adjunto / Invitado</option>
+                      <option value="conferenciante">Conferenciante</option>
+                      <option value="tutor_tfm">Tutor de TFM / Tesis</option>
+                      <option value="diseno_curricular">Diseño Curricular</option>
+                      <option value="otro">Otro</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Tipo de contrato</label>
+                    <select
+                      name="contract_type"
+                      className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium text-sm appearance-none"
+                    >
+                      <option value="">A definir</option>
+                      <option value="docencia_plena">Docencia plena</option>
+                      <option value="docencia_semiplena">Docencia semiplena</option>
+                      <option value="por_creditos">Por créditos</option>
+                      <option value="asignatura_invitada">Asignatura invitada</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
