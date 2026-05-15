@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import Link from "next/link";
+import { createBrowserClient } from "@supabase/ssr";
 
 // ─── Design tokens ─────────────────────────────────────────────────────────
 const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
@@ -66,6 +67,15 @@ const lbl: React.CSSProperties = {
   color: D.ink, display: "block", marginBottom: 6,
 };
 
+interface UniversitySuggestion {
+  id: number;
+  name: string;
+  acronym: string | null;
+  domain: string | null;
+  city: string | null;
+  autonomous_community: string | null;
+}
+
 // ─── Component ─────────────────────────────────────────────────────────────
 export function BecomeInstitutionClient({
   userEmail,
@@ -86,11 +96,70 @@ export function BecomeInstitutionClient({
   const [city,     setCity]     = useState("");
   const [website,  setWebsite]  = useState("");
 
+  // Autocomplete state
+  const [suggestions,     setSuggestions]     = useState<UniversitySuggestion[]>([]);
+  const [showDropdown,    setShowDropdown]    = useState(false);
+  const [isSearching,     setIsSearching]     = useState(false);
+  const [selectedFromList, setSelectedFromList] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Step 2 fields
   const [contactEmail, setContactEmail] = useState(userEmail);
   const [terms,        setTerms]        = useState(false);
 
   const warnPersonal = step === 2 && !!contactEmail && isPersonalDomain(contactEmail);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  async function searchUniversities(query: string) {
+    if (query.length < 2) { setSuggestions([]); setShowDropdown(false); return; }
+    setIsSearching(true);
+    try {
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data } = await supabase
+        .from("universities_es")
+        .select("id, name, acronym, domain, city, autonomous_community")
+        .ilike("name", `%${query}%`)
+        .limit(8);
+      setSuggestions(data || []);
+      setShowDropdown((data?.length ?? 0) > 0);
+    } catch {
+      setSuggestions([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }
+
+  function handleInstNameChange(value: string) {
+    setInstName(value);
+    setSelectedFromList(false);
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => searchUniversities(value), 280);
+  }
+
+  function selectUniversity(u: UniversitySuggestion) {
+    setInstName(u.name);
+    setSelectedFromList(true);
+    setShowDropdown(false);
+    // Auto-fill country and website when selecting from list
+    if (!country) setCountry("España");
+    if (u.city && !city) setCity(u.city);
+    if (u.domain && !website) setWebsite(`https://www.${u.domain}`);
+    if (!instType) setInstType("Universidad pública");
+  }
 
   function validateStep1() {
     const e: Record<string, string> = {};
@@ -165,7 +234,7 @@ export function BecomeInstitutionClient({
         </h1>
         <p style={{ fontSize: 14, color: D.muted, margin: 0 }}>
           {step === 1
-            ? "Datos básicos de tu centro para aparecer en el directorio."
+            ? "Busca tu universidad o añade una nueva institución."
             : "Confirma el email de contacto y acepta las condiciones."}
         </p>
       </div>
@@ -192,14 +261,85 @@ export function BecomeInstitutionClient({
         {/* ── Step 1 ── */}
         {step === 1 && (
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-            <div>
-              <label style={lbl}>Nombre de la institución <span style={{ color: D.error }}>*</span></label>
-              <input
-                style={inp(!!fieldErrors.instName)}
-                value={instName}
-                onChange={e => setInstName(e.target.value)}
-                placeholder="Universidad Complutense de Madrid..."
-              />
+
+            {/* Institution name with autocomplete */}
+            <div ref={dropdownRef} style={{ position: "relative" }}>
+              <label style={lbl}>
+                Nombre de la institución <span style={{ color: D.error }}>*</span>
+              </label>
+              <p style={{ fontFamily: SANS, fontSize: 12, color: D.faint, margin: "0 0 8px" }}>
+                Escribe para buscar entre las universidades registradas, o introduce una nueva.
+              </p>
+              <div style={{ position: "relative" }}>
+                <input
+                  style={inp(!!fieldErrors.instName)}
+                  value={instName}
+                  onChange={e => handleInstNameChange(e.target.value)}
+                  onFocus={() => suggestions.length > 0 && setShowDropdown(true)}
+                  placeholder="Ej: Universidad Complutense de Madrid..."
+                  autoComplete="off"
+                />
+                {isSearching && (
+                  <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 12, color: D.faint }}>
+                    Buscando…
+                  </span>
+                )}
+                {selectedFromList && (
+                  <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#059669" }}>✓</span>
+                )}
+              </div>
+
+              {/* Dropdown */}
+              {showDropdown && suggestions.length > 0 && (
+                <div style={{
+                  position: "absolute", top: "100%", left: 0, right: 0,
+                  background: D.white, border: `1px solid ${D.border}`,
+                  borderRadius: 8, boxShadow: "0 8px 24px rgba(13,34,64,0.12)",
+                  zIndex: 50, marginTop: 2, maxHeight: 260, overflowY: "auto",
+                }}>
+                  {suggestions.map(u => (
+                    <button
+                      key={u.id}
+                      type="button"
+                      onClick={() => selectUniversity(u)}
+                      style={{
+                        width: "100%", textAlign: "left", padding: "10px 14px",
+                        background: "none", border: "none", cursor: "pointer",
+                        borderBottom: `1px solid ${D.border}`, display: "flex",
+                        alignItems: "center", justifyContent: "space-between", gap: 8,
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = D.surf)}
+                      onMouseLeave={e => (e.currentTarget.style.background = "none")}
+                    >
+                      <div>
+                        <p style={{ fontFamily: SANS, fontSize: 13, fontWeight: 600, color: D.ink, margin: 0 }}>{u.name}</p>
+                        {(u.city || u.domain) && (
+                          <p style={{ fontFamily: SANS, fontSize: 11, color: D.faint, margin: "2px 0 0" }}>
+                            {[u.city, u.domain].filter(Boolean).join(" · ")}
+                          </p>
+                        )}
+                      </div>
+                      {u.acronym && (
+                        <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: D.blue, background: "rgba(27,79,216,0.08)", padding: "2px 8px", borderRadius: 20, flexShrink: 0 }}>
+                          {u.acronym}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setShowDropdown(false)}
+                    style={{
+                      width: "100%", textAlign: "center", padding: "9px 14px",
+                      background: D.surf, border: "none", cursor: "pointer",
+                      fontFamily: SANS, fontSize: 12, color: D.muted, fontWeight: 600,
+                    }}
+                  >
+                    + Añadir «{instName}» como nueva institución
+                  </button>
+                </div>
+              )}
+
               {fieldErrors.instName && (
                 <p style={{ fontFamily: SANS, fontSize: 12, color: D.error, marginTop: 4 }}>{fieldErrors.instName}</p>
               )}
@@ -257,14 +397,9 @@ export function BecomeInstitutionClient({
 
             {/* Summary of step 1 */}
             <div style={{
-              background: D.surf,
-              border: `1px solid ${D.border}`,
-              borderRadius: 10,
-              padding: "14px 16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 12,
+              background: D.surf, border: `1px solid ${D.border}`,
+              borderRadius: 10, padding: "14px 16px",
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
             }}>
               <div>
                 <p style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: D.faint, margin: "0 0 2px" }}>
@@ -304,7 +439,6 @@ export function BecomeInstitutionClient({
               {fieldErrors.contactEmail && (
                 <p style={{ fontFamily: SANS, fontSize: 12, color: D.error, marginTop: 4 }}>{fieldErrors.contactEmail}</p>
               )}
-              {/* Personal domain warning */}
               {warnPersonal && !fieldErrors.contactEmail && (
                 <div style={{
                   display: "flex", gap: 10, alignItems: "flex-start",
@@ -313,8 +447,7 @@ export function BecomeInstitutionClient({
                 }}>
                   <span style={{ fontSize: 15, flexShrink: 0 }}>⚠️</span>
                   <p style={{ fontFamily: SANS, fontSize: 12, color: D.warn, margin: 0, lineHeight: 1.5 }}>
-                    Este parece un email personal (Gmail, Hotmail, etc.). Te recomendamos usar el email corporativo
-                    de tu institución para más credibilidad ante los docentes.
+                    Este parece un email personal. Te recomendamos usar el email corporativo de tu institución para más credibilidad.
                   </p>
                 </div>
               )}
@@ -322,10 +455,8 @@ export function BecomeInstitutionClient({
 
             {/* Freemium info */}
             <div style={{
-              background: "rgba(27,79,216,0.04)",
-              border: "1px solid rgba(27,79,216,0.15)",
-              borderRadius: 10,
-              padding: "14px 16px",
+              background: "rgba(27,79,216,0.04)", border: "1px solid rgba(27,79,216,0.15)",
+              borderRadius: 10, padding: "14px 16px",
             }}>
               <p style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: D.blue, margin: "0 0 6px" }}>
                 Plan Esencial — Gratis

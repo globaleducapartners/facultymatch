@@ -14,6 +14,7 @@ import Link from "next/link";
 import { InstitutionLogoUpload } from "@/components/dashboard/InstitutionLogoUpload";
 import { SecuritySettingsSection } from "@/components/settings/SecuritySettingsSection";
 import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton";
+import { InstitutionSaveButton } from "@/components/dashboard/InstitutionSaveButton";
 
 export default async function InstitutionDashboardPage() {
   const supabase = await createClient();
@@ -155,36 +156,33 @@ export default async function InstitutionDashboardPage() {
   const profileCompletion = Math.round(fields.filter(Boolean).length / fields.length * 100);
   const isPending = institution?.status === "pending";
 
+  const instTypeLabel: Record<string, string> = {
+    university: "Universidad pública", private_university: "Universidad privada",
+    business_school: "Business School", polytechnic: "Escuela Politécnica",
+    online: "Universidad online", research: "Centro de investigación", other: "Centro educativo",
+  };
+  const typeLabel = instTypeLabel[(institution as any)?.institution_type] || (institution as any)?.institution_type || "Institución";
+  const instInitials = (institution?.name || "?").split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase();
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500">
 
       {/* Search CTA hero */}
-      <Link
-        href="/app/institution/search"
-        className="block group"
-      >
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0D2240] to-[#1B4FD8] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 transition-all duration-300">
-          {/* Background decoration */}
-          <div className="absolute right-0 top-0 w-64 h-full opacity-10 pointer-events-none"
-            style={{ background: "radial-gradient(circle at 80% 50%, #fff 0%, transparent 70%)" }}
-          />
-          <div className="relative flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-white/20 transition-colors">
-              <Search size={22} className="text-white" />
+      <Link href="/app/institution/search" className="block group">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0D2240] to-[#1B4FD8] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 transition-all duration-300">
+          <div className="absolute right-0 top-0 w-64 h-full opacity-10 pointer-events-none" style={{ background: "radial-gradient(circle at 80% 50%, #fff 0%, transparent 70%)" }} />
+          <div className="relative flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-white/20 transition-colors">
+              <Search size={18} className="text-white" />
             </div>
             <div>
-              <p className="text-white/70 text-xs font-black uppercase tracking-widest mb-0.5">Directorio de docentes</p>
-              <h2 className="text-white text-xl font-black leading-tight">Buscar profesorado</h2>
-              <p className="text-white/60 text-sm font-medium mt-0.5 hidden sm:block">
-                Encuentra docentes por especialidad, idioma, país o acreditación ANECA.
-              </p>
+              <p className="text-white/70 text-[10px] font-black uppercase tracking-widest">Directorio de docentes</p>
+              <h2 className="text-white text-base font-black leading-tight">Buscar profesorado</h2>
             </div>
           </div>
-          <div className="relative flex-shrink-0">
-            <span className="inline-flex items-center gap-2 bg-white text-[#1B4FD8] font-black px-5 py-2.5 rounded-xl text-sm group-hover:bg-blue-50 transition-colors">
-              Buscar ahora <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-            </span>
-          </div>
+          <span className="relative inline-flex items-center gap-2 bg-white text-[#1B4FD8] font-black px-4 py-2 rounded-xl text-sm group-hover:bg-blue-50 transition-colors flex-shrink-0">
+            Buscar ahora <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+          </span>
         </div>
       </Link>
 
@@ -197,63 +195,75 @@ export default async function InstitutionDashboardPage() {
           <div>
             <p className="text-sm font-bold text-amber-800">Cuenta en revisión</p>
             <p className="text-xs text-amber-600 font-medium mt-0.5">
-              Tu institución está pendiente de aprobación. Nuestro equipo la revisará en 24-48h hábiles.
-              Mientras tanto, ya puedes completar tu perfil y explorar los docentes disponibles.
+              Pendiente de aprobación. Nuestro equipo la revisará en 24-48h hábiles. Puedes completar tu perfil mientras tanto.
             </p>
           </div>
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-navy">Mi Institución</h1>
-          <p className="text-gray-500 font-medium mt-1">Gestiona tu perfil y la configuración de tu cuenta.</p>
-        </div>
-        <Badge className={`self-start sm:self-auto font-bold px-4 py-2 rounded-full border-none text-sm ${profileCompletion >= 80 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
-          {profileCompletion}% completado
-        </Badge>
-      </div>
+      {/* ── Two-column layout: left form, right sidebar ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 items-start">
 
-      {/* Completion banner */}
-      {profileCompletion < 80 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
-          <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-            <Building2 size={16} className="text-amber-600" />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-amber-800">Completa tu perfil institucional</p>
-            <p className="text-xs text-amber-600 font-medium mt-0.5">Un perfil completo genera más confianza en los docentes y mejora los resultados de búsqueda.</p>
-          </div>
-        </div>
-      )}
+        {/* ── LEFT: LinkedIn-style profile + form ── */}
+        <div className="space-y-5">
 
-      {/* Profile summary card */}
-      <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
-        <CardContent className="pt-5 pb-5">
-          <div className="flex items-center gap-4">
-            <InstitutionLogoUpload
-              institutionId={institution?.id ?? ""}
-              currentLogoUrl={institution?.logo_url ?? null}
-            />
-            <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-black text-navy truncate">{institution?.name || "Mi Institución"}</h2>
-              <p className="text-sm text-gray-500 font-medium">
-                {[institution?.city, institution?.country].filter(Boolean).join(", ") || "Ubicación por configurar"}
-              </p>
-              <div className="mt-2">
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-talentia-blue rounded-full transition-all duration-700" style={{ width: `${profileCompletion}%` }} />
-                </div>
-                <p className="text-xs text-gray-400 font-medium mt-1">{profileCompletion}% del perfil completado</p>
-              </div>
+          {/* Profile card (cover + logo + name) */}
+          <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
+            {/* Cover band */}
+            <div className="h-36 bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#4F7FE8] relative">
+              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <CardContent className="pt-0 pb-5 px-6">
+              {/* Logo overlapping cover */}
+              <div className="flex items-end justify-between" style={{ marginTop: -40 }}>
+                <div className="relative z-10">
+                  <div className="w-20 h-20 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-white flex items-center justify-center">
+                    {institution?.logo_url
+                      ? <img src={institution.logo_url} alt={institution.name} className="w-full h-full object-cover" />
+                      : <span className="text-2xl font-black text-[#0D2240]">{instInitials}</span>
+                    }
+                  </div>
+                  {/* Logo upload hint */}
+                  <div className="mt-1">
+                    <InstitutionLogoUpload
+                      institutionId={institution?.id ?? ""}
+                      currentLogoUrl={institution?.logo_url ?? null}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 pb-1">
+                  {institution?.status === "approved" && (
+                    <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs font-bold px-3 py-1 rounded-full border border-green-100">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" /> Verificada
+                    </span>
+                  )}
+                  {isPending && (
+                    <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-bold px-3 py-1 rounded-full border border-amber-100">
+                      <AlertTriangle size={10} /> En revisión
+                    </span>
+                  )}
+                </div>
+              </div>
+              {/* Name + meta */}
+              <div className="mt-3">
+                <h1 className="text-2xl font-black text-[#0C1018] leading-tight">{institution?.name || "Mi Institución"}</h1>
+                <p className="text-sm text-gray-500 font-medium mt-0.5">
+                  {typeLabel}{[institution?.city, institution?.country].filter(Boolean).length > 0 && " · "}
+                  {[institution?.city, institution?.country].filter(Boolean).join(", ")}
+                  {(institution as any)?.modality && ` · ${(institution as any).modality}`}
+                </p>
+                {(institution as any)?.website && (
+                  <a href={(institution as any).website} target="_blank" rel="noopener noreferrer"
+                    className="text-xs text-[#1B4FD8] font-medium hover:underline mt-1 inline-block">
+                    🌐 {((institution as any).website as string).replace(/^https?:\/\//, "")}
+                  </a>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Profile edit form */}
-      <form action={updateInstitution} className="space-y-6">
+          {/* Profile edit form */}
+          <form action={updateInstitution} className="space-y-5">
         {/* Identity */}
         <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
           <CardHeader>
@@ -398,12 +408,73 @@ export default async function InstitutionDashboardPage() {
         </Card>
 
         <div className="flex justify-end">
-          <Button type="submit" className="bg-talentia-blue hover:bg-blue-700 text-white font-bold h-12 px-10 rounded-xl transition-all shadow-lg shadow-blue-100 flex items-center gap-2">
-            <Save size={16} />
-            Guardar perfil institucional
-          </Button>
+          <InstitutionSaveButton />
         </div>
       </form>
+
+        </div>{/* end LEFT column */}
+
+        {/* ── RIGHT sidebar ── */}
+        <div className="space-y-4 lg:sticky lg:top-6">
+
+          {/* Progress card */}
+          <Card className="border-none shadow-sm rounded-2xl">
+            <CardContent className="pt-5 pb-5">
+              <p className="text-sm font-black text-[#0C1018] mb-3">Progreso del perfil</p>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-gray-400">
+                  {profileCompletion < 60 ? "Empieza a completar tu perfil" : profileCompletion < 80 ? "Casi completo" : "Perfil completo"}
+                </span>
+                <span className="text-xl font-black" style={{ color: profileCompletion >= 80 ? "#059669" : "#1B4FD8" }}>
+                  {profileCompletion}%
+                </span>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full rounded-full transition-all duration-700"
+                  style={{ width: `${profileCompletion}%`, background: profileCompletion >= 80 ? "#059669" : "#1B4FD8" }} />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick access */}
+          <Card className="border-none shadow-sm rounded-2xl">
+            <CardContent className="pt-5 pb-5">
+              <p className="text-sm font-black text-[#0C1018] mb-3">Accesos rápidos</p>
+              <div className="space-y-2">
+                <Link href="/app/institution/search" className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-[#F2F6FC] transition-colors group">
+                  <Search size={15} className="text-[#1B4FD8] flex-shrink-0" />
+                  <span className="text-sm font-semibold text-gray-700 group-hover:text-[#0D2240]">Buscar docentes</span>
+                </Link>
+                <Link href="/app/institution/favorites" className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-[#F2F6FC] transition-colors group">
+                  <span className="text-[#E9A030] text-sm">★</span>
+                  <span className="text-sm font-semibold text-gray-700 group-hover:text-[#0D2240]">Mis favoritos</span>
+                </Link>
+                <Link href="/app/institution/contacts" className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-[#F2F6FC] transition-colors group">
+                  <Mail size={15} className="text-[#1B4FD8] flex-shrink-0" />
+                  <span className="text-sm font-semibold text-gray-700 group-hover:text-[#0D2240]">Contactos enviados</span>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Tips */}
+          {profileCompletion < 100 && (
+            <Card className="border-none shadow-sm rounded-2xl">
+              <CardContent className="pt-5 pb-5">
+                <p className="text-sm font-black text-[#0C1018] mb-3">Mejora tu visibilidad</p>
+                <div className="space-y-2.5">
+                  {!institution?.name && <Tip text="Añade el nombre de tu institución" />}
+                  {!(institution as any)?.description && <Tip text="Escribe una descripción de la institución" />}
+                  {!institution?.website && <Tip text="Añade tu web oficial" />}
+                  {!(institution as any)?.contact_email && <Tip text="Añade un email de contacto" />}
+                  {!institution?.country && <Tip text="Indica el país y ciudad" />}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>{/* end RIGHT sidebar */}
+
+      </div>{/* end grid */}
 
       {/* Settings section */}
       <div className="pt-4 border-t border-gray-100">
@@ -455,6 +526,15 @@ export default async function InstitutionDashboardPage() {
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+function Tip({ text }: { text: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
+      <span className="text-xs text-gray-500 font-medium">{text}</span>
     </div>
   );
 }

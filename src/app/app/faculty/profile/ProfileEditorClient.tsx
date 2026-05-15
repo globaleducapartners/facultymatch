@@ -343,17 +343,20 @@ export function ProfileEditorClient({
                 >
                   <Pencil size={13} /> Editar perfil
                 </button>
-                <button
-                  onClick={() => toggle("documents")}
+                <a
+                  href="/app/faculty/profile/print"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     fontFamily: SANS, fontSize: 13, fontWeight: 700,
                     padding: "8px 18px", borderRadius: 20,
                     background: D.white, color: D.ink, border: `1.5px solid ${D.border}`,
                     cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+                    textDecoration: "none",
                   }}
                 >
-                  <FileText size={13} /> CV
-                </button>
+                  <FileText size={13} /> CV / Imprimir
+                </a>
                 {facultyProfile?.linkedin_url && (
                   <a
                     href={facultyProfile.linkedin_url}
@@ -936,7 +939,7 @@ export function ProfileEditorClient({
             borderRadius: 16, padding: "20px", marginBottom: 12,
           }}>
             <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: D.ink, letterSpacing: "-0.02em", marginBottom: 14 }}>
-              Completitud del perfil
+              Progreso del perfil
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
               <span style={{ fontFamily: SANS, fontSize: 12, color: D.muted }}>
