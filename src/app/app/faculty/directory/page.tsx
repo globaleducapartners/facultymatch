@@ -16,7 +16,7 @@ export default async function FacultyDirectoryPage({
   // Institution users go to their own search
   const { data: userProfile } = await supabase
     .from("user_profiles")
-    .select("role")
+    .select("role, can_switch_role")
     .eq("id", user.id)
     .single();
 
@@ -52,6 +52,7 @@ export default async function FacultyDirectoryPage({
           searchLimitReached={false}
           monthlyContactsUsed={0}
           isReadOnly
+          isAlreadyInstitution={!!userProfile?.can_switch_role}
         />
       );
     }
@@ -82,7 +83,7 @@ export default async function FacultyDirectoryPage({
   if (hasAreaFilter)  educatorQuery = educatorQuery.in("id", areaMatchIds);
   if (phd === "true") educatorQuery = educatorQuery.eq("is_phd", true);
   if (aneca)          educatorQuery = educatorQuery.ilike("aneca_accreditation", `%${aneca}%`);
-  if (language)       educatorQuery = (educatorQuery as any).filter("languages::text", "ilike", `%${language}%`);
+  if (language)       educatorQuery = (educatorQuery as any).filter("languages", "cs", JSON.stringify([{ lang: language }]));
   if (modality)       educatorQuery = educatorQuery.ilike("availability", `%${modality}%`);
 
   const { data: educators } = await educatorQuery.range(0, 49);
@@ -118,6 +119,7 @@ export default async function FacultyDirectoryPage({
       searchLimitReached={false}
       monthlyContactsUsed={0}
       isReadOnly
+      isAlreadyInstitution={!!userProfile?.can_switch_role}
     />
   );
 }

@@ -6,7 +6,6 @@ import {
   Bell,
   ChevronDown,
   LogOut,
-  Globe,
   Building2,
   MessageSquare,
   CheckCheck,
@@ -184,13 +183,7 @@ export function Topbar({ user, profile }: TopbarProps) {
         </div>
       )}
 
-      <div className="flex items-center gap-4 md:gap-8">
-        <div className="hidden md:flex items-center gap-2 text-sm text-gray-500 font-medium">
-          <Globe size={16} />
-          ES
-          <ChevronDown size={14} />
-        </div>
-
+      <div className="flex items-center gap-4">
         <div className="flex items-center gap-3">
           {/* ── Notification bell ── */}
           <div className="relative" ref={bellRef}>

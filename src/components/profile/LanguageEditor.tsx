@@ -64,6 +64,7 @@ export function LanguageEditor({ initialLanguages }: Props) {
       <div className="flex gap-2">
         <input
           type="text"
+          list="fm-language-suggestions"
           value={newLang}
           onChange={(e) => setNewLang(e.target.value)}
           onKeyDown={(e) => {
@@ -75,6 +76,21 @@ export function LanguageEditor({ initialLanguages }: Props) {
           placeholder="Ej: Inglés, Francés, Alemán..."
           className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none text-sm font-medium"
         />
+        <datalist id="fm-language-suggestions">
+          <option value="Español" />
+          <option value="Inglés" />
+          <option value="Francés" />
+          <option value="Alemán" />
+          <option value="Portugués" />
+          <option value="Italiano" />
+          <option value="Chino" />
+          <option value="Árabe" />
+          <option value="Japonés" />
+          <option value="Ruso" />
+          <option value="Catalán" />
+          <option value="Euskera" />
+          <option value="Gallego" />
+        </datalist>
         <select
           value={newLevel}
           onChange={(e) => setNewLevel(e.target.value)}

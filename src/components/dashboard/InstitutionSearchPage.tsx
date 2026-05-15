@@ -24,7 +24,7 @@ import { ContactModal } from "./ContactModal";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import Image from "next/image";
 import Link from "next/link";
-import { toggleFavorite } from "@/app/auth/actions";
+import { toggleFavorite, switchActiveMode } from "@/app/auth/actions";
 import { toast } from "sonner";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -41,6 +41,8 @@ interface InstitutionSearchPageProps {
   monthlyContactsUsed: number;
   /** When true: faculty browsing mode — contact locked, no plan/limit UI */
   isReadOnly?: boolean;
+  /** When true: user already has an institution profile (dual-mode) */
+  isAlreadyInstitution?: boolean;
   /** Base URL for search form and filter chip links */
   searchPath?: string;
 }
@@ -89,6 +91,7 @@ export function InstitutionSearchPage({
   searchLimitReached,
   monthlyContactsUsed,
   isReadOnly = false,
+  isAlreadyInstitution = false,
   searchPath,
 }: InstitutionSearchPageProps) {
   const basePath = searchPath ?? (isReadOnly ? "/app/faculty/directory" : "/app/institution/search");
@@ -206,16 +209,30 @@ export function InstitutionSearchPage({
             <div>
               <p className="font-black text-blue-900 text-sm">Modo exploración — solo lectura</p>
               <p className="text-blue-700 text-sm font-medium mt-0.5">
-                Puedes ver todos los perfiles, pero necesitas una cuenta de institución para contactar docentes.
+                {isAlreadyInstitution
+                  ? "Tienes un perfil de institución. Cambia al modo institución para contactar docentes."
+                  : "Puedes ver todos los perfiles, pero necesitas una cuenta de institución para contactar docentes."}
               </p>
             </div>
           </div>
-          <Link
-            href="/app/become-institution"
-            className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
-          >
-            <Zap size={14} /> Registrar institución
-          </Link>
+          {isAlreadyInstitution ? (
+            <form action={switchActiveMode}>
+              <input type="hidden" name="mode" value="institution" />
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
+              >
+                <Zap size={14} /> Cambiar a modo institución
+              </button>
+            </form>
+          ) : (
+            <Link
+              href="/app/become-institution"
+              className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
+            >
+              <Zap size={14} /> Registrar institución
+            </Link>
+          )}
         </div>
       )}
 
@@ -507,12 +524,24 @@ export function InstitutionSearchPage({
                   <div className="space-y-2">
                     <div className="flex gap-3">
                       {isReadOnly ? (
-                        <Link
-                          href="/app/become-institution"
-                          className="flex-1 inline-flex items-center justify-center gap-2 bg-[#EEF4FF] hover:bg-blue-100 text-[#1B4FD8] font-bold h-11 rounded-xl transition-colors text-sm"
-                        >
-                          <Lock size={15} /> Registrar institución para contactar
-                        </Link>
+                        isAlreadyInstitution ? (
+                          <form action={switchActiveMode} className="flex-1">
+                            <input type="hidden" name="mode" value="institution" />
+                            <button
+                              type="submit"
+                              className="w-full inline-flex items-center justify-center gap-2 bg-[#EEF4FF] hover:bg-blue-100 text-[#1B4FD8] font-bold h-11 rounded-xl transition-colors text-sm"
+                            >
+                              <Zap size={15} /> Cambiar a modo institución
+                            </button>
+                          </form>
+                        ) : (
+                          <Link
+                            href="/app/become-institution"
+                            className="flex-1 inline-flex items-center justify-center gap-2 bg-[#EEF4FF] hover:bg-blue-100 text-[#1B4FD8] font-bold h-11 rounded-xl transition-colors text-sm"
+                          >
+                            <Lock size={15} /> Registrar institución para contactar
+                          </Link>
+                        )
                       ) : canContact ? (
                         <Button
                           onClick={() => setIsContactModalOpen(true)}

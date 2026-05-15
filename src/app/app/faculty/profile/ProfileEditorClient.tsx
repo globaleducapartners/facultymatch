@@ -637,7 +637,7 @@ export function ProfileEditorClient({
                         background: D.surf, border: `1px solid ${D.border}`,
                         padding: "5px 12px", borderRadius: 999,
                       }}>
-                        {typeof l === "string" ? l : `${l.language || l.name}${l.level ? ` · ${l.level}` : ""}`}
+                        {typeof l === "string" ? l : `${l.lang || l.language || l.name}${l.level ? ` · ${l.level}` : ""}`}
                       </span>
                     ))}
                   </div>
