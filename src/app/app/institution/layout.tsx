@@ -13,7 +13,7 @@ export default async function InstitutionLayout({
 
   const { data: profile } = await supabase
     .from("user_profiles")
-    .select("role")
+    .select("role, can_switch_role, active_mode")
     .eq("id", user.id)
     .single();
 
@@ -21,7 +21,12 @@ export default async function InstitutionLayout({
     redirect("/onboarding/role");
   }
 
-  if (profile.role !== "institution") {
+  // Allow pure institution accounts AND faculty users who registered an institution (dual-mode)
+  const canAccessInstitution =
+    profile.role === "institution" ||
+    (profile.can_switch_role === true && profile.active_mode === "institution");
+
+  if (!canAccessInstitution) {
     redirect("/app/faculty");
   }
 

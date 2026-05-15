@@ -299,10 +299,10 @@ export function Topbar({ user, profile }: TopbarProps) {
                   {profile?.full_name}
                 </span>
                 <span className="text-xs text-[#4B5A7A] font-medium capitalize">
-                  {profile?.role === "faculty"
-                    ? "Docente"
-                    : profile?.role === "institution"
+                  {profile?.active_mode === "institution" || profile?.role === "institution"
                     ? "Institución"
+                    : profile?.role === "faculty"
+                    ? "Docente"
                     : "Admin"}
                 </span>
               </div>

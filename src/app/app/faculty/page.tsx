@@ -37,8 +37,13 @@ export default async function EducatorDashboard() {
     .eq("id", user.id)
     .single();
 
-  // Institution users should not be on the faculty dashboard home
+  // Institution-only accounts go to institution dashboard
   if (profile?.role === "institution") {
+    const { redirect } = await import("next/navigation");
+    redirect("/app/institution");
+  }
+  // Dual-mode users in institution mode → redirect to institution
+  if (profile?.can_switch_role && profile?.active_mode === "institution") {
     const { redirect } = await import("next/navigation");
     redirect("/app/institution");
   }

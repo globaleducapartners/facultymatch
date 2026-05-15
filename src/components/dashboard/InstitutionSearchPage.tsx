@@ -211,7 +211,7 @@ export function InstitutionSearchPage({
             </div>
           </div>
           <Link
-            href="/app/institution"
+            href="/app/become-institution"
             className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
           >
             <Zap size={14} /> Registrar institución
@@ -508,10 +508,10 @@ export function InstitutionSearchPage({
                     <div className="flex gap-3">
                       {isReadOnly ? (
                         <Link
-                          href="/app/institution"
-                          className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold h-11 rounded-xl transition-colors text-sm"
+                          href="/app/become-institution"
+                          className="flex-1 inline-flex items-center justify-center gap-2 bg-[#EEF4FF] hover:bg-blue-100 text-[#1B4FD8] font-bold h-11 rounded-xl transition-colors text-sm"
                         >
-                          <Lock size={15} /> Regístrate como institución para contactar
+                          <Lock size={15} /> Registrar institución para contactar
                         </Link>
                       ) : canContact ? (
                         <Button
