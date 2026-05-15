@@ -58,10 +58,10 @@ function LoginContent() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "2fr 3fr", fontFamily: SANS }}>
+    <div id="fm-login-layout" style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "2fr 3fr", fontFamily: SANS }}>
 
       {/* ── Panel izquierdo — dark ── */}
-      <div style={{
+      <div id="fm-login-left" style={{
         background: `linear-gradient(160deg, ${D.dark} 0%, ${D.navy} 100%)`,
         padding: "48px 44px",
         display: "flex", flexDirection: "column", justifyContent: "space-between",
@@ -136,8 +136,13 @@ function LoginContent() {
       </div>
 
       {/* ── Panel derecho — blanco ── */}
-      <div style={{ background: D.surf, padding: "48px 56px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div id="fm-login-right" style={{ background: D.surf, padding: "48px 56px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
         <div style={{ maxWidth: 400, margin: "0 auto", width: "100%" }}>
+
+          {/* Logo visible only on mobile */}
+          <div id="fm-login-mobile-logo" style={{ display: "none", marginBottom: 28 }}>
+            <Logo />
+          </div>
 
           {/* Cabecera */}
           <div style={{ marginBottom: 32 }}>
@@ -228,7 +233,15 @@ function LoginContent() {
         </div>
       </div>
 
-      <style>{`@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }`}</style>
+      <style>{`
+        @keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
+        @media (max-width: 767px) {
+          #fm-login-layout { display: flex !important; flex-direction: column !important; }
+          #fm-login-left   { display: none !important; }
+          #fm-login-right  { padding: 36px 24px !important; justify-content: flex-start !important; }
+          #fm-login-mobile-logo { display: block !important; }
+        }
+      `}</style>
     </div>
   );
 }

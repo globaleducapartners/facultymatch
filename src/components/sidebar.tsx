@@ -39,6 +39,14 @@ const facultyBottomNavItems = [
   { label: "Ajustes",      href: "/app/faculty/settings",    icon: Settings },
 ];
 
+const institutionBottomNavItems = [
+  { label: "Inicio",    href: "/app/institution/home",     icon: Home },
+  { label: "Buscar",    href: "/app/institution/search",   icon: Search },
+  { label: "Favoritos", href: "/app/institution/favorites",icon: Star },
+  { label: "Contactos", href: "/app/institution/contacts", icon: Mail },
+  { label: "Perfil",    href: "/app/institution",          icon: Building2 },
+];
+
 const institutionItems = [
   { label: "Inicio",            href: "/app/institution/home",     icon: Home },
   { label: "Mi institución",    href: "/app/institution",          icon: Building2 },
@@ -67,11 +75,12 @@ export function Sidebar() {
     navItems = adminItems;
   }
 
-  const isFaculty = pathname?.startsWith("/app/faculty");
+  const isFaculty     = pathname?.startsWith("/app/faculty");
+  const isInstitution = pathname?.startsWith("/app/institution");
 
   return (
     <>
-      {/* Mobile bottom nav — faculty only */}
+      {/* Mobile bottom nav — faculty */}
       {isFaculty && (
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E2E8F0] flex justify-around py-2 z-50 md:hidden">
           {facultyBottomNavItems.map((item) => {
@@ -82,7 +91,7 @@ export function Sidebar() {
                 href={item.href}
                 className={cn(
                   "flex flex-col items-center gap-0.5 px-2 py-1 min-w-0 rounded-lg transition-colors",
-                  isActive ? "text-[#0D2240]" : "text-gray-400"
+                  isActive ? "text-[#1B4FD8]" : "text-gray-400"
                 )}
               >
                 <item.icon size={20} />
@@ -93,9 +102,38 @@ export function Sidebar() {
         </nav>
       )}
 
-      {/* Tablet hamburger */}
+      {/* Mobile bottom nav — institution */}
+      {isInstitution && (
+        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E2E8F0] flex justify-around py-2 z-50 md:hidden">
+          {institutionBottomNavItems.map((item) => {
+            const isActive = item.href === "/app/institution"
+              ? pathname === "/app/institution"
+              : pathname === item.href || pathname?.startsWith(item.href + "/");
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex flex-col items-center gap-0.5 px-2 py-1 min-w-0 rounded-lg transition-colors",
+                  isActive ? "text-[#1B4FD8]" : "text-gray-400"
+                )}
+              >
+                <item.icon size={20} />
+                <span className="text-[9px] font-bold leading-tight">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      )}
+
+      {/* Mobile/tablet hamburger — shows on mobile for non-bottom-nav access, tablet for all */}
       <button
-        className="hidden md:flex lg:hidden fixed bottom-6 right-6 z-50 bg-[#0D2240] text-white p-3 rounded-full shadow-lg items-center justify-center"
+        className={cn(
+          "fixed bottom-6 right-6 z-50 bg-[#0D2240] text-white p-3 rounded-full shadow-lg items-center justify-center lg:hidden",
+          // On mobile: only show for non-faculty/institution (e.g. admin), or always show
+          // For faculty/institution we have bottom nav, but hamburger gives full sidebar access
+          isFaculty || isInstitution ? "hidden md:flex" : "flex"
+        )}
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? <X size={22} /> : <Menu size={22} />}
@@ -111,12 +149,11 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-[#E2E8F0] flex-col transition-transform duration-300 transform",
-        "hidden md:flex",
+        "fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-[#E2E8F0] flex flex-col transition-transform duration-300 transform",
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Nav items */}
-        <div className="flex-1 overflow-y-auto py-3 px-3">
+        <div className="flex-1 overflow-y-auto py-3 px-3 pb-20 lg:pb-3">
           <nav className="space-y-0.5">
             {navItems.map((item, idx) => {
               const isActive = item.href === "/app/institution"

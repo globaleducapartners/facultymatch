@@ -254,10 +254,10 @@ function SignupForm() {
   const TOTAL = 4;
 
   return (
-    <div style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "2fr 3fr", fontFamily: SANS }}>
+    <div id="fm-signup-layout" style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "2fr 3fr", fontFamily: SANS }}>
 
       {/* ── Panel izquierdo — dark ── */}
-      <div style={{
+      <div id="fm-signup-left" style={{
         background: `linear-gradient(160deg, ${D.dark} 0%, ${D.navy} 100%)`,
         padding: "48px 44px",
         display: "flex", flexDirection: "column", justifyContent: "space-between",
@@ -333,8 +333,13 @@ function SignupForm() {
       </div>
 
       {/* ── Panel derecho ── */}
-      <div style={{ background: D.surf, padding: "48px 56px", overflowY: "auto" }}>
+      <div id="fm-signup-right" style={{ background: D.surf, padding: "48px 56px", overflowY: "auto" }}>
         <div style={{ maxWidth: 480, margin: "0 auto" }}>
+
+          {/* Logo visible only on mobile */}
+          <div id="fm-signup-mobile-logo" style={{ display: "none", marginBottom: 24 }}>
+            <Logo />
+          </div>
 
           {/* Progress bar */}
           <div style={{ display: "flex", gap: 5, marginBottom: 36 }}>
@@ -566,6 +571,15 @@ function SignupForm() {
           </p>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 767px) {
+          #fm-signup-layout { display: flex !important; flex-direction: column !important; }
+          #fm-signup-left   { display: none !important; }
+          #fm-signup-right  { padding: 36px 24px !important; }
+          #fm-signup-mobile-logo { display: block !important; }
+        }
+      `}</style>
     </div>
   );
 }

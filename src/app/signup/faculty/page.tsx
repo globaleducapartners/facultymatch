@@ -127,10 +127,10 @@ export default function SignupFacultyPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "1fr 1fr", fontFamily: SANS }}>
+    <div id="fm-sfac-layout" style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "1fr 1fr", fontFamily: SANS }}>
 
       {/* ── Columna izquierda — Formulario ── */}
-      <div style={{ background: D.surf, padding: "56px 52px", overflowY: "auto", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div id="fm-sfac-left" style={{ background: D.surf, padding: "56px 52px", overflowY: "auto", display: "flex", flexDirection: "column", justifyContent: "center" }}>
         <div style={{ maxWidth: 440, width: "100%", margin: "0 auto" }}>
 
           {/* Logo */}
@@ -273,7 +273,7 @@ export default function SignupFacultyPage() {
       </div>
 
       {/* ── Columna derecha — Panel oscuro ── */}
-      <div style={{
+      <div id="fm-sfac-right" style={{
         background: `linear-gradient(160deg, ${D.dark} 0%, ${D.navy} 100%)`,
         padding: "56px 52px",
         display: "flex", flexDirection: "column", justifyContent: "center",
@@ -342,6 +342,13 @@ export default function SignupFacultyPage() {
         </div>
       </div>
 
+      <style>{`
+        @media (max-width: 767px) {
+          #fm-sfac-layout { display: flex !important; flex-direction: column !important; }
+          #fm-sfac-right  { display: none !important; }
+          #fm-sfac-left   { padding: 36px 24px !important; justify-content: flex-start !important; }
+        }
+      `}</style>
     </div>
   );
 }

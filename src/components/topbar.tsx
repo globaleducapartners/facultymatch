@@ -149,7 +149,7 @@ export function Topbar({ user, profile }: TopbarProps) {
         </Link>
       </div>
 
-      {/* ── Role switcher (dual-role users only) ── */}
+      {/* ── Role switcher (dual-role) — desktop ── */}
       {profile?.can_switch_role && (
         <div className="hidden md:flex items-center bg-[#F2F6FC] border border-[#D8E2EF] rounded-xl p-1 gap-0.5">
           <form action={switchActiveMode}>
@@ -178,6 +178,40 @@ export function Topbar({ user, profile }: TopbarProps) {
             >
               <Building2 size={13} />
               Modo institución
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* ── Role switcher — mobile (icon-only) ── */}
+      {profile?.can_switch_role && (
+        <div className="flex md:hidden items-center bg-[#F2F6FC] border border-[#D8E2EF] rounded-xl p-0.5 gap-0.5">
+          <form action={switchActiveMode}>
+            <input type="hidden" name="mode" value="faculty" />
+            <button
+              type="submit"
+              title="Modo docente"
+              className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all ${
+                profile.active_mode === "faculty"
+                  ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
+                  : "text-[#4B5A7A]"
+              }`}
+            >
+              <GraduationCap size={15} />
+            </button>
+          </form>
+          <form action={switchActiveMode}>
+            <input type="hidden" name="mode" value="institution" />
+            <button
+              type="submit"
+              title="Modo institución"
+              className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all ${
+                profile.active_mode === "institution"
+                  ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
+                  : "text-[#4B5A7A]"
+              }`}
+            >
+              <Building2 size={15} />
             </button>
           </form>
         </div>
