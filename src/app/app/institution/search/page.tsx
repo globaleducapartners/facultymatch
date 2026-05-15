@@ -97,7 +97,7 @@ export default async function InstitutionSearchRoute({
     { data: areaMatchData },
     { data: nameMatchData },
   ] = await Promise.all([
-    supabase.from("favorites").select("faculty_id").eq("institution_id", institution.id),
+    admin.from("favorites").select("faculty_id").eq("institution_id", institution.id),
     supabase.from("contacts").select("*", { count: "exact", head: true }).eq("institution_id", institution.id),
     supabase.from("contacts").select("*", { count: "exact", head: true })
       .eq("institution_id", institution.id)
@@ -198,9 +198,9 @@ export default async function InstitutionSearchRoute({
     educatorQuery = educatorQuery.ilike("aneca_accreditation", `%${aneca}%`);
   }
 
-  // Language — JSONB column cast to text for ilike
+  // Language — JSONB containment: check if languages array contains {lang: "Inglés"}
   if (language) {
-    educatorQuery = (educatorQuery as any).filter("languages::text", "ilike", `%${language}%`);
+    educatorQuery = (educatorQuery as any).filter("languages", "cs", JSON.stringify([{ lang: language }]));
   }
 
   // Modality → availability column

@@ -33,7 +33,7 @@ export default async function AppPage() {
     }
 
     if (profile.role === "institution") {
-      redirect("/app/institution");
+      redirect("/app/institution/home");
     }
 
   if (profile.role === "admin" || profile.role === "super_admin") {

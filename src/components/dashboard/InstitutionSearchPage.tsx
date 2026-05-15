@@ -105,6 +105,8 @@ export function InstitutionSearchPage({
   const [favorites, setFavorites] = useState<string[]>(initialFavorites || []);
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const [usedContacts, setUsedContacts] = useState(monthlyContactsUsed);
+  // Direct contact from card (bypasses drawer)
+  const [directContactEducator, setDirectContactEducator] = useState<any | null>(null);
 
   const canContact = !isReadOnly && (isPro || usedContacts < FREE_CONTACTS_LIMIT);
 
@@ -125,6 +127,17 @@ export function InstitutionSearchPage({
     params.delete("faculty");
     const str = params.toString();
     window.history.replaceState(null, "", `/app/institution/search${str ? `?${str}` : ""}`);
+  };
+
+  // ── Direct contact from card (no drawer) ──────────────────────────────────
+
+  const handleDirectContact = (educator: any) => {
+    setSelectedId(null); // close drawer if open
+    setDirectContactEducator(educator);
+  };
+
+  const handleCloseDirectContact = () => {
+    setDirectContactEducator(null);
   };
 
   // ── Favorites ─────────────────────────────────────────────────────────────
@@ -453,7 +466,6 @@ export function InstitutionSearchPage({
           {initialEducators.map((educator) => (
             <div
               key={educator.id}
-              onClick={() => openEducator(educator.id)}
               className={`rounded-2xl transition-all ${
                 selectedId === educator.id ? "ring-2 ring-[#1B4FD8] shadow-md" : ""
               }`}
@@ -464,6 +476,9 @@ export function InstitutionSearchPage({
                 isFavorite={favorites.includes(educator.id)}
                 canContact={canContact}
                 compact
+                onCardClick={() => openEducator(educator.id)}
+                onContactClick={canContact ? handleDirectContact : undefined}
+                onFavoriteClick={institutionId ? (e, id) => handleToggleFavorite(e, id) : undefined}
               />
             </div>
           ))}
@@ -683,7 +698,7 @@ export function InstitutionSearchPage({
         </SheetContent>
       </Sheet>
 
-      {/* Contact modal */}
+      {/* Contact modal (from drawer) */}
       {selectedEducator && canContact && (
         <ContactModal
           isOpen={isContactModalOpen}
@@ -692,6 +707,18 @@ export function InstitutionSearchPage({
           facultyName={selectedEducator.full_name}
           institutionId={institutionId}
           onSuccess={() => setUsedContacts((n) => n + 1)}
+        />
+      )}
+
+      {/* Contact modal (from card "Contactar" button — no drawer) */}
+      {directContactEducator && canContact && (
+        <ContactModal
+          isOpen={!!directContactEducator}
+          onClose={handleCloseDirectContact}
+          facultyId={directContactEducator.id}
+          facultyName={directContactEducator.full_name}
+          institutionId={institutionId}
+          onSuccess={() => { setUsedContacts((n) => n + 1); handleCloseDirectContact(); }}
         />
       )}
     </div>

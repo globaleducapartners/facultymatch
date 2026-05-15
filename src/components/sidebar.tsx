@@ -40,6 +40,7 @@ const facultyBottomNavItems = [
 ];
 
 const institutionItems = [
+  { label: "Inicio",            href: "/app/institution/home",     icon: Home },
   { label: "Mi institución",    href: "/app/institution",          icon: Building2 },
   { label: "Buscar docentes",   href: "/app/institution/search",   icon: Search },
   { label: "Shortlists",        href: "/app/institution/favorites",icon: Star },
@@ -59,7 +60,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
-  let navItems = educatorItems;
+  let navItems: { label: string; href: string; icon: any; group?: string }[] = educatorItems;
   if (pathname?.startsWith("/app/institution")) {
     navItems = institutionItems;
   } else if (pathname?.startsWith("/app/admin") || pathname?.startsWith("/control")) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,11 +26,22 @@ interface EducatorCardProps {
   isFavorite?: boolean;
   compact?: boolean;
   canContact?: boolean;
+  /** Compact mode: call parent to handle contact directly (skips local modal) */
+  onContactClick?: (educator: any) => void;
+  /** Compact mode: call parent to handle favourite toggle */
+  onFavoriteClick?: (e: React.MouseEvent, educatorId: string) => void;
+  /** Compact mode: open detail drawer for this educator */
+  onCardClick?: () => void;
 }
 
-export function EducatorCard({ educator, institutionId, isFavorite: initialIsFavorite, compact, canContact = true }: EducatorCardProps) {
+export function EducatorCard({ educator, institutionId, isFavorite: initialIsFavorite, compact, canContact = true, onContactClick, onFavoriteClick, onCardClick }: EducatorCardProps) {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite || false);
+
+  // Sync local favorite state when parent re-renders with updated prop
+  useEffect(() => {
+    setIsFavorite(initialIsFavorite ?? false);
+  }, [initialIsFavorite]);
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -65,7 +76,10 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
   // ─── LinkedIn-style compact card ─────────────────────────────────────────
   if (compact) {
     return (
-      <div className="bg-white rounded-2xl border border-[#D8E2EF] shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-pointer flex flex-col overflow-hidden h-full relative group">
+      <div
+        className="bg-white rounded-2xl border border-[#D8E2EF] shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-pointer flex flex-col overflow-hidden h-full relative group"
+        onClick={() => onCardClick?.()}
+      >
         {/* Pro badge */}
         {educator.is_pro && (
           <span className="absolute top-3 right-3 z-10 bg-amber-50 text-amber-600 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">
@@ -161,19 +175,29 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
 
           {/* Action buttons */}
           <div className="flex gap-2 pt-2 mt-auto">
-            <button
-              onClick={handleToggleFavorite}
-              className={`flex-shrink-0 w-9 h-9 rounded-xl border flex items-center justify-center transition-all ${
-                isFavorite
-                  ? "text-amber-500 bg-amber-50 border-amber-100"
-                  : "text-[#9CA3AF] border-[#D8E2EF] hover:text-amber-500 hover:bg-amber-50"
-              }`}
-            >
-              <Star size={14} className={isFavorite ? "fill-current" : ""} />
-            </button>
+            {institutionId && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onFavoriteClick) onFavoriteClick(e, educator.id);
+                  else handleToggleFavorite(e);
+                }}
+                className={`flex-shrink-0 w-9 h-9 rounded-xl border flex items-center justify-center transition-all ${
+                  isFavorite
+                    ? "text-amber-500 bg-amber-50 border-amber-100"
+                    : "text-[#9CA3AF] border-[#D8E2EF] hover:text-amber-500 hover:bg-amber-50"
+                }`}
+              >
+                <Star size={14} className={isFavorite ? "fill-current" : ""} />
+              </button>
+            )}
             {canContact ? (
               <button
-                onClick={(e) => { e.stopPropagation(); setIsContactModalOpen(true); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onContactClick) onContactClick(educator);
+                  else setIsContactModalOpen(true);
+                }}
                 className="flex-1 bg-[#1B4FD8] hover:bg-[#0D2240] text-white text-xs font-bold h-9 rounded-xl flex items-center justify-center gap-1.5 transition-colors"
               >
                 <Mail size={12} /> Contactar
@@ -190,13 +214,16 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
           </div>
         </div>
 
-        <ContactModal
-          isOpen={isContactModalOpen}
-          onClose={() => setIsContactModalOpen(false)}
-          facultyId={educator.id}
-          facultyName={educator.full_name}
-          institutionId={institutionId}
-        />
+        {/* Only render local ContactModal when no parent handler is provided */}
+        {!onContactClick && (
+          <ContactModal
+            isOpen={isContactModalOpen}
+            onClose={() => setIsContactModalOpen(false)}
+            facultyId={educator.id}
+            facultyName={educator.full_name}
+            institutionId={institutionId}
+          />
+        )}
       </div>
     );
   }
