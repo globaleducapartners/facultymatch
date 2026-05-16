@@ -32,8 +32,8 @@ function StatCard({
         <Icon size={22} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-black text-gray-400 uppercase tracking-widest truncate">{label}</p>
-        <p className="text-3xl font-black text-navy mt-0.5">{value}</p>
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate">{label}</p>
+        <p className="text-2xl lg:text-3xl font-black text-navy mt-0.5">{value}</p>
         {sub && <p className="text-xs text-gray-400 font-medium mt-0.5">{sub}</p>}
       </div>
     </div>

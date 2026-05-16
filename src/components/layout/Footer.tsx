@@ -45,21 +45,46 @@ export function Footer() {
     <footer style={{
       background: D.dark,
       borderTop: `1px solid ${D.border}`,
-      padding: "60px 32px 32px",
+      padding: "60px 24px 32px",
       fontFamily: SANS,
     }}>
+      <style>{`
+        .fm-footer-grid {
+          display: grid;
+          grid-template-columns: 2.2fr 1fr 1fr 1fr;
+          gap: 40px;
+        }
+        .fm-footer-trust {
+          display: flex;
+          align-items: center;
+          gap: 24px;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        @media (max-width: 900px) {
+          .fm-footer-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 32px !important;
+          }
+        }
+        @media (max-width: 520px) {
+          .fm-footer-grid {
+            grid-template-columns: 1fr !important;
+            gap: 28px !important;
+          }
+          .fm-footer-trust {
+            gap: 12px !important;
+          }
+        }
+      `}</style>
       <div style={{ maxWidth: 1120, margin: "0 auto" }}>
 
         {/* Trust line */}
-        <div style={{
-          display: "flex", justifyContent: "center",
-          marginBottom: 52,
-        }}>
-          <div style={{
-            display: "flex", alignItems: "center", gap: 24,
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 48 }}>
+          <div className="fm-footer-trust" style={{
             background: "rgba(255,255,255,0.04)",
             border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: 999, padding: "10px 28px",
+            borderRadius: 999, padding: "10px 20px",
           }}>
             {["Verificado", "Sin comisiones", "Sin intermediarios"].map((label, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 7 }}>
@@ -76,10 +101,7 @@ export function Footer() {
         </div>
 
         {/* Top row */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "2.2fr 1fr 1fr 1fr",
-          gap: 40,
+        <div className="fm-footer-grid" style={{
           paddingBottom: 48,
           borderBottom: `1px solid ${D.border}`,
           marginBottom: 28,

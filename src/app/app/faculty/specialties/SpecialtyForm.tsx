@@ -40,7 +40,7 @@ export function SpecialtyForm({ action }: Props) {
 
   return (
     <form action={action} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label style={lbl}>Área Principal (UNESCO)</label>
           <select

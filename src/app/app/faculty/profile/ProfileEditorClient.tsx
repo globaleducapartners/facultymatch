@@ -1,6 +1,17 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
+
+function useIsMobile() {
+  const [mob, setMob] = useState(false);
+  useEffect(() => {
+    const check = () => setMob(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return mob;
+}
 import {
   Globe, MapPin, Briefcase, GraduationCap, FileText,
   Bell, BookOpen, Languages,
@@ -184,6 +195,7 @@ export function ProfileEditorClient({
 }: Props) {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isPending] = useTransition();
+  const isMob = useIsMobile();
 
   const avatarUrl = profile?.avatar_url || facultyProfile?.avatar_url;
   const completeness = calcCompleteness(facultyProfile, profile, userMeta);
@@ -216,7 +228,7 @@ export function ProfileEditorClient({
       )}
 
       {/* Two-column layout */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 290px", gap: 20, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "minmax(0,1fr) 290px", gap: 20, alignItems: "start" }}>
 
         {/* ── LEFT column ── */}
         <div>
@@ -389,7 +401,7 @@ export function ProfileEditorClient({
                   <AvatarUpload userId={user.id} currentAvatarUrl={avatarUrl} name={fullName} />
                 </div>
                 <form action={saveBasicInfo} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", gap: 16 }}>
                     <Field label="Nombre completo">
                       <input name="fullName" style={inp} required
                         defaultValue={profile?.full_name || userMeta?.full_name} />
@@ -399,7 +411,7 @@ export function ProfileEditorClient({
                         defaultValue={facultyProfile?.headline} />
                     </Field>
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", gap: 16 }}>
                     <Field label="País">
                       <input name="country" style={inp} placeholder="España"
                         defaultValue={facultyProfile?.country || userMeta?.country} />
@@ -515,7 +527,7 @@ export function ProfileEditorClient({
             }
             form={
               <form action={saveExperience} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", gap: 16 }}>
                   <Field label="Institución actual">
                     <InstitutionSelector name="currentInstitution"
                       initialValue={facultyProfile?.current_institution || ""}
@@ -526,7 +538,7 @@ export function ProfileEditorClient({
                       defaultValue={facultyProfile?.years_experience ?? ""} />
                   </Field>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", gap: 16 }}>
                   <Field label="Nivel académico máximo">
                     <select name="academicLevel" style={{ ...inp, appearance: "none" as const }}
                       defaultValue={facultyProfile?.academic_level || ""}>
@@ -728,7 +740,7 @@ export function ProfileEditorClient({
                     placeholder="Lista tus publicaciones principales…"
                     defaultValue={facultyProfile?.research_publications} />
                 </Field>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", gap: 16 }}>
                   <Field label="Google Scholar ID">
                     <input name="googleScholarId" style={inp} placeholder="XXXXXXX"
                       defaultValue={facultyProfile?.google_scholar_id} />
@@ -835,7 +847,7 @@ export function ProfileEditorClient({
             }
             form={
               <form action={saveLinks} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", gap: 16 }}>
                   <Field label="LinkedIn URL">
                     <input name="linkedinUrl" style={inp} placeholder="https://linkedin.com/in/…"
                       defaultValue={facultyProfile?.linkedin_url} />
@@ -861,7 +873,7 @@ export function ProfileEditorClient({
             isEditing={isEditing("preferences")}
             onToggleEdit={() => toggle("preferences")}
             children={
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", gap: 10, marginTop: 12 }}>
                 <div style={{ padding: "12px 14px", background: D.surf, borderRadius: 10, border: `1px solid ${D.border}` }}>
                   <div style={{ fontFamily: SANS, fontSize: 11, color: D.faint, marginBottom: 4 }}>Método preferido</div>
                   <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: D.ink, textTransform: "capitalize" as const }}>
@@ -887,7 +899,7 @@ export function ProfileEditorClient({
                     <option value="platform">Solo plataforma</option>
                   </select>
                 </Field>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMob ? "1fr" : "1fr 1fr", gap: 16 }}>
                   <Field label="Email de contacto">
                     <input name="contactEmail" type="email" style={inp}
                       placeholder="tu@email.com"

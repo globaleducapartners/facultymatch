@@ -65,7 +65,7 @@ export default function MailingPage() {
         {/* Segment selector */}
         <div className="space-y-3">
           <label className="text-xs font-black uppercase tracking-widest text-gray-400">Destinatarios</label>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {SEGMENTS.map((s) => (
               <button
                 key={s.value}
