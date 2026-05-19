@@ -322,6 +322,14 @@ function Hero() {
               </button>
             </Link>
           </div>
+          {isMob && (
+            <Link href="/login" style={{ marginTop: 20, display: "inline-block" }}>
+              <span style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.5)" }}>
+                ¿Ya tienes cuenta?{" "}
+                <span style={{ color: D.gold, fontWeight: 700 }}>Acceder →</span>
+              </span>
+            </Link>
+          )}
         </div>
 
         {/* Right: Floating stat cards — desktop only */}

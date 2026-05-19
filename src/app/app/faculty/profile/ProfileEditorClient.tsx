@@ -608,10 +608,15 @@ export function ProfileEditorClient({
                         </div>
                         <div>
                           <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: D.ink }}>
-                            {deg.title || deg.degree || "Titulación"}
+                            {deg.type || deg.title || deg.degree || "Titulación"}
                           </div>
+                          {deg.field && (
+                            <div style={{ fontFamily: SANS, fontSize: 13, color: D.blue, fontWeight: 600, marginTop: 1 }}>
+                              {deg.field}
+                            </div>
+                          )}
                           <div style={{ fontFamily: SANS, fontSize: 13, color: D.muted, marginTop: 1 }}>
-                            {deg.institution || deg.school || ""}
+                            {deg.university || deg.institution || deg.school || ""}
                           </div>
                           {deg.year && (
                             <div style={{ fontFamily: SANS, fontSize: 12, color: D.faint, marginTop: 2 }}>{deg.year}</div>

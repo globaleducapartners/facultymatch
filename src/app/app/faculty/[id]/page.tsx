@@ -4,7 +4,7 @@ import {
     GraduationCap, Globe, MapPin, Award, Star, Mail,
     Briefcase, BookOpen, ExternalLink, FileText,
     Calendar, CheckCircle2, ShieldCheck, ChevronRight,
-    Languages, Building2, Search, Sparkles, Lock, Zap
+    Languages, Building2, Search, Sparkles, Lock, Zap, MessageCircle
   } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,13 @@ export default async function FacultyProfilePage({
     supabase.from("institutions").select("*").eq("user_id", user.id).single(),
     supabase.from("user_profiles").select("plan, subscription_status").eq("id", user.id).single(),
   ]);
+
+  // Get faculty avatar from user_profiles
+  const { data: facultyUserProfile } = await supabase
+    .from("user_profiles")
+    .select("avatar_url")
+    .eq("id", id)
+    .single();
 
   const institutionIsPro =
     institutionUserProfile?.plan === "institution-pro" &&
@@ -97,9 +104,17 @@ export default async function FacultyProfilePage({
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full -translate-y-1/2 translate-x-1/2 -z-10"></div>
             
             <div className="flex flex-col md:flex-row gap-8 items-start">
-              <div className="w-24 h-24 bg-talentia-blue text-white rounded-3xl flex items-center justify-center text-3xl font-black shrink-0 shadow-xl shadow-blue-100">
-                {faculty.full_name?.substring(0, 2).toUpperCase()}
-              </div>
+              {facultyUserProfile?.avatar_url ? (
+                <img
+                  src={facultyUserProfile.avatar_url}
+                  alt={faculty.full_name}
+                  className="w-24 h-24 rounded-3xl object-cover shrink-0 shadow-xl shadow-blue-100"
+                />
+              ) : (
+                <div className="w-24 h-24 bg-talentia-blue text-white rounded-3xl flex items-center justify-center text-3xl font-black shrink-0 shadow-xl shadow-blue-100">
+                  {faculty.full_name?.substring(0, 2).toUpperCase()}
+                </div>
+              )}
               
               <div className="space-y-4 flex-1">
                 <div className="space-y-1">
@@ -188,25 +203,45 @@ export default async function FacultyProfilePage({
                   <div className="space-y-4">
                     <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Formación y Acreditación</h4>
                     <div className="space-y-4">
-                      <div className="flex gap-4 items-start">
-                        <div className="w-10 h-10 bg-blue-50 text-talentia-blue rounded-xl flex items-center justify-center shrink-0">
-                          <GraduationCap size={20} />
+                      {Array.isArray(faculty.degrees) && faculty.degrees.length > 0 ? (
+                        faculty.degrees.map((deg: any, i: number) => (
+                          <div key={i} className="flex gap-4 items-start">
+                            <div className="w-10 h-10 bg-blue-50 text-talentia-blue rounded-xl flex items-center justify-center shrink-0">
+                              <GraduationCap size={20} />
+                            </div>
+                            <div>
+                              <p className="font-bold text-navy">{deg.type || deg.title || "Titulación"}</p>
+                              {deg.field && <p className="text-sm font-medium text-talentia-blue">{deg.field}</p>}
+                              <p className="text-sm font-medium text-gray-500">
+                                {deg.university || ""}
+                                {deg.year && <span className="ml-2 text-gray-400">({deg.year})</span>}
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      ) : faculty.degree_level ? (
+                        <div className="flex gap-4 items-start">
+                          <div className="w-10 h-10 bg-blue-50 text-talentia-blue rounded-xl flex items-center justify-center shrink-0">
+                            <GraduationCap size={20} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-navy">{faculty.degree_level}</p>
+                            <p className="text-sm font-medium text-gray-500">Nivel de estudios</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-bold text-navy">{faculty.degree_level || "Grado Académico"}</p>
-                          <p className="text-sm font-medium text-gray-500">Nivel de estudios superior</p>
+                      ) : null}
+
+                      {faculty.aneca_accreditation && (
+                        <div className="flex gap-4 items-start">
+                          <div className="w-10 h-10 bg-blue-50 text-talentia-blue rounded-xl flex items-center justify-center shrink-0">
+                            <Award size={20} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-navy">{faculty.aneca_accreditation}</p>
+                            <p className="text-sm font-medium text-gray-500 italic">Acreditación ANECA</p>
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="flex gap-4 items-start">
-                        <div className="w-10 h-10 bg-blue-50 text-talentia-blue rounded-xl flex items-center justify-center shrink-0">
-                          <Award size={20} />
-                        </div>
-                        <div>
-                          <p className="font-bold text-navy">{faculty.aneca_accreditation || "Sin acreditar ANECA"}</p>
-                          <p className="text-sm font-medium text-gray-500 italic">Acreditación para docencia en España</p>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -407,6 +442,17 @@ export default async function FacultyProfilePage({
                   institutionId={institution.id}
                 />
 
+                {faculty.contact_whatsapp && (
+                  <a
+                    href={`https://wa.me/${faculty.contact_whatsapp.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5b] text-white font-bold h-12 rounded-xl text-sm transition-colors"
+                  >
+                    <MessageCircle size={16} /> WhatsApp
+                  </a>
+                )}
+
                 <div className="flex gap-4">
                   <FavoriteButton
                     facultyId={faculty.id}
@@ -414,9 +460,11 @@ export default async function FacultyProfilePage({
                     initialIsFavorite={isFavorite}
                   />
 
-                  <Button variant="outline" className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 font-bold h-12 rounded-xl">
-                    Descargar CV
-                  </Button>
+                  {faculty.cv_url && (
+                    <Button variant="outline" asChild className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 font-bold h-12 rounded-xl">
+                      <a href={faculty.cv_url} target="_blank" rel="noopener noreferrer">Descargar CV</a>
+                    </Button>
+                  )}
                 </div>
               </div>
 

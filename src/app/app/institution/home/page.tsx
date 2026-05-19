@@ -160,6 +160,27 @@ export default async function InstitutionHomePage() {
         ))}
       </div>
 
+      {/* ── Upgrade banner (mobile only, freemium) ── */}
+      {!isPro && (
+        <Link
+          href="/app/institution/billing"
+          className="lg:hidden flex items-center justify-between gap-3 bg-gradient-to-r from-energy-orange to-orange-500 text-white rounded-2xl px-5 py-4 shadow-lg shadow-orange-200 hover:shadow-xl transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Zap size={16} className="text-white" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/80">Plan Professional</p>
+              <p className="text-sm font-black leading-tight">Búsquedas y contactos ilimitados</p>
+            </div>
+          </div>
+          <span className="text-xs font-black bg-white/20 px-3 py-1.5 rounded-xl whitespace-nowrap flex-shrink-0">
+            Desde 99€/mes →
+          </span>
+        </Link>
+      )}
+
       {/* ── Main grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 

@@ -509,6 +509,82 @@ export async function contactFaculty(formData: FormData) {
   return { success: true };
 }
 
+export async function replyToContact(contactId: string, replyMessage: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'No autenticado' };
+
+  const admin = createAdminClient();
+
+  // Get contact record + institution + faculty info
+  const { data: contact } = await admin
+    .from('contacts')
+    .select('*, institution:institutions(id, name, contact_email, user_id)')
+    .eq('id', contactId)
+    .single();
+
+  if (!contact) return { error: 'Solicitud no encontrada' };
+
+  // Verify the faculty owns this contact request
+  const { data: fp } = await admin
+    .from('faculty_profiles')
+    .select('id, user_id')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (!fp || contact.faculty_id !== fp.id) return { error: 'No autorizado' };
+
+  // Update status to replied
+  await admin.from('contacts').update({ status: 'replied', reply_message: replyMessage, replied_at: new Date().toISOString() }).eq('id', contactId);
+
+  // Get faculty name
+  const { data: facultyUser } = await admin.from('user_profiles').select('full_name').eq('id', user.id).single();
+  const facultyName = facultyUser?.full_name || 'El docente';
+
+  // Get institution email
+  const inst = contact.institution as any;
+  let institutionEmail: string | null = inst?.contact_email || null;
+  if (!institutionEmail && inst?.user_id) {
+    const { data: authUser } = await admin.auth.admin.getUserById(inst.user_id);
+    institutionEmail = authUser?.user?.email || null;
+  }
+
+  if (institutionEmail) {
+    try {
+      await resend.emails.send({
+        from: FROM,
+        to: [institutionEmail],
+        subject: `💬 ${facultyName} ha respondido a tu solicitud en FacultyMatch`,
+        html: `
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:40px 16px;">
+            <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:40px;">
+              <h1 style="color:#0B1220;font-size:22px;margin:0 0 8px;">Has recibido una respuesta</h1>
+              <p style="color:#64748b;font-size:15px;margin:0 0 24px;">
+                <strong style="color:#0B1220;">${facultyName}</strong> ha respondido a tu solicitud de contacto.
+              </p>
+              <div style="background:#f1f5f9;border-radius:8px;padding:20px;margin-bottom:24px;border-left:3px solid #2563EB;">
+                <p style="margin:0;font-size:14px;color:#0B1220;line-height:1.7;">${replyMessage.replace(/\n/g, '<br>')}</p>
+              </div>
+              <a href="https://www.facultymatch.app/app/institution/contacts"
+                 style="display:inline-block;background:#2563EB;color:#fff;padding:14px 28px;border-radius:8px;font-weight:700;text-decoration:none;font-size:15px;">
+                Ver en mi panel →
+              </a>
+              <p style="margin:24px 0 0;font-size:12px;color:#94a3b8;">
+                FacultyMatch · <a href="https://www.facultymatch.app" style="color:#94a3b8;">www.facultymatch.app</a>
+              </p>
+            </div>
+          </div>
+        `,
+      });
+    } catch (e) {
+      console.warn('[replyToContact] Email failed:', e);
+    }
+  }
+
+  revalidatePath('/app/faculty/requests');
+  return { success: true };
+}
+
 export async function toggleFavorite(facultyId: string, institutionId: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
