@@ -1,9 +1,16 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
-import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Mail, Calendar, MapPin, ChevronLeft, Clock, CheckCircle2 } from "lucide-react";
+import { Mail, ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { ContactThread } from "./ContactThread";
+
+const SUBJECT_LABELS: Record<string, string> = {
+  profesor_adjunto: "Profesor Adjunto",
+  conferenciante: "Conferenciante",
+  tutor_tfm: "Tutor TFM",
+  diseno_curricular: "Diseño Curricular",
+  otro: "Otro",
+};
 
 export default async function ContactsPage() {
   const supabase = await createClient();
@@ -11,22 +18,18 @@ export default async function ContactsPage() {
 
   const { data: institution } = await supabase
     .from("institutions")
-    .select("id")
+    .select("id, name")
     .eq("user_id", user!.id)
     .single();
 
-  // Use admin to bypass RLS (institution_id ≠ auth.uid() — it's the institution record ID)
   const admin = createAdminClient();
 
-  // Simple select without FK join — joins were failing because faculty_profiles
-  // shares its id with user_profiles (no separate user_id / avatar_url columns)
   const { data: contacts } = await admin
     .from("contacts")
     .select("*")
     .eq("institution_id", institution?.id)
     .order("created_at", { ascending: false });
 
-  // faculty_profiles.id === user_profiles.id === contacts.faculty_id
   const facultyIds = contacts?.map((c: any) => c.faculty_id).filter(Boolean) ?? [];
 
   const [{ data: facultyUsers }, { data: facultyProfiles }] = await Promise.all([
@@ -34,84 +37,54 @@ export default async function ContactsPage() {
       ? admin.from("user_profiles").select("id, full_name, avatar_url").in("id", facultyIds)
       : Promise.resolve({ data: [] as any[] }),
     facultyIds.length > 0
-      ? admin.from("faculty_profiles").select("id, headline").in("id", facultyIds)
+      ? admin.from("faculty_profiles").select("id, headline, contact_whatsapp").in("id", facultyIds)
       : Promise.resolve({ data: [] as any[] }),
   ]);
 
-  const facultyMap: Record<string, { full_name: string; avatar_url: string | null; headline: string }> = {};
+  const facultyMap: Record<string, { full_name: string; avatar_url: string | null; headline: string; contact_whatsapp: string | null }> = {};
   (facultyUsers ?? []).forEach((u: any) => {
-    facultyMap[u.id] = { full_name: u.full_name ?? "Docente", avatar_url: u.avatar_url ?? null, headline: "" };
+    facultyMap[u.id] = { full_name: u.full_name ?? "Docente", avatar_url: u.avatar_url ?? null, headline: "", contact_whatsapp: null };
   });
   (facultyProfiles ?? []).forEach((fp: any) => {
-    if (facultyMap[fp.id]) facultyMap[fp.id].headline = fp.headline ?? "";
+    if (facultyMap[fp.id]) {
+      facultyMap[fp.id].headline = fp.headline ?? "";
+      facultyMap[fp.id].contact_whatsapp = fp.contact_whatsapp ?? null;
+    }
   });
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 max-w-5xl mx-auto">
+    <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl mx-auto">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild className="rounded-full hover:bg-gray-100">
-          <Link href="/app/institution"><ChevronLeft size={24} /></Link>
+          <Link href="/app/institution/home"><ChevronLeft size={24} /></Link>
         </Button>
         <div>
-          <h1 className="text-3xl font-bold text-navy">Contactos enviados</h1>
-          <p className="text-gray-500 font-medium">Historial de propuestas enviadas a docentes.</p>
+          <h1 className="text-3xl font-bold text-navy">Conversaciones</h1>
+          <p className="text-gray-500 font-medium">Tus propuestas y respuestas de docentes.</p>
         </div>
       </div>
 
       {contacts && contacts.length > 0 ? (
-        <div className="grid gap-4">
+        <div className="space-y-4">
           {contacts.map((contact: any) => {
             const faculty = facultyMap[contact.faculty_id];
-            const isSent = contact.status === "sent" || contact.status === "pending";
             return (
-              <div key={contact.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                <div className="flex flex-col md:flex-row gap-6 items-start">
-                  <div className="w-16 h-16 bg-talentia-blue/10 text-talentia-blue rounded-xl flex items-center justify-center shrink-0 relative overflow-hidden">
-                    {faculty?.avatar_url ? (
-                      <Image src={faculty.avatar_url} alt="Avatar" fill sizes="64px" className="object-cover" />
-                    ) : (
-                      <span className="text-xl font-black">
-                        {faculty?.full_name?.substring(0, 2).toUpperCase() ?? "?"}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex-1 space-y-4">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div>
-                        <h3 className="text-lg font-bold text-navy">{faculty?.full_name ?? "Docente"}</h3>
-                        <p className="text-sm font-medium text-gray-500">{faculty?.headline}</p>
-                      </div>
-                      <Badge className={`${isSent ? "bg-blue-50 text-blue-600" : contact.status === "replied" ? "bg-green-50 text-green-600" : "bg-gray-50 text-gray-600"} border-none px-4 py-1.5 rounded-full text-xs font-bold`}>
-                        {isSent && <Clock size={14} className="mr-1.5 inline" />}
-                        {contact.status === "replied" && <CheckCircle2 size={14} className="mr-1.5 inline" />}
-                        {isSent ? "Enviada" : contact.status === "replied" ? "Respondida" : "Archivada"}
-                      </Badge>
-                    </div>
-                    <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 space-y-3">
-                      <div className="flex flex-wrap gap-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                        {contact.subject && <span className="flex items-center gap-1.5"><Mail size={14} className="text-talentia-blue" />{contact.subject}</span>}
-                        {contact.modality && <span className="flex items-center gap-1.5"><MapPin size={14} className="text-talentia-blue" />{contact.modality}</span>}
-                        {contact.dates && <span className="flex items-center gap-1.5"><Calendar size={14} className="text-talentia-blue" />{contact.dates}</span>}
-                      </div>
-                      {contact.message && (
-                        <p className="text-gray-600 text-sm italic leading-relaxed">"{contact.message}"</p>
-                      )}
-                    </div>
-                    <div className="flex justify-end text-xs font-medium text-gray-400">
-                      Enviada el {new Date(contact.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <ContactThread
+                key={contact.id}
+                contact={contact}
+                faculty={faculty ?? { full_name: "Docente", avatar_url: null, headline: "", contact_whatsapp: null }}
+                institutionName={institution?.name ?? "Tu institución"}
+                subjectLabel={SUBJECT_LABELS[contact.subject] ?? contact.subject ?? ""}
+              />
             );
           })}
         </div>
       ) : (
         <div className="bg-white p-20 rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center text-center">
           <div className="bg-blue-50 p-6 rounded-full text-talentia-blue mb-6"><Mail size={48} /></div>
-          <h3 className="text-xl font-bold text-navy mb-2">No has enviado contactos aún</h3>
+          <h3 className="text-xl font-bold text-navy mb-2">No has iniciado conversaciones aún</h3>
           <p className="text-gray-500 max-w-xs mx-auto font-medium">
-            Cuando encuentres un docente que encaje con tu programa, podrás contactarle directamente desde aquí.
+            Cuando encuentres un docente que encaje con tu programa, podrás contactarle directamente desde el directorio.
           </p>
           <Button asChild className="mt-8 bg-talentia-blue hover:bg-blue-700 text-white font-bold h-12 rounded-xl px-8">
             <Link href="/app/institution/search">Buscar docentes</Link>

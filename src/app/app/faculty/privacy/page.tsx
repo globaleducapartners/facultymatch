@@ -80,12 +80,13 @@ export default async function PrivacyPage({
   async function updateVisibility(formData: FormData) {
     "use server";
     const mode = formData.get("visibilityMode") as "public" | "private" | "hidden";
+    const nameVis = (formData.get("nameVisibility") as string) || "public";
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const admin = createAdminClient();
     await admin.from("faculty_profiles")
-      .upsert({ id: user.id, user_id: user.id, visibility: mode }, { onConflict: "id" });
+      .upsert({ id: user.id, user_id: user.id, visibility: mode, name_visibility: nameVis }, { onConflict: "id" });
     revalidatePath("/app/faculty/privacy");
     redirect("/app/faculty/privacy?saved=1");
   }
@@ -255,6 +256,34 @@ export default async function PrivacyPage({
             </CardHeader>
             <CardContent>
               <form action={updateVisibility}>
+                {/* Name visibility */}
+                <div className="mb-8">
+                  <p className="text-sm font-black text-navy mb-3 flex items-center gap-2">
+                    <Eye size={15} className="text-talentia-blue" /> Visibilidad de tu nombre
+                  </p>
+                  <RadioGroup
+                    name="nameVisibility"
+                    defaultValue={(facultyProfile as any)?.name_visibility || "public"}
+                    className="space-y-3"
+                  >
+                    {[
+                      { value: "public", id: "nv-public", label: "Nombre completo visible", desc: "Cualquiera en el directorio puede ver tu nombre completo." },
+                      { value: "institutions", id: "nv-institutions", label: "Solo para instituciones", desc: "Las instituciones ven tu nombre completo; visitantes anónimos solo ven tus iniciales." },
+                    ].map((opt) => (
+                      <div key={opt.id} className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:border-blue-100 transition-all cursor-pointer">
+                        <RadioGroupItem value={opt.value} id={opt.id} className="mt-1" />
+                        <Label htmlFor={opt.id} className="flex-1 cursor-pointer">
+                          <span className="font-bold text-navy block mb-0.5">{opt.label}</span>
+                          <p className="text-sm text-gray-500 font-medium leading-relaxed">{opt.desc}</p>
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+
+                <p className="text-sm font-black text-navy mb-3 flex items-center gap-2">
+                  <ShieldCheck size={15} className="text-talentia-blue" /> Modo de visibilidad del perfil
+                </p>
                 <RadioGroup
                   name="visibilityMode"
                   defaultValue={facultyProfile?.visibility || "public"}

@@ -29,7 +29,9 @@ export default async function BillingPage() {
   const proFeatures = [
     "Búsquedas ilimitadas",
     "Filtros avanzados (Doctorado, Idioma, Disponibilidad, Modalidad)",
-    "Acceso a datos de contacto de docentes verificados",
+    "Acceso a datos de contacto de docentes verificados (email)",
+    "Contacto directo por WhatsApp con docentes que lo permitan",
+    "Mensajería de seguimiento en tus conversaciones",
     "Hasta 3 usuarios en la misma cuenta institucional",
     "Soporte prioritario",
   ];
