@@ -85,8 +85,13 @@ export default async function PrivacyPage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const admin = createAdminClient();
-    await admin.from("faculty_profiles")
+    // Try with name_visibility first; if column doesn't exist fall back without it
+    const { error } = await admin.from("faculty_profiles")
       .upsert({ id: user.id, user_id: user.id, visibility: mode, name_visibility: nameVis }, { onConflict: "id" });
+    if (error?.message?.includes("name_visibility")) {
+      await admin.from("faculty_profiles")
+        .upsert({ id: user.id, user_id: user.id, visibility: mode }, { onConflict: "id" });
+    }
     revalidatePath("/app/faculty/privacy");
     redirect("/app/faculty/privacy?saved=1");
   }

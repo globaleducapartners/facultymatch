@@ -144,7 +144,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
           </div>
 
           {/* Faculty reply bubble (left) */}
-          {isReplied && contact.reply_message && (
+          {isReplied && (
             <div className="flex flex-col items-start gap-2">
               <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                 <div className="relative w-5 h-5 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center flex-shrink-0">
@@ -162,8 +162,10 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
                   </>
                 )}
               </div>
-              <div className="max-w-[80%] bg-gray-100 text-navy p-4 rounded-2xl rounded-tl-sm">
-                <p className="text-sm font-medium leading-relaxed">{contact.reply_message}</p>
+              <div className={`max-w-[80%] p-4 rounded-2xl rounded-tl-sm ${contact.reply_message ? "bg-gray-100 text-navy" : "bg-green-50 border border-dashed border-green-200 text-green-700"}`}>
+                <p className="text-sm font-medium leading-relaxed">
+                  {contact.reply_message ?? "El docente ha respondido a tu propuesta."}
+                </p>
               </div>
             </div>
           )}
@@ -188,7 +190,9 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
           {!isArchived && !sent && (
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Link
-                href={`/app/faculty/${contact.faculty_id}`}
+                href={`/faculty/${contact.faculty_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-xs font-bold text-talentia-blue hover:underline"
               >
                 <ExternalLink size={12} /> Ver perfil completo

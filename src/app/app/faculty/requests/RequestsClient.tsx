@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Archive, Building2, MapPin, Clock, CheckCircle2, Mail, ChevronDown, ChevronUp, Send } from "lucide-react";
+import { Archive, Clock, CheckCircle2, Mail, ChevronDown, ChevronUp, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ReplyDialog } from "./ReplyDialog";
 import { updateStatus } from "./actions";
+import { replyToContact } from "@/app/auth/actions";
 
 const SUBJECT_LABELS: Record<string, string> = {
   profesor_adjunto: "Profesor Adjunto / Invitado",
@@ -48,15 +49,30 @@ interface Props {
   archivedRequests: ContactRequest[];
 }
 
-function RequestCard({ req, showReply = false, facultyName }: { req: ContactRequest; showReply?: boolean; facultyName?: string }) {
+function RequestCard({ req, isPending = false }: { req: ContactRequest; isPending?: boolean }) {
   const [replyOpen, setReplyOpen] = useState(false);
   const [archiving, setArchiving] = useState(false);
   const [expanded, setExpanded] = useState(true);
+  const [showFollowUp, setShowFollowUp] = useState(false);
+  const [followUpMsg, setFollowUpMsg] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sentOk, setSentOk] = useState(false);
 
   const instInitials = (req.institution?.name ?? "IN").substring(0, 2).toUpperCase();
 
+  const handleFollowUp = async () => {
+    if (!followUpMsg.trim()) return;
+    setSending(true);
+    await replyToContact(req.id, followUpMsg.trim());
+    setSending(false);
+    setSentOk(true);
+    setShowFollowUp(false);
+    setFollowUpMsg("");
+    setTimeout(() => window.location.reload(), 800);
+  };
+
   return (
-    <div className={`bg-white rounded-2xl border shadow-sm transition-all ${showReply ? "border-blue-100 hover:border-blue-200" : "border-green-100"}`}>
+    <div className={`bg-white rounded-2xl border shadow-sm transition-all ${isPending ? "border-blue-100 hover:border-blue-200" : "border-green-100"}`}>
       {/* Header */}
       <div className="flex items-center gap-4 p-5 cursor-pointer" onClick={() => setExpanded(!expanded)}>
         <div className="w-10 h-10 bg-navy/10 text-navy rounded-xl flex items-center justify-center font-black text-xs flex-shrink-0">
@@ -82,7 +98,7 @@ function RequestCard({ req, showReply = false, facultyName }: { req: ContactRequ
           </p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          {showReply ? (
+          {isPending ? (
             <>
               <Button
                 onClick={(e) => { e.stopPropagation(); setReplyOpen(true); }}
@@ -111,33 +127,84 @@ function RequestCard({ req, showReply = false, facultyName }: { req: ContactRequ
       {/* Conversation thread */}
       {expanded && (
         <div className="px-5 pb-5 border-t border-gray-50 pt-4 space-y-4">
-          {/* Institution message bubble */}
+          {/* Institution message bubble (left, they sent to us) */}
           <div className="flex flex-col items-start gap-1">
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{req.institution?.name}</p>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+              {req.institution?.name}
+            </p>
             <div className="max-w-[85%] bg-gray-100 text-navy p-4 rounded-2xl rounded-tl-sm">
-              <div className="flex flex-wrap gap-2 mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                {req.modality && <span className="flex items-center gap-1"><Clock size={9} /> {MODALITY_LABELS[req.modality] ?? req.modality}</span>}
-                {req.dates && <span className="flex items-center gap-1"><Clock size={9} /> {req.dates}</span>}
-              </div>
+              {(req.modality || req.dates) && (
+                <div className="flex flex-wrap gap-2 mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                  {req.modality && <span className="flex items-center gap-1"><Clock size={9} /> {MODALITY_LABELS[req.modality] ?? req.modality}</span>}
+                  {req.dates && <span className="flex items-center gap-1"><Clock size={9} /> {req.dates}</span>}
+                </div>
+              )}
               <p className="text-sm font-medium leading-relaxed">{req.message}</p>
             </div>
           </div>
 
-          {/* My reply bubble */}
-          {req.reply_message && (
+          {/* My reply bubble (right) */}
+          {req.reply_message ? (
             <div className="flex flex-col items-end gap-1">
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mr-1">
-                Tu respuesta · {req.replied_at ? new Date(req.replied_at).toLocaleDateString("es-ES", { day: "numeric", month: "long" }) : ""}
+                Tu respuesta {req.replied_at ? `· ${new Date(req.replied_at).toLocaleDateString("es-ES", { day: "numeric", month: "long" })}` : ""}
               </p>
               <div className="max-w-[85%] bg-talentia-blue text-white p-4 rounded-2xl rounded-tr-sm">
                 <p className="text-sm font-medium leading-relaxed">{req.reply_message}</p>
               </div>
             </div>
+          ) : !isPending ? (
+            <div className="flex justify-end">
+              <div className="max-w-[85%] border border-dashed border-green-200 bg-green-50/50 text-green-700 p-3 rounded-2xl rounded-tr-sm">
+                <p className="text-xs font-medium italic">Respondiste a esta solicitud.</p>
+              </div>
+            </div>
+          ) : null}
+
+          {/* Success message */}
+          {sentOk && (
+            <div className="flex items-center gap-2 py-2 px-4 bg-green-50 rounded-xl text-xs font-bold text-green-700">
+              <CheckCircle2 size={13} /> Mensaje enviado.
+            </div>
           )}
 
-          {/* Pending indicator */}
-          {showReply && !req.reply_message && (
-            <p className="text-xs font-medium text-gray-400 italic">Aún no has respondido a esta solicitud.</p>
+          {/* Follow-up button for replied conversations */}
+          {!isPending && !showFollowUp && !sentOk && (
+            <div className="flex justify-end pt-1">
+              <button
+                onClick={() => setShowFollowUp(true)}
+                className="flex items-center gap-1.5 text-xs font-bold text-talentia-blue hover:underline"
+              >
+                <Send size={11} /> Enviar seguimiento
+              </button>
+            </div>
+          )}
+
+          {/* Follow-up compose */}
+          {showFollowUp && (
+            <div className="space-y-3 pt-2 border-t border-gray-100">
+              <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Mensaje de seguimiento</p>
+              <textarea
+                value={followUpMsg}
+                onChange={e => setFollowUpMsg(e.target.value)}
+                rows={3}
+                className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none text-sm font-medium resize-none"
+                placeholder="Escribe tu respuesta..."
+              />
+              <div className="flex gap-2 justify-end">
+                <Button variant="ghost" size="sm" onClick={() => setShowFollowUp(false)} className="rounded-xl font-bold">
+                  Cancelar
+                </Button>
+                <Button
+                  size="sm"
+                  disabled={sending || !followUpMsg.trim()}
+                  onClick={handleFollowUp}
+                  className="bg-talentia-blue hover:bg-blue-700 text-white font-bold rounded-xl"
+                >
+                  {sending ? <Loader2 size={14} className="animate-spin" /> : <><Send size={12} className="mr-1.5" />Enviar</>}
+                </Button>
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -163,7 +230,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
         </h2>
         <div className="space-y-3">
           {pendingRequests.length > 0 ? (
-            pendingRequests.map(req => <RequestCard key={req.id} req={req} showReply />)
+            pendingRequests.map(req => <RequestCard key={req.id} req={req} isPending />)
           ) : (
             <div className="bg-white rounded-2xl border border-gray-100 py-16 text-center space-y-3">
               <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
@@ -182,7 +249,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
           <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2">
             <CheckCircle2 size={13} /> Respondidas ({repliedRequests.length})
           </h2>
-          <div className="space-y-3 opacity-90">
+          <div className="space-y-3">
             {repliedRequests.map(req => <RequestCard key={req.id} req={req} />)}
           </div>
         </section>
