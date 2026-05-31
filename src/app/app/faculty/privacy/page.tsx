@@ -44,11 +44,11 @@ export default async function PrivacyPage({
     ...(institutionRows || []).map((i: any) => i.name as string),
   ].filter(Boolean))).sort() as string[];
 
-  // Try SELECT with institution_name column; fall back if column doesn't exist yet
+  // Try SELECT with institution_name + domain column; fall back if columns don't exist yet
   let blockedRules: any[] | null = null;
   const { data: rulesWithName, error: rulesError } = await adminClient
     .from("visibility_rules")
-    .select("id, institution_name, institution:institutions(id, name)")
+    .select("id, institution_name, domain, institution:institutions(id, name)")
     .eq("faculty_id", user.id)
     .eq("rule", "block");
   if (!rulesError) {
@@ -65,6 +65,7 @@ export default async function PrivacyPage({
   const blockedInstitutions = (blockedRules || []).map((r: any) => ({
     ruleId: r.id as string,
     name: (r.institution_name as string) || (r.institution as any)?.name || "Institución desconocida",
+    domain: (r.domain as string | null) || null,
   }));
 
   // Pro: plan set by Stripe webhook in user_profiles
@@ -129,13 +130,26 @@ export default async function PrivacyPage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const admin = createAdminClient();
-    // Look up institution UUID if it has a registered account
+    // Look up institution UUID + user_id if it has a registered account
     const { data: inst } = await admin
       .from("institutions")
-      .select("id")
+      .select("id, user_id")
       .ilike("name", name)
       .limit(1)
       .maybeSingle();
+
+    // Try to extract email domain from the institution's registered account
+    let institutionDomain: string | null = null;
+    if (inst?.user_id) {
+      try {
+        const { data: { user: instUser } } = await admin.auth.admin.getUserById(inst.user_id);
+        if (instUser?.email) {
+          const parts = instUser.email.split("@");
+          if (parts.length === 2 && parts[1]) institutionDomain = parts[1].toLowerCase();
+        }
+      } catch {}
+    }
+
     // Check for duplicate: by institution_id if registered, otherwise by institution_name
     let existing = null;
     if (inst) {
@@ -158,31 +172,40 @@ export default async function PrivacyPage({
       existing = data;
     }
     if (!existing) {
-      // Try insert with institution_name (requires migration: ADD COLUMN institution_name text)
+      // Try insert with institution_name + domain
       const { error: insertError } = await admin.from("visibility_rules").insert({
         faculty_id: user.id,
         institution_id: inst?.id ?? null,
         institution_name: name,
+        domain: institutionDomain,
         rule: "block",
       });
       if (insertError) {
-        // Column may not exist yet — fallback without institution_name (only works if institution has an account)
-        if (inst?.id) {
-          const { error: fallbackError } = await admin.from("visibility_rules").insert({
-            faculty_id: user.id,
-            institution_id: inst.id,
-            rule: "block",
-          });
-          if (fallbackError) {
-            console.error("[blockInstitution] Fallback insert failed:", fallbackError.message);
+        // Fallback: try without domain column
+        const { error: noDomainError } = await admin.from("visibility_rules").insert({
+          faculty_id: user.id,
+          institution_id: inst?.id ?? null,
+          institution_name: name,
+          rule: "block",
+        });
+        if (noDomainError) {
+          // Last fallback: only institution_id (only if registered)
+          if (inst?.id) {
+            const { error: fallbackError } = await admin.from("visibility_rules").insert({
+              faculty_id: user.id,
+              institution_id: inst.id,
+              rule: "block",
+            });
+            if (fallbackError) {
+              console.error("[blockInstitution] All inserts failed:", fallbackError.message);
+              revalidatePath("/app/faculty/privacy");
+              redirect("/app/faculty/privacy?error=save-failed");
+            }
+          } else {
+            console.error("[blockInstitution] Insert failed:", noDomainError.message);
             revalidatePath("/app/faculty/privacy");
             redirect("/app/faculty/privacy?error=save-failed");
           }
-        } else {
-          // Unregistered institution and no institution_name column — cannot save
-          console.error("[blockInstitution] Insert failed (institution_name column missing):", insertError.message);
-          revalidatePath("/app/faculty/privacy");
-          redirect("/app/faculty/privacy?error=save-failed");
         }
       }
     }
@@ -360,7 +383,7 @@ export default async function PrivacyPage({
                 Bloqueo de instituciones
               </CardTitle>
               <CardDescription className="font-medium">
-                Bloquea instituciones específicas para que nunca puedan ver tu perfil. Gratuito para todos los planes.
+                Bloquea instituciones específicas para que nunca puedan ver tu perfil. Si el centro está registrado en FacultyMatch, el bloqueo se aplica también a todos los correos de su dominio. Gratuito para todos los planes.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -406,7 +429,14 @@ export default async function PrivacyPage({
                           <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-red-50 group-hover:text-red-400 transition-colors">
                             <Lock size={18} />
                           </div>
-                          <p className="text-sm font-bold text-navy">{inst.name}</p>
+                          <div>
+                            <p className="text-sm font-bold text-navy">{inst.name}</p>
+                            {inst.domain && (
+                              <p className="text-xs text-gray-400 font-medium mt-0.5">
+                                Bloquea accesos desde @{inst.domain}
+                              </p>
+                            )}
+                          </div>
                         </div>
                         <form
                           action={async () => {

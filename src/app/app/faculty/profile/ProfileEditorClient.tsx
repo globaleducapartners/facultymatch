@@ -19,6 +19,7 @@ import {
   Pencil, Check, X, ExternalLink, Award,
 } from "lucide-react";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
+import { BannerUpload } from "@/components/profile/BannerUpload";
 import { LanguageEditor } from "@/components/profile/LanguageEditor";
 import { DegreeEditor } from "@/components/profile/DegreeEditor";
 import { InstitutionsTaughtEditor } from "@/components/profile/InstitutionsTaughtEditor";
@@ -195,9 +196,11 @@ export function ProfileEditorClient({
 }: Props) {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isPending] = useTransition();
+  const [bannerPickerOpen, setBannerPickerOpen] = useState(false);
   const isMob = useIsMobile();
 
   const avatarUrl = profile?.avatar_url || facultyProfile?.avatar_url;
+  const bannerUrl = (facultyProfile as any)?.banner_url || null;
   const completeness = calcCompleteness(facultyProfile, profile, userMeta);
 
   const fullName    = profile?.full_name || userMeta?.full_name || "";
@@ -241,24 +244,59 @@ export function ProfileEditorClient({
             {/* Cover banner */}
             <div style={{
               height: 168,
-              background: `linear-gradient(135deg, ${D.navy} 0%, ${D.blue} 55%, #4F7FE8 100%)`,
+              background: bannerUrl
+                ? "transparent"
+                : `linear-gradient(135deg, ${D.navy} 0%, ${D.blue} 55%, #4F7FE8 100%)`,
               position: "relative",
+              overflow: "hidden",
             }}>
-              <button
-                onClick={() => toggle("basic")}
-                style={{
-                  position: "absolute", top: 14, right: 14,
-                  display: "flex", alignItems: "center", gap: 6,
-                  background: "rgba(255,255,255,0.18)",
-                  border: "1px solid rgba(255,255,255,0.35)",
-                  borderRadius: 8, padding: "6px 13px",
-                  color: "#fff", fontFamily: SANS, fontSize: 12, fontWeight: 600,
-                  cursor: "pointer", backdropFilter: "blur(6px)",
-                }}
-              >
-                <Pencil size={12} /> Editar perfil
-              </button>
+              {bannerUrl && (
+                <img
+                  src={bannerUrl}
+                  alt=""
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+                />
+              )}
+              <div style={{ position: "relative", zIndex: 2, display: "flex", gap: 8, position: "absolute" as any, top: 14, right: 14 }}>
+                <button
+                  onClick={() => setBannerPickerOpen(true)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    background: "rgba(0,0,0,0.38)",
+                    border: "1px solid rgba(255,255,255,0.35)",
+                    borderRadius: 8, padding: "6px 13px",
+                    color: "#fff", fontFamily: SANS, fontSize: 12, fontWeight: 600,
+                    cursor: "pointer", backdropFilter: "blur(6px)",
+                  }}
+                >
+                  <Pencil size={12} /> Banner
+                </button>
+                <button
+                  onClick={() => toggle("basic")}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    background: "rgba(0,0,0,0.38)",
+                    border: "1px solid rgba(255,255,255,0.35)",
+                    borderRadius: 8, padding: "6px 13px",
+                    color: "#fff", fontFamily: SANS, fontSize: 12, fontWeight: 600,
+                    cursor: "pointer", backdropFilter: "blur(6px)",
+                  }}
+                >
+                  <Pencil size={12} /> Editar perfil
+                </button>
+              </div>
             </div>
+
+            {/* Banner picker overlay */}
+            {bannerPickerOpen && (
+              <div style={{ padding: "12px 24px 0" }}>
+                <BannerUpload
+                  userId={user.id}
+                  currentBannerUrl={bannerUrl}
+                  onClose={() => setBannerPickerOpen(false)}
+                />
+              </div>
+            )}
 
             {/* Avatar + identity */}
             <div style={{ padding: "0 24px 24px" }}>

@@ -88,12 +88,16 @@ export default async function InstitutionSearchRoute({
     ? supabase.from("user_profiles").select("id").ilike("full_name", `%${query}%`)
     : Promise.resolve({ data: null as null | { id: string }[] });
 
+  // Extract the institution's email domain for domain-based blocking
+  const userEmailDomain = user.email?.split("@")[1]?.toLowerCase() || null;
+
   const [
     { data: favoritesData },
     { count: contactsCount },
     { count: monthlyContactsUsed },
     { data: blockedById },
     { data: blockedByName },
+    { data: blockedByDomain },
     { data: areaMatchData },
     { data: nameMatchData },
   ] = await Promise.all([
@@ -107,6 +111,9 @@ export default async function InstitutionSearchRoute({
     institution.name
       ? admin.from("visibility_rules").select("faculty_id").ilike("institution_name", institution.name).eq("rule", "block")
       : Promise.resolve({ data: null as null | { faculty_id: string }[] }),
+    userEmailDomain
+      ? admin.from("visibility_rules").select("faculty_id").eq("domain", userEmailDomain).eq("rule", "block")
+      : Promise.resolve({ data: null as null | { faculty_id: string }[] }),
     areaPreQuery,
     namePreQuery,
   ]);
@@ -114,8 +121,9 @@ export default async function InstitutionSearchRoute({
   const favorites = favoritesData?.map((f: any) => f.faculty_id) || [];
 
   const blockedFacultyIds = new Set([
-    ...(blockedById   || []).map((r: any) => r.faculty_id),
-    ...(blockedByName || []).map((r: any) => r.faculty_id),
+    ...(blockedById     || []).map((r: any) => r.faculty_id),
+    ...(blockedByName   || []).map((r: any) => r.faculty_id),
+    ...(blockedByDomain || []).map((r: any) => r.faculty_id),
   ]);
 
   const areaMatchIds: string[] = [...new Set((areaMatchData || []).map((e: any) => e.faculty_id))];

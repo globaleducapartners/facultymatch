@@ -53,6 +53,8 @@ export default async function PublicFacultyProfilePage({
     admin.from("user_profiles").select("full_name, avatar_url").eq("id", id).single(),
   ]);
 
+  const bannerUrl = (faculty as any)?.banner_url || null;
+
   if (!faculty) return notFound();
 
   const fullName = userProfile?.full_name || (faculty as any).full_name || "Docente";
@@ -91,7 +93,11 @@ export default async function PublicFacultyProfilePage({
         {/* Hero card */}
         <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
           {/* Cover */}
-          <div className="h-28 bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#2563EB]" />
+          <div className="relative h-28 overflow-hidden bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#2563EB]">
+            {bannerUrl && (
+              <Image src={bannerUrl} alt="" fill sizes="100vw" className="object-cover object-center" unoptimized />
+            )}
+          </div>
 
           <div className="px-6 sm:px-10 pb-8">
             {/* Avatar + name */}
