@@ -123,17 +123,25 @@ export default function FacultyClient() {
         minHeight: isMob ? "90svh" : 580,
         display: "flex", alignItems: "center",
       }}>
-        <video
-          autoPlay muted loop playsInline
-          poster="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=1800"
-          style={{
+        {isMob ? (
+          <div style={{
             position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover", objectPosition: "center 30%",
-          }}
-        >
-          <source src="/faculty-hero.mp4" type="video/mp4" />
-        </video>
+            backgroundImage: `url(https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=85&w=1200)`,
+            backgroundSize: "cover", backgroundPosition: "center 30%",
+          }} />
+        ) : (
+          <video
+            autoPlay muted loop playsInline
+            poster="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=1800"
+            style={{
+              position: "absolute", inset: 0,
+              width: "100%", height: "100%",
+              objectFit: "cover", objectPosition: "center 30%",
+            }}
+          >
+            <source src="/faculty-hero.mp4" type="video/mp4" />
+          </video>
+        )}
         <div style={{
           position: "absolute", inset: 0,
           background: "linear-gradient(160deg, rgba(7,19,38,0.75) 0%, rgba(7,19,38,0.88) 60%, rgba(7,19,38,0.96) 100%)",
@@ -268,6 +276,64 @@ export default function FacultyClient() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRIVACIDAD CALLOUT ── */}
+      <section style={{ background: D.navy, padding: isMob ? "48px 24px" : "52px 32px" }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <div style={{
+            display: "flex",
+            flexDirection: isMob ? "column" as const : "row" as const,
+            alignItems: isMob ? "flex-start" : "center",
+            gap: isMob ? 20 : 40,
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 20, padding: isMob ? "28px 24px" : "32px 40px",
+          }}>
+            <div style={{
+              width: 56, height: 56, borderRadius: 16, flexShrink: 0,
+              background: "rgba(27,79,216,0.3)", border: "1px solid rgba(27,79,216,0.4)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={D.gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{
+                fontFamily: SANS, fontSize: 10, fontWeight: 800,
+                letterSpacing: "0.16em", textTransform: "uppercase" as const,
+                color: D.gold, marginBottom: 8,
+              }}>
+                Tu empresa no lo sabrá
+              </div>
+              <h3 style={{
+                fontFamily: SANS, fontSize: isMob ? 20 : 24,
+                fontWeight: 800, color: "#fff", letterSpacing: "-0.03em",
+                margin: "0 0 10px", lineHeight: 1.2,
+              }}>
+                Tu institución actual no verá tu perfil,<br />a menos que tú quieras.
+              </h3>
+              <p style={{
+                fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.5)",
+                lineHeight: 1.75, margin: 0, maxWidth: 520,
+              }}>
+                El bloqueo selectivo de instituciones está disponible en todos los planes, incluso el gratuito.
+                Añade tu centro actual y nadie allí podrá ver tu perfil ni tus datos de contacto.
+              </p>
+            </div>
+            <Link href="/signup" style={{ flexShrink: 0 }}>
+              <button style={{
+                fontFamily: SANS, background: D.gold, color: D.ink,
+                border: "none", padding: "13px 28px", borderRadius: 10,
+                fontSize: 14, fontWeight: 700, cursor: "pointer",
+                whiteSpace: "nowrap" as const,
+              }}>
+                Publicar con privacidad →
+              </button>
+            </Link>
           </div>
         </div>
       </section>

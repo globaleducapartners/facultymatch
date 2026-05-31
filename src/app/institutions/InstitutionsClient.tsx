@@ -154,17 +154,25 @@ export default function InstitutionsClient() {
         minHeight: isMob ? "90svh" : 580,
         display: "flex", alignItems: "center",
       }}>
-        <video
-          autoPlay muted loop playsInline
-          poster="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=85&w=1800"
-          style={{
+        {isMob ? (
+          <div style={{
             position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover", objectPosition: "center 30%",
-          }}
-        >
-          <source src="https://assets.mixkit.co/videos/48165/48165-720.mp4" type="video/mp4" />
-        </video>
+            backgroundImage: `url(https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=85&w=1200)`,
+            backgroundSize: "cover", backgroundPosition: "center 30%",
+          }} />
+        ) : (
+          <video
+            autoPlay muted loop playsInline
+            poster="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=85&w=1800"
+            style={{
+              position: "absolute", inset: 0,
+              width: "100%", height: "100%",
+              objectFit: "cover", objectPosition: "center 30%",
+            }}
+          >
+            <source src="https://assets.mixkit.co/videos/48165/48165-720.mp4" type="video/mp4" />
+          </video>
+        )}
         <div style={{
           position: "absolute", inset: 0,
           background: "linear-gradient(160deg, rgba(7,19,38,0.78) 0%, rgba(7,19,38,0.88) 60%, rgba(7,19,38,0.96) 100%)",
@@ -476,6 +484,107 @@ export default function InstitutionsClient() {
         </div>
       </section>
 
+      {/* ── POR QUÉ NO LINKEDIN ── */}
+      <section style={{ background: D.white, padding: pad }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <div style={{
+              fontFamily: SANS, fontSize: 11, fontWeight: 700,
+              letterSpacing: "0.16em", textTransform: "uppercase" as const,
+              color: D.gold, marginBottom: 14,
+            }}>
+              Por qué no LinkedIn
+            </div>
+            <h2 style={{
+              fontFamily: SANS,
+              fontSize: isMob ? 26 : "clamp(28px, 3vw, 40px)",
+              fontWeight: 800,
+              color: D.ink, letterSpacing: "-0.04em", margin: "0 0 16px",
+            }}>
+              LinkedIn tiene 50 millones de perfiles.<br />Nosotros tenemos los que enseñan.
+            </h2>
+            <p style={{ fontFamily: SANS, fontSize: 15, color: D.muted, maxWidth: 520, margin: "0 auto" }}>
+              No todos los profesionales quieren dar clases — ni saben que pueden.
+              FacultyMatch solo incluye perfiles que se han registrado explícitamente
+              para dar docencia y están disponibles ahora.
+            </p>
+          </div>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMob ? "1fr" : "1fr 1fr",
+            gap: 16, maxWidth: 840, margin: "0 auto",
+          }}>
+            {[
+              {
+                feature: "Disponibilidad docente",
+                fm: "Filtro real: inmediata, próximo semestre, solo online",
+                li: "No existe. Hay que contactar y preguntar uno a uno",
+              },
+              {
+                feature: "Perfiles verificados",
+                fm: "Revisados manualmente antes de publicarse",
+                li: "Cualquiera puede escribir que da clases en su perfil",
+              },
+              {
+                feature: "Tiempo hasta el primer contacto",
+                fm: "Media de 3 días hábiles",
+                li: "+2 semanas de media (mensajes frecuentemente ignorados)",
+              },
+              {
+                feature: "Comisión por contratación",
+                fm: "0 € — nunca",
+                li: "No aplica, pero el proceso manual tiene un coste oculto alto",
+              },
+            ].map((row, i) => (
+              <div key={i} style={{
+                background: D.surf, border: `1px solid ${D.border}`,
+                borderRadius: 14, padding: "20px 22px",
+              }}>
+                <div style={{
+                  fontFamily: SANS, fontSize: 10, fontWeight: 700,
+                  letterSpacing: "0.1em", textTransform: "uppercase" as const,
+                  color: D.faint, marginBottom: 14,
+                }}>
+                  {row.feature}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column" as const, gap: 12 }}>
+                  <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <div style={{
+                      width: 22, height: 22, borderRadius: 6, flexShrink: 0, marginTop: 1,
+                      background: "rgba(5,150,105,0.1)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 6l3 3 5-5" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <span style={{ fontFamily: SANS, fontSize: 9, fontWeight: 800, color: D.blue, letterSpacing: "0.08em", textTransform: "uppercase" as const }}>FacultyMatch </span>
+                      <p style={{ fontFamily: SANS, fontSize: 13, color: D.ink, margin: "2px 0 0", lineHeight: 1.5 }}>{row.fm}</p>
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <div style={{
+                      width: 22, height: 22, borderRadius: 6, flexShrink: 0, marginTop: 1,
+                      background: "rgba(220,38,38,0.08)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 2l8 8M10 2l-8 8" stroke="#DC2626" strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <span style={{ fontFamily: SANS, fontSize: 9, fontWeight: 800, color: D.faint, letterSpacing: "0.08em", textTransform: "uppercase" as const }}>LinkedIn </span>
+                      <p style={{ fontFamily: SANS, fontSize: 13, color: D.muted, margin: "2px 0 0", lineHeight: 1.5 }}>{row.li}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── PRECIOS ── */}
       <section id="precios" style={{ background: D.white, padding: pad }}>
         <div style={{ maxWidth: 1120, margin: "0 auto" }}>
@@ -593,6 +702,16 @@ export default function InstitutionsClient() {
                   Activar Professional
                 </button>
               </Link>
+              <p style={{ fontFamily: SANS, fontSize: 12, textAlign: "center", margin: "10px 0 0", color: "rgba(255,255,255,0.4)" }}>
+                o{" "}
+                <a
+                  href="mailto:support@facultymatch.app?subject=Prueba%20Professional%2014%20d%C3%ADas"
+                  style={{ color: D.gold, fontWeight: 700 }}
+                >
+                  solicita 14 días de prueba gratuita
+                </a>
+                {" "}— sin tarjeta
+              </p>
             </div>
           </div>
 

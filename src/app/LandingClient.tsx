@@ -224,18 +224,26 @@ function Hero() {
       display: "flex", alignItems: "center",
       overflow: "hidden", background: D.dark,
     }}>
-      {/* Video BG */}
-      <video
-        autoPlay muted loop playsInline
-        poster="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=85&w=1800"
-        style={{
+      {/* Video BG (desktop) / Static image (mobile) */}
+      {isMob ? (
+        <div style={{
           position: "absolute", inset: 0,
-          width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "center 30%",
-        }}
-      >
-        <source src="https://assets.mixkit.co/videos/36827/36827-720.mp4" type="video/mp4" />
-      </video>
+          backgroundImage: `url(https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=85&w=1200)`,
+          backgroundSize: "cover", backgroundPosition: "center 30%",
+        }} />
+      ) : (
+        <video
+          autoPlay muted loop playsInline
+          poster="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=85&w=1800"
+          style={{
+            position: "absolute", inset: 0,
+            width: "100%", height: "100%",
+            objectFit: "cover", objectPosition: "center 30%",
+          }}
+        >
+          <source src="https://assets.mixkit.co/videos/36827/36827-720.mp4" type="video/mp4" />
+        </video>
+      )}
 
       {/* Gradient overlay */}
       <div style={{
@@ -1014,17 +1022,25 @@ function PullQuote() {
   const isMob = useIsMobile();
   return (
     <div style={{ position: "relative", overflow: "hidden", minHeight: isMob ? 260 : 320 }}>
-      <video
-        autoPlay muted loop playsInline
-        poster="https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&q=80&w=1800"
-        style={{
+      {isMob ? (
+        <div style={{
           position: "absolute", inset: 0,
-          width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "center 45%",
-        }}
-      >
-        <source src="https://assets.mixkit.co/videos/4640/4640-720.mp4" type="video/mp4" />
-      </video>
+          backgroundImage: `url(https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&q=80&w=1200)`,
+          backgroundSize: "cover", backgroundPosition: "center 45%",
+        }} />
+      ) : (
+        <video
+          autoPlay muted loop playsInline
+          poster="https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&q=80&w=1800"
+          style={{
+            position: "absolute", inset: 0,
+            width: "100%", height: "100%",
+            objectFit: "cover", objectPosition: "center 45%",
+          }}
+        >
+          <source src="https://assets.mixkit.co/videos/4640/4640-720.mp4" type="video/mp4" />
+        </video>
+      )}
       <div style={{ position: "absolute", inset: 0, background: "rgba(7,19,38,0.82)" }} />
       <div style={{
         position: "relative", zIndex: 2,
