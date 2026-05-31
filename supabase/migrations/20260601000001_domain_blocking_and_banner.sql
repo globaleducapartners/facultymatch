@@ -22,17 +22,38 @@ VALUES ('banners', 'banners', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- 4. Allow authenticated users to manage their own banner files
-CREATE POLICY IF NOT EXISTS "Users can upload their own banner"
-  ON storage.objects FOR INSERT
-  TO authenticated
-  WITH CHECK (bucket_id = 'banners' AND (storage.foldername(name))[1] = auth.uid()::text);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'storage' AND tablename = 'objects'
+      AND policyname = 'Users can upload their own banner'
+  ) THEN
+    CREATE POLICY "Users can upload their own banner"
+      ON storage.objects FOR INSERT
+      TO authenticated
+      WITH CHECK (bucket_id = 'banners' AND (storage.foldername(name))[1] = auth.uid()::text);
+  END IF;
 
-CREATE POLICY IF NOT EXISTS "Users can update their own banner"
-  ON storage.objects FOR UPDATE
-  TO authenticated
-  USING (bucket_id = 'banners' AND (storage.foldername(name))[1] = auth.uid()::text);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'storage' AND tablename = 'objects'
+      AND policyname = 'Users can update their own banner'
+  ) THEN
+    CREATE POLICY "Users can update their own banner"
+      ON storage.objects FOR UPDATE
+      TO authenticated
+      USING (bucket_id = 'banners' AND (storage.foldername(name))[1] = auth.uid()::text);
+  END IF;
 
-CREATE POLICY IF NOT EXISTS "Public banner read"
-  ON storage.objects FOR SELECT
-  TO public
-  USING (bucket_id = 'banners');
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'storage' AND tablename = 'objects'
+      AND policyname = 'Public banner read'
+  ) THEN
+    CREATE POLICY "Public banner read"
+      ON storage.objects FOR SELECT
+      TO public
+      USING (bucket_id = 'banners');
+  END IF;
+END $$;
