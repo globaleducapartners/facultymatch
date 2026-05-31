@@ -171,12 +171,12 @@ export default async function InstitutionHomePage() {
               <Zap size={16} className="text-white" />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/80">Plan Professional</p>
-              <p className="text-sm font-black leading-tight">Búsquedas y contactos ilimitados</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/80">Mejora tu plan</p>
+              <p className="text-sm font-black leading-tight">Más búsquedas, más contactos, sin límites</p>
             </div>
           </div>
           <span className="text-xs font-black bg-white/20 px-3 py-1.5 rounded-xl whitespace-nowrap flex-shrink-0">
-            Desde 99€/mes →
+            Desde 35€/mes →
           </span>
         </Link>
       )}
