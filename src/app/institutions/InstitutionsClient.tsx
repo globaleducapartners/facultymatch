@@ -611,27 +611,28 @@ export default function InstitutionsClient() {
 
           <div style={{
             display: "grid",
-            gridTemplateColumns: isMob ? "1fr" : "1fr 1fr",
-            gap: 20, maxWidth: 780, margin: "0 auto",
+            gridTemplateColumns: isMob ? "1fr" : "repeat(3, 1fr)",
+            gap: 20, maxWidth: 1060, margin: "0 auto",
           }}>
             {/* Essential */}
             <div style={{
               background: D.surf, border: `1px solid ${D.border}`,
-              borderRadius: 20, padding: "36px 32px",
+              borderRadius: 20, padding: "32px 28px",
+              display: "flex", flexDirection: "column" as const,
             }}>
               <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: D.faint, marginBottom: 18 }}>
                 Plan Essential
               </div>
-              <div style={{ fontFamily: SANS, fontSize: 48, fontWeight: 900, color: D.ink, letterSpacing: "-0.05em", margin: "0 0 4px", lineHeight: 1 }}>
+              <div style={{ fontFamily: SANS, fontSize: 44, fontWeight: 900, color: D.ink, letterSpacing: "-0.05em", margin: "0 0 4px", lineHeight: 1 }}>
                 0 €
               </div>
               <div style={{ fontFamily: SANS, fontSize: 13, color: D.faint, marginBottom: 28 }}>para empezar</div>
-              <div style={{ display: "flex", flexDirection: "column" as const, gap: 12, marginBottom: 32 }}>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 11, marginBottom: 28, flex: 1 }}>
                 {[
                   "Registro gratuito",
                   "5 búsquedas al mes",
-                  "Vista de perfil básica",
                   "5 contactos al mes",
+                  "Vista de perfil básica",
                 ].map((f, i) => (
                   <div key={i} style={{ display: "flex", gap: 10, alignItems: "center" }}>
                     <div style={{ width: 18, height: 18, borderRadius: 5, background: "rgba(233,160,48,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -639,7 +640,7 @@ export default function InstitutionsClient() {
                         <path d="M2 6l3 3 5-5" stroke={D.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </div>
-                    <span style={{ fontFamily: SANS, fontSize: 14, color: D.muted }}>{f}</span>
+                    <span style={{ fontFamily: SANS, fontSize: 13, color: D.muted }}>{f}</span>
                   </div>
                 ))}
               </div>
@@ -647,15 +648,20 @@ export default function InstitutionsClient() {
                 <button style={{
                   fontFamily: SANS, width: "100%", background: "transparent",
                   color: D.navy, border: `1.5px solid ${D.navy}`,
-                  padding: "13px 0", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer",
+                  padding: "12px 0", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer",
                 }}>
                   Registrar mi institución
                 </button>
               </Link>
             </div>
 
-            {/* Professional */}
-            <div style={{ background: D.navy, borderRadius: 20, padding: "36px 32px", position: "relative" as const }}>
+            {/* Growth */}
+            <div style={{
+              background: D.navy, borderRadius: 20, padding: "32px 28px",
+              position: "relative" as const,
+              display: "flex", flexDirection: "column" as const,
+              boxShadow: "0 8px 40px rgba(27,79,216,0.22)",
+            }}>
               <div style={{
                 position: "absolute", top: 20, right: 20,
                 background: D.gold, color: D.ink,
@@ -663,25 +669,25 @@ export default function InstitutionsClient() {
                 letterSpacing: "0.08em", textTransform: "uppercase" as const,
                 padding: "4px 10px", borderRadius: 999,
               }}>
-                Más usado
+                Más popular
               </div>
               <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: D.gold, marginBottom: 18 }}>
-                Plan Professional
+                Plan Growth
               </div>
-              <div style={{ fontFamily: SANS, fontSize: 48, fontWeight: 900, color: "#fff", letterSpacing: "-0.05em", margin: "0 0 4px", lineHeight: 1 }}>
-                99 €
+              <div style={{ fontFamily: SANS, fontSize: 44, fontWeight: 900, color: "#fff", letterSpacing: "-0.05em", margin: "0 0 4px", lineHeight: 1 }}>
+                35 €
               </div>
               <div style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 28 }}>
                 al mes · sin permanencia
               </div>
-              <div style={{ display: "flex", flexDirection: "column" as const, gap: 12, marginBottom: 32 }}>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 11, marginBottom: 28, flex: 1 }}>
                 {[
-                  "Búsquedas ilimitadas",
-                  "Filtros avanzados completos",
-                  "Contactos ilimitados",
-                  "Shortlists y favoritos sin límite",
-                  "Hasta 3 usuarios por institución",
-                  "Soporte prioritario",
+                  "20 búsquedas al mes",
+                  "20 contactos al mes",
+                  "Filtros avanzados",
+                  "Shortlists y favoritos",
+                  "1 usuario",
+                  "Soporte por email",
                 ].map((f, i) => (
                   <div key={i} style={{ display: "flex", gap: 10, alignItems: "center" }}>
                     <div style={{ width: 18, height: 18, borderRadius: 5, background: "rgba(233,160,48,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -689,57 +695,84 @@ export default function InstitutionsClient() {
                         <path d="M2 6l3 3 5-5" stroke={D.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </div>
-                    <span style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.65)" }}>{f}</span>
+                    <span style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+              <a href="mailto:support@facultymatch.app?subject=Solicitud%20Plan%20Growth">
+                <button style={{
+                  fontFamily: SANS, width: "100%", background: D.gold,
+                  color: D.ink, border: "none",
+                  padding: "12px 0", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer",
+                }}>
+                  Solicitar acceso
+                </button>
+              </a>
+              <p style={{ fontFamily: SANS, fontSize: 11, textAlign: "center", margin: "9px 0 0", color: "rgba(255,255,255,0.35)" }}>
+                Disponible por email · lanzamiento próximo
+              </p>
+            </div>
+
+            {/* Professional */}
+            <div style={{
+              background: D.dark, borderRadius: 20, padding: "32px 28px",
+              position: "relative" as const,
+              display: "flex", flexDirection: "column" as const,
+              border: `1px solid rgba(233,160,48,0.25)`,
+            }}>
+              <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: D.gold, marginBottom: 18 }}>
+                Plan Professional
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 44, fontWeight: 900, color: "#fff", letterSpacing: "-0.05em", margin: "0 0 4px", lineHeight: 1 }}>
+                99 €
+              </div>
+              <div style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 28 }}>
+                al mes · sin permanencia
+              </div>
+              <div style={{ display: "flex", flexDirection: "column" as const, gap: 11, marginBottom: 28, flex: 1 }}>
+                {[
+                  "Búsquedas ilimitadas",
+                  "Contactos ilimitados",
+                  "Filtros avanzados completos",
+                  "Shortlists y favoritos sin límite",
+                  "Hasta 3 usuarios",
+                  "Soporte prioritario",
+                ].map((f, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                    <div style={{ width: 18, height: 18, borderRadius: 5, background: "rgba(233,160,48,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 6l3 3 5-5" stroke={D.gold} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <span style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.65)" }}>{f}</span>
                   </div>
                 ))}
               </div>
               <Link href="/checkout?plan=institution-pro">
                 <button style={{
-                  fontFamily: SANS, width: "100%", background: D.gold,
-                  color: D.ink, border: "none",
-                  padding: "13px 0", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer",
+                  fontFamily: SANS, width: "100%", background: "rgba(255,255,255,0.1)",
+                  color: "#fff", border: "1px solid rgba(255,255,255,0.2)",
+                  padding: "12px 0", borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: "pointer",
                 }}>
                   Activar Professional
                 </button>
               </Link>
-              <p style={{ fontFamily: SANS, fontSize: 12, textAlign: "center", margin: "10px 0 0", color: "rgba(255,255,255,0.4)" }}>
+              <p style={{ fontFamily: SANS, fontSize: 11, textAlign: "center", margin: "9px 0 0", color: "rgba(255,255,255,0.35)" }}>
                 o{" "}
                 <a
                   href="mailto:support@facultymatch.app?subject=Prueba%20Professional%2014%20d%C3%ADas"
                   style={{ color: D.gold, fontWeight: 700 }}
                 >
-                  solicita 14 días de prueba gratuita
+                  14 días de prueba gratuita
                 </a>
                 {" "}— sin tarjeta
               </p>
             </div>
           </div>
 
-          <p style={{ fontFamily: SANS, fontSize: 12, color: D.faint, textAlign: "center", marginTop: 22 }}>
+          <p style={{ fontFamily: SANS, fontSize: 12, color: D.faint, textAlign: "center", marginTop: 24 }}>
             Sin comisiones por contratación. Sin permanencia. Cancela cuando quieras.
           </p>
-          <div style={{
-            maxWidth: 780, margin: "20px auto 0",
-            background: "rgba(233,160,48,0.08)", border: "1px solid rgba(233,160,48,0.25)",
-            borderRadius: 14, padding: "14px 20px",
-            display: "flex", alignItems: "center", gap: 14,
-          }}>
-            <div style={{
-              background: "rgba(233,160,48,0.2)", borderRadius: 8,
-              padding: "6px 12px", flexShrink: 0,
-              fontFamily: SANS, fontSize: 10, fontWeight: 800,
-              color: D.gold, letterSpacing: "0.1em", textTransform: "uppercase" as const,
-            }}>
-              Próximamente
-            </div>
-            <p style={{ fontFamily: SANS, fontSize: 13, color: D.muted, margin: 0 }}>
-              <strong style={{ color: D.navy }}>Plan Growth (~35€/mes)</strong> — 20 búsquedas, 20 contactos, 1 usuario.
-              {" "}Para departamentos pequeños y escuelas medianas.{" "}
-              <a href="mailto:support@facultymatch.app" style={{ color: D.blue, fontWeight: 700 }}>
-                Solicitar acceso anticipado →
-              </a>
-            </p>
-          </div>
         </div>
       </section>
 

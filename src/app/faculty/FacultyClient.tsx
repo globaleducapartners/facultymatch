@@ -175,8 +175,8 @@ export default function FacultyClient() {
             color: "#fff", lineHeight: 1.06, letterSpacing: "-0.04em",
             margin: "0 0 20px", maxWidth: 740,
           }}>
-            Tu experiencia en el mundo real
-            <br />es lo que más se enseña.
+            Lo que la IA no puede sustituir
+            <br />es tu experiencia.
           </h1>
 
           <p className="fm-animate-up fm-animate-up-delay-2" style={{
