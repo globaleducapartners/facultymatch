@@ -29,7 +29,7 @@ import { toast } from "sonner";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-const FREE_CONTACTS_LIMIT = 2;
+const FREE_CONTACTS_LIMIT = 5;
 
 interface InstitutionSearchPageProps {
   initialEducators: any[];
@@ -257,7 +257,7 @@ export function InstitutionSearchPage({
               <Lock size={16} className="text-amber-600" />
             </div>
             <div>
-              <p className="font-black text-amber-900 text-sm">Has alcanzado el límite de 2 búsquedas mensuales</p>
+              <p className="font-black text-amber-900 text-sm">Has alcanzado el límite de 5 búsquedas mensuales</p>
               <p className="text-amber-700 text-sm font-medium mt-0.5">
                 Activa el Plan Professional para búsquedas ilimitadas.
               </p>

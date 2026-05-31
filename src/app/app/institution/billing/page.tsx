@@ -21,7 +21,8 @@ export default async function BillingPage() {
 
   const essentialFeatures = [
     "Visualización básica de perfiles de docentes (sin datos de contacto)",
-    "2 búsquedas al mes",
+    "5 búsquedas al mes",
+    "5 contactos al mes",
     "1 usuario por cuenta",
     "Soporte por email",
   ];
@@ -134,8 +135,24 @@ export default async function BillingPage() {
             </div>
           </div>
 
+          <div className="max-w-3xl bg-amber-50 border border-amber-200 rounded-2xl p-5 flex items-start gap-4">
+            <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Zap size={16} className="text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-amber-900">¿Buscas algo intermedio?</p>
+              <p className="text-xs text-amber-700 font-medium mt-0.5 leading-relaxed">
+                Próximamente: <strong>Plan Growth (~35€/mes)</strong> — 20 búsquedas, 20 contactos, 1 usuario.
+                Ideal para departamentos pequeños y escuelas medianas. Escríbenos si quieres acceso anticipado:{" "}
+                <a href="mailto:support@facultymatch.app" className="text-amber-900 font-bold underline">
+                  support@facultymatch.app
+                </a>
+              </p>
+            </div>
+          </div>
+
           <p className="text-xs text-gray-400 max-w-3xl">
-            ¿Necesitas una solución para tu organización? Escríbenos a{" "}
+            ¿Necesitas una solución enterprise para tu organización? Escríbenos a{" "}
             <a href="mailto:support@facultymatch.app" className="text-blue-500 hover:underline">
               support@facultymatch.app
             </a>

@@ -497,11 +497,11 @@ function StatsStrip() {
               letterSpacing: "-0.04em",
               lineHeight: 1,
               marginBottom: 8,
-              opacity: inView ? 1 : 0,
-              transition: `opacity 0.5s ease ${i * 0.12}s, transform 0.5s ease ${i * 0.12}s`,
-              transform: inView ? "translateY(0)" : "translateY(16px)",
+              opacity: 1,
+              transition: `transform 0.5s ease ${i * 0.12}s`,
+              transform: inView ? "translateY(0)" : "translateY(10px)",
             }}>
-              {inView ? <Counter to={s.value} suffix={s.suffix} /> : `+0${s.suffix}`}
+              {inView ? <Counter to={s.value} suffix={s.suffix} /> : `+${s.value}${s.suffix}`}
             </div>
             <div style={{
               fontFamily: SANS, fontSize: 13, fontWeight: 500,
@@ -605,9 +605,9 @@ function HowItWorks() {
                 alignItems: isMob ? "flex-start" : "center",
                 textAlign: isMob ? "left" as const : "center" as const,
                 gap: isMob ? 20 : 0,
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateY(0)" : "translateY(20px)",
-                transition: `opacity 0.6s ease ${i * 0.15}s, transform 0.6s ease ${i * 0.15}s`,
+                opacity: 1,
+                transform: inView ? "translateY(0)" : "translateY(12px)",
+                transition: `transform 0.6s ease ${i * 0.15}s`,
                 position: "relative" as const, zIndex: 1,
               }}>
                 {/* Icon circle */}
@@ -716,9 +716,9 @@ function SplitDocentes() {
         <div style={{
           padding: isMob ? "36px 0 0" : "64px 64px 64px 32px",
           display: "flex", flexDirection: "column" as const, justifyContent: "center",
-          opacity: inView ? 1 : 0,
-          transform: inView ? "translateX(0)" : "translateX(-20px)",
-          transition: "opacity 0.7s ease, transform 0.7s ease",
+          opacity: 1,
+          transform: inView ? "translateX(0)" : "translateX(-10px)",
+          transition: "transform 0.7s ease",
         }}>
           <div style={{
             fontFamily: SANS, fontSize: 11, fontWeight: 700,
@@ -803,9 +803,9 @@ function SplitInstituciones() {
         <div style={{
           padding: isMob ? "0 0 36px" : "64px 32px 64px 64px",
           display: "flex", flexDirection: "column" as const, justifyContent: "center",
-          opacity: inView ? 1 : 0,
-          transform: inView ? "translateX(0)" : "translateX(-20px)",
-          transition: "opacity 0.7s ease, transform 0.7s ease",
+          opacity: 1,
+          transform: inView ? "translateX(0)" : "translateX(-10px)",
+          transition: "transform 0.7s ease",
         }}>
           <div style={{
             fontFamily: SANS, fontSize: 11, fontWeight: 700,
@@ -950,9 +950,9 @@ function Testimonials() {
               overflow: "hidden",
               height: 340,
               cursor: "pointer",
-              opacity: inView ? 1 : 0,
-              transform: inView ? "translateY(0)" : "translateY(24px)",
-              transition: `opacity 0.6s ease ${i * 0.15}s, transform 0.6s ease ${i * 0.15}s`,
+              opacity: 1,
+              transform: inView ? "translateY(0)" : "translateY(12px)",
+              transition: `transform 0.6s ease ${i * 0.15}s`,
             }}>
               {/* Background image */}
               <div style={{
@@ -1105,9 +1105,9 @@ function PrivacyFeature() {
         <div style={{
           padding: isMob ? "36px 0 0" : "60px 60px 60px 64px",
           display: "flex", flexDirection: "column" as const, justifyContent: "center",
-          opacity: inView ? 1 : 0,
-          transform: inView ? "translateX(0)" : "translateX(20px)",
-          transition: "opacity 0.7s ease 0.1s, transform 0.7s ease 0.1s",
+          opacity: 1,
+          transform: inView ? "translateX(0)" : "translateX(10px)",
+          transition: "transform 0.7s ease 0.1s",
         }}>
           <div style={{
             width: 52, height: 52, borderRadius: 14,

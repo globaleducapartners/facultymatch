@@ -57,7 +57,7 @@ export default async function InstitutionSearchRoute({
       .eq("month", currentMonth)
       .maybeSingle();
 
-    if ((usageData?.search_count ?? 0) >= 2) {
+    if ((usageData?.search_count ?? 0) >= 5) {
       searchLimitReached = true;
     } else {
       await admin.rpc("increment_search_usage", {

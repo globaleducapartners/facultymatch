@@ -138,9 +138,9 @@ export default async function InstitutionHomePage() {
           {
             icon: Search,
             label: isPro ? "Búsquedas ilimitadas" : `Búsquedas este mes`,
-            value: isPro ? "∞" : `${searchesUsed}/2`,
-            color: isPro ? "text-purple-600" : (searchesUsed >= 2 ? "text-red-500" : "text-purple-600"),
-            bg: isPro ? "bg-purple-50" : (searchesUsed >= 2 ? "bg-red-50" : "bg-purple-50"),
+            value: isPro ? "∞" : `${searchesUsed}/5`,
+            color: isPro ? "text-purple-600" : (searchesUsed >= 5 ? "text-red-500" : "text-purple-600"),
+            bg: isPro ? "bg-purple-50" : (searchesUsed >= 5 ? "bg-red-50" : "bg-purple-50"),
             href: "/app/institution/search",
           },
         ].map((stat) => (
@@ -364,7 +364,7 @@ export default async function InstitutionHomePage() {
               >
                 <Zap size={12} /> Activar Plan Professional
               </Link>
-              {searchesUsed >= 2 && (
+              {searchesUsed >= 5 && (
                 <p className="text-[10px] text-red-500 font-bold">
                   Has alcanzado el límite de búsquedas gratuitas este mes.
                 </p>

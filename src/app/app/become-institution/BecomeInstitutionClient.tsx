@@ -463,7 +463,7 @@ export function BecomeInstitutionClient({
               </p>
               <ul style={{ margin: 0, padding: "0 0 0 16px" }}>
                 {[
-                  "2 búsquedas por mes incluidas",
+                  "5 búsquedas por mes incluidas",
                   "Acceso al directorio completo de docentes",
                   "Filtros por área, idioma, país y acreditación",
                   "Actualiza a Pro para búsquedas ilimitadas",

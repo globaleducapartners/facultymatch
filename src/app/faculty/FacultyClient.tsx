@@ -94,7 +94,7 @@ const BENEFITS = [
       </svg>
     ),
     title: "Privacidad total",
-    desc: "Tu institución actual no sabe que estás aquí, a menos que tú quieras. Bloqueo selectivo por nombre de institución incluido en el plan Professional.",
+    desc: "Tu institución actual no sabe que estás aquí, a menos que tú quieras. Bloqueo selectivo por nombre de institución disponible en el plan gratuito.",
   },
   {
     icon: (
@@ -244,9 +244,9 @@ export default function FacultyClient() {
                 borderRadius: 16,
                 borderTop: `3px solid ${p.dot}`,
                 padding: "28px 26px",
-                opacity: profilesVisible ? 1 : 0,
-                transform: profilesVisible ? "translateY(0)" : "translateY(20px)",
-                transition: `opacity 0.6s ease ${i * 0.12}s, transform 0.6s ease ${i * 0.12}s`,
+                opacity: 1,
+                transform: profilesVisible ? "translateY(0)" : "translateY(10px)",
+                transition: `transform 0.6s ease ${i * 0.12}s`,
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 14 }}>
                   <div style={{ width: 9, height: 9, borderRadius: "50%", background: p.dot, flexShrink: 0 }} />
@@ -311,9 +311,9 @@ export default function FacultyClient() {
                 {BENEFITS.map((b, i) => (
                   <div key={i} style={{
                     display: "flex", gap: 16, alignItems: "flex-start",
-                    opacity: benefitsVisible ? 1 : 0,
-                    transform: benefitsVisible ? "translateX(0)" : "translateX(-16px)",
-                    transition: `opacity 0.5s ease ${i * 0.1}s, transform 0.5s ease ${i * 0.1}s`,
+                    opacity: 1,
+                    transform: benefitsVisible ? "translateX(0)" : "translateX(-8px)",
+                    transition: `transform 0.5s ease ${i * 0.1}s`,
                   }}>
                     <div style={{
                       width: 44, height: 44, borderRadius: 12,
@@ -383,6 +383,7 @@ export default function FacultyClient() {
                   "Recepción de solicitudes de instituciones",
                   "Control de disponibilidad",
                   "Visibilidad pública básica",
+                  "Bloqueo de instituciones específicas",
                 ].map((f, i) => (
                   <div key={i} style={{ display: "flex", gap: 10, alignItems: "center" }}>
                     <div style={{ width: 18, height: 18, borderRadius: 5, background: "rgba(233,160,48,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -428,10 +429,10 @@ export default function FacultyClient() {
               <div style={{ display: "flex", flexDirection: "column" as const, gap: 12, marginBottom: 32 }}>
                 {[
                   "Todo lo del Plan Basic",
-                  "Bloqueo de instituciones específicas",
-                  "Oculto para tu institución actual",
                   "Posicionamiento prioritario en búsquedas",
-                  "Estadísticas de visitas a tu perfil",
+                  "Estadísticas avanzadas de visitas a tu perfil",
+                  "Visibilidad preferente ante instituciones objetivo",
+                  "Soporte por email prioritario",
                 ].map((f, i) => (
                   <div key={i} style={{ display: "flex", gap: 10, alignItems: "center" }}>
                     <div style={{ width: 18, height: 18, borderRadius: 5, background: "rgba(233,160,48,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>

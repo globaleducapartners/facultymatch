@@ -235,10 +235,10 @@ function buildActivationEmail(name: string, plan: string, periodEnd: string | nu
       <p style="margin:0 0 12px;font-weight:900;color:#0B1220;font-size:14px;text-transform:uppercase;letter-spacing:1px;">Funcionalidades activadas:</p>
       <ul style="margin:0;padding:0 0 0 20px;color:#475569;font-size:14px;line-height:2;">
         ${isFaculty ? `
-        <li>Bloqueo de instituciones específicas</li>
         <li>Posicionamiento prioritario en búsquedas</li>
-        <li>Oculto para tu centro actual</li>
-        <li>Estadísticas de visitas a tu perfil</li>` : `
+        <li>Estadísticas avanzadas de visitas a tu perfil</li>
+        <li>Visibilidad preferente ante instituciones objetivo</li>
+        <li>Soporte por email prioritario</li>` : `
         <li>Búsquedas ilimitadas de docentes</li>
         <li>Contacto directo con docentes verificados</li>
         <li>Acceso a informes de mercado</li>

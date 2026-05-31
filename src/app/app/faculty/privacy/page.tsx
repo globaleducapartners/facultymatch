@@ -357,105 +357,81 @@ export default async function PrivacyPage({
             <CardHeader>
               <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
                 <ShieldCheck size={22} className="text-energy-orange" />
-                Privacidad Profesional
+                Bloqueo de instituciones
               </CardTitle>
               <CardDescription className="font-medium">
-                Bloquea instituciones específicas para que nunca puedan ver tu perfil.
+                Bloquea instituciones específicas para que nunca puedan ver tu perfil. Gratuito para todos los planes.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {!isPremium ? (
-                /* ── Premium gate ── */
-                <div className="rounded-2xl border-2 border-dashed border-talentia-blue/30 bg-blue-50/40 p-6 space-y-4 text-center">
-                  <div className="flex items-center justify-center gap-2 text-talentia-blue">
-                    <Sparkles size={20} />
-                    <span className="text-sm font-black uppercase tracking-widest">Plan Professional</span>
-                  </div>
-                  <p className="text-sm font-medium text-gray-600 max-w-sm mx-auto">
-                    El bloqueo de instituciones específicas es exclusivo del <strong>Plan Professional</strong>.
-                    Mantén tu perfil invisible para tu centro actual o competidores directos.
-                  </p>
-                  <div className="text-2xl font-black text-navy">29€ <span className="text-base text-gray-400 font-bold">/ año</span></div>
-                  <a
-                    href="/checkout?plan=faculty-pro"
-                    className="inline-flex items-center gap-2 bg-energy-orange hover:bg-orange-500 text-white font-black text-sm px-6 py-3 rounded-xl transition-colors shadow-lg shadow-orange-100"
-                  >
-                    <Sparkles size={15} /> Desbloquear Privacidad Profesional
-                  </a>
+              <form action={blockInstitution} className="flex gap-2">
+                <div className="relative flex-1">
+                  <Search
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                    size={18}
+                  />
+                  <input
+                    name="institutionName"
+                    type="text"
+                    list="block-university-list"
+                    placeholder="Escribe el nombre del centro a bloquear..."
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium"
+                  />
+                  <datalist id="block-university-list">
+                    {allUniversityNames.map((u) => (
+                      <option key={u} value={u} />
+                    ))}
+                  </datalist>
                 </div>
-              ) : (
-                /* ── Block form (premium users) ── */
-                <>
-                  <form action={blockInstitution} className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Search
-                        className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                        size={18}
-                      />
-                      <input
-                        name="institutionName"
-                        type="text"
-                        list="block-university-list"
-                        placeholder="Escribe el nombre del centro a bloquear..."
-                        className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium"
-                      />
-                      <datalist id="block-university-list">
-                        {allUniversityNames.map((u) => (
-                          <option key={u} value={u} />
-                        ))}
-                      </datalist>
-                    </div>
-                    <Button
-                      type="submit"
-                      className="bg-talentia-blue hover:bg-blue-700 text-white font-black rounded-xl px-5 shrink-0 h-auto"
-                    >
-                      Bloquear
-                    </Button>
-                  </form>
+                <Button
+                  type="submit"
+                  className="bg-talentia-blue hover:bg-blue-700 text-white font-black rounded-xl px-5 shrink-0 h-auto"
+                >
+                  Bloquear
+                </Button>
+              </form>
 
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">
-                      Instituciones bloqueadas ({blockedInstitutions.length})
-                    </h4>
-                    {blockedInstitutions.length > 0 ? (
-                      <div className="grid gap-3">
-                        {blockedInstitutions.map((inst) => (
-                          <div
-                            key={inst.ruleId}
-                            className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-red-100 transition-colors group"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-red-50 group-hover:text-red-400 transition-colors">
-                                <Lock size={18} />
-                              </div>
-                              <p className="text-sm font-bold text-navy">{inst.name}</p>
-                            </div>
-                            <form
-                              action={async () => {
-                                "use server";
-                                await unblockInstitution(inst.ruleId);
-                              }}
-                            >
-                              <button
-                                type="submit"
-                                className="p-2 text-gray-300 hover:text-red-600 transition-colors"
-                              >
-                                <X size={18} />
-                              </button>
-                            </form>
+              <div className="space-y-3">
+                <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">
+                  Instituciones bloqueadas ({blockedInstitutions.length})
+                </h4>
+                {blockedInstitutions.length > 0 ? (
+                  <div className="grid gap-3">
+                    {blockedInstitutions.map((inst) => (
+                      <div
+                        key={inst.ruleId}
+                        className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-red-100 transition-colors group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-red-50 group-hover:text-red-400 transition-colors">
+                            <Lock size={18} />
                           </div>
-                        ))}
+                          <p className="text-sm font-bold text-navy">{inst.name}</p>
+                        </div>
+                        <form
+                          action={async () => {
+                            "use server";
+                            await unblockInstitution(inst.ruleId);
+                          }}
+                        >
+                          <button
+                            type="submit"
+                            className="p-2 text-gray-300 hover:text-red-600 transition-colors"
+                          >
+                            <X size={18} />
+                          </button>
+                        </form>
                       </div>
-                    ) : (
-                      <div className="p-8 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
-                        <p className="text-sm text-gray-400 font-medium">
-                          No tienes ninguna institución bloqueada.
-                        </p>
-                      </div>
-                    )}
+                    ))}
                   </div>
-                </>
-              )}
+                ) : (
+                  <div className="p-8 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                    <p className="text-sm text-gray-400 font-medium">
+                      No tienes ninguna institución bloqueada.
+                    </p>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>

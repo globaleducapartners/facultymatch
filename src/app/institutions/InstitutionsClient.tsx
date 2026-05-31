@@ -520,9 +520,9 @@ export default function InstitutionsClient() {
               <div style={{ display: "flex", flexDirection: "column" as const, gap: 12, marginBottom: 32 }}>
                 {[
                   "Registro gratuito",
-                  "2 búsquedas al mes",
+                  "5 búsquedas al mes",
                   "Vista de perfil básica",
-                  "2 contactos al mes",
+                  "5 contactos al mes",
                 ].map((f, i) => (
                   <div key={i} style={{ display: "flex", gap: 10, alignItems: "center" }}>
                     <div style={{ width: 18, height: 18, borderRadius: 5, background: "rgba(233,160,48,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -599,6 +599,28 @@ export default function InstitutionsClient() {
           <p style={{ fontFamily: SANS, fontSize: 12, color: D.faint, textAlign: "center", marginTop: 22 }}>
             Sin comisiones por contratación. Sin permanencia. Cancela cuando quieras.
           </p>
+          <div style={{
+            maxWidth: 780, margin: "20px auto 0",
+            background: "rgba(233,160,48,0.08)", border: "1px solid rgba(233,160,48,0.25)",
+            borderRadius: 14, padding: "14px 20px",
+            display: "flex", alignItems: "center", gap: 14,
+          }}>
+            <div style={{
+              background: "rgba(233,160,48,0.2)", borderRadius: 8,
+              padding: "6px 12px", flexShrink: 0,
+              fontFamily: SANS, fontSize: 10, fontWeight: 800,
+              color: D.gold, letterSpacing: "0.1em", textTransform: "uppercase" as const,
+            }}>
+              Próximamente
+            </div>
+            <p style={{ fontFamily: SANS, fontSize: 13, color: D.muted, margin: 0 }}>
+              <strong style={{ color: D.navy }}>Plan Growth (~35€/mes)</strong> — 20 búsquedas, 20 contactos, 1 usuario.
+              {" "}Para departamentos pequeños y escuelas medianas.{" "}
+              <a href="mailto:support@facultymatch.app" style={{ color: D.blue, fontWeight: 700 }}>
+                Solicitar acceso anticipado →
+              </a>
+            </p>
+          </div>
         </div>
       </section>
 

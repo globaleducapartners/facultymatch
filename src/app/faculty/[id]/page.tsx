@@ -78,7 +78,7 @@ export default async function PublicFacultyProfilePage({
               Acceder
             </Link>
             <Link
-              href="/register"
+              href="/signup"
               className="flex items-center gap-1.5 bg-talentia-blue hover:bg-blue-700 text-white text-sm font-bold px-4 py-2 rounded-xl transition-colors"
             >
               <UserPlus size={14} /> Registrarse
@@ -240,7 +240,7 @@ export default async function PublicFacultyProfilePage({
                 Regístrate en FacultyMatch para enviar propuestas, ver datos de contacto y mucho más.
               </p>
               <Link
-                href="/register"
+                href="/signup"
                 className="flex items-center justify-center gap-2 w-full bg-white text-navy font-black py-3 rounded-xl hover:bg-gray-100 transition-colors text-sm"
               >
                 <UserPlus size={15} /> Crear cuenta gratuita
