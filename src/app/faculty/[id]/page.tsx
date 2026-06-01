@@ -224,20 +224,24 @@ export default async function PublicFacultyProfilePage({
             )}
 
             {/* Experience / languages */}
-            {((faculty as any)?.experience_years > 0 || (faculty as any)?.years_teaching > 0 || Array.isArray((faculty as any)?.languages)) && (
+            {(() => {
+              const yearsExp = (faculty as any)?.years_experience ?? (faculty as any)?.experience_years ?? (faculty as any)?.years_teaching ?? 0;
+              return (yearsExp > 0 || Array.isArray((faculty as any)?.languages));
+            })() && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
                 <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
                   <Briefcase size={13} /> Experiencia
                 </h2>
                 <div className="flex flex-wrap gap-4">
-                  {((faculty as any)?.experience_years || (faculty as any)?.years_teaching) > 0 && (
+                  {(() => {
+                    const y = (faculty as any)?.years_experience ?? (faculty as any)?.experience_years ?? (faculty as any)?.years_teaching ?? 0;
+                    return y > 0 ? (
                     <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl">
                       <Briefcase size={15} className="text-talentia-blue" />
-                      <span className="text-sm font-bold text-navy">
-                        {(faculty as any)?.experience_years || (faculty as any)?.years_teaching} años de experiencia
-                      </span>
+                      <span className="text-sm font-bold text-navy">{y} años de experiencia</span>
                     </div>
-                  )}
+                    ) : null;
+                  })()}
                   {Array.isArray((faculty as any)?.languages) && (faculty as any).languages.length > 0 && (
                     <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl">
                       <Globe size={15} className="text-talentia-blue" />
