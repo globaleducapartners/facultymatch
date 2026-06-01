@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { notFound, redirect } from "next/navigation";
 import {
     GraduationCap, Globe, MapPin, Award, Star, Mail,
@@ -25,26 +25,28 @@ export default async function FacultyProfilePage({
 
   if (!user) redirect("/login");
 
+  const admin = createAdminClient();
+
   // Get current institution profile + plan
   const [{ data: institution }, { data: institutionUserProfile }] = await Promise.all([
-    supabase.from("institutions").select("*").eq("user_id", user.id).single(),
+    supabase.from("institutions").select("*").eq("user_id", user.id).maybeSingle(),
     supabase.from("user_profiles").select("plan, subscription_status").eq("id", user.id).single(),
   ]);
 
-  // Get faculty avatar from user_profiles
-  const { data: facultyUserProfile } = await supabase
+  // Get faculty name + avatar from user_profiles (admin to bypass RLS)
+  const { data: facultyUserProfile } = await admin
     .from("user_profiles")
-    .select("avatar_url")
+    .select("full_name, avatar_url")
     .eq("id", id)
     .single();
 
+  const activeStatus = institutionUserProfile?.subscription_status;
   const institutionIsPro =
-    institutionUserProfile?.plan === "institution-pro" &&
-    institutionUserProfile?.subscription_status === "active";
+    (institutionUserProfile?.plan === "institution-pro" || institutionUserProfile?.plan === "institution-growth") &&
+    (activeStatus === "active" || activeStatus === "trialing");
 
-  // Fetch faculty profile with related data
-  // RLS will automatically filter this out if blocked
-  const { data: faculty, error } = await supabase
+  // Fetch faculty profile with admin client to bypass RLS + visibility issues
+  const { data: faculty, error } = await admin
     .from("faculty_profiles")
     .select(`
       *,
@@ -53,6 +55,7 @@ export default async function FacultyProfilePage({
       links:faculty_links(*)
     `)
     .eq("id", id)
+    .or("visibility.eq.public,visibility.eq.private,visibility.is.null")
     .single();
 
   if (error || !faculty) {
@@ -91,9 +94,9 @@ export default async function FacultyProfilePage({
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 text-sm font-bold text-gray-400">
-        <Link href="/app/institution" className="hover:text-talentia-blue transition-colors">Buscador</Link>
+        <Link href="/app/institution/search" className="hover:text-talentia-blue transition-colors">Buscador</Link>
         <ChevronRight size={14} />
-        <span className="text-navy">Perfil de {faculty.full_name}</span>
+        <span className="text-navy">Perfil de {facultyUserProfile?.full_name || faculty.full_name || "Docente"}</span>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -103,23 +106,27 @@ export default async function FacultyProfilePage({
           <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 lg:p-12 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full -translate-y-1/2 translate-x-1/2 -z-10"></div>
             
+            {(() => {
+              const fullName = facultyUserProfile?.full_name || faculty.full_name || "Docente";
+              const initials = fullName.substring(0, 2).toUpperCase();
+              return (
             <div className="flex flex-col md:flex-row gap-8 items-start">
               {facultyUserProfile?.avatar_url ? (
                 <img
                   src={facultyUserProfile.avatar_url}
-                  alt={faculty.full_name}
+                  alt={fullName}
                   className="w-24 h-24 rounded-3xl object-cover shrink-0 shadow-xl shadow-blue-100"
                 />
               ) : (
                 <div className="w-24 h-24 bg-talentia-blue text-white rounded-3xl flex items-center justify-center text-3xl font-black shrink-0 shadow-xl shadow-blue-100">
-                  {faculty.full_name?.substring(0, 2).toUpperCase()}
+                  {initials}
                 </div>
               )}
-              
+
               <div className="space-y-4 flex-1">
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-3">
-                    <h1 className="text-3xl font-black text-navy">{faculty.full_name}</h1>
+                    <h1 className="text-3xl font-black text-navy">{fullName}</h1>
                     {faculty.verified === 'verified' && (
                       <Badge className="bg-green-50 text-green-600 border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
                         <CheckCircle2 size={12} className="mr-1" /> Verificado
@@ -152,6 +159,7 @@ export default async function FacultyProfilePage({
                 </div>
               </div>
             </div>
+            ); })()}
           </div>
 
           {/* Content Tabs */}
@@ -438,7 +446,7 @@ export default async function FacultyProfilePage({
               <div className="flex flex-col gap-4">
                 <ContactModalWrapper
                   facultyId={faculty.id}
-                  facultyName={faculty.full_name}
+                  facultyName={facultyUserProfile?.full_name || faculty.full_name || "Docente"}
                   institutionId={institution.id}
                 />
 
