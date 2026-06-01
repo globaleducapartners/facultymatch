@@ -295,11 +295,15 @@ export function InstitutionSearchPage({
               className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-52"
             >
               <option value="">Todas las áreas</option>
-              <option value="Negocios">Negocios & Management</option>
-              <option value="Tecnología">Ingeniería & Tech</option>
-              <option value="Salud">Salud & Ciencias</option>
-              <option value="Humanidades">Artes & Humanidades</option>
-              <option value="Derecho">Derecho & Ciencias Sociales</option>
+              <option value="Business & Management">Business & Management</option>
+              <option value="Economía & Finanzas">Economía & Finanzas</option>
+              <option value="Derecho & Ciencias Políticas">Derecho & CC. Políticas</option>
+              <option value="Ingeniería & Tecnología">Ingeniería & Tecnología</option>
+              <option value="IA & Datos">IA & Datos</option>
+              <option value="Salud & Ciencias">Salud & Ciencias</option>
+              <option value="Comunicación & Marketing">Comunicación & Marketing</option>
+              <option value="Educación">Educación</option>
+              <option value="Otros">Otros</option>
             </select>
 
             {/* Modality */}
@@ -313,9 +317,9 @@ export function InstitutionSearchPage({
               className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-44"
             >
               <option value="">Modalidad</option>
-              <option value="online">Online</option>
-              <option value="presencial">Presencial</option>
-              <option value="híbrida">Híbrida</option>
+              <option value="Online">Online</option>
+              <option value="Presencial">Presencial</option>
+              <option value="Híbrida">Híbrida</option>
             </select>
 
             {/* More filters toggle */}

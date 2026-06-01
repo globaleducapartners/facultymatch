@@ -73,8 +73,8 @@ export default async function InstitutionSearchRoute({
     ? `${year + 1}-01-01`
     : `${year}-${String(monthNum + 1).padStart(2, "0")}-01`;
 
-  // Area / subarea: resolve matching faculty IDs from faculty_expertise
-  const areaPreQuery = (area || subarea)
+  // Area / subarea: resolve matching faculty IDs from faculty_expertise table
+  const areaExpertiseQuery = (area || subarea)
     ? (() => {
         let q = admin.from("faculty_expertise").select("faculty_id");
         if (area)    q = q.ilike("area", `%${area}%`);
@@ -83,9 +83,14 @@ export default async function InstitutionSearchRoute({
       })()
     : Promise.resolve({ data: null as null | { faculty_id: string }[] });
 
-  // Text search: resolve faculty IDs whose full_name matches
+  // Also search faculty_profiles.faculty_areas (where new signups store their areas)
+  const areaProfilesQuery = area
+    ? admin.from("faculty_profiles").select("id").contains("faculty_areas", [area])
+    : Promise.resolve({ data: null as null | { id: string }[] });
+
+  // Text search: use admin to bypass RLS on user_profiles
   const namePreQuery = query
-    ? supabase.from("user_profiles").select("id").ilike("full_name", `%${query}%`)
+    ? admin.from("user_profiles").select("id").ilike("full_name", `%${query}%`)
     : Promise.resolve({ data: null as null | { id: string }[] });
 
   // Extract the institution's email domain for domain-based blocking
@@ -99,6 +104,7 @@ export default async function InstitutionSearchRoute({
     { data: blockedByName },
     { data: blockedByDomain },
     { data: areaMatchData },
+    { data: areaProfilesData },
     { data: nameMatchData },
   ] = await Promise.all([
     admin.from("favorites").select("faculty_id").eq("institution_id", institution.id),
@@ -114,7 +120,8 @@ export default async function InstitutionSearchRoute({
     userEmailDomain
       ? admin.from("visibility_rules").select("faculty_id").eq("domain", userEmailDomain).eq("rule", "block")
       : Promise.resolve({ data: null as null | { faculty_id: string }[] }),
-    areaPreQuery,
+    areaExpertiseQuery,
+    areaProfilesQuery,
     namePreQuery,
   ]);
 
@@ -126,7 +133,11 @@ export default async function InstitutionSearchRoute({
     ...(blockedByDomain || []).map((r: any) => r.faculty_id),
   ]);
 
-  const areaMatchIds: string[] = [...new Set((areaMatchData || []).map((e: any) => e.faculty_id))];
+  // Merge area matches from faculty_expertise AND faculty_profiles.faculty_areas
+  const areaMatchIds: string[] = [...new Set([
+    ...(areaMatchData   || []).map((e: any) => e.faculty_id),
+    ...(areaProfilesData || []).map((p: any) => p.id),
+  ])];
   const nameMatchIds: string[] = (nameMatchData || []).map((m: any) => m.id);
 
   // If area/subarea filter is active but produced zero matches, bail out early
@@ -167,10 +178,10 @@ export default async function InstitutionSearchRoute({
   }
 
   // ── Main DB query with all filters pushed down ────────────────────────────
-  let educatorQuery = supabase
+  let educatorQuery = admin
     .from("faculty_profiles")
     .select(`*, user:user_profiles(full_name, avatar_url, plan, subscription_status), expertise:faculty_expertise(*)`)
-    .in("visibility", ["public", "private"]);
+    .or("visibility.eq.public,visibility.eq.private,visibility.is.null");
 
   // Exclude blocked faculty
   if (blockedFacultyIds.size > 0) {
@@ -211,9 +222,9 @@ export default async function InstitutionSearchRoute({
     educatorQuery = (educatorQuery as any).filter("languages", "cs", JSON.stringify([{ lang: language }]));
   }
 
-  // Modality → availability column
+  // Modality → modalities array column (stored as ["Online","Presencial","Híbrida"])
   if (modality) {
-    educatorQuery = educatorQuery.ilike("availability", `%${modality}%`);
+    educatorQuery = (educatorQuery as any).contains("modalities", [modality]);
   }
 
   // First page: 50 results

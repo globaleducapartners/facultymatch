@@ -49,7 +49,7 @@ export default async function PublicFacultyProfilePage({
       *,
       expertise:faculty_expertise(*),
       links:faculty_links(*)
-    `).eq("id", id).neq("visibility", "hidden").single(),
+    `).eq("id", id).or("visibility.eq.public,visibility.eq.private,visibility.is.null").single(),
     admin.from("user_profiles").select("full_name, avatar_url").eq("id", id).single(),
   ]);
 
