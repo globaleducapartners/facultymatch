@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
-export default function EducatorRedirectPage({
+export default async function EducatorRedirectPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  redirect(`/app/faculty/${params.id}`);
+  const { id } = await params;
+  redirect(`/app/faculty/${id}`);
 }

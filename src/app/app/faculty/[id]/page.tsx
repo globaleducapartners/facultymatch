@@ -493,7 +493,7 @@ export default async function FacultyProfilePage({
                   institutionId={institution.id}
                 />
 
-                {faculty.contact_whatsapp && (
+                {faculty?.contact_whatsapp && (
                   <a
                     href={`https://wa.me/${faculty.contact_whatsapp.replace(/\D/g, '')}`}
                     target="_blank"
