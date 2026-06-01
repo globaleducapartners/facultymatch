@@ -45,8 +45,9 @@ export default async function FacultyProfilePage({
     (institutionUserProfile?.plan === "institution-pro" || institutionUserProfile?.plan === "institution-growth") &&
     (activeStatus === "active" || activeStatus === "trialing");
 
-  // Fetch faculty profile with admin client to bypass RLS + visibility issues
-  const { data: faculty, error } = await admin
+  // Fetch faculty profile with admin client — admin bypasses RLS so no visibility filter needed
+  // Use maybeSingle() to avoid error when faculty_profiles row doesn't exist yet
+  const { data: faculty } = await admin
     .from("faculty_profiles")
     .select(`
       *,
@@ -55,28 +56,47 @@ export default async function FacultyProfilePage({
       links:faculty_links(*)
     `)
     .eq("id", id)
-    .or("visibility.eq.public,visibility.eq.private,visibility.is.null")
-    .single();
+    .maybeSingle();
 
-  if (error || !faculty) {
-    // If not found, it might be blocked or hidden
+  // If no user_profiles row either → truly not found
+  if (!facultyUserProfile) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center space-y-6">
         <div className="bg-red-50 p-6 rounded-full text-red-500">
           <ShieldCheck size={48} />
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-navy">Perfil no disponible</h1>
-          <p className="text-gray-500 max-w-md">
-            Este perfil no está disponible en este momento. Puede que el docente haya cambiado su visibilidad o no tengas permisos para verlo.
-          </p>
+          <h1 className="text-2xl font-bold text-navy">Perfil no encontrado</h1>
+          <p className="text-gray-500 max-w-md">Este docente no existe o ha sido eliminado.</p>
         </div>
         <Button asChild variant="outline" className="rounded-xl font-bold">
-          <Link href="/app/institution">Volver al buscador</Link>
+          <Link href={institution ? "/app/institution/search" : "/app/faculty/directory"}>Volver al buscador</Link>
         </Button>
       </div>
     );
   }
+
+  // Hidden profiles → not available
+  if (faculty?.visibility === "hidden") {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center space-y-6">
+        <div className="bg-gray-50 p-6 rounded-full text-gray-400">
+          <ShieldCheck size={48} />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-navy">Perfil oculto</h1>
+          <p className="text-gray-500 max-w-md">Este docente ha ocultado su perfil.</p>
+        </div>
+        <Button asChild variant="outline" className="rounded-xl font-bold">
+          <Link href={institution ? "/app/institution/search" : "/app/faculty/directory"}>Volver al buscador</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  // Use URL id as fallback when faculty_profiles row doesn't exist
+  const facultyId = faculty?.id ?? id;
+  const facultyName = facultyUserProfile?.full_name || faculty?.full_name || "Docente";
 
   // Check if favorite
   let isFavorite = false;
@@ -85,7 +105,7 @@ export default async function FacultyProfilePage({
       .from("favorites")
       .select("id")
       .eq("institution_id", institution.id)
-      .eq("faculty_id", faculty.id)
+      .eq("faculty_id", facultyId)
       .single();
     isFavorite = !!fav;
   }
@@ -94,9 +114,9 @@ export default async function FacultyProfilePage({
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 text-sm font-bold text-gray-400">
-        <Link href="/app/institution/search" className="hover:text-talentia-blue transition-colors">Buscador</Link>
+        <Link href={institution ? "/app/institution/search" : "/app/faculty/directory"} className="hover:text-talentia-blue transition-colors">Buscador</Link>
         <ChevronRight size={14} />
-        <span className="text-navy">Perfil de {facultyUserProfile?.full_name || faculty.full_name || "Docente"}</span>
+        <span className="text-navy">Perfil de {facultyUserProfile?.full_name || (faculty as any)?.full_name || "Docente"}</span>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -106,7 +126,7 @@ export default async function FacultyProfilePage({
           <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
             {/* Banner */}
             <div className="relative h-36 sm:h-48">
-              {faculty.banner_url ? (
+              {faculty?.banner_url ? (
                 <img src={faculty.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#4F7FE8]" />
@@ -115,7 +135,7 @@ export default async function FacultyProfilePage({
 
             <div className="px-8 lg:px-12 pb-10 -mt-12 relative">
             {(() => {
-              const fullName = facultyUserProfile?.full_name || faculty.full_name || "Docente";
+              const fullName = facultyUserProfile?.full_name || faculty?.full_name || "Docente";
               const initials = fullName.substring(0, 2).toUpperCase();
               return (
             <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -131,39 +151,45 @@ export default async function FacultyProfilePage({
                 </div>
               )}
 
-              <div className="space-y-4 flex-1">
+              <div className="space-y-4 flex-1 mt-12">
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-3">
                     <h1 className="text-3xl font-black text-navy">{fullName}</h1>
-                    {faculty.verified === 'verified' && (
+                    {faculty?.verified === 'verified' && (
                       <Badge className="bg-green-50 text-green-600 border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
                         <CheckCircle2 size={12} className="mr-1" /> Verificado
                       </Badge>
                     )}
-                    {faculty.aneca_accreditation && (
+                    {faculty?.aneca_accreditation && (
                       <Badge className="bg-blue-50 text-talentia-blue border-none px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                        <Award size={12} className="mr-1" /> {faculty.aneca_accreditation}
+                        <Award size={12} className="mr-1" /> {faculty?.aneca_accreditation}
                       </Badge>
                     )}
                   </div>
-                  <p className="text-xl font-bold text-gray-500">{faculty.headline}</p>
+                  <p className="text-xl font-bold text-gray-500">{faculty?.headline}</p>
                 </div>
 
                 <div className="flex flex-wrap gap-6">
-                  <div className="flex items-center gap-2 text-sm font-bold text-gray-400">
-                    <MapPin size={16} className="text-talentia-blue" />
-                    {faculty.city ? `${faculty.city}, ${faculty.country}` : faculty.country}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm font-bold text-gray-400">
-                    <Briefcase size={16} className="text-talentia-blue" />
-                    {faculty.years_teaching}+ años docencia
-                  </div>
-                  <div className="flex items-center gap-2 text-sm font-bold text-gray-400">
-                    <Languages size={16} className="text-talentia-blue" />
-                    {(Array.isArray(faculty.languages) ? faculty.languages : [])
-                      .map((l: any) => typeof l === 'string' ? l : l.lang ?? l.language ?? '')
-                      .filter(Boolean).join(', ')}
-                  </div>
+                  {(faculty?.city || faculty?.country) && (
+                    <div className="flex items-center gap-2 text-sm font-bold text-gray-400">
+                      <MapPin size={16} className="text-talentia-blue" />
+                      {faculty?.city ? `${faculty.city}, ${faculty.country}` : faculty?.country}
+                    </div>
+                  )}
+                  {faculty?.years_teaching > 0 && (
+                    <div className="flex items-center gap-2 text-sm font-bold text-gray-400">
+                      <Briefcase size={16} className="text-talentia-blue" />
+                      {faculty?.years_teaching}+ años docencia
+                    </div>
+                  )}
+                  {Array.isArray(faculty?.languages) && faculty.languages.length > 0 && (
+                    <div className="flex items-center gap-2 text-sm font-bold text-gray-400">
+                      <Languages size={16} className="text-talentia-blue" />
+                      {faculty.languages
+                        .map((l: any) => typeof l === 'string' ? l : l.lang ?? l.language ?? '')
+                        .filter(Boolean).join(', ')}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -187,7 +213,7 @@ export default async function FacultyProfilePage({
                     <FileText size={20} className="text-talentia-blue" /> Sobre mí
                   </h3>
                   <p className="text-gray-600 font-medium leading-relaxed whitespace-pre-line">
-                    {faculty.bio || "No se ha proporcionado biografía."}
+                    {faculty?.bio || "No se ha proporcionado biografía."}
                   </p>
                 </div>
 
@@ -195,8 +221,8 @@ export default async function FacultyProfilePage({
                   <div className="space-y-4">
                     <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Especialidades</h4>
                     <div className="space-y-4">
-                      {faculty.expertise?.length > 0 ? (
-                        faculty.expertise.map((exp: any) => (
+                      {faculty?.expertise?.length > 0 ? (
+                        faculty?.expertise.map((exp: any) => (
                           <div key={exp.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
                             <p className="text-xs font-black text-talentia-blue uppercase tracking-widest mb-1">{exp.area}</p>
                             <p className="font-bold text-navy">{exp.subarea}</p>
@@ -211,9 +237,9 @@ export default async function FacultyProfilePage({
                             )}
                           </div>
                         ))
-                      ) : Array.isArray(faculty.faculty_areas) && faculty.faculty_areas.length > 0 ? (
+                      ) : Array.isArray(faculty?.faculty_areas) && faculty?.faculty_areas.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
-                          {faculty.faculty_areas.map((area: string) => (
+                          {faculty?.faculty_areas.map((area: string) => (
                             <Badge key={area} className="bg-blue-50 text-talentia-blue border-blue-100 px-3 py-1 rounded-xl text-xs font-bold">
                               {area}
                             </Badge>
@@ -228,8 +254,8 @@ export default async function FacultyProfilePage({
                   <div className="space-y-4">
                     <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Formación y Acreditación</h4>
                     <div className="space-y-4">
-                      {Array.isArray(faculty.degrees) && faculty.degrees.length > 0 ? (
-                        faculty.degrees.map((deg: any, i: number) => (
+                      {Array.isArray(faculty?.degrees) && faculty?.degrees.length > 0 ? (
+                        faculty?.degrees.map((deg: any, i: number) => (
                           <div key={i} className="flex gap-4 items-start">
                             <div className="w-10 h-10 bg-blue-50 text-talentia-blue rounded-xl flex items-center justify-center shrink-0">
                               <GraduationCap size={20} />
@@ -244,25 +270,25 @@ export default async function FacultyProfilePage({
                             </div>
                           </div>
                         ))
-                      ) : faculty.degree_level ? (
+                      ) : faculty?.degree_level ? (
                         <div className="flex gap-4 items-start">
                           <div className="w-10 h-10 bg-blue-50 text-talentia-blue rounded-xl flex items-center justify-center shrink-0">
                             <GraduationCap size={20} />
                           </div>
                           <div>
-                            <p className="font-bold text-navy">{faculty.degree_level}</p>
+                            <p className="font-bold text-navy">{faculty?.degree_level}</p>
                             <p className="text-sm font-medium text-gray-500">Nivel de estudios</p>
                           </div>
                         </div>
                       ) : null}
 
-                      {faculty.aneca_accreditation && (
+                      {faculty?.aneca_accreditation && (
                         <div className="flex gap-4 items-start">
                           <div className="w-10 h-10 bg-blue-50 text-talentia-blue rounded-xl flex items-center justify-center shrink-0">
                             <Award size={20} />
                           </div>
                           <div>
-                            <p className="font-bold text-navy">{faculty.aneca_accreditation}</p>
+                            <p className="font-bold text-navy">{faculty?.aneca_accreditation}</p>
                             <p className="text-sm font-medium text-gray-500 italic">Acreditación ANECA</p>
                           </div>
                         </div>
@@ -285,7 +311,7 @@ export default async function FacultyProfilePage({
                         <div className="absolute left-[-4px] top-2 w-2.5 h-2.5 rounded-full bg-talentia-blue border-2 border-white shadow-sm"></div>
                         <div className="space-y-1">
                           <p className="text-sm font-black text-talentia-blue uppercase tracking-widest">Experiencia Docente</p>
-                          <p className="text-2xl font-black text-navy">{faculty.years_teaching} años</p>
+                          <p className="text-2xl font-black text-navy">{faculty?.years_teaching} años</p>
                           <p className="text-sm font-medium text-gray-500">En instituciones de educación superior.</p>
                         </div>
                       </div>
@@ -294,7 +320,7 @@ export default async function FacultyProfilePage({
                         <div className="absolute left-[-4px] top-2 w-2.5 h-2.5 rounded-full bg-tech-cyan border-2 border-white shadow-sm"></div>
                         <div className="space-y-1">
                           <p className="text-sm font-black text-tech-cyan uppercase tracking-widest">Experiencia Profesional</p>
-                          <p className="text-2xl font-black text-navy">{faculty.years_professional} años</p>
+                          <p className="text-2xl font-black text-navy">{faculty?.years_professional} años</p>
                           <p className="text-sm font-medium text-gray-500">En sectores relacionados con su especialidad.</p>
                         </div>
                       </div>
@@ -306,7 +332,7 @@ export default async function FacultyProfilePage({
                       <Building2 size={20} className="text-talentia-blue" /> Niveles Impartidos
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {faculty.levels?.map((level: string) => (
+                      {faculty?.levels?.map((level: string) => (
                         <Badge key={level} className="bg-gray-50 text-navy border border-gray-100 px-4 py-2 rounded-xl text-sm font-bold">
                           {level}
                         </Badge>
@@ -330,17 +356,17 @@ export default async function FacultyProfilePage({
                       <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 space-y-4">
                         <div className="space-y-1">
                           <p className="text-xs font-bold text-gray-500 uppercase">Google Scholar ID</p>
-                          <p className="font-bold text-navy break-all">{faculty.google_scholar_id || "No proporcionado"}</p>
+                          <p className="font-bold text-navy break-all">{faculty?.google_scholar_id || "No proporcionado"}</p>
                         </div>
                         <div className="space-y-1">
                           <p className="text-xs font-bold text-gray-500 uppercase">Investigación Destacada</p>
                           <p className="text-sm font-medium text-gray-600 line-clamp-3">
-                            {faculty.research_publications || "No se han listado publicaciones."}
+                            {faculty?.research_publications || "No se han listado publicaciones."}
                           </p>
                         </div>
-                        {faculty.google_scholar_id && (
+                        {faculty?.google_scholar_id && (
                           <Button variant="link" className="p-0 h-auto text-talentia-blue font-bold text-xs" asChild>
-                            <a href={`https://scholar.google.com/citations?user=${faculty.google_scholar_id}`} target="_blank" rel="noopener noreferrer">
+                            <a href={`https://scholar.google.com/citations?user=${faculty?.google_scholar_id}`} target="_blank" rel="noopener noreferrer">
                               Ver perfil en Scholar <ExternalLink size={12} className="ml-1" />
                             </a>
                           </Button>
@@ -351,7 +377,7 @@ export default async function FacultyProfilePage({
                     <div className="space-y-4">
                       <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Archivos Adjuntos</h4>
                       <div className="space-y-3">
-                        {faculty.documents?.map((doc: any) => (
+                        {faculty?.documents?.map((doc: any) => (
                           <div key={doc.id} className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 hover:border-talentia-blue transition-colors group">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-gray-50 text-gray-400 rounded-lg group-hover:bg-blue-50 group-hover:text-talentia-blue transition-colors">
@@ -371,7 +397,7 @@ export default async function FacultyProfilePage({
                         )) || <p className="text-sm text-gray-400 italic">No hay documentos públicos.</p>}
                         
                         {/* Placeholder for CV if exists in faculty profile but not in documents table yet */}
-                        {faculty.cv_url && (
+                        {faculty?.cv_url && (
                           <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 hover:border-talentia-blue transition-colors group">
                             <div className="flex items-center gap-3">
                               <div className="p-2 bg-gray-50 text-gray-400 rounded-lg group-hover:bg-blue-50 group-hover:text-talentia-blue transition-colors">
@@ -383,7 +409,7 @@ export default async function FacultyProfilePage({
                               </div>
                             </div>
                             <Button variant="ghost" size="icon" className="rounded-lg h-8 w-8 text-gray-400 hover:text-talentia-blue" asChild>
-                              <a href={faculty.cv_url} target="_blank" rel="noopener noreferrer">
+                              <a href={faculty?.cv_url} target="_blank" rel="noopener noreferrer">
                                 <ExternalLink size={16} />
                               </a>
                             </Button>
@@ -410,7 +436,7 @@ export default async function FacultyProfilePage({
                         </div>
                         <div>
                           <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Estado de disponibilidad</p>
-                          <p className="font-bold text-navy text-lg">{faculty.availability === 'available' ? 'Abierto a propuestas' : faculty.availability === 'limited' ? 'Disponibilidad limitada' : 'Solo por invitación'}</p>
+                          <p className="font-bold text-navy text-lg">{faculty?.availability === 'available' ? 'Abierto a propuestas' : faculty?.availability === 'limited' ? 'Disponibilidad limitada' : 'Solo por invitación'}</p>
                         </div>
                       </div>
 
@@ -421,7 +447,7 @@ export default async function FacultyProfilePage({
                         <div>
                           <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Modalidad preferida</p>
                           <div className="flex flex-wrap gap-2 mt-1">
-                            {faculty.modalities?.map((mod: string) => (
+                            {faculty?.modalities?.map((mod: string) => (
                               <Badge key={mod} className="bg-white text-gray-600 border border-gray-200 px-3 py-1 rounded-full text-xs font-bold capitalize">
                                 {mod}
                               </Badge>
@@ -462,8 +488,8 @@ export default async function FacultyProfilePage({
 
               <div className="flex flex-col gap-4">
                 <ContactModalWrapper
-                  facultyId={faculty.id}
-                  facultyName={facultyUserProfile?.full_name || faculty.full_name || "Docente"}
+                  facultyId={facultyId}
+                  facultyName={facultyName}
                   institutionId={institution.id}
                 />
 
@@ -480,14 +506,14 @@ export default async function FacultyProfilePage({
 
                 <div className="flex gap-4">
                   <FavoriteButton
-                    facultyId={faculty.id}
+                    facultyId={facultyId}
                     institutionId={institution.id}
                     initialIsFavorite={isFavorite}
                   />
 
-                  {faculty.cv_url && (
+                  {faculty?.cv_url && (
                     <Button variant="outline" asChild className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20 font-bold h-12 rounded-xl">
-                      <a href={faculty.cv_url} target="_blank" rel="noopener noreferrer">Descargar CV</a>
+                      <a href={faculty?.cv_url} target="_blank" rel="noopener noreferrer">Descargar CV</a>
                     </Button>
                   )}
                 </div>
@@ -517,7 +543,7 @@ export default async function FacultyProfilePage({
               </Link>
               {isFavorite !== undefined && (
                 <FavoriteButton
-                  facultyId={faculty.id}
+                  facultyId={facultyId}
                   institutionId={institution.id}
                   initialIsFavorite={isFavorite}
                 />
@@ -540,7 +566,7 @@ export default async function FacultyProfilePage({
           <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-6">
             <h4 className="text-sm font-black text-navy uppercase tracking-widest">Enlaces y Redes</h4>
             <div className="space-y-4">
-              {faculty.links?.map((link: any) => (
+              {faculty?.links?.map((link: any) => (
                 <a 
                   key={link.id}
                   href={link.url}
@@ -556,9 +582,9 @@ export default async function FacultyProfilePage({
               ))}
               
               {/* Fallback if no specific links table entry but profile fields exist */}
-              {faculty.linkedin_url && (
+              {faculty?.linkedin_url && (
                 <a 
-                  href={faculty.linkedin_url}
+                  href={faculty?.linkedin_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-50 hover:border-talentia-blue transition-all group"

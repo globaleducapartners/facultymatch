@@ -99,7 +99,12 @@ export async function middleware(request: NextRequest) {
       url.pathname = "/app/faculty";
       return NextResponse.redirect(url);
     }
-    if (activeMode === "institution" && pathname.startsWith("/app/faculty")) {
+    // Institution users can view individual faculty profiles (/app/faculty/[uuid])
+    // but not the faculty dashboard pages (profile, settings, etc.)
+    const isInstitutionViewingFacultyProfile =
+      activeMode === "institution" &&
+      /^\/app\/faculty\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pathname);
+    if (activeMode === "institution" && pathname.startsWith("/app/faculty") && !isInstitutionViewingFacultyProfile) {
       const url = request.nextUrl.clone();
       url.pathname = "/app/institution";
       return NextResponse.redirect(url);

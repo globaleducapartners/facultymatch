@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { InstitutionSearchPage } from "@/components/dashboard/InstitutionSearchPage";
 import { redirect } from "next/navigation";
 
@@ -58,20 +58,22 @@ export default async function FacultyDirectoryPage({
     }
   }
 
-  // Name pre-query
+  const admin = createAdminClient();
+
+  // Name pre-query (admin to bypass RLS on user_profiles)
   let nameMatchIds: string[] = [];
   if (query) {
-    const { data } = await supabase
+    const { data } = await admin
       .from("user_profiles")
       .select("id")
       .ilike("full_name", `%${query}%`);
     nameMatchIds = (data || []).map((m: any) => m.id);
   }
 
-  let educatorQuery = supabase
+  let educatorQuery = admin
     .from("faculty_profiles")
     .select(`*, user:user_profiles(full_name, avatar_url, plan, subscription_status), expertise:faculty_expertise(*)`)
-    .in("visibility", ["public", "private"]);
+    .or("visibility.eq.public,visibility.eq.private,visibility.is.null");
 
   if (query) {
     const orParts = [`headline.ilike.%${query}%`, `bio.ilike.%${query}%`];
