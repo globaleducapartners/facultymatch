@@ -69,11 +69,17 @@ export default async function FacultyProfilePage({
     (viewerProfile?.plan === "institution-pro" || viewerProfile?.plan === "institution-growth") &&
     (viewerProfile?.subscription_status === "active" || viewerProfile?.subscription_status === "trialing");
 
-  const { data: faculty } = await admin
-    .from("faculty_profiles")
-    .select(`*, expertise:faculty_expertise(*), documents:faculty_documents(*), links:faculty_links(*)`)
-    .eq("id", id)
-    .maybeSingle();
+  const [{ data: faculty }, { data: facultyDocs }] = await Promise.all([
+    admin
+      .from("faculty_profiles")
+      .select(`*, expertise:faculty_expertise(*)`)
+      .eq("id", id)
+      .maybeSingle(),
+    admin
+      .from("faculty_documents")
+      .select("*")
+      .eq("faculty_id", id),
+  ]);
 
   if (!facultyUserProfile) {
     return (
@@ -120,8 +126,8 @@ export default async function FacultyProfilePage({
   const hasInstitutions   = Array.isArray(faculty?.institutions_taught) && (faculty?.institutions_taught?.length ?? 0) > 0;
   const hasLanguages      = Array.isArray(faculty?.languages) && (faculty?.languages?.length ?? 0) > 0;
   const hasResearch       = !!(faculty?.google_scholar_id || faculty?.orcid_id || faculty?.research_publications);
-  const hasDocs           = (faculty?.documents?.length ?? 0) > 0 || !!faculty?.cv_url;
-  const hasLinks          = (faculty?.links?.length ?? 0) > 0 || !!faculty?.linkedin_url || !!faculty?.website;
+  const hasDocs           = (facultyDocs?.length ?? 0) > 0 || !!faculty?.cv_url;
+  const hasLinks          = !!faculty?.linkedin_url || !!faculty?.website;
 
   return (
     <div className="animate-in fade-in duration-500 pb-12">
@@ -467,7 +473,7 @@ export default async function FacultyProfilePage({
             <Section>
               <SectionTitle icon={<FileText size={18} />} title="Documentos" />
               <div className="space-y-2">
-                {faculty?.documents?.map((doc: any) => (
+                {facultyDocs?.map((doc: any) => (
                   <a
                     key={doc.id}
                     href={doc.file_url}
@@ -659,22 +665,22 @@ export default async function FacultyProfilePage({
             </div>
           )}
 
-          {/* Public profile link */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-2">
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Enlace público</p>
-            <a
-              href={faculty?.profile_slug
-                ? `https://facultymatch.app/faculty/${faculty.profile_slug}`
-                : `https://facultymatch.app/faculty/${id}`}
-              target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 text-xs font-bold text-talentia-blue hover:underline break-all"
-            >
-              <Globe size={13} className="shrink-0" />
+          {/* Public profile link — compact */}
+          <a
+            href={faculty?.profile_slug
+              ? `https://facultymatch.app/faculty/${faculty.profile_slug}`
+              : `https://facultymatch.app/faculty/${id}`}
+            target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-3 bg-white rounded-2xl border border-gray-100 hover:border-talentia-blue transition-colors group"
+          >
+            <Globe size={13} className="text-gray-400 group-hover:text-talentia-blue shrink-0 transition-colors" />
+            <span className="text-xs font-semibold text-gray-400 group-hover:text-talentia-blue transition-colors truncate">
               {faculty?.profile_slug
                 ? `facultymatch.app/faculty/${faculty.profile_slug}`
-                : `facultymatch.app/faculty/${id.slice(0, 8)}…`}
-            </a>
-          </div>
+                : `Ver perfil público`}
+            </span>
+            <ExternalLink size={11} className="text-gray-300 group-hover:text-talentia-blue shrink-0 transition-colors ml-auto" />
+          </a>
 
         </aside>
       </div>

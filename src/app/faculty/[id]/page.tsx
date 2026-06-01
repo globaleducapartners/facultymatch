@@ -51,8 +51,8 @@ export default async function PublicFacultyProfilePage({
 
   const [facultyResult, authResult] = await Promise.all([
     isUUID
-      ? admin.from("faculty_profiles").select(`*, expertise:faculty_expertise(*), links:faculty_links(*)`).eq("id", id).maybeSingle()
-      : admin.from("faculty_profiles").select(`*, expertise:faculty_expertise(*), links:faculty_links(*)`).eq("profile_slug", id).maybeSingle(),
+      ? admin.from("faculty_profiles").select(`*, expertise:faculty_expertise(*)`).eq("id", id).maybeSingle()
+      : admin.from("faculty_profiles").select(`*, expertise:faculty_expertise(*)`).eq("profile_slug", id).maybeSingle(),
     supabase.auth.getUser(),
   ]);
 
