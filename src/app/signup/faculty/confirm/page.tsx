@@ -89,31 +89,40 @@ function ConfirmContent() {
             )}
           </div>
 
-          {/* Info box — warning */}
+          {/* Info box — success */}
           <div style={{
-            background: "#FFFBEB", border: "1px solid #FDE68A",
+            background: "#F0FDF4", border: "1px solid #BBF7D0",
             borderRadius: 12, padding: "14px 16px",
           }}>
-            <p style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: "#92400E", margin: "0 0 4px" }}>
-              Antes de acceder, confirma tu email
+            <p style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: "#166534", margin: "0 0 4px" }}>
+              Tu perfil ya está creado
             </p>
-            <p style={{ fontFamily: SANS, fontSize: 12, color: "#B45309", margin: 0, lineHeight: 1.5 }}>
-              Haz clic en el enlace del email para activar tu cuenta. Expira en 24 horas.
+            <p style={{ fontFamily: SANS, fontSize: 12, color: "#15803D", margin: 0, lineHeight: 1.5 }}>
+              Confirma tu email para que las instituciones puedan encontrarte. El enlace expira en 24 horas.
             </p>
           </div>
 
-          {/* Info box — next step */}
+          {/* Info box — note */}
           <div style={{
             background: "#EFF6FF", border: "1px solid #BFDBFE",
             borderRadius: 12, padding: "14px 16px",
           }}>
             <p style={{ fontFamily: SANS, fontSize: 13, color: D.navy, margin: 0, lineHeight: 1.5 }}>
-              Una vez confirmado podrás acceder y completar tu perfil docente.
+              La verificación solo es necesaria para publicar tu perfil. Puedes entrar a explorar el dashboard mientras tanto.
             </p>
           </div>
 
           {/* Actions */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <Link href="/login" style={{
+              fontFamily: SANS, display: "flex", alignItems: "center", justifyContent: "center",
+              width: "100%", background: D.blue, color: D.white,
+              padding: "13px", borderRadius: 10,
+              fontSize: 14, fontWeight: 700, textDecoration: "none",
+            }}>
+              Acceder al dashboard →
+            </Link>
+
             <button
               onClick={handleResend}
               disabled={resending || resent}
@@ -142,13 +151,6 @@ function ConfirmContent() {
                 ¿Email incorrecto? Volver al registro
               </Link>
             </p>
-
-            <Link href="/login" style={{
-              fontFamily: SANS, display: "block", textAlign: "center",
-              fontSize: 14, fontWeight: 700, color: D.blue, textDecoration: "none",
-            }}>
-              ¿Ya confirmaste? Acceder →
-            </Link>
           </div>
         </div>
       </div>

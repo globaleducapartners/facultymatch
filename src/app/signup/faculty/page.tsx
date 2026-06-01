@@ -90,7 +90,7 @@ export default function SignupFacultyPage() {
       );
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.facultymatch.app").replace(/\/$/, "");
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
         password,
         options: {
@@ -119,7 +119,13 @@ export default function SignupFacultyPage() {
         return;
       }
 
-      router.push("/app/faculty");
+      // If Supabase returned a session directly (email confirmation disabled),
+      // go straight to the app. Otherwise show the confirmation page.
+      if (data?.session) {
+        router.push("/app/faculty");
+      } else {
+        router.push(`/signup/faculty/confirm?email=${encodeURIComponent(email.trim().toLowerCase())}`);
+      }
     } catch {
       setServerError("Error de red. Inténtalo de nuevo.");
       setLoading(false);
