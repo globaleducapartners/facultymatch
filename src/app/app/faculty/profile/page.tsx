@@ -109,6 +109,10 @@ export default async function ProfilePage({
     const academicLevel = formData.get("academicLevel") as string;
     const institutionsTaughtRaw = formData.get("institutionsTaught") as string;
     const institutionsTaught = JSON.parse(institutionsTaughtRaw || "[]");
+    const modalitiesRaw = formData.get("modalities") as string;
+    const modalities = JSON.parse(modalitiesRaw || "[]");
+    const levelsRaw = formData.get("levels") as string;
+    const levels = JSON.parse(levelsRaw || "[]");
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -118,10 +122,13 @@ export default async function ProfilePage({
       .update({
         current_institution: currentInstitution,
         years_experience: yearsExperience,
+        years_teaching: yearsExperience,
         availability,
         is_phd: isPhd,
         academic_level: academicLevel,
         institutions_taught: institutionsTaught,
+        modalities,
+        levels,
         updated_at: new Date().toISOString(),
       }).eq("id", user.id);
 

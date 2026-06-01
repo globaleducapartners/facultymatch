@@ -199,6 +199,21 @@ export function ProfileEditorClient({
   const [bannerPickerOpen, setBannerPickerOpen] = useState(false);
   const isMob = useIsMobile();
 
+  const [selectedModalities, setSelectedModalities] = useState<string[]>(
+    (facultyProfile?.modalities as string[] | null) || []
+  );
+  const [selectedLevels, setSelectedLevels] = useState<string[]>(
+    (facultyProfile?.levels as string[] | null) || []
+  );
+
+  const MODALITY_OPTIONS = ["Presencial", "Online", "Híbrida"];
+  const LEVEL_OPTIONS = ["Grado", "Máster", "Doctorado", "FP Superior", "Executive Education", "Corporate Training"];
+
+  const toggleModality = (m: string) =>
+    setSelectedModalities(prev => prev.includes(m) ? prev.filter(x => x !== m) : [...prev, m]);
+  const toggleLevel = (l: string) =>
+    setSelectedLevels(prev => prev.includes(l) ? prev.filter(x => x !== l) : [...prev, l]);
+
   const avatarUrl = profile?.avatar_url || facultyProfile?.avatar_url;
   const bannerUrl = (facultyProfile as any)?.banner_url || null;
   const completeness = calcCompleteness(facultyProfile, profile, userMeta);
@@ -620,6 +635,41 @@ export function ProfileEditorClient({
                   <InstitutionsTaughtEditor
                     initialInstitutions={(facultyProfile?.institutions_taught as string[] | null) || []} />
                 </Field>
+
+                {/* Modalities */}
+                <Field label="Modalidades de enseñanza">
+                  <input type="hidden" name="modalities" value={JSON.stringify(selectedModalities)} />
+                  <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8 }}>
+                    {MODALITY_OPTIONS.map(m => (
+                      <button key={m} type="button" onClick={() => toggleModality(m)} style={{
+                        fontFamily: SANS, fontSize: 13, fontWeight: 700,
+                        padding: "7px 14px", borderRadius: 999, cursor: "pointer",
+                        border: `1.5px solid ${selectedModalities.includes(m) ? D.blue : D.border}`,
+                        background: selectedModalities.includes(m) ? "#EFF6FF" : D.white,
+                        color: selectedModalities.includes(m) ? D.blue : D.muted,
+                        transition: "all 0.15s",
+                      }}>{m}</button>
+                    ))}
+                  </div>
+                </Field>
+
+                {/* Levels */}
+                <Field label="Niveles educativos que impartes">
+                  <input type="hidden" name="levels" value={JSON.stringify(selectedLevels)} />
+                  <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8 }}>
+                    {LEVEL_OPTIONS.map(l => (
+                      <button key={l} type="button" onClick={() => toggleLevel(l)} style={{
+                        fontFamily: SANS, fontSize: 13, fontWeight: 700,
+                        padding: "7px 14px", borderRadius: 999, cursor: "pointer",
+                        border: `1.5px solid ${selectedLevels.includes(l) ? D.blue : D.border}`,
+                        background: selectedLevels.includes(l) ? "#EFF6FF" : D.white,
+                        color: selectedLevels.includes(l) ? D.blue : D.muted,
+                        transition: "all 0.15s",
+                      }}>{l}</button>
+                    ))}
+                  </div>
+                </Field>
+
                 <SaveButton pending={isPending} />
               </form>
             }
