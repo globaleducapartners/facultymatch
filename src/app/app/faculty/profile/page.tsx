@@ -3,6 +3,17 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ProfileEditorClient } from "./ProfileEditorClient";
 
+function toSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
 export default async function ProfilePage({
   searchParams,
 }: {
@@ -50,12 +61,37 @@ export default async function ProfilePage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    // Generate slug only if not already set
+    const { data: existing } = await supabase
+      .from("faculty_profiles")
+      .select("profile_slug")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    let profileSlug = existing?.profile_slug;
+    if (!profileSlug && fullName) {
+      const base = toSlug(fullName);
+      let candidate = base;
+      let counter = 1;
+      while (true) {
+        const { data: taken } = await supabase
+          .from("faculty_profiles")
+          .select("id")
+          .eq("profile_slug", candidate)
+          .neq("id", user.id)
+          .maybeSingle();
+        if (!taken) { profileSlug = candidate; break; }
+        candidate = `${base}-${++counter}`;
+      }
+    }
+
     await supabase.from("user_profiles").update({ full_name: fullName }).eq("id", user.id);
     await supabase.from("faculty_profiles")
       .upsert({
         id: user.id, user_id: user.id,
         headline, bio, country, city,
         location: [city, country].filter(Boolean).join(", ") || null,
+        profile_slug: profileSlug || null,
         updated_at: new Date().toISOString(),
       }, { onConflict: "id" });
 

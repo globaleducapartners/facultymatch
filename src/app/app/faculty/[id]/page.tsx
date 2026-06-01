@@ -103,22 +103,30 @@ export default async function FacultyProfilePage({
         {/* Main Content */}
         <div className="lg:col-span-8 space-y-8">
           {/* Header Card */}
-          <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 lg:p-12 shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50/50 rounded-full -translate-y-1/2 translate-x-1/2 -z-10"></div>
-            
+          <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+            {/* Banner */}
+            <div className="relative h-36 sm:h-48">
+              {faculty.banner_url ? (
+                <img src={faculty.banner_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#4F7FE8]" />
+              )}
+            </div>
+
+            <div className="px-8 lg:px-12 pb-10 -mt-12 relative">
             {(() => {
               const fullName = facultyUserProfile?.full_name || faculty.full_name || "Docente";
               const initials = fullName.substring(0, 2).toUpperCase();
               return (
-            <div className="flex flex-col md:flex-row gap-8 items-start">
+            <div className="flex flex-col md:flex-row gap-6 items-start">
               {facultyUserProfile?.avatar_url ? (
                 <img
                   src={facultyUserProfile.avatar_url}
                   alt={fullName}
-                  className="w-24 h-24 rounded-3xl object-cover shrink-0 shadow-xl shadow-blue-100"
+                  className="w-24 h-24 rounded-3xl object-cover shrink-0 shadow-xl shadow-blue-100 border-4 border-white"
                 />
               ) : (
-                <div className="w-24 h-24 bg-talentia-blue text-white rounded-3xl flex items-center justify-center text-3xl font-black shrink-0 shadow-xl shadow-blue-100">
+                <div className="w-24 h-24 bg-talentia-blue text-white rounded-3xl flex items-center justify-center text-3xl font-black shrink-0 shadow-xl shadow-blue-100 border-4 border-white">
                   {initials}
                 </div>
               )}
@@ -160,6 +168,7 @@ export default async function FacultyProfilePage({
               </div>
             </div>
             ); })()}
+            </div>
           </div>
 
           {/* Content Tabs */}
@@ -202,6 +211,14 @@ export default async function FacultyProfilePage({
                             )}
                           </div>
                         ))
+                      ) : Array.isArray(faculty.faculty_areas) && faculty.faculty_areas.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {faculty.faculty_areas.map((area: string) => (
+                            <Badge key={area} className="bg-blue-50 text-talentia-blue border-blue-100 px-3 py-1 rounded-xl text-xs font-bold">
+                              {area}
+                            </Badge>
+                          ))}
+                        </div>
                       ) : (
                         <p className="text-sm text-gray-400 font-medium italic">No se han especificado áreas.</p>
                       )}

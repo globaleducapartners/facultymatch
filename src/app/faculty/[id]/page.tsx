@@ -1,5 +1,5 @@
-import { createAdminClient } from "@/lib/supabase-server";
-import { notFound } from "next/navigation";
+import { createAdminClient, createClient } from "@/lib/supabase-server";
+import { notFound, redirect } from "next/navigation";
 import {
   GraduationCap, Globe, MapPin, Award, Briefcase, BookOpen,
   CheckCircle2, ShieldCheck, Lock, Star, Languages, ExternalLink,
@@ -24,8 +24,12 @@ const AVAIL_LABELS: Record<string, { label: string; color: string; bg: string }>
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const admin = createAdminClient();
-  const { data: faculty } = await admin.from("faculty_profiles").select("full_name, headline").eq("id", id).single();
-  const { data: up } = await admin.from("user_profiles").select("full_name").eq("id", id).single();
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  const { data: faculty } = isUUID
+    ? await admin.from("faculty_profiles").select("id, full_name, headline").eq("id", id).maybeSingle()
+    : await admin.from("faculty_profiles").select("id, full_name, headline").eq("profile_slug", id).maybeSingle();
+  const resolvedId = faculty?.id || id;
+  const { data: up } = await admin.from("user_profiles").select("full_name").eq("id", resolvedId).maybeSingle();
   const name = up?.full_name || faculty?.full_name || "Docente";
   return {
     title: `${name} | FacultyMatch`,
@@ -40,29 +44,43 @@ export default async function PublicFacultyProfilePage({
 }) {
   const { id } = await params;
   const admin = createAdminClient();
+  const supabase = await createClient();
 
-  const [
-    { data: faculty },
-    { data: userProfile },
-  ] = await Promise.all([
-    admin.from("faculty_profiles").select(`
-      *,
-      expertise:faculty_expertise(*),
-      links:faculty_links(*)
-    `).eq("id", id).or("visibility.eq.public,visibility.eq.private,visibility.is.null").single(),
-    admin.from("user_profiles").select("full_name, avatar_url").eq("id", id).single(),
+  // Support both UUID and slug-based URLs
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+  const [facultyResult, authResult] = await Promise.all([
+    isUUID
+      ? admin.from("faculty_profiles").select(`*, expertise:faculty_expertise(*), links:faculty_links(*)`).eq("id", id).maybeSingle()
+      : admin.from("faculty_profiles").select(`*, expertise:faculty_expertise(*), links:faculty_links(*)`).eq("profile_slug", id).maybeSingle(),
+    supabase.auth.getUser(),
   ]);
+
+  const faculty = facultyResult.data;
+  const user = authResult.data.user;
+  const resolvedId = faculty?.id || id;
+
+  const { data: userProfile } = await admin.from("user_profiles").select("full_name, avatar_url").eq("id", resolvedId).single();
+
+  // No user record at all → 404
+  if (!userProfile) return notFound();
+
+  // Explicitly hidden → 404
+  if ((faculty as any)?.visibility === "hidden") return notFound();
+
+  // Private profile → require login
+  if ((faculty as any)?.visibility === "private" && !user) {
+    redirect(`/login?next=/faculty/${id}`);
+  }
 
   const bannerUrl = (faculty as any)?.banner_url || null;
 
-  if (!faculty) return notFound();
-
-  const fullName = userProfile?.full_name || (faculty as any).full_name || "Docente";
+  const fullName = userProfile?.full_name || (faculty as any)?.full_name || "Docente";
   const avatarUrl = userProfile?.avatar_url || null;
   const initials = fullName.substring(0, 2).toUpperCase();
-  const avail = faculty.availability ? (AVAIL_LABELS[faculty.availability] || null) : null;
-  const isVerified = faculty.verified && faculty.verified !== "none";
-  const locationStr = [faculty.city, faculty.country || faculty.location].filter(Boolean).join(", ");
+  const avail = (faculty as any)?.availability ? (AVAIL_LABELS[(faculty as any).availability] || null) : null;
+  const isVerified = (faculty as any)?.verified && (faculty as any).verified !== "none";
+  const locationStr = [(faculty as any)?.city, (faculty as any)?.country || (faculty as any)?.location].filter(Boolean).join(", ");
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -112,7 +130,7 @@ export default async function PublicFacultyProfilePage({
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <h1 className="text-2xl font-black text-navy">{fullName}</h1>
-                  {(faculty as any).is_phd && (
+                  {(faculty as any)?.is_phd && (
                     <span className="text-[10px] font-black text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">PhD</span>
                   )}
                   {isVerified && (
@@ -121,7 +139,7 @@ export default async function PublicFacultyProfilePage({
                     </Badge>
                   )}
                 </div>
-                <p className="text-gray-600 font-medium">{faculty.headline || "Docente académico"}</p>
+                <p className="text-gray-600 font-medium">{(faculty as any)?.headline || "Docente académico"}</p>
                 <div className="flex flex-wrap gap-4 mt-2">
                   {locationStr && (
                     <span className="flex items-center gap-1 text-sm text-gray-400 font-medium">
@@ -138,8 +156,8 @@ export default async function PublicFacultyProfilePage({
             </div>
 
             {/* Bio */}
-            {faculty.bio && (
-              <p className="text-gray-600 leading-relaxed max-w-3xl">{faculty.bio}</p>
+            {(faculty as any)?.bio && (
+              <p className="text-gray-600 leading-relaxed max-w-3xl">{(faculty as any).bio}</p>
             )}
           </div>
         </div>
@@ -148,13 +166,13 @@ export default async function PublicFacultyProfilePage({
           {/* Left: details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Expertise */}
-            {Array.isArray(faculty.expertise) && faculty.expertise.length > 0 && (
+            {Array.isArray((faculty as any)?.expertise) && (faculty as any).expertise.length > 0 && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
                 <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
                   <BookOpen size={13} /> Áreas de especialización
                 </h2>
                 <div className="flex flex-wrap gap-2">
-                  {faculty.expertise.map((exp: any) => {
+                  {(faculty as any).expertise.map((exp: any) => {
                     const area = typeof exp.area === "string" ? exp.area : exp.area?.name ?? "";
                     const sub = typeof exp.subarea === "string" ? exp.subarea : exp.subarea?.name ?? "";
                     const label = [area, sub].filter(Boolean).join(": ");
@@ -206,25 +224,25 @@ export default async function PublicFacultyProfilePage({
             )}
 
             {/* Experience / languages */}
-            {((faculty as any).experience_years > 0 || (faculty as any).years_teaching > 0 || Array.isArray(faculty.languages)) && (
+            {((faculty as any)?.experience_years > 0 || (faculty as any)?.years_teaching > 0 || Array.isArray((faculty as any)?.languages)) && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4">
                 <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
                   <Briefcase size={13} /> Experiencia
                 </h2>
                 <div className="flex flex-wrap gap-4">
-                  {((faculty as any).experience_years || (faculty as any).years_teaching) > 0 && (
+                  {((faculty as any)?.experience_years || (faculty as any)?.years_teaching) > 0 && (
                     <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl">
                       <Briefcase size={15} className="text-talentia-blue" />
                       <span className="text-sm font-bold text-navy">
-                        {(faculty as any).experience_years || (faculty as any).years_teaching} años de experiencia
+                        {(faculty as any)?.experience_years || (faculty as any)?.years_teaching} años de experiencia
                       </span>
                     </div>
                   )}
-                  {Array.isArray(faculty.languages) && faculty.languages.length > 0 && (
+                  {Array.isArray((faculty as any)?.languages) && (faculty as any).languages.length > 0 && (
                     <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-xl">
                       <Globe size={15} className="text-talentia-blue" />
                       <span className="text-sm font-bold text-navy">
-                        {faculty.languages.map((l: any) => typeof l === "string" ? l : l.lang ?? l.language ?? "").filter(Boolean).join(", ")}
+                        {(faculty as any).languages.map((l: any) => typeof l === "string" ? l : l.lang ?? l.language ?? "").filter(Boolean).join(", ")}
                       </span>
                     </div>
                   )}

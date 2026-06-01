@@ -46,7 +46,7 @@ export function BannerUpload({ userId, currentBannerUrl, onClose }: BannerUpload
       const { error: dbErr } = await supabase
         .from("faculty_profiles")
         .update({ banner_url: url })
-        .eq("user_id", userId);
+        .eq("id", userId);
       if (dbErr) throw dbErr;
       router.refresh();
       onClose();
