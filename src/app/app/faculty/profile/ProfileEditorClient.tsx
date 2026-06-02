@@ -545,13 +545,13 @@ export function ProfileEditorClient({
                 ) : (
                   <EmptyState text="Añade tu institución actual y experiencia docente" />
                 )}
-                {(facultyProfile?.institutions_taught as string[] | null)?.length > 0 && (
+                {((facultyProfile?.institutions_taught as string[] | null)?.length ?? 0) > 0 && (
                   <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${D.border}` }}>
                     <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: D.muted, marginBottom: 8 }}>
                       También ha impartido en:
                     </div>
                     <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 6 }}>
-                      {(facultyProfile.institutions_taught as string[]).map((inst: string, i: number) => (
+                      {((facultyProfile?.institutions_taught || []) as string[]).map((inst: string, i: number) => (
                         <span key={i} style={{
                           fontFamily: SANS, fontSize: 12, color: D.ink,
                           background: D.surf, border: `1px solid ${D.border}`,
@@ -633,9 +633,9 @@ export function ProfileEditorClient({
             onToggleEdit={() => toggle("formacion")}
             children={
               <div>
-                {(facultyProfile?.degrees as any[] | null)?.length > 0 ? (
+                {((facultyProfile?.degrees as any[] | null)?.length ?? 0) > 0 ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: 14, marginTop: 12 }}>
-                    {(facultyProfile.degrees as any[]).map((deg: any, i: number) => (
+                    {((facultyProfile?.degrees || []) as any[]).map((deg: any, i: number) => (
                       <div key={i} style={{ display: "flex", gap: 14 }}>
                         <div style={{
                           width: 46, height: 46, borderRadius: 8, background: "#F5F3FF",
@@ -684,9 +684,9 @@ export function ProfileEditorClient({
             onToggleEdit={() => toggle("idiomas")}
             children={
               <div>
-                {(facultyProfile?.languages as any[] | null)?.length > 0 ? (
+                {((facultyProfile?.languages as any[] | null)?.length ?? 0) > 0 ? (
                   <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8, marginTop: 12 }}>
-                    {(facultyProfile.languages as any[]).map((l: any, i: number) => (
+                    {((facultyProfile?.languages || []) as any[]).map((l: any, i: number) => (
                       <span key={i} style={{
                         fontFamily: SANS, fontSize: 13, color: D.ink, fontWeight: 600,
                         background: D.surf, border: `1px solid ${D.border}`,

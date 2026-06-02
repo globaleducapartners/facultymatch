@@ -116,12 +116,14 @@ export default async function VerificationPage() {
     revalidatePath("/app/faculty/verification");
   }
 
-  const statusBadge = {
+  const badges: Record<string, { label: string; cls: string }> = {
     approved: { label: "Verificado", cls: "bg-tech-cyan text-white border-tech-cyan" },
     pending: { label: "En revisión", cls: "bg-orange-50 text-energy-orange border-energy-orange/30" },
     requires_info: { label: "Requiere info", cls: "bg-blue-50 text-talentia-blue border-talentia-blue/30" },
     rejected: { label: "Rechazado", cls: "bg-red-50 text-red-600 border-red-200" },
-  }[verificationStatus] ?? { label: "Sin verificar", cls: "bg-gray-50 text-gray-400 border-gray-100" };
+  };
+
+  const statusBadge = badges[verificationStatus as string] ?? { label: "Sin verificar", cls: "bg-gray-50 text-gray-400 border-gray-100" };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

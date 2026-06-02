@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { StripeUpgradeButton } from "@/components/profile/StripeUpgradeButton";
+import { StripeCancelButton } from "@/components/profile/StripeCancelButton";
 import { SecuritySettingsSection } from "@/components/settings/SecuritySettingsSection";
 import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton";
 
@@ -163,6 +164,9 @@ export default async function SettingsPage() {
                     {f}
                   </div>
                 ))}
+              </div>
+              <div className="pt-4 border-t border-blue-100">
+                <StripeCancelButton />
               </div>
             </div>
           ) : (

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Zap, Star, Mail } from "lucide-react";
+import { StripeCancelButton } from "@/components/profile/StripeCancelButton";
 
 export default async function BillingPage() {
   const supabase = await createClient();
@@ -91,12 +92,9 @@ export default async function BillingPage() {
                 Mejorar a Professional — 99€/mes
               </Link>
             )}
-            <p className="text-xs text-gray-400 pt-2">
-              Para cancelar o modificar tu suscripción escríbenos a{" "}
-              <a href="mailto:support@facultymatch.app" className="text-blue-600 font-bold">
-                support@facultymatch.app
-              </a>
-            </p>
+            <div className="pt-2">
+              <StripeCancelButton />
+            </div>
           </div>
         </div>
       </div>

@@ -74,15 +74,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Pasarela de pago no configurada' }, { status: 500 });
   }
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2024-06-20',
-  });
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const code = generateInviteCode();
 
   let stripePromoCode: Stripe.PromotionCode;
   try {
     stripePromoCode = await stripe.promotionCodes.create({
-      coupon: process.env.STRIPE_REFERRAL_COUPON_ID!,
+      promotion: {
+        type: 'coupon',
+        coupon: process.env.STRIPE_REFERRAL_COUPON_ID!,
+      },
       code,
       max_redemptions: 1,
       restrictions: {
