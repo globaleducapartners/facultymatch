@@ -32,7 +32,8 @@ interface BannerUploadProps {
 
 export function BannerUpload({ userId, currentBannerUrl, onClose }: BannerUploadProps) {
   const [tab, setTab] = useState<"presets" | "upload">("presets");
-  const [selected, setSelected] = useState<string | null>(currentBannerUrl || null);
+  const UNSET = "__unset__";
+  const [selected, setSelected] = useState<string>(currentBannerUrl ?? UNSET);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,8 +49,8 @@ export function BannerUpload({ userId, currentBannerUrl, onClose }: BannerUpload
         .update({ banner_url: url })
         .eq("id", userId);
       if (dbErr) throw dbErr;
-      router.refresh();
       onClose();
+      window.location.reload();
     } catch (err: any) {
       setError(err.message || "Error al guardar el banner.");
     } finally {
@@ -132,7 +133,7 @@ export function BannerUpload({ userId, currentBannerUrl, onClose }: BannerUpload
               onClick={() => setSelected("")}
               style={{
                 borderRadius: 12, overflow: "hidden", cursor: "pointer",
-                border: selected === "" || selected === null ? "2px solid #1B4FD8" : "2px solid #D8E2EF",
+                border: selected === "" || selected === UNSET ? "2px solid #1B4FD8" : "2px solid #D8E2EF",
                 height: 64,
                 background: "linear-gradient(135deg, #0D2240 0%, #1B4FD8 55%, #4F7FE8 100%)",
                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -140,7 +141,7 @@ export function BannerUpload({ userId, currentBannerUrl, onClose }: BannerUpload
               }}
             >
               <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, fontWeight: 600 }}>Gradiente por defecto</span>
-              {(selected === "" || selected === null) && (
+              {(selected === "" || selected === UNSET) && (
                 <div style={{ position: "absolute", top: 8, right: 8, width: 22, height: 22, borderRadius: "50%", background: "#1B4FD8", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Check size={13} color="#fff" />
                 </div>
@@ -183,14 +184,14 @@ export function BannerUpload({ userId, currentBannerUrl, onClose }: BannerUpload
 
             <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
               <button
-                onClick={() => selected !== undefined && saveBanner(selected || "")}
-                disabled={uploading || selected === currentBannerUrl}
+                onClick={() => selected !== UNSET && saveBanner(selected === UNSET ? "" : selected)}
+                disabled={uploading || selected === UNSET}
                 style={{
                   display: "flex", alignItems: "center", gap: 6,
                   background: "#1B4FD8", color: "#fff", border: "none",
                   padding: "10px 20px", borderRadius: 10, fontSize: 13, fontWeight: 700,
-                  cursor: (uploading || selected === currentBannerUrl) ? "not-allowed" : "pointer",
-                  opacity: (uploading || selected === currentBannerUrl) ? 0.6 : 1,
+                  cursor: (uploading || selected === UNSET) ? "not-allowed" : "pointer",
+                  opacity: (uploading || selected === UNSET) ? 0.6 : 1,
                 }}
               >
                 {uploading ? <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} /> : <Check size={14} />}
