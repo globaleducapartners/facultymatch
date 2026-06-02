@@ -287,16 +287,6 @@ export function ProfileEditorClient({
               </div>
             </div>
 
-            {/* Banner picker overlay */}
-            {bannerPickerOpen && (
-              <div style={{ padding: "12px 24px 0" }}>
-                <BannerUpload
-                  userId={user.id}
-                  currentBannerUrl={bannerUrl}
-                  onClose={() => setBannerPickerOpen(false)}
-                />
-              </div>
-            )}
 
             {/* Avatar + identity */}
             <div style={{ padding: "0 24px 24px" }}>
@@ -1083,6 +1073,33 @@ export function ProfileEditorClient({
 
         </div>
       </div>
+
+      {/* Banner picker — modal flotante */}
+      {bannerPickerOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            background: "rgba(0,0,0,0.55)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setBannerPickerOpen(false);
+          }}
+        >
+          <div style={{ width: "100%", maxWidth: 480 }}>
+            <BannerUpload
+              userId={user.id}
+              currentBannerUrl={bannerUrl}
+              onClose={() => setBannerPickerOpen(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
