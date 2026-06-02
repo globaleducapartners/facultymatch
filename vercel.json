@@ -5,6 +5,14 @@
   "crons": [
     {
       "path": "/api/referrals/expiry-reminder",
+    {
+      "path": "/api/faculty/profile-reminder",
+      "schedule": "0 9 * * *"
+    },
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/faculty/profile-reminder",
       "schedule": "0 9 * * *"
     }
   ]
