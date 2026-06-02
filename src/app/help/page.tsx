@@ -59,9 +59,9 @@ export default function HelpPage() {
             <Button className="w-full sm:w-auto bg-tech-cyan hover:bg-cyan-500 text-navy font-black rounded-xl h-14 px-8 flex items-center gap-2">
               <MessageCircle size={20} /> Chat en vivo
             </Button>
-            <Button className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl h-14 px-8 border border-white/10 flex items-center gap-2" onClick={() => window.location.href = "mailto:support@facultymatch.app"}>
+            <Link href="mailto:support@facultymatch.app" className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl h-14 px-8 border border-white/10 flex items-center justify-center gap-2">
               <Mail size={20} /> support@facultymatch.app
-            </Button>
+            </Link>
           </div>
         </div>
       </main>
