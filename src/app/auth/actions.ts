@@ -259,8 +259,8 @@ export async function signUpInstitution(formData: FormData) {
     contact_name: fullName,
     contact_email: email.toLowerCase(),
     contact_phone: phone,
-    contact_position: position,
-    areas_needed: knowledge_areas,
+    contact_role: position,
+    knowledge_areas: knowledge_areas,
     urgency: urgency || null,
   }).then(({ error }) => {
     if (error) console.warn('[signUpInstitution] application insert failed:', error.message);
