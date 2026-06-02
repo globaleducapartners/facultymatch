@@ -125,89 +125,108 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
       </div>
 
       {/* Conversation thread */}
-      {expanded && (
-        <div className="px-5 pb-5 border-t border-gray-50 pt-4 space-y-4">
-          {/* Institution message bubble (left, they sent to us) */}
-          <div className="flex flex-col items-start gap-1">
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-              {req.institution?.name}
-            </p>
-            <div className="max-w-[85%] bg-gray-100 text-navy p-4 rounded-2xl rounded-tl-sm">
-              {(req.modality || req.dates) && (
-                <div className="flex flex-wrap gap-2 mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                  {req.modality && <span className="flex items-center gap-1"><Clock size={9} /> {MODALITY_LABELS[req.modality] ?? req.modality}</span>}
-                  {req.dates && <span className="flex items-center gap-1"><Clock size={9} /> {req.dates}</span>}
+      {expanded && (() => {
+        interface ThreadMessage {
+          sender: "institution" | "faculty";
+          message: string;
+          created_at: string;
+        }
+
+        const messages: ThreadMessage[] = [];
+        messages.push({
+          sender: "institution",
+          message: req.message,
+          created_at: req.created_at,
+        });
+
+        const rawFollowUps = (req as any).follow_ups;
+        if (Array.isArray(rawFollowUps) && rawFollowUps.length > 0) {
+          rawFollowUps.forEach((fu: any) => {
+            messages.push({
+              sender: fu.sender,
+              message: fu.message,
+              created_at: fu.created_at || req.created_at,
+            });
+          });
+        } else if (req.reply_message) {
+          messages.push({
+            sender: "faculty",
+            message: req.reply_message,
+            created_at: req.replied_at || req.created_at,
+          });
+        }
+
+        return (
+          <div className="px-5 pb-5 border-t border-gray-50 pt-4 space-y-4">
+            {messages.map((msg, index) => {
+              const isInst = msg.sender === "institution";
+              return (
+                <div key={index} className={`flex flex-col ${isInst ? "items-start" : "items-end"} gap-1`}>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">
+                    {isInst ? req.institution?.name : "Tu respuesta"} {msg.created_at ? `· ${new Date(msg.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}` : ""}
+                  </p>
+                  <div className={`max-w-[85%] p-4 rounded-2xl ${isInst ? "bg-gray-100 text-navy rounded-tl-sm" : "bg-talentia-blue text-white rounded-tr-sm"}`}>
+                    {/* Meta tags for first institution message */}
+                    {isInst && index === 0 && (req.modality || req.dates) && (
+                      <div className="flex flex-wrap gap-2 mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                        {req.modality && <span className="flex items-center gap-1"><Clock size={9} /> {MODALITY_LABELS[req.modality] ?? req.modality}</span>}
+                        {req.dates && <span className="flex items-center gap-1"><Clock size={9} /> {req.dates}</span>}
+                      </div>
+                    )}
+                    <p className="text-sm font-medium leading-relaxed break-words">{msg.message}</p>
+                  </div>
                 </div>
-              )}
-              <p className="text-sm font-medium leading-relaxed">{req.message}</p>
-            </div>
-          </div>
+              );
+            })}
 
-          {/* My reply bubble (right) */}
-          {req.reply_message ? (
-            <div className="flex flex-col items-end gap-1">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mr-1">
-                Tu respuesta {req.replied_at ? `· ${new Date(req.replied_at).toLocaleDateString("es-ES", { day: "numeric", month: "long" })}` : ""}
-              </p>
-              <div className="max-w-[85%] bg-talentia-blue text-white p-4 rounded-2xl rounded-tr-sm">
-                <p className="text-sm font-medium leading-relaxed">{req.reply_message}</p>
+            {/* Success message */}
+            {sentOk && (
+              <div className="flex items-center gap-2 py-2 px-4 bg-green-50 rounded-xl text-xs font-bold text-green-700">
+                <CheckCircle2 size={13} /> Mensaje enviado.
               </div>
-            </div>
-          ) : !isPending ? (
-            <div className="flex justify-end">
-              <div className="max-w-[85%] border border-dashed border-green-200 bg-green-50/50 text-green-700 p-3 rounded-2xl rounded-tr-sm">
-                <p className="text-xs font-medium italic">Respondiste a esta solicitud.</p>
-              </div>
-            </div>
-          ) : null}
+            )}
 
-          {/* Success message */}
-          {sentOk && (
-            <div className="flex items-center gap-2 py-2 px-4 bg-green-50 rounded-xl text-xs font-bold text-green-700">
-              <CheckCircle2 size={13} /> Mensaje enviado.
-            </div>
-          )}
-
-          {/* Follow-up button for replied conversations */}
-          {!isPending && !showFollowUp && !sentOk && (
-            <div className="flex justify-end pt-1">
-              <button
-                onClick={() => setShowFollowUp(true)}
-                className="flex items-center gap-1.5 text-xs font-bold text-talentia-blue hover:underline"
-              >
-                <Send size={11} /> Enviar seguimiento
-              </button>
-            </div>
-          )}
-
-          {/* Follow-up compose */}
-          {showFollowUp && (
-            <div className="space-y-3 pt-2 border-t border-gray-100">
-              <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Mensaje de seguimiento</p>
-              <textarea
-                value={followUpMsg}
-                onChange={e => setFollowUpMsg(e.target.value)}
-                rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none text-sm font-medium resize-none"
-                placeholder="Escribe tu respuesta..."
-              />
-              <div className="flex gap-2 justify-end">
-                <Button variant="ghost" size="sm" onClick={() => setShowFollowUp(false)} className="rounded-xl font-bold">
-                  Cancelar
-                </Button>
-                <Button
-                  size="sm"
-                  disabled={sending || !followUpMsg.trim()}
-                  onClick={handleFollowUp}
-                  className="bg-talentia-blue hover:bg-blue-700 text-white font-bold rounded-xl"
+            {/* Follow-up button for replied conversations */}
+            {!isPending && !showFollowUp && !sentOk && (
+              <div className="flex justify-end pt-1">
+                <button
+                  onClick={() => setShowFollowUp(true)}
+                  className="flex items-center gap-1.5 text-xs font-bold text-talentia-blue hover:underline"
                 >
-                  {sending ? <Loader2 size={14} className="animate-spin" /> : <><Send size={12} className="mr-1.5" />Enviar</>}
-                </Button>
+                  <Send size={11} /> Enviar seguimiento
+                </button>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+
+            {/* Follow-up compose */}
+            {showFollowUp && (
+              <div className="space-y-3 pt-2 border-t border-gray-100">
+                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Mensaje de seguimiento</p>
+                <textarea
+                  value={followUpMsg}
+                  onChange={e => setFollowUpMsg(e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none text-sm font-medium resize-none"
+                  placeholder="Escribe tu respuesta..."
+                />
+                <div className="flex gap-2 justify-end">
+                  <Button variant="ghost" size="sm" onClick={() => setShowFollowUp(false)} className="rounded-xl font-bold">
+                    Cancelar
+                  </Button>
+                  <Button
+                    size="sm"
+                    disabled={sending || !followUpMsg.trim()}
+                    onClick={handleFollowUp}
+                    className="bg-talentia-blue hover:bg-blue-700 text-white font-bold rounded-xl"
+                  >
+                    {sending ? <Loader2 size={14} className="animate-spin" /> : <><Send size={12} className="mr-1.5" />Enviar</>}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       <ReplyDialog
         contactId={req.id}

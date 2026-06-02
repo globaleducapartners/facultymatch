@@ -516,6 +516,15 @@ export async function replyToContact(contactId: string, replyMessage: string) {
 
   const admin = createAdminClient();
 
+  // Ensure follow_ups column exists
+  try {
+    await admin.rpc("exec_sql", {
+      sql: "ALTER TABLE contacts ADD COLUMN IF NOT EXISTS follow_ups JSONB DEFAULT '[]'::jsonb;"
+    });
+  } catch (err) {
+    console.warn("Failed to ensure follow_ups column:", err);
+  }
+
   // Get contact record + institution + faculty info
   const { data: contact } = await admin
     .from('contacts')
@@ -534,8 +543,22 @@ export async function replyToContact(contactId: string, replyMessage: string) {
 
   if (!fp || contact.faculty_id !== fp.id) return { error: 'No autorizado' };
 
+  // Update follow_ups array
+  const currentFollowUps = Array.isArray(contact.follow_ups) ? contact.follow_ups : [];
+  const newFollowUp = {
+    sender: "faculty",
+    message: replyMessage,
+    created_at: new Date().toISOString()
+  };
+  const updatedFollowUps = [...currentFollowUps, newFollowUp];
+
   // Update status to replied
-  await admin.from('contacts').update({ status: 'replied', reply_message: replyMessage, replied_at: new Date().toISOString() }).eq('id', contactId);
+  await admin.from('contacts').update({
+    status: 'replied',
+    reply_message: replyMessage,
+    replied_at: new Date().toISOString(),
+    follow_ups: updatedFollowUps
+  }).eq('id', contactId);
 
   // Get faculty name
   const { data: facultyUser } = await admin.from('user_profiles').select('full_name').eq('id', user.id).single();

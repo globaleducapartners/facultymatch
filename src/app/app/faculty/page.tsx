@@ -8,6 +8,7 @@ import {
   GraduationCap,
   Eye,
   EyeOff,
+  Lock,
   MapPin,
   Clock,
   Briefcase,
@@ -254,6 +255,85 @@ export default async function EducatorDashboard() {
             <Link href="/app/faculty/profile" className="text-sm font-black text-red-700 hover:underline mt-1 inline-block">
               Mejorar mi perfil →
             </Link>
+          </div>
+        </div>
+      )}
+
+      {/* ── Visibility & Completeness Alerts ── */}
+      {(progress < 100 || !facultyProfile?.visibility || facultyProfile?.visibility === "hidden" || facultyProfile?.visibility === "private") && (
+        <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-4">
+          <div className="flex items-center gap-2">
+            <AlertCircle size={18} className="text-talentia-blue" />
+            <h3 className="font-black text-navy text-sm">Avisos importantes sobre tu perfil</h3>
+          </div>
+          <div className="grid gap-3">
+            {progress < 100 && (
+              <div className="flex items-start gap-3 p-3 bg-amber-50/60 rounded-xl border border-amber-100">
+                <div className="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <AlertCircle size={14} className="text-amber-700" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-black text-amber-900">Perfil incompleto ({progress}% completado)</p>
+                  <p className="text-xs text-amber-700 font-medium mt-0.5">
+                    Faltan completar las siguientes secciones: <strong className="font-bold">{pendingItems.map((i) => i.label).join(", ")}</strong>. Completa tu perfil para que sea más atractivo y fácil de encontrar por las universidades.
+                  </p>
+                  <Link href="/app/faculty/profile" className="text-xs font-black text-amber-800 hover:underline mt-1.5 inline-block">
+                    Completar secciones faltantes →
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {facultyProfile?.visibility === "hidden" && (
+              <div className="flex items-start gap-3 p-3 bg-red-50/60 rounded-xl border border-red-100">
+                <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <EyeOff size={14} className="text-red-700" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-black text-red-900">Perfil Oculto</p>
+                  <p className="text-xs text-red-700 font-medium mt-0.5">
+                    Tu visibilidad está configurada como <strong className="font-bold">Oculto</strong>. Ninguna institución podrá encontrarte en el buscador ni en el directorio.
+                  </p>
+                  <Link href="/app/faculty/privacy" className="text-xs font-black text-red-800 hover:underline mt-1.5 inline-block">
+                    Modificar visibilidad del perfil →
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {facultyProfile?.visibility === "private" && (
+              <div className="flex items-start gap-3 p-3 bg-blue-50/60 rounded-xl border border-blue-100">
+                <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Lock size={14} className="text-blue-700" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-black text-blue-900">Perfil privado (Solo instituciones)</p>
+                  <p className="text-xs text-blue-700 font-medium mt-0.5">
+                    Tu visibilidad está configurada para mostrarse <strong className="font-bold">solo a instituciones verificadas</strong>. Los visitantes públicos no registrados no pueden ver tu información.
+                  </p>
+                  <Link href="/app/faculty/privacy" className="text-xs font-black text-blue-800 hover:underline mt-1.5 inline-block">
+                    Gestionar privacidad del perfil →
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {!facultyProfile?.visibility && (
+              <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                <div className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <AlertCircle size={14} className="text-gray-500" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-black text-gray-800">Visibilidad no configurada</p>
+                  <p className="text-xs text-gray-500 font-medium mt-0.5">
+                    No has configurado tu preferencia de privacidad. Por defecto tu perfil es público en la plataforma.
+                  </p>
+                  <Link href="/app/faculty/privacy" className="text-xs font-black text-gray-700 hover:underline mt-1.5 inline-block">
+                    Configurar privacidad →
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

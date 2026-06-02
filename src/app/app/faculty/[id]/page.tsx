@@ -61,27 +61,30 @@ export default async function FacultyProfilePage({
     supabase.from("user_profiles").select("plan, subscription_status").eq("id", user.id).single(),
   ]);
 
-  const { data: facultyUserProfile } = await admin
-    .from("user_profiles")
-    .select("full_name, avatar_url")
-    .eq("id", id)
-    .single();
-
   const isPro =
     (viewerProfile?.plan === "institution-pro" || viewerProfile?.plan === "institution-growth") &&
     (viewerProfile?.subscription_status === "active" || viewerProfile?.subscription_status === "trialing");
 
-  const [{ data: faculty }, { data: facultyDocs }] = await Promise.all([
-    admin
-      .from("faculty_profiles")
-      .select(`*, expertise:faculty_expertise(*)`)
-      .eq("id", id)
-      .maybeSingle(),
-    admin
-      .from("faculty_documents")
-      .select("*")
-      .eq("faculty_id", id),
+  // Fetch faculty profile user, documents, and auth user details
+  const [facultyUserProfileResult, facultyResult, facultyDocsResult, facultyAuthUserResult] = await Promise.all([
+    admin.from("user_profiles").select("full_name, avatar_url").eq("id", id).single(),
+    admin.from("faculty_profiles").select(`*, expertise:faculty_expertise(*)`).eq("id", id).maybeSingle(),
+    admin.from("faculty_documents").select("*").eq("faculty_id", id),
+    admin.auth.admin.getUserById(id).catch(() => ({ data: { user: null } })),
   ]);
+
+  const facultyUserProfile = facultyUserProfileResult.data;
+  const faculty = facultyResult.data;
+  const facultyDocs = facultyDocsResult.data;
+  const facultyAuthUser = facultyAuthUserResult?.data?.user;
+
+  const registeredEmail = facultyAuthUser?.email || null;
+  const registeredPhone = facultyAuthUser?.phone || null;
+
+  const emailToShow = faculty?.contact_email || registeredEmail || null;
+  const phoneToShow = faculty?.phone || registeredPhone || null;
+  const whatsappToShow = faculty?.contact_whatsapp || phoneToShow || null;
+  const linkedinToShow = faculty?.contact_linkedin || faculty?.linkedin_url || null;
 
   if (!facultyUserProfile) {
     return (
@@ -583,9 +586,9 @@ export default async function FacultyProfilePage({
                   facultyName={facultyName}
                   institutionId={institution.id}
                 />
-                {faculty?.contact_whatsapp && (
+                {whatsappToShow && (
                   <a
-                    href={`https://wa.me/${faculty.contact_whatsapp.replace(/\D/g, "")}`}
+                    href={`https://wa.me/${whatsappToShow.replace(/\D/g, "")}`}
                     target="_blank" rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#20bd5b] text-white font-bold h-12 rounded-xl text-sm transition-colors shadow-sm"
                   >
@@ -603,27 +606,35 @@ export default async function FacultyProfilePage({
               </div>
 
               {/* Contact details */}
-              {(faculty?.contact_email || faculty?.contact_linkedin || faculty?.phone) && (
+              {(emailToShow || linkedinToShow || phoneToShow || whatsappToShow) && (
                 <div className="space-y-3 pt-5 border-t border-white/10">
                   <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest">Contacto directo</p>
-                  {faculty?.contact_email && (
-                    <a href={`mailto:${faculty.contact_email}`} className="flex items-center gap-3 text-sm font-semibold text-white/90 hover:text-white transition-colors">
+                  {emailToShow && (
+                    <a href={`mailto:${emailToShow}`} className="flex items-center gap-3 text-sm font-semibold text-white/90 hover:text-white transition-colors">
                       <div className="p-1.5 bg-white/10 rounded-lg shrink-0">
                         <AtSign size={14} className="text-blue-200" />
                       </div>
-                      <span className="truncate flex-1">{faculty.contact_email}</span>
+                      <span className="truncate flex-1">{emailToShow}</span>
                     </a>
                   )}
-                  {faculty?.contact_whatsapp && (
-                    <div className="flex items-center gap-3 text-sm font-semibold text-white/90">
+                  {phoneToShow && (
+                    <a href={`tel:${phoneToShow}`} className="flex items-center gap-3 text-sm font-semibold text-white/90 hover:text-white transition-colors">
                       <div className="p-1.5 bg-white/10 rounded-lg shrink-0">
                         <Phone size={14} className="text-blue-200" />
                       </div>
-                      <span className="flex-1">{faculty.contact_whatsapp}</span>
+                      <span className="truncate flex-1">{phoneToShow}</span>
+                    </a>
+                  )}
+                  {whatsappToShow && (
+                    <div className="flex items-center gap-3 text-sm font-semibold text-white/90">
+                      <div className="p-1.5 bg-white/10 rounded-lg shrink-0">
+                        <MessageCircle size={14} className="text-blue-200" />
+                      </div>
+                      <span className="flex-1">{whatsappToShow} (WhatsApp)</span>
                     </div>
                   )}
-                  {faculty?.contact_linkedin && (
-                    <a href={faculty.contact_linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm font-semibold text-white/90 hover:text-white transition-colors">
+                  {linkedinToShow && (
+                    <a href={linkedinToShow} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm font-semibold text-white/90 hover:text-white transition-colors">
                       <div className="p-1.5 bg-white/10 rounded-lg shrink-0">
                         <Link2 size={14} className="text-blue-200" />
                       </div>

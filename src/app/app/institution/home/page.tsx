@@ -221,8 +221,29 @@ export default async function InstitutionHomePage() {
                   const userObj = Array.isArray(fp?.user) ? fp?.user[0] : fp?.user;
                   const name = userObj?.full_name || "Docente";
                   const initials = name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase();
+
+                  // Calculate last message text & sender for "último seguimiento"
+                  let lastMsgText = contact.message;
+                  let lastMsgSender = "Tú";
+                  let lastMsgDate = contact.created_at;
+
+                  const rawFollowUps = contact.follow_ups;
+                  if (Array.isArray(rawFollowUps) && rawFollowUps.length > 0) {
+                    const lastFu = rawFollowUps[rawFollowUps.length - 1];
+                    lastMsgText = lastFu.message;
+                    lastMsgSender = lastFu.sender === "institution" ? "Tú" : name;
+                    lastMsgDate = lastFu.created_at || contact.created_at;
+                  } else if (contact.reply_message) {
+                    lastMsgText = contact.reply_message;
+                    lastMsgSender = name;
+                    lastMsgDate = contact.replied_at || contact.created_at;
+                  }
+
+                  const isReplied = contact.status === "replied";
+                  const isSent = contact.status === "sent" || contact.status === "pending";
+
                   return (
-                    <div key={contact.id} className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-colors">
+                    <div key={contact.id} className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-colors border border-gray-50/50">
                       {userObj?.avatar_url ? (
                         <img src={userObj.avatar_url} alt={name} className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
                       ) : (
@@ -231,13 +252,22 @@ export default async function InstitutionHomePage() {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="font-black text-navy text-sm truncate">{name}</p>
-                        {fp?.headline && (
-                          <p className="text-xs text-gray-400 font-medium truncate">{fp.headline}</p>
-                        )}
+                        <div className="flex items-center gap-2">
+                          <p className="font-black text-navy text-sm truncate">{name}</p>
+                          <Badge className={`border-none text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 ${
+                            isReplied ? "bg-green-50 text-green-600" :
+                            isSent ? "bg-blue-50 text-talentia-blue" :
+                            "bg-gray-100 text-gray-500"
+                          }`}>
+                            {isReplied ? "Respondida" : isSent ? "Enviada" : "Archivada"}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-500 font-medium truncate mt-0.5">
+                          <strong className="font-bold text-gray-600">{lastMsgSender}:</strong> {lastMsgText}
+                        </p>
                       </div>
-                      <span className="text-[10px] text-gray-400 font-bold whitespace-nowrap">
-                        {new Date(contact.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}
+                      <span className="text-[10px] text-gray-400 font-bold whitespace-nowrap self-start mt-1">
+                        {new Date(lastMsgDate).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}
                       </span>
                     </div>
                   );
