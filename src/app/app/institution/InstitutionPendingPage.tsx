@@ -48,7 +48,7 @@ export function InstitutionPendingPage() {
 
           <p className="text-sm text-gray-400 font-medium">
             ¿Tienes preguntas?{" "}
-            <Link href="mailto:soporte@facultymatch.app" className="text-talentia-blue font-bold hover:underline">
+            <Link href="mailto:support@facultymatch.app" className="text-talentia-blue font-bold hover:underline">
               Contacta con nosotros
             </Link>
           </p>

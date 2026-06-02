@@ -730,7 +730,7 @@ export async function saveInstitutionOnboarding(formData: FormData) {
     .neq("user_id", user.id)
     .maybeSingle();
   const duplicateWarning = existingByName
-    ? "Ya existe una institución con este nombre registrada por otra cuenta. Si crees que es un error, contacta con soporte@facultymatch.app."
+    ? "Ya existe una institución con este nombre registrada por otra cuenta. Si crees que es un error, contacta con support@facultymatch.app."
     : undefined;
 
   const { error: instError } = await admin

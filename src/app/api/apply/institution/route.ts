@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
     try {
       await resend.emails.send({
         from: FROM,
-        to: ["info@facultymatch.app"],
+        to: ["support@facultymatch.app"],
         subject: `🏛️ Nueva institución: ${institution_name} · ${country || "—"}`,
         html: buildAlertEmail({
           institution_name,
@@ -177,7 +177,7 @@ function buildConfirmationEmail(contactName: string, institutionName: string, co
               </td></tr>
             </table>
             <p style="margin:0;font-size:12px;color:#94A3B8;line-height:1.6;">
-              Si tienes alguna pregunta, responde a este email o escríbenos a <a href="mailto:info@facultymatch.app" style="color:#2563EB;">info@facultymatch.app</a>
+              Si tienes alguna pregunta, responde a este email o escríbenos a <a href="mailto:support@facultymatch.app" style="color:#2563EB;">support@facultymatch.app</a>
             </p>
           </td></tr></table>
         </td></tr>

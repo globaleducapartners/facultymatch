@@ -174,7 +174,7 @@ function buildWelcomeEmail(firstName: string, email: string, magicLinkUrl: strin
     <p style="margin:0;font-size:12px;color:#94A3B8;">
       FacultyMatch by Grupo Global Educa SL ·
       <a href="https://www.facultymatch.app" style="color:#94A3B8;">www.facultymatch.app</a> ·
-      <a href="mailto:info@facultymatch.app" style="color:#94A3B8;">info@facultymatch.app</a>
+      <a href="mailto:support@facultymatch.app" style="color:#94A3B8;">support@facultymatch.app</a>
     </p>
   </td></tr>
 

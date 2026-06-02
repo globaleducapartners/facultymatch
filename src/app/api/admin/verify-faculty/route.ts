@@ -150,7 +150,7 @@ function emailWrapper(content: string) {
   <!-- Footer -->
   <tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
     <p style="margin:0;font-size:12px;color:#94a3b8;">FacultyMatch · <a href="${SITE}" style="color:#94a3b8;">${SITE.replace("https://","")}</a></p>
-    <p style="margin:4px 0 0;font-size:11px;color:#cbd5e1;">Grupo Global Educa SL · info@facultymatch.app</p>
+    <p style="margin:4px 0 0;font-size:11px;color:#cbd5e1;">Grupo Global Educa SL · support@facultymatch.app</p>
   </td></tr>
 </table>
 </td></tr></table>
@@ -217,7 +217,7 @@ function buildRejectionEmail(name: string, reason: string) {
         Mejorar mi perfil →
       </a>
     </div>
-    <p style="text-align:center;color:#94a3b8;font-size:13px;">Si tienes dudas, escríbenos a <a href="mailto:info@facultymatch.app" style="color:#2563EB;">info@facultymatch.app</a></p>
+    <p style="text-align:center;color:#94a3b8;font-size:13px;">Si tienes dudas, escríbenos a <a href="mailto:support@facultymatch.app" style="color:#2563EB;">support@facultymatch.app</a></p>
   `);
 }
 
@@ -236,6 +236,6 @@ function buildRequiresInfoEmail(name: string, message: string) {
         Completar mi perfil →
       </a>
     </div>
-    <p style="text-align:center;color:#94a3b8;font-size:13px;">¿Tienes dudas? <a href="mailto:info@facultymatch.app" style="color:#2563EB;">info@facultymatch.app</a></p>
+    <p style="text-align:center;color:#94a3b8;font-size:13px;">¿Tienes dudas? <a href="mailto:support@facultymatch.app" style="color:#2563EB;">support@facultymatch.app</a></p>
   `);
 }

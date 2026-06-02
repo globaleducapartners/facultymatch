@@ -122,10 +122,10 @@ export function Footer() {
             </p>
             {/* Contact */}
             <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 22 }}>
-              <a href="mailto:info@facultymatch.app" style={{
+              <a href="mailto:support@facultymatch.app" style={{
                 fontFamily: SANS, fontSize: 13, color: D.text, textDecoration: "none",
               }}>
-                info@facultymatch.app
+                support@facultymatch.app
               </a>
               <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" style={{
                 fontFamily: SANS, fontSize: 13, color: D.text, textDecoration: "none",
@@ -229,7 +229,7 @@ export function Footer() {
               Contacto
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <a href="mailto:info@facultymatch.app" style={{ fontFamily: SANS, fontSize: 13, color: D.text, textDecoration: "none" }}>
+              <a href="mailto:support@facultymatch.app" style={{ fontFamily: SANS, fontSize: 13, color: D.text, textDecoration: "none" }}>
                 Email
               </a>
               <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: SANS, fontSize: 13, color: D.text, textDecoration: "none" }}>
