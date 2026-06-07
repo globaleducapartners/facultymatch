@@ -304,7 +304,7 @@ export async function GET(request: Request) {
   // Always use role-based routing — send users to the right dashboard
   let destination: string;
   if (!profile?.role) {
-    destination = '/onboarding/role';
+    destination = '/app/faculty';
   } else if (profile.role === 'faculty') {
     destination = '/app/faculty';
   } else if (profile.role === 'institution') {
@@ -313,7 +313,7 @@ export async function GET(request: Request) {
     destination = '/control';
   } else {
     // Explicit next param for special cases (e.g. /update-password already handled above)
-    destination = next !== '/dashboard' ? next : '/onboarding/role';
+    destination = next !== '/dashboard' ? next : '/app/faculty';
   }
 
   return NextResponse.redirect(new URL(destination, origin).toString());
