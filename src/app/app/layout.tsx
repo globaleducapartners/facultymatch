@@ -21,15 +21,8 @@ export default async function DashboardLayout({
     .eq("id", user.id)
     .single();
 
-  if (!profile) {
-    redirect("/onboarding");
-  }
-
-  if (!profile.onboarding_completed) {
-    if (profile.role === "institution") {
-      redirect("/onboarding/institution");
-    }
-    redirect("/onboarding");
+  if (!profile?.role) {
+    redirect("/app/faculty");
   }
 
   return (
