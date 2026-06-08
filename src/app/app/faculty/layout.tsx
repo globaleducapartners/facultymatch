@@ -18,7 +18,7 @@ export default async function FacultyLayout({
     .single();
 
   if (!profile?.role) {
-    redirect("/onboarding/role");
+    redirect("/app/faculty");
   }
 
   // Institution users can view individual faculty profiles (/app/faculty/[id])
