@@ -9,7 +9,7 @@ export default async function PrintProfilePage() {
 
   const [{ data: profile }, { data: faculty }, { data: expertise }] = await Promise.all([
     supabase.from("user_profiles").select("full_name, avatar_url").eq("id", user.id).single(),
-    supabase.from("faculty_profiles").select("*").eq("id", user.id).maybeSingle(),
+    supabase.from("faculty_profiles").select("*").eq("user_id", user.id).maybeSingle(),
     supabase.from("faculty_expertise").select("*").eq("faculty_id", user.id),
   ]);
 

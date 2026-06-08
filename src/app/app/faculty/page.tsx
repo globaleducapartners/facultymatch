@@ -97,7 +97,7 @@ export default async function EducatorDashboard() {
     { count: favoritesCount },
     { count: contactsCount },
   ] = await Promise.all([
-    supabase.from("faculty_profiles").select("*").eq("id", user.id).maybeSingle(),
+    supabase.from("faculty_profiles").select("*").eq("user_id", user.id).maybeSingle(),
     supabase
       .from("contacts")
       .select("*, institution:institutions(name, country)")

@@ -16,11 +16,11 @@ export default async function DashboardPage() {
     .single();
 
   if (!profile) {
-    redirect("/onboarding/role");
+    redirect("/app/faculty");
   }
 
   if (!profile.role) {
-    redirect("/onboarding/role");
+    redirect("/app/faculty");
   }
 
   // Only faculty has an onboarding wizard
