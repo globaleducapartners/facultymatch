@@ -12,6 +12,7 @@ export default async function AppPage() {
     .eq("id", user.id)
     .single();
 
+  if (!profile?.role) redirect("/app/faculty");
   if (profile?.role === "institution") redirect("/app/institution/home");
   if (profile?.role === "admin" || profile?.role === "super_admin") redirect("/control");
   redirect("/app/faculty");

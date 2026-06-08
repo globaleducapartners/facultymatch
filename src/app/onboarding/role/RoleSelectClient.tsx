@@ -28,7 +28,7 @@ export default function RoleSelectClient({ userId }: { userId: string }) {
     }
 
     // Hard navigation so middleware picks up the new role from a fresh request
-    const destination = selected === "faculty" ? "/onboarding" : "/app/institution";
+    const destination = selected === "faculty" ? "/app/faculty" : "/app/institution";
     window.location.href = destination;
   }
 

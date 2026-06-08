@@ -330,7 +330,9 @@ export function Topbar({ user, profile }: TopbarProps) {
                     ? "Institución"
                     : profile?.role === "faculty"
                     ? "Docente"
-                    : "Admin"}
+                    : profile?.role === "admin" || profile?.role === "super_admin"
+                    ? "Admin"
+                    : "Cargando..."}
                 </span>
               </div>
               <ChevronDown size={16} className="text-gray-400 hidden md:block" />
