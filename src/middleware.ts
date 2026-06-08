@@ -77,7 +77,7 @@ export async function middleware(request: NextRequest) {
 
     if (!profile?.role) {
       const url = request.nextUrl.clone();
-      url.pathname = "/onboarding/role";
+      url.pathname = "/app/faculty";
       return NextResponse.redirect(url);
     }
 
