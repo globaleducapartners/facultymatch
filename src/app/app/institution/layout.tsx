@@ -18,7 +18,7 @@ export default async function InstitutionLayout({
     .single();
 
   if (!profile?.role) {
-    redirect("/onboarding/role");
+    redirect("/app/faculty");
   }
 
   // Allow pure institution accounts AND faculty users who registered an institution (dual-mode)
