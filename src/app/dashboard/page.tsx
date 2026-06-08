@@ -33,7 +33,7 @@ export default async function DashboardPage() {
   } else if (profile?.role === "institution") {
     redirect("/app/institution");
   } else if (profile?.role === "admin" || profile?.role === "super_admin") {
-    redirect("/app/admin");
+    redirect("/control");
   }
 
   redirect("/");

@@ -86,7 +86,7 @@ export async function middleware(request: NextRequest) {
     // Redirigir admins a /control cuando intentan acceder a /app/*
     const role = profile.role;
     if (role === "admin" || role === "super_admin") {
-      if (!pathname.startsWith("/control") && !pathname.startsWith("/app/admin")) {
+      if (!pathname.startsWith("/control")) {
         const url = request.nextUrl.clone();
         url.pathname = "/control";
         return NextResponse.redirect(url);
