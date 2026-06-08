@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "bun scripts/seed.ts"
+    "seed": "bun scripts/seed.ts",
+    "fix-admin": "bun scripts/fix-admin.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

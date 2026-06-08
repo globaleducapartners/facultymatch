@@ -6,8 +6,17 @@ import {
   Eye, CheckCircle2, XCircle, Loader2, X,
   Mail, Phone, MapPin, Linkedin, GraduationCap,
   ShieldCheck, AlignLeft, Clock, AlertCircle, RefreshCw,
+  Globe, FileText, Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+export type FacultyDoc = {
+  id: string;
+  faculty_id: string;
+  name: string;
+  doc_type: string | null;
+  created_at: string;
+};
 
 export type Faculty = {
   id: string;
@@ -29,6 +38,14 @@ export type Faculty = {
   academic_level: string | null;
   phone: string | null;
   aneca_accreditation: boolean;
+  degrees: any[];
+  languages: any[];
+  website: string | null;
+  google_scholar_id: string | null;
+  orcid_id: string | null;
+  is_phd: boolean;
+  name_visibility: string;
+  documents: FacultyDoc[];
 };
 
 type Metrics = {
@@ -410,6 +427,10 @@ export default function PendingFacultyPanel({
                     : null
                   }
                 />
+                <InfoRow icon={<Globe size={14} />} label="Web" value={selected.website} />
+                {selected.is_phd && (
+                  <InfoRow icon={<Award size={14} />} label="PhD" value="Sí" />
+                )}
               </Section>
 
               <Section title="Perfil Académico">
@@ -425,6 +446,20 @@ export default function PendingFacultyPanel({
                   </div>
                 </div>
                 <InfoRow icon={<AlignLeft size={14} />} label="Bio" value={selected.bio} multiline />
+                {selected.degrees?.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Titulaciones</p>
+                    {selected.degrees.map((deg: any, i: number) => (
+                      <div key={i} className="flex gap-2 items-start">
+                        <GraduationCap size={14} className="text-talentia-blue mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-bold text-navy">{deg.type || deg.title || "Titulación"}</p>
+                          {deg.university && <p className="text-xs text-gray-500">{deg.university}{deg.year ? ` (${deg.year})` : ""}</p>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </Section>
 
               <Section title="Disponibilidad">
@@ -439,6 +474,22 @@ export default function PendingFacultyPanel({
                   </div>
                 </div>
               </Section>
+
+              {selected.documents?.length > 0 && (
+                <Section title="Documentos Adjuntos">
+                  <div className="space-y-2">
+                    {selected.documents.map((doc) => (
+                      <div key={doc.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        <FileText size={16} className="text-talentia-blue flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-navy truncate">{doc.name}</p>
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{doc.doc_type || "Documento"}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Section>
+              )}
 
               <Section title="Checklist de Verificación">
                 <div className="space-y-2">

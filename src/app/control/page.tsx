@@ -38,6 +38,7 @@ export default async function ControlPage() {
 
   let metaMap: Record<string, any> = {};
   let fpMap: Record<string, any> = {};
+  let docsMap: Record<string, any[]> = {};
 
   if (pendingRaw && pendingRaw.length > 0) {
     const ids = pendingRaw.map((p) => p.id);
@@ -56,6 +57,11 @@ export default async function ControlPage() {
             knowledge_areas: u.user_metadata?.knowledge_areas || [],
             modalities: u.user_metadata?.modalities || [],
             availability: u.user_metadata?.availability,
+            website: u.user_metadata?.website,
+            google_scholar: u.user_metadata?.google_scholar_id,
+            orcid: u.user_metadata?.orcid_id,
+            is_phd: u.user_metadata?.is_phd || false,
+            languages: u.user_metadata?.languages || [],
           };
         }
       });
@@ -64,10 +70,22 @@ export default async function ControlPage() {
     // Faculty profiles batch (for those who completed onboarding)
     const { data: fps } = await admin
       .from('faculty_profiles')
-      .select('user_id, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline, updated_at')
+      .select('user_id, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline, updated_at, degrees, languages, website, google_scholar_id, orcid_id, is_phd, aneca_accreditation, academic_level, contact_email, contact_whatsapp, contact_linkedin, banner_url, name_visibility')
       .in('user_id', ids);
     if (fps) {
       fps.forEach((fp: any) => { fpMap[fp.user_id] = fp; });
+    }
+
+    // Faculty documents
+    const { data: docs } = await admin
+      .from('faculty_documents')
+      .select('id, faculty_id, name, doc_type, created_at')
+      .in('faculty_id', ids);
+    if (docs) {
+      docs.forEach((d: any) => {
+        if (!docsMap[d.faculty_id]) docsMap[d.faculty_id] = [];
+        docsMap[d.faculty_id].push(d);
+      });
     }
   }
 
@@ -91,9 +109,17 @@ export default async function ControlPage() {
       country: fp.country || null,
       headline: fp.headline || null,
       profile_updated_at: fp.updated_at || null,
-      academic_level: meta.academic_level || null,
+      academic_level: meta.academic_level || fp.academic_level || null,
       phone: meta.phone || null,
-      aneca_accreditation: meta.aneca_accreditation || false,
+      aneca_accreditation: meta.aneca_accreditation || fp.aneca_accreditation || false,
+      degrees: fp.degrees || [],
+      languages: fp.languages?.length > 0 ? fp.languages : (meta.languages || []),
+      website: fp.website || meta.website || null,
+      google_scholar_id: fp.google_scholar_id || meta.google_scholar || null,
+      orcid_id: fp.orcid_id || meta.orcid || null,
+      is_phd: fp.is_phd || meta.is_phd || false,
+      name_visibility: fp.name_visibility || 'public',
+      documents: docsMap[p.id] || [],
     };
   });
 

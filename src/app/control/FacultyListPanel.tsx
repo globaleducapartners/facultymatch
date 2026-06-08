@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   Eye, X, Mail, Phone, MapPin, Linkedin, GraduationCap,
   ShieldCheck, AlignLeft, Clock, AlertCircle, RefreshCw, Loader2,
-  XCircle, ExternalLink,
+  XCircle, ExternalLink, FileText,
 } from "lucide-react";
 import type { Faculty } from "./PendingFacultyPanel";
 
@@ -259,6 +259,20 @@ export default function FacultyListPanel({
                   </div>
                 </div>
                 <DrawerRow icon={<AlignLeft size={14} />} label="Bio" value={selected.bio} multiline />
+                {(selected as any).degrees?.length > 0 && (
+                  <div className="space-y-2 mt-2">
+                    <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Titulaciones</p>
+                    {(selected as any).degrees.map((deg: any, i: number) => (
+                      <div key={i} className="flex gap-2 items-start">
+                        <GraduationCap size={14} className="text-talentia-blue mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-bold text-navy">{deg.type || deg.title || "Titulación"}</p>
+                          {deg.university && <p className="text-xs text-gray-500">{deg.university}{deg.year ? ` (${deg.year})` : ""}</p>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </DrawerSection>
 
               <DrawerSection title="Disponibilidad">
@@ -273,6 +287,22 @@ export default function FacultyListPanel({
                   </div>
                 </div>
               </DrawerSection>
+
+              {(selected as any).documents?.length > 0 && (
+                <DrawerSection title="Documentos Adjuntos">
+                  <div className="space-y-2">
+                    {(selected as any).documents.map((doc: any) => (
+                      <div key={doc.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                        <FileText size={16} className="text-talentia-blue flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-navy truncate">{doc.name}</p>
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{doc.doc_type || "Documento"}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </DrawerSection>
+              )}
 
               {mode === "rejected" && selected.verification_notes && (
                 <DrawerSection title="Motivo del rechazo">
