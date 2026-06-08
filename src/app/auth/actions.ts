@@ -364,7 +364,9 @@ export async function signIn(formData: FormData) {
   // Otherwise redirect based on role
   const userId = data.user?.id;
   if (userId) {
-    const { data: profile } = await supabase
+    // Use admin client to bypass recursive RLS on user_profiles
+    const admin = createAdminClient();
+    const { data: profile } = await admin
       .from("user_profiles")
       .select("role, onboarding_completed")
       .eq("id", userId)

@@ -8,7 +8,9 @@ export default async function ControlLayout({ children }: { children: React.Reac
 
   if (!user) redirect("/login?next=/control");
 
-  const { data: profile } = await supabase
+  // Use admin client to bypass recursive RLS on user_profiles
+  const admin = createAdminClient();
+  const { data: profile } = await admin
     .from("user_profiles")
     .select("role, full_name")
     .eq("id", user.id)
@@ -19,7 +21,6 @@ export default async function ControlLayout({ children }: { children: React.Reac
   }
 
   // Pending count for sidebar badge
-  const admin = createAdminClient();
   const { count: pendingCount } = await admin
     .from('user_profiles')
     .select('*', { count: 'exact', head: true })

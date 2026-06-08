@@ -1,4 +1,5 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
@@ -48,12 +49,10 @@ export async function middleware(request: NextRequest) {
   // /control is guarded by its own layout — middleware only checks auth
   const isControlRoute = pathname === "/control" || pathname.startsWith("/control/");
 
-  // Rutas protegidas: SOLO /app/* y /admin/*
+  // Rutas protegidas: SOLO /app/*
   const isAppRoute =
     pathname === "/app" ||
     pathname.startsWith("/app/") ||
-    pathname === "/admin" ||
-    pathname.startsWith("/admin/") ||
     pathname === "/checkout" ||
     pathname.startsWith("/checkout");
 
@@ -69,11 +68,17 @@ export async function middleware(request: NextRequest) {
 
   // Solo para rutas /app/* comprobamos rol (no para /control — su layout lo gestiona)
   if (user && isAppRoute && !pathname.startsWith("/onboarding") && !pathname.startsWith("/auth")) {
-    const { data: profile } = await supabase
+    // Use admin client to bypass recursive RLS on user_profiles
+    const admin = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+    const { data: profile } = await admin
       .from("user_profiles")
       .select("role, active_mode")
       .eq("id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile?.role) {
       // No role assigned yet — let layouts handle it, don't redirect here
