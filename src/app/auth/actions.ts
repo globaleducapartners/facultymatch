@@ -371,7 +371,7 @@ export async function signIn(formData: FormData) {
       .single();
 
     if (!profile?.role) {
-      redirect("/onboarding/role");
+      redirect("/app/faculty");
     } else if (profile.role === "faculty") {
       redirect("/app/faculty");
     } else if (profile.role === "institution") {
@@ -381,7 +381,7 @@ export async function signIn(formData: FormData) {
     }
   }
 
-  redirect("/onboarding/role");
+  redirect("/app/faculty");
 }
 
 export async function contactFaculty(formData: FormData) {
