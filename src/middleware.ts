@@ -76,9 +76,8 @@ export async function middleware(request: NextRequest) {
       .single();
 
     if (!profile?.role) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/app/faculty";
-      return NextResponse.redirect(url);
+      // No role assigned yet — let layouts handle it, don't redirect here
+      return response;
     }
 
     // active_mode as source of truth; fall back to role when null
