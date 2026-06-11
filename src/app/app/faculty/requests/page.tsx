@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { RequestsClient } from "./RequestsClient";
 
@@ -14,7 +14,7 @@ export default async function RequestsPage() {
     .eq("id", user.id)
     .maybeSingle();
 
-  const { data: requests } = await supabase
+  const { data: requests } = await admin
     .from("contacts")
     .select("*, institution:institutions(name, country)")
     .eq("faculty_id", facultyProfile?.id ?? user.id)

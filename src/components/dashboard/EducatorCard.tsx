@@ -235,6 +235,17 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
               >
                 <Mail size={12} /> Contactar
               </button>
+            ) : !institutionId ? (
+              // Faculty browsing — opens the restricted preview drawer
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCardClick?.();
+                }}
+                className="flex-1 bg-[#F2F6FC] text-[#6B7280] text-xs font-bold h-9 rounded-xl flex items-center justify-center gap-1.5 border border-[#D8E2EF] hover:bg-gray-200 transition-colors"
+              >
+                <Lock size={12} /> Ver perfil
+              </button>
             ) : (
               <Link
                 href="/app/institution/billing"

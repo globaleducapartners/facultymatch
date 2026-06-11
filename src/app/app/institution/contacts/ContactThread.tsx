@@ -134,7 +134,8 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
               created_at: fu.created_at || contact.created_at,
             });
           });
-        } else if (isReplied && contact.reply_message) {
+        } else if (contact.reply_message) {
+          // Fallback: show the latest reply when follow_ups are not available
           messages.push({
             sender: "faculty",
             message: contact.reply_message,
