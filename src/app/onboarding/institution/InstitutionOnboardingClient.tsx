@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { saveInstitutionOnboarding } from "@/app/auth/actions";
+import { trackEvent } from "@/lib/analytics";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -79,6 +80,7 @@ export default function InstitutionOnboardingClient({
     } else {
       toast.success("¡Perfil institucional creado!");
     }
+    trackEvent("institution_registered");
     window.location.href = "/app/institution";
     };
 

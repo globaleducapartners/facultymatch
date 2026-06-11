@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { trackEvent } from "@/lib/analytics";
 
 interface Props {
   facultyId: string;
@@ -8,7 +9,7 @@ interface Props {
 
 /**
  * Fires a POST to the track-view API on mount to increment the view counter.
- * Counts EVERY time the component mounts (every click/view).
+ * Also fires a GA4 event for analytics.
  * Uses a ref to prevent double-counting from React StrictMode double-renders.
  */
 export function ProfileViewTracker({ facultyId }: Props) {
@@ -29,6 +30,8 @@ export function ProfileViewTracker({ facultyId }: Props) {
     }).catch(() => {
       // Silently ignore failures (e.g. offline, abort)
     });
+
+    trackEvent("faculty_profile_viewed", { faculty_id: facultyId });
 
     return () => controller.abort();
   }, [facultyId]);

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { autosaveOnboarding, saveOnboarding } from "@/app/auth/actions";
+import { trackEvent } from "@/lib/analytics";
 import {
   CheckCircle2,
   ArrowRight,
@@ -192,6 +193,7 @@ export default function OnboardingClient({ initialData }: OnboardingClientProps)
         setLoading(false);
       } else {
         toast.success("¡Perfil completado con éxito!");
+        trackEvent("faculty_registered");
         window.location.href = "/app/faculty";
       }
   };

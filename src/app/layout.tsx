@@ -4,6 +4,7 @@ import "./globals.css";
 import { VisualEditsMessenger } from "orchids-visual-edits";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { CookieConsent } from "@/components/layout/CookieConsent";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import Script from "next/script";
 
 const inter = Inter({
@@ -84,18 +85,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <ConditionalFooter />
           <CookieConsent />
           <VisualEditsMessenger />
-          <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-K37WD3ZQYM"
-            strategy="afterInteractive"
-          />
-          <Script id="google-analytics" strategy="afterInteractive">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-K37WD3ZQYM');
-            `}
-          </Script>
+          <GoogleAnalytics />
 
       </body>
     </html>

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { contactFaculty } from "@/app/auth/actions";
+import { trackEvent } from "@/lib/analytics";
 import { Loader2, Mail, Calendar, BookOpen, MapPin } from "lucide-react";
 
 interface ContactModalProps {
@@ -50,6 +51,11 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
     } else {
       setSuccess(true);
       setLoading(false);
+      trackEvent("institution_contact_sent", {
+        faculty_id: facultyId,
+        institution_id: institutionId,
+        reason: formData.get("reason") as string,
+      });
       if (onSuccess) onSuccess();
       setTimeout(() => {
         onClose();
