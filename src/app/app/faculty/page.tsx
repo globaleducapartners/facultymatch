@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import DismissNotificationButton from "@/components/profile/DismissNotificationButton";
+import { formatDateTZ, formatDateTimeTZ } from "@/lib/utils";
 
 // ─── Resource articles ────────────────────────────────────────────────────────
 
@@ -94,22 +95,11 @@ export default async function EducatorDashboard() {
 
   const [
     { data: facultyProfile },
-    { data: recentRequests },
     { data: expertiseData },
-    { count: favoritesCount },
-    { count: contactsCount },
     { data: adminNotifications },
   ] = await Promise.all([
     supabase.from("faculty_profiles").select("*").eq("user_id", user.id).maybeSingle(),
-    supabase
-      .from("contacts")
-      .select("*, institution:institutions(name, country)")
-      .eq("faculty_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(3),
     supabase.from("faculty_expertise").select("id").eq("faculty_id", user.id).limit(1),
-    admin.from("favorites").select("*", { count: "exact", head: true }).eq("faculty_id", user.id),
-    admin.from("contacts").select("*", { count: "exact", head: true }).eq("faculty_id", user.id),
     supabase
       .from("admin_notifications")
       .select("*")
@@ -117,6 +107,25 @@ export default async function EducatorDashboard() {
       .is("read_at", null)
       .order("sent_at", { ascending: false })
       .limit(5),
+  ]);
+
+  // Use the faculty_profiles PK (id) for FK lookups — it's the correct join key for
+  // favorites.faculty_id and contacts.faculty_id (references faculty_profiles.id, not auth.users.id)
+  const facultyProfileId = facultyProfile?.id || user.id;
+
+  const [
+    { data: recentRequests },
+    { count: favoritesCount },
+    { count: contactsCount },
+  ] = await Promise.all([
+    admin
+      .from("contacts")
+      .select("*, institution:institutions(name, country)")
+      .eq("faculty_id", facultyProfileId)
+      .order("created_at", { ascending: false })
+      .limit(3),
+    admin.from("favorites").select("*", { count: "exact", head: true }).eq("faculty_id", facultyProfileId),
+    admin.from("contacts").select("*", { count: "exact", head: true }).eq("faculty_id", facultyProfileId),
   ]);
 
   const userMeta = user.user_metadata || {};
@@ -279,7 +288,7 @@ export default async function EducatorDashboard() {
             <p className="font-black text-purple-800 text-sm">{notif.subject}</p>
             {notif.body && <p className="text-sm text-purple-600 font-medium mt-0.5">{notif.body}</p>}
             <p className="text-[10px] text-purple-400 font-semibold mt-1">
-              {new Date(notif.sent_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+              {formatDateTimeTZ(notif.sent_at)}
             </p>
           </div>
           <DismissNotificationButton notificationId={notif.id} />
@@ -482,7 +491,7 @@ export default async function EducatorDashboard() {
                       <div className="flex items-center justify-between gap-2">
                         <p className="font-black text-navy text-sm truncate">{req.institution?.name ?? "Institución"}</p>
                         <span className="text-[10px] font-bold text-gray-400 whitespace-nowrap">
-                          {new Date(req.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}
+                          {formatDateTZ(req.created_at)}
                         </span>
                       </div>
                       {req.message && (
@@ -648,7 +657,7 @@ export default async function EducatorDashboard() {
                       <CalendarDays size={11} /> Renovación
                     </div>
                     <p className="text-white font-black text-xs">
-                      {end.toLocaleDateString("es-ES", { day: "2-digit", month: "long", year: "numeric" })}
+                      {formatDateTZ(profile.subscription_current_period_end, { day: "2-digit", month: "long", year: "numeric" })}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">

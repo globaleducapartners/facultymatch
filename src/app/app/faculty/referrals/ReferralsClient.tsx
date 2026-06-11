@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatDateTZ } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
   Gift,
@@ -231,7 +232,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                     <div key={ref.id} className="grid grid-cols-[1fr_auto_auto] gap-4 items-center px-6 py-4 hover:bg-gray-50/50 transition-colors">
                       <span className="text-sm font-medium text-navy truncate">{ref.invitee_email}</span>
                       <span className="text-xs text-gray-400 font-medium whitespace-nowrap">
-                        {new Date(ref.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}
+                        {formatDateTZ(ref.created_at)}
                       </span>
                       <Badge
                         className={`text-[10px] font-black uppercase tracking-wider border px-2.5 py-1 rounded-full ${

@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { formatDateTZ } from "@/lib/utils";
 
 export default async function InstitutionHomePage() {
   const supabase = await createClient();
@@ -268,7 +269,7 @@ export default async function InstitutionHomePage() {
                         </p>
                       </div>
                       <span className="text-[10px] text-gray-400 font-bold whitespace-nowrap self-start mt-1">
-                        {new Date(lastMsgDate).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}
+                        {formatDateTZ(lastMsgDate)}
                       </span>
                     </div>
                   );

@@ -10,6 +10,7 @@ import {
   MessageSquare,
   CheckCheck,
   GraduationCap,
+  Megaphone,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -21,6 +22,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut, switchActiveMode } from "@/app/auth/actions";
 import { createBrowserClient } from "@supabase/ssr";
+import { timeAgoTZ } from "@/lib/utils";
 
 interface TopbarProps {
   user: {
@@ -39,19 +41,10 @@ interface TopbarProps {
 
 interface Notification {
   id: string;
-  type: "contact" | "message";
+  type: "contact" | "admin";
   title: string;
   body: string;
   created_at: string;
-}
-
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `Hace ${Math.max(0, mins)} min`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `Hace ${hours}h`;
-  return `Hace ${Math.floor(hours / 24)}d`;
 }
 
 export function Topbar({ user, profile }: TopbarProps) {
@@ -83,7 +76,28 @@ export function Topbar({ user, profile }: TopbarProps) {
 
       const notifs: Notification[] = [];
 
-      // Get faculty profile id (if faculty role)
+      // ── 1. Admin notifications (in-app notifications from /control) ──
+      const { data: adminNotifs } = await supabase
+        .from("admin_notifications")
+        .select("id, subject, body, sent_at")
+        .eq("faculty_id", user.id)
+        .is("read_at", null)
+        .order("sent_at", { ascending: false })
+        .limit(5);
+
+      if (adminNotifs) {
+        for (const n of adminNotifs) {
+          notifs.push({
+            id: n.id,
+            type: "admin",
+            title: n.subject,
+            body: n.body || "",
+            created_at: n.sent_at,
+          });
+        }
+      }
+
+      // ── 2. Pending contact requests (faculty role) ──
       const { data: fp } = await supabase
         .from("faculty_profiles")
         .select("id")
@@ -91,7 +105,6 @@ export function Topbar({ user, profile }: TopbarProps) {
         .maybeSingle();
 
       if (fp?.id) {
-        // Pending contact requests
         const { data: contacts } = await supabase
           .from("contacts")
           .select("id, created_at, institution:institutions(name)")
@@ -114,12 +127,12 @@ export function Topbar({ user, profile }: TopbarProps) {
         }
       }
 
-      // Sort newest first and cap at 5
+      // Sort newest first and cap at 10
       notifs.sort(
         (a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
-      setNotifications(notifs.slice(0, 5));
+      setNotifications(notifs.slice(0, 10));
     } catch {
       // graceful fail — show empty state
     } finally {
@@ -228,7 +241,7 @@ export function Topbar({ user, profile }: TopbarProps) {
             >
               <Bell size={22} />
               {notifLoaded && notifications.length > 0 && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-[#1B4FD8] text-white text-[9px] font-black rounded-full flex items-center justify-center px-1">{notifications.length}</span>
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 shadow-sm">{notifications.length}</span>
               )}
             </button>
 
@@ -271,13 +284,13 @@ export function Topbar({ user, profile }: TopbarProps) {
                             className={`mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
                               n.type === "contact"
                                 ? "bg-[#0D2240]/10 text-[#0D2240]"
-                                : "bg-[#E9A030]/10 text-[#E9A030]"
+                                : "bg-red-100 text-red-600"
                             }`}
                           >
                             {n.type === "contact" ? (
                               <Building2 size={15} />
                             ) : (
-                              <MessageSquare size={15} />
+                              <Megaphone size={15} />
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -286,7 +299,7 @@ export function Topbar({ user, profile }: TopbarProps) {
                               {n.body}
                             </p>
                             <p className="text-[10px] text-gray-300 font-medium mt-1">
-                              {timeAgo(n.created_at)}
+                              {timeAgoTZ(n.created_at)}
                             </p>
                           </div>
                         </div>

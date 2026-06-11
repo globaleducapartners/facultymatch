@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatDateTZ, formatDateTimeTZ } from "@/lib/utils";
 import {
   Mail, MapPin, Calendar, Clock, CheckCircle2, ChevronDown, ChevronUp,
   Send, MessageCircle, ExternalLink, Loader2
@@ -104,7 +105,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
                isSent ? <><Clock size={10} className="inline mr-1" />Enviada</> : "Archivada"}
             </Badge>
             <p className="text-[10px] text-gray-400 font-medium mt-1">
-              {new Date(contact.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "short" })}
+              {formatDateTZ(contact.created_at)}
             </p>
           </div>
           {expanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
@@ -162,7 +163,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
                     )}
                     <span>{isInst ? institutionName : faculty.full_name}</span>
                     <span>·</span>
-                    <span>{new Date(msg.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</span>
+                    <span>{formatDateTimeTZ(msg.created_at)}</span>
                   </div>
                   <div className={`max-w-[80%] p-4 rounded-2xl ${isInst ? "bg-talentia-blue text-white rounded-tr-sm" : "bg-gray-100 text-navy rounded-tl-sm"}`}>
                     {/* Meta tags only for first institution message */}

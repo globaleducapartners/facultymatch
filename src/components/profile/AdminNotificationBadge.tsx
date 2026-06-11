@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Bell, X, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase-client";
+import { formatDateTimeTZ } from "@/lib/utils";
 
 interface Notification {
   id: string;
@@ -119,9 +120,7 @@ export default function AdminNotificationBadge() {
                         <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-2">{n.body}</p>
                       )}
                       <p className="text-[9px] text-gray-400 mt-1">
-                        {new Date(n.sent_at).toLocaleDateString("es-ES", {
-                          day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
-                        })}
+                        {formatDateTimeTZ(n.sent_at)}
                       </p>
                     </div>
                     <button

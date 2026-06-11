@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Archive, Clock, CheckCircle2, Mail, ChevronDown, ChevronUp, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { formatDateTZ, formatDateTimeTZ } from "@/lib/utils";
 import { ReplyDialog } from "./ReplyDialog";
 import { updateStatus } from "./actions";
 import { replyToContact } from "@/app/auth/actions";
@@ -93,7 +94,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
             )}
           </div>
           <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
-            {new Date(req.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "long" })}
+            {formatDateTZ(req.created_at, { day: "numeric", month: "long" })}
             {req.institution?.country && ` · ${req.institution.country}`}
           </p>
         </div>
@@ -163,7 +164,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
               return (
                 <div key={index} className={`flex flex-col ${isInst ? "items-start" : "items-end"} gap-1`}>
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">
-                    {isInst ? req.institution?.name : "Tu respuesta"} {msg.created_at ? `· ${new Date(msg.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}` : ""}
+                    {isInst ? req.institution?.name : "Tu respuesta"} {msg.created_at ? `· ${formatDateTimeTZ(msg.created_at)}` : ""}
                   </p>
                   <div className={`max-w-[85%] p-4 rounded-2xl ${isInst ? "bg-gray-100 text-navy rounded-tl-sm" : "bg-talentia-blue text-white rounded-tr-sm"}`}>
                     {/* Meta tags for first institution message */}
@@ -286,7 +287,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
                 <div className="bg-gray-100 p-2.5 rounded-xl flex-shrink-0"><Archive size={18} className="text-gray-300" /></div>
                 <div>
                   <h4 className="text-sm font-bold text-navy">{req.institution?.name}</h4>
-                  <p className="text-xs text-gray-400 mt-0.5">Archivada · {new Date(req.created_at).toLocaleDateString("es-ES")}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Archivada · {formatDateTZ(req.created_at)}</p>
                 </div>
               </div>
             ))}

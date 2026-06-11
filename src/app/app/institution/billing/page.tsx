@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Zap, Star, Mail } from "lucide-react";
 import { StripeCancelButton } from "@/components/profile/StripeCancelButton";
+import { formatDateTZ } from "@/lib/utils";
 
 export default async function BillingPage() {
   const supabase = await createClient();
@@ -20,7 +21,7 @@ export default async function BillingPage() {
   const isEssential = !isPro && !isGrowth;
 
   const periodEnd = profile?.subscription_current_period_end
-    ? new Date(profile.subscription_current_period_end).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })
+    ? formatDateTZ(profile.subscription_current_period_end, { day: "numeric", month: "long", year: "numeric" })
     : null;
 
   const essentialFeatures = [
