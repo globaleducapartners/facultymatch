@@ -23,7 +23,7 @@ export default async function PrivacyPage({
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
     .select("*")
-    .eq("id", user.id)
+    .eq("user_id", user.id)
     .maybeSingle();
 
   // Plan lives in user_profiles (set by Stripe webhook)
@@ -538,6 +538,11 @@ export default async function PrivacyPage({
               <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                 <Star size={20} className="text-energy-orange" />
                 Visibilidad preferente
+                {isPremium && (
+                  <Badge className="bg-gradient-to-r from-energy-orange to-orange-500 text-white text-[8px] font-black uppercase tracking-widest border-none ml-1">
+                    Pro
+                  </Badge>
+                )}
               </CardTitle>
               <CardDescription className="font-medium text-xs">
                 Aparece primero cuando estas instituciones busquen docentes.
