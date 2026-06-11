@@ -84,7 +84,10 @@ export default async function ApprovedPage() {
       degrees: fp.degrees || [],
       languages: fp.languages || [],
       website: fp.website || meta.website || null,
+      google_scholar_id: fp.google_scholar_id || null,
+      orcid_id: fp.orcid_id || null,
       is_phd: fp.is_phd || meta.is_phd || false,
+      name_visibility: fp.name_visibility || "public",
       documents: docsMap[p.id] || [],
     };
   });

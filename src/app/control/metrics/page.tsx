@@ -2,7 +2,7 @@ import { createAdminClient } from "@/lib/supabase-server";
 import {
   Users, Building2, GraduationCap, Clock, CheckCircle2, XCircle,
   TrendingUp, Mail, UserPlus, Repeat2, Award, Globe, MapPin,
-  BookOpen,
+  BookOpen, Eye, Send,
 } from "lucide-react";
 
 function StatCard({
@@ -76,6 +76,37 @@ export default async function MetricsPage() {
     admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("role", "faculty").eq("is_phd", true),
     admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("role", "faculty").eq("aneca_accreditation", true),
   ]);
+
+  // View count from faculty_profiles
+  const { data: viewData } = await admin
+    .from("faculty_profiles")
+    .select("view_count")
+    .limit(1000);
+  const totalViews = (viewData ?? []).reduce((sum, fp: any) => sum + (fp.view_count || 0), 0);
+
+  // Email logs count
+  const { count: emailLogCount } = await admin
+    .from("email_logs")
+    .select("*", { count: "exact", head: true });
+
+  // Top viewed profiles
+  const { data: topProfiles } = await admin
+    .from("faculty_profiles")
+    .select("user_id, view_count, headline")
+    .order("view_count", { ascending: false })
+    .limit(5);
+
+  let topNames: Record<string, string> = {};
+  if (topProfiles?.length) {
+    const ids = topProfiles.map((p: any) => p.user_id);
+    const { data: users } = await admin
+      .from("user_profiles")
+      .select("id, full_name")
+      .in("id", ids);
+    if (users) {
+      users.forEach((u: any) => { topNames[u.id] = u.full_name || "Sin nombre"; });
+    }
+  }
 
   // Recent signups
   const [{ data: recentFaculty }, { data: recentInstitutions }] = await Promise.all([
@@ -172,6 +203,42 @@ export default async function MetricsPage() {
           <StatCard icon={TrendingUp}    label="Tasa de conversión"       value={conversionRate}      color="orange" sub="Docentes → institución" />
         </div>
       </section>
+
+      {/* Engagement */}
+      <section className="space-y-3">
+        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Engagement & comunicación</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard icon={Eye}   label="Visitas a perfiles"   value={totalViews}          color="blue"   sub="Totales acumuladas" />
+          <StatCard icon={Send}  label="Emails enviados"      value={emailLogCount ?? 0}  color="purple" sub="Desde el panel admin" />
+          <StatCard icon={Mail}  label="Contactos totales"    value={totalContacts ?? 0}  color="green"  sub={`${contactsMonth ?? 0} este mes`} />
+          <StatCard icon={Users} label="Docentes registrados" value={totalFaculty ?? 0}   color="orange" sub={`${facultyThisMonth ?? 0} este mes`} />
+        </div>
+      </section>
+
+      {/* Top viewed profiles */}
+      {topProfiles && topProfiles.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+            <Eye size={16} className="text-talentia-blue" />
+            <h3 className="text-sm font-black text-navy">Perfiles más vistos</h3>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {topProfiles.map((fp: any, i: number) => (
+              <div key={fp.user_id} className="flex items-center gap-3 px-5 py-3">
+                <span className="w-6 text-center text-xs font-black text-gray-400">#{i + 1}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-navy truncate">{topNames[fp.user_id] || "Sin nombre"}</p>
+                  {fp.headline && <p className="text-[11px] text-gray-400 truncate">{fp.headline}</p>}
+                </div>
+                <div className="flex items-center gap-1 text-sm font-black text-talentia-blue">
+                  <Eye size={14} />
+                  {fp.view_count ?? 0}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Areas & Nationalities */}
       <div className="grid lg:grid-cols-2 gap-6">

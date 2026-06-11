@@ -20,14 +20,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Subject and body are required" }, { status: 400 });
   }
 
-  // Get user emails by segment
+  // Get user emails by segment — also build email→id map for logging
   let emails: string[] = [];
+  const emailToId: Record<string, string> = {};
+
+  // Build map of email → user_id from auth for logging
+  const { data: authData } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  (authData?.users ?? []).forEach((u) => {
+    if (u.email) emailToId[u.email] = u.id;
+  });
 
   if (segment === "faculty" || segment === "all") {
     const { data: facultyUsers } = await admin.from("user_profiles").select("id").eq("role", "faculty").limit(1000);
     if (facultyUsers?.length) {
       const ids = facultyUsers.map(u => u.id);
-      const { data: authData } = await admin.auth.admin.listUsers({ perPage: 1000 });
       const facultyEmails = (authData?.users ?? [])
         .filter(u => ids.includes(u.id) && u.email)
         .map(u => u.email!);
@@ -39,12 +45,17 @@ export async function POST(request: Request) {
     const { data: instUsers } = await admin.from("institutions").select("contact_email, user_id").limit(500);
     if (instUsers?.length) {
       const instIds = instUsers.map(u => u.user_id).filter(Boolean);
-      const { data: authData } = await admin.auth.admin.listUsers({ perPage: 1000 });
       const instEmails = (authData?.users ?? [])
         .filter(u => instIds.includes(u.id) && u.email)
         .map(u => u.email!);
-      // Merge with contact_email
+      // Also add contact_emails that aren't in auth, and map them
       const directEmails = instUsers.map(u => u.contact_email).filter(Boolean) as string[];
+      directEmails.forEach((e) => {
+        if (!emailToId[e]) {
+          const matchingUser = instUsers.find((u: any) => u.contact_email === e && u.user_id);
+          if (matchingUser?.user_id) emailToId[e] = matchingUser.user_id;
+        }
+      });
       const allInstEmails = [...new Set([...instEmails, ...directEmails])];
       emails.push(...allInstEmails);
     }
@@ -113,6 +124,21 @@ export async function POST(request: Request) {
     } catch {
       errors += batch.length;
     }
+  }
+
+  // Log all sent emails to email_logs
+  const logEntries = emails.map((email) => ({
+    recipient_id: emailToId[email] || null,
+    recipient_email: email,
+    template: "broadcast",
+    subject,
+    metadata: { admin_id: user.id, segment: segment || null },
+  }));
+
+  // Insert in batches of 100
+  for (let i = 0; i < logEntries.length; i += 100) {
+    const batch = logEntries.slice(i, i + 100);
+    try { await admin.from("email_logs").insert(batch); } catch {}
   }
 
   return NextResponse.json({ success: true, sent, errors, total: emails.length });

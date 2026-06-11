@@ -20,10 +20,12 @@ import {
   Globe,
   Zap,
   Star,
+  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import DismissNotificationButton from "@/components/profile/DismissNotificationButton";
 
 // ─── Resource articles ────────────────────────────────────────────────────────
 
@@ -96,6 +98,7 @@ export default async function EducatorDashboard() {
     { data: expertiseData },
     { count: favoritesCount },
     { count: contactsCount },
+    { data: adminNotifications },
   ] = await Promise.all([
     supabase.from("faculty_profiles").select("*").eq("user_id", user.id).maybeSingle(),
     supabase
@@ -107,6 +110,13 @@ export default async function EducatorDashboard() {
     supabase.from("faculty_expertise").select("id").eq("faculty_id", user.id).limit(1),
     admin.from("favorites").select("*", { count: "exact", head: true }).eq("faculty_id", user.id),
     admin.from("contacts").select("*", { count: "exact", head: true }).eq("faculty_id", user.id),
+    supabase
+      .from("admin_notifications")
+      .select("*")
+      .eq("faculty_id", user.id)
+      .is("read_at", null)
+      .order("sent_at", { ascending: false })
+      .limit(5),
   ]);
 
   const userMeta = user.user_metadata || {};
@@ -258,6 +268,23 @@ export default async function EducatorDashboard() {
           </div>
         </div>
       )}
+
+      {/* ── Admin Notifications ── */}
+      {adminNotifications && adminNotifications.length > 0 && adminNotifications.map((notif: any) => (
+        <div key={notif.id} className="bg-purple-50 border border-purple-200 rounded-2xl p-4 flex items-start gap-4">
+          <div className="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Bell size={18} className="text-purple-600" />
+          </div>
+          <div className="flex-1">
+            <p className="font-black text-purple-800 text-sm">{notif.subject}</p>
+            {notif.body && <p className="text-sm text-purple-600 font-medium mt-0.5">{notif.body}</p>}
+            <p className="text-[10px] text-purple-400 font-semibold mt-1">
+              {new Date(notif.sent_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+            </p>
+          </div>
+          <DismissNotificationButton notificationId={notif.id} />
+        </div>
+      ))}
 
       {/* ── Visibility & Completeness Alerts ── */}
       {(progress < 100 || !facultyProfile?.visibility || facultyProfile?.visibility === "hidden" || facultyProfile?.visibility === "private") && (
