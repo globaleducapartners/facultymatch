@@ -3,6 +3,56 @@ import { InstitutionSearchPage } from "@/components/dashboard/InstitutionSearchP
 import { InstitutionWelcomeBanner } from "@/components/dashboard/InstitutionWelcomeBanner";
 import { redirect } from "next/navigation";
 
+// ─── Area → Spanish keywords mapping ──────────────────────────────────────────
+const AREA_KEYWORDS: Record<string, string[]> = {
+  "Business & Management": [
+    "negocios", "business", "management", "administración", "administracion",
+    "marketing", "ventas", "emprendimiento", "emprendedurismo",
+    "recursos humanos", "logística", "logistica", "comercio",
+  ],
+  "Economía & Finanzas": [
+    "economía", "economia", "finanzas", "financiero", "contabilidad",
+    "mba", "finance",
+  ],
+  "Derecho & Ciencias Políticas": [
+    "derecho", "jurídico", "juridico", "políticas", "politicas",
+    "ciencias políticas", "civil", "penal", "constitucional",
+    "internacional", "extranjería",
+  ],
+  "Ingeniería & Tecnología": [
+    "ingeniería", "ingenieria", "tecnología", "tecnologia",
+    "informática", "informatica", "sistemas", "técnico", "tecnico",
+  ],
+  "IA & Datos": [
+    "ia", "datos", "inteligencia artificial", "data",
+    "machine learning", "big data",
+  ],
+  "Salud & Ciencias": [
+    "salud", "enfermería", "enfermeria", "farmacia", "nutrición",
+    "nutricion", "medicina", "ciencias", "dietética", "dietetica",
+    "emergencias",
+  ],
+  "Comunicación & Marketing": [
+    "comunicación", "comunicacion", "marketing", "periodismo",
+    "publicidad", "relaciones públicas", "relaciones publicas",
+  ],
+  "Educación": [
+    "educación", "educacion", "docencia", "formación", "formacion",
+    "pedagógica", "pedagogica", "enseñanza", "ensenanza",
+    "orientación", "orientacion", "tutoría", "tutoria",
+    "formación profesional",
+  ],
+  "Otros": [],
+};
+
+function getAreaKeywords(area: string): string[] {
+  // Direct match in the mapping
+  const matched = AREA_KEYWORDS[area];
+  if (matched) return matched;
+  // If not found, use the area string itself as a keyword
+  return [area.toLowerCase()];
+}
+
 export default async function InstitutionSearchRoute({
   searchParams,
 }: {
@@ -74,25 +124,73 @@ export default async function InstitutionSearchRoute({
     ? `${year + 1}-01-01`
     : `${year}-${String(monthNum + 1).padStart(2, "0")}-01`;
 
-  // Area / subarea: resolve matching faculty IDs from faculty_expertise table
-  const areaExpertiseQuery = (area || subarea)
+  // ── Area / subarea: broad multi-field search ─────────────────────────────
+  const hasAreaFilter = !!(area || subarea);
+
+  // Resolve area keywords (from mapping or direct)
+  const areaKeywords = area ? getAreaKeywords(area) : [];
+  // Subarea param → use as an additional keyword
+  if (subarea && !areaKeywords.includes(subarea.toLowerCase())) {
+    areaKeywords.push(subarea.toLowerCase());
+  }
+
+  // Query 1: faculty_expertise — match across area, subarea
+  const areaExpertiseQuery = areaKeywords.length > 0
     ? (() => {
-        let q = admin.from("faculty_expertise").select("faculty_id");
-        if (area)    q = q.ilike("area", `%${area}%`);
-        if (subarea) q = q.or(`area.ilike.%${subarea}%,level.ilike.%${subarea}%`);
-        return q;
+        // Build OR conditions for each keyword across area + subarea
+        const conditions: string[] = [];
+        for (const kw of areaKeywords) {
+          conditions.push(`area.ilike.%${kw}%`);
+          conditions.push(`subarea.ilike.%${kw}%`);
+        }
+        // Also include original area text and subarea text for direct match
+        if (area) {
+          conditions.push(`area.ilike.%${area}%`);
+          conditions.push(`subarea.ilike.%${area}%`);
+        }
+        if (subarea) {
+          conditions.push(`area.ilike.%${subarea}%`);
+          conditions.push(`subarea.ilike.%${subarea}%`);
+        }
+        return admin.from("faculty_expertise").select("faculty_id").or(conditions.join(","));
       })()
     : Promise.resolve({ data: null as null | { faculty_id: string }[] });
 
-  // Also search faculty_profiles.faculty_areas (where new signups store their areas)
-  const areaProfilesQuery = area
-    ? admin.from("faculty_profiles").select("id").contains("faculty_areas", [area])
+  // Query 2: faculty_profiles — match across headline, bio, subjects, degrees
+  const areaProfilesQuery = areaKeywords.length > 0
+    ? (() => {
+        const fpConditions: string[] = [];
+        for (const kw of areaKeywords) {
+          fpConditions.push(`headline.ilike.%${kw}%`);
+          fpConditions.push(`bio.ilike.%${kw}%`);
+          fpConditions.push(`degrees.ilike.%${kw}%`);
+          // subjects array — PostgREST @> (contains) with case‑insensitive match
+          fpConditions.push(`subjects.ilike.%${kw}%`);
+        }
+        // Also original text
+        if (area) {
+          fpConditions.push(`headline.ilike.%${area}%`);
+          fpConditions.push(`bio.ilike.%${area}%`);
+          fpConditions.push(`degrees.ilike.%${area}%`);
+          fpConditions.push(`subjects.ilike.%${area}%`);
+        }
+        if (subarea) {
+          fpConditions.push(`headline.ilike.%${subarea}%`);
+          fpConditions.push(`bio.ilike.%${subarea}%`);
+          fpConditions.push(`degrees.ilike.%${subarea}%`);
+          fpConditions.push(`subjects.ilike.%${subarea}%`);
+        }
+        return admin.from("faculty_profiles").select("id").or(fpConditions.join(","));
+      })()
     : Promise.resolve({ data: null as null | { id: string }[] });
 
   // Text search: use admin to bypass RLS on user_profiles
   const namePreQuery = query
     ? admin.from("user_profiles").select("id").ilike("full_name", `%${query}%`)
     : Promise.resolve({ data: null as null | { id: string }[] });
+
+  // Pre-fetch which faculty IDs have expertise entries (for completeness scoring)
+  const allExpertiseQuery = admin.from("faculty_expertise").select("faculty_id");
 
   // Extract the institution's email domain for domain-based blocking
   const userEmailDomain = user.email?.split("@")[1]?.toLowerCase() || null;
@@ -107,6 +205,7 @@ export default async function InstitutionSearchRoute({
     { data: areaMatchData },
     { data: areaProfilesData },
     { data: nameMatchData },
+    { data: allExpertiseData },
   ] = await Promise.all([
     admin.from("favorites").select("faculty_id").eq("institution_id", institution.id),
     supabase.from("contacts").select("*", { count: "exact", head: true }).eq("institution_id", institution.id),
@@ -124,6 +223,7 @@ export default async function InstitutionSearchRoute({
     areaExpertiseQuery,
     areaProfilesQuery,
     namePreQuery,
+    allExpertiseQuery,
   ]);
 
   const favorites = favoritesData?.map((f: any) => f.faculty_id) || [];
@@ -134,16 +234,18 @@ export default async function InstitutionSearchRoute({
     ...(blockedByDomain || []).map((r: any) => r.faculty_id),
   ]);
 
-  // Merge area matches from faculty_expertise AND faculty_profiles.faculty_areas
+  // Merge area matches from faculty_expertise AND faculty_profiles headline/bio
   const areaMatchIds: string[] = [...new Set([
     ...(areaMatchData   || []).map((e: any) => e.faculty_id),
     ...(areaProfilesData || []).map((p: any) => p.id),
   ])];
   const nameMatchIds: string[] = (nameMatchData || []).map((m: any) => m.id);
+  const hasExpertiseIds = new Set((allExpertiseData || []).map((e: any) => e.faculty_id));
 
-  // If area/subarea filter is active but produced zero matches, bail out early
-  const hasAreaFilter = !!(area || subarea);
-  const earlyEmpty = hasAreaFilter && areaMatchIds.length === 0;
+  // ── NOTE: earlyEmpty has been REMOVED ──
+  // Instead of returning empty when area filter has zero matches,
+  // we let the broader query run. If no results, the UI will show
+  // "No se han encontrado docentes" as a fallback.
 
   const isNewUser = !!(
     institution.created_at &&
@@ -161,23 +263,6 @@ export default async function InstitutionSearchRoute({
     />
   ) : null;
 
-  if (earlyEmpty) {
-    return (
-      <>
-        {welcomeBanner}
-        <InstitutionSearchPage
-          initialEducators={[]}
-          institutionId={institution.id || ""}
-          searchParams={params}
-          initialFavorites={favorites}
-          isPro={isPro}
-          searchLimitReached={searchLimitReached}
-          monthlyContactsUsed={monthlyContactsUsed ?? 0}
-        />
-      </>
-    );
-  }
-
   // ── Main DB query with all filters pushed down ────────────────────────────
   let educatorQuery = admin
     .from("faculty_profiles")
@@ -189,9 +274,15 @@ export default async function InstitutionSearchRoute({
     educatorQuery = educatorQuery.not("id", "in", `(${[...blockedFacultyIds].join(",")})`);
   }
 
-  // Text search: headline + bio + full_name (via pre-queried IDs)
+  // Broad text search: headline + bio + current_institution + subjects + degrees + full_name (via pre-queried IDs)
   if (query) {
-    const orParts = [`headline.ilike.%${query}%`, `bio.ilike.%${query}%`];
+    const orParts = [
+      `headline.ilike.%${query}%`,
+      `bio.ilike.%${query}%`,
+      `current_institution.ilike.%${query}%`,
+      `degrees.ilike.%${query}%`,
+      `subjects.ilike.%${query}%`,
+    ];
     if (nameMatchIds.length > 0) {
       orParts.push(`id.in.(${nameMatchIds.join(",")})`);
     }
@@ -203,9 +294,31 @@ export default async function InstitutionSearchRoute({
     educatorQuery = educatorQuery.ilike("location", `%${country}%`);
   }
 
-  // Area / subarea (resolved via pre-query)
-  if (hasAreaFilter) {
+  // Area / subarea (resolved via broad pre-query)
+  if (hasAreaFilter && areaMatchIds.length > 0) {
     educatorQuery = educatorQuery.in("id", areaMatchIds);
+  } else if (hasAreaFilter && areaKeywords.length > 0 && areaMatchIds.length === 0) {
+    // Fallback: no exact matches from pre-queries, try inline ilike on the main query
+    const fpConditions: string[] = [];
+    for (const kw of areaKeywords) {
+      fpConditions.push(`headline.ilike.%${kw}%`);
+      fpConditions.push(`bio.ilike.%${kw}%`);
+      fpConditions.push(`degrees.ilike.%${kw}%`);
+      fpConditions.push(`subjects.ilike.%${kw}%`);
+    }
+    if (area) {
+      fpConditions.push(`headline.ilike.%${area}%`);
+      fpConditions.push(`bio.ilike.%${area}%`);
+      fpConditions.push(`degrees.ilike.%${area}%`);
+      fpConditions.push(`subjects.ilike.%${area}%`);
+    }
+    if (subarea) {
+      fpConditions.push(`headline.ilike.%${subarea}%`);
+      fpConditions.push(`bio.ilike.%${subarea}%`);
+      fpConditions.push(`degrees.ilike.%${subarea}%`);
+      fpConditions.push(`subjects.ilike.%${subarea}%`);
+    }
+    educatorQuery = (educatorQuery as any).or(fpConditions.join(","));
   }
 
   // PhD
@@ -250,11 +363,33 @@ export default async function InstitutionSearchRoute({
     }
   }
 
+  // ── Transform + sort by Pro status + profile completeness ────────────────
   const transformedEducators = (educators || [])
     .map((ed: any) => {
       const userJoin = ed.user;
       const userObj = Array.isArray(userJoin) ? userJoin[0] : userJoin;
       const isFacultyPro = userObj?.plan === "faculty-pro" && userObj?.subscription_status === "active";
+
+      // Profile completeness scoring (0–100)
+      const hasAvatar = !!userObj?.avatar_url;
+      const hasBio = !!ed.bio;
+      const hasHeadline = !!ed.headline;
+      const hasDegrees = Array.isArray(ed.degrees) && ed.degrees.length > 0;
+      const docCount = documentsMap[ed.id]?.length || 0;
+      const hasExpertise = hasExpertiseIds.has(ed.id);
+      const hasLanguages = Array.isArray(ed.languages) && ed.languages.length > 0;
+      const hasAneca = !!ed.aneca_accreditation;
+
+      const completenessScore =
+        (hasAvatar ? 25 : 0) +
+        (hasBio ? 20 : 0) +
+        (hasHeadline ? 10 : 0) +
+        (hasDegrees ? 15 : 0) +
+        (docCount > 0 ? 10 : 0) +
+        (hasExpertise ? 10 : 0) +
+        (hasLanguages ? 5 : 0) +
+        (hasAneca ? 5 : 0);
+
       return {
         ...ed,
         full_name: userObj?.full_name || ed.full_name || "Docente",
@@ -264,12 +399,17 @@ export default async function InstitutionSearchRoute({
         experience_years: ed.years_teaching || ed.years_experience || 0,
         is_pro: isFacultyPro,
         faculty_documents: documentsMap[ed.id] || [],
+        _completeness: completenessScore,
       };
     })
     .sort((a: any, b: any) => {
+      // 1. Pro users first
       if (a.is_pro && !b.is_pro) return -1;
       if (!a.is_pro && b.is_pro) return 1;
-      return 0;
+      // 2. Then by completeness score (descending)
+      if (b._completeness !== a._completeness) return b._completeness - a._completeness;
+      // 3. Then alphabetically
+      return (a.full_name || "").localeCompare(b.full_name || "");
     });
 
   return (
