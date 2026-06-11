@@ -1,7 +1,7 @@
 import { ApproveButtons } from "./ApproveButtons";
 import { InstitutionActions } from "./InstitutionActions";
 import { createAdminClient } from "@/lib/supabase-server";
-import { Building2, Globe, Mail, Phone, MapPin, Calendar, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Building2, Globe, Mail, Phone, MapPin, Calendar, CheckCircle2, XCircle, Clock, Zap, MessageSquare, Heart, Activity, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 async function toggleInstitutionStatus(formData: FormData) {
@@ -88,6 +88,65 @@ export default async function ControlInstitutionsPage() {
     return inst.contact_email || authEmailMap[inst.user_id || inst.id] || null;
   }
 
+  // ── Contacts & Favorites aggregation ──
+  const contactStats = new Map<string, { count: number; lastActivity: string }>();
+  const favoriteStats = new Map<string, { count: number; lastActivity: string }>();
+
+  const { data: allContacts } = await admin
+    .from("contacts")
+    .select("institution_id, created_at");
+  if (allContacts) {
+    for (const c of allContacts) {
+      if (!c.institution_id) continue;
+      const prev = contactStats.get(c.institution_id) || { count: 0, lastActivity: "" };
+      prev.count++;
+      if (c.created_at && c.created_at > prev.lastActivity) prev.lastActivity = c.created_at;
+      contactStats.set(c.institution_id, prev);
+    }
+  }
+
+  const { data: allFavorites } = await admin
+    .from("favorites")
+    .select("institution_id, created_at");
+  if (allFavorites) {
+    for (const f of allFavorites) {
+      if (!f.institution_id) continue;
+      const prev = favoriteStats.get(f.institution_id) || { count: 0, lastActivity: "" };
+      prev.count++;
+      if (f.created_at && f.created_at > prev.lastActivity) prev.lastActivity = f.created_at;
+      favoriteStats.set(f.institution_id, prev);
+    }
+  }
+
+  // Enrich institutions with intention / stats
+  type IntentionLevel = "alta" | "media" | "baja";
+  function getIntention(instId: string): IntentionLevel {
+    const contacts = contactStats.get(instId);
+    const favorites = favoriteStats.get(instId);
+    const hasContacts = (contacts?.count ?? 0) > 0;
+    const hasFavorites = (favorites?.count ?? 0) > 0;
+    if (hasContacts) return "alta";
+    if (hasFavorites) return "media";
+    return "baja";
+  }
+  function getLastActivity(instId: string): string | null {
+    const c = contactStats.get(instId);
+    const f = favoriteStats.get(instId);
+    const candidates = [c?.lastActivity, f?.lastActivity].filter(Boolean) as string[];
+    return candidates.length ? candidates.sort().reverse()[0] : null;
+  }
+
+  // Sort: alta first, then media, then baja; secondary by created_at desc
+  if (institutions) {
+    const intentionRank = { alta: 0, media: 1, baja: 2 };
+    institutions.sort((a, b) => {
+      const rA = intentionRank[getIntention(a.id)];
+      const rB = intentionRank[getIntention(b.id)];
+      if (rA !== rB) return rA - rB;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }
+
   if (error) {
     return (
       <div className="p-8">
@@ -114,11 +173,12 @@ export default async function ControlInstitutionsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {[
           { label: "Total registradas", value: total, icon: Building2, color: "text-talentia-blue bg-blue-50" },
           { label: "Activas / Aprobadas", value: active, icon: CheckCircle2, color: "text-green-600 bg-green-50" },
           { label: "Pendientes", value: pendingCount, icon: Clock, color: "text-amber-600 bg-amber-50" },
+          { label: "Alta intención", value: (institutions ?? []).filter(i => getIntention(i.id) === "alta").length, icon: TrendingUp, color: "text-emerald-600 bg-emerald-50" },
           { label: "Bloqueadas / Rechazadas", value: blocked + rejected, icon: XCircle, color: "text-red-500 bg-red-50" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
@@ -211,6 +271,12 @@ export default async function ControlInstitutionsPage() {
           <div className="divide-y divide-gray-50">
             {institutions.map((inst) => {
               const isActive = inst.status === "active" || inst.status === "approved";
+              const intentionLevel = getIntention(inst.id);
+              const intentionBadge = intentionLevel === "alta"
+                ? <Badge className="bg-emerald-50 text-emerald-700 border-none text-[10px] font-black flex items-center gap-1"><Zap size={10} /> Alta intención</Badge>
+                : intentionLevel === "media"
+                  ? <Badge className="bg-amber-50 text-amber-700 border-none text-[10px] font-black flex items-center gap-1"><Heart size={10} /> Int. media</Badge>
+                  : <Badge className="bg-gray-100 text-gray-500 border-none text-[10px] font-black flex items-center gap-1">Int. baja</Badge>;
               const statusBadge = isActive
                 ? <Badge className="bg-green-50 text-green-700 border-none text-[10px] font-black flex items-center gap-1"><CheckCircle2 size={10} /> Aprobada</Badge>
                 : inst.status === "blocked"
@@ -242,6 +308,7 @@ export default async function ControlInstitutionsPage() {
                             {inst.institution_type || inst.type}
                           </Badge>
                         )}
+                        {intentionBadge}
                       </div>
 
                       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
@@ -275,6 +342,21 @@ export default async function ControlInstitutionsPage() {
                             <Calendar size={11} /> {new Date(inst.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
                           </span>
                         )}
+                        {/* Stats */}
+                        <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">
+                          <MessageSquare size={11} /> {contactStats.get(inst.id)?.count ?? 0} contactos
+                        </span>
+                        <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">
+                          <Heart size={11} /> {favoriteStats.get(inst.id)?.count ?? 0} favoritos
+                        </span>
+                        {(() => {
+                          const lastAct = getLastActivity(inst.id);
+                          return lastAct ? (
+                            <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">
+                              <Activity size={11} /> {new Date(lastAct).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </span>
+                          ) : null;
+                        })()}
                       </div>
 
                       {inst.description && (
