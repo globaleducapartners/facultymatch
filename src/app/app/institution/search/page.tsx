@@ -37,7 +37,8 @@ export default async function InstitutionSearchRoute({
     .eq("id", user.id)
     .single();
 
-  const isPro = userProfile?.plan === "institution-pro" && userProfile?.subscription_status === "active";
+  const isPro = (userProfile?.plan === "institution-pro" || userProfile?.plan === "institution-growth") &&
+    (userProfile?.subscription_status === "active" || userProfile?.subscription_status === "trialing");
 
   const hasSearchParams = !!(
     params.query || params.area || params.subarea || params.country ||
@@ -230,6 +231,25 @@ export default async function InstitutionSearchRoute({
   // First page: 50 results
   const { data: educators } = await educatorQuery.range(0, 49);
 
+  // ── Batch fetch faculty documents for all educators ─────────────────────
+  const educatorIds = (educators || []).map((ed: any) => ed.id);
+  let documentsMap: Record<string, any[]> = {};
+  if (educatorIds.length > 0) {
+    const { data: allDocs } = await admin
+      .from("faculty_documents")
+      .select("id, name, file_name, file_path, doc_type, faculty_id, created_at")
+      .in("faculty_id", educatorIds)
+      .order("created_at", { ascending: false });
+    if (allDocs) {
+      documentsMap = allDocs.reduce((acc: Record<string, any[]>, doc: any) => {
+        const fid = doc.faculty_id;
+        if (!acc[fid]) acc[fid] = [];
+        acc[fid].push(doc);
+        return acc;
+      }, {});
+    }
+  }
+
   const transformedEducators = (educators || [])
     .map((ed: any) => {
       const userJoin = ed.user;
@@ -243,6 +263,7 @@ export default async function InstitutionSearchRoute({
         city: ed.city || null,
         experience_years: ed.years_teaching || ed.years_experience || 0,
         is_pro: isFacultyPro,
+        faculty_documents: documentsMap[ed.id] || [],
       };
     })
     .sort((a: any, b: any) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Filter,
@@ -16,6 +16,13 @@ import {
   Lock,
   Zap,
   ChevronDown,
+  Building2,
+  GraduationCap,
+  Eye,
+  FileText,
+  Phone,
+  AtSign,
+  MessageCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,6 +33,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { toggleFavorite, switchActiveMode } from "@/app/auth/actions";
 import { toast } from "sonner";
+import { ProfileViewTracker } from "@/components/profile/ProfileViewTracker";
+import { getDocumentUrl } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -111,6 +120,42 @@ export function InstitutionSearchPage({
   const canContact = !isReadOnly && (isPro || usedContacts < FREE_CONTACTS_LIMIT);
 
   const selectedEducator = initialEducators.find((e) => e.id === selectedId);
+
+  // Documents: prefer pre-loaded data from server, fallback to on-demand fetch
+  const [facultyDocs, setFacultyDocs] = useState<any[]>([]);
+  const [loadingDocs, setLoadingDocs] = useState(false);
+  const [docsFetched, setDocsFetched] = useState(false);
+
+  useEffect(() => {
+    if (!selectedEducator) {
+      setFacultyDocs([]);
+      setDocsFetched(false);
+      return;
+    }
+
+    // If documents are pre-loaded from server, use them immediately
+    const preloaded = (selectedEducator as any).faculty_documents;
+    if (Array.isArray(preloaded) && preloaded.length > 0) {
+      setFacultyDocs(preloaded);
+      setDocsFetched(true);
+      return;
+    }
+
+    // Fallback: fetch on-demand if no pre-loaded data
+    if (!docsFetched) {
+      setLoadingDocs(true);
+      fetch(`/api/faculty/documents?facultyId=${selectedId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setFacultyDocs(Array.isArray(data) ? data : []);
+        })
+        .catch(() => setFacultyDocs([]))
+        .finally(() => {
+          setLoadingDocs(false);
+          setDocsFetched(true);
+        });
+    }
+  }, [selectedEducator, selectedId, docsFetched]);
 
   // ── URL sync ──────────────────────────────────────────────────────────────
 
@@ -502,6 +547,8 @@ export function InstitutionSearchPage({
         <SheetContent side="right" className="sm:max-w-[480px] w-full p-0 flex flex-col overflow-hidden">
           {selectedEducator && (
             <>
+              {/* Track view when drawer opens */}
+              <ProfileViewTracker facultyId={selectedEducator.id} />
               {/* Header */}
               <div className="p-6 border-b border-gray-100 flex gap-4 items-start flex-shrink-0 pr-14">
                 <div className="w-16 h-16 rounded-2xl overflow-hidden border border-gray-100 flex-shrink-0">
@@ -639,6 +686,12 @@ export function InstitutionSearchPage({
                           {selectedEducator.experience_years}+ años exp.
                         </div>
                       )}
+                      {selectedEducator.current_institution && (
+                        <div className="flex items-center gap-2 text-sm font-bold text-gray-600">
+                          <Building2 size={15} className="text-talentia-blue flex-shrink-0" />
+                          <span className="truncate">{selectedEducator.current_institution}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -691,6 +744,150 @@ export function InstitutionSearchPage({
                       </div>
                     </div>
                   )}
+
+                  {/* Degrees (up to 3) */}
+                  {Array.isArray(selectedEducator.degrees) && selectedEducator.degrees.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Formación</h4>
+                      <div className="space-y-2">
+                        {selectedEducator.degrees.slice(0, 3).map((deg: any, i: number) => (
+                          <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                            <div className="p-1.5 bg-white rounded-lg text-purple-600 border border-gray-100">
+                              <GraduationCap size={14} />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs font-bold text-navy truncate">
+                                {deg.type || deg.title || deg.degree || "Titulación"}
+                              </p>
+                              {deg.field && (
+                                <p className="text-[11px] font-medium text-talentia-blue truncate">{deg.field}</p>
+                              )}
+                              {deg.university && (
+                                <p className="text-[10px] text-gray-400 truncate">{deg.university}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        {selectedEducator.degrees.length > 3 && (
+                          <p className="text-xs text-gray-400 font-medium text-center">
+                            +{selectedEducator.degrees.length - 3} más
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Website/LinkedIn */}
+                  {(selectedEducator.website || selectedEducator.linkedin_url) && (
+                    <div className="space-y-2">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Enlaces</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedEducator.website && (
+                          <a
+                            href={selectedEducator.website}
+                            target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-talentia-blue bg-blue-50 px-3 py-1.5 rounded-xl hover:bg-blue-100 transition-colors"
+                          >
+                            <Globe size={12} />
+                            Web
+                            <ExternalLink size={10} />
+                          </a>
+                        )}
+                        {selectedEducator.linkedin_url && (
+                          <a
+                            href={selectedEducator.linkedin_url}
+                            target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0A66C2] bg-[#E8F4FD] px-3 py-1.5 rounded-xl hover:bg-[#D0E8F7] transition-colors"
+                          >
+                            LinkedIn
+                            <ExternalLink size={10} />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Documents ── */}
+                  {(loadingDocs || facultyDocs.length > 0) && (
+                    <div className="space-y-2">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Documentos</h4>
+                      {loadingDocs ? (
+                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                          <div className="w-5 h-5 rounded-full border-2 border-talentia-blue border-t-transparent animate-spin" />
+                          <span className="text-xs text-gray-400 font-medium">Cargando...</span>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {facultyDocs.map((doc: any) => (
+                            <a
+                              key={doc.id}
+                              href={getDocumentUrl(doc.file_path)}
+                              target="_blank" rel="noopener noreferrer"
+                              className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50/50 hover:border-blue-200 transition-all group border border-transparent"
+                            >
+                              <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-talentia-blue">
+                                <FileText size={14} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-bold text-navy truncate">{doc.name || doc.file_name || "Documento"}</p>
+                                <p className="text-[10px] font-semibold text-slate-400 uppercase">{doc.doc_type || "PDF"}</p>
+                              </div>
+                              <ExternalLink size={12} className="text-slate-300 group-hover:text-talentia-blue" />
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* ── Contact info (Pro only) ── */}
+                  {isPro && (selectedEducator.contact_email || selectedEducator.contact_whatsapp || selectedEducator.phone || selectedEducator.contact_linkedin) && (
+                    <div className="space-y-2">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Contacto directo</h4>
+                      <div className="space-y-2">
+                        {selectedEducator.contact_email && (
+                          <a href={`mailto:${selectedEducator.contact_email}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50/50 transition-all group">
+                            <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-talentia-blue">
+                              <AtSign size={14} />
+                            </div>
+                            <span className="text-xs font-semibold text-navy truncate flex-1">{selectedEducator.contact_email}</span>
+                          </a>
+                        )}
+                        {selectedEducator.contact_whatsapp && (
+                          <a href={`https://wa.me/${selectedEducator.contact_whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-green-50/50 transition-all group">
+                            <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-green-600">
+                              <MessageCircle size={14} />
+                            </div>
+                            <span className="text-xs font-semibold text-navy truncate flex-1">{selectedEducator.contact_whatsapp}</span>
+                          </a>
+                        )}
+                        {selectedEducator.phone && (
+                          <a href={`tel:${selectedEducator.phone}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50/50 transition-all group">
+                            <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-talentia-blue">
+                              <Phone size={14} />
+                            </div>
+                            <span className="text-xs font-semibold text-navy truncate flex-1">{selectedEducator.phone}</span>
+                          </a>
+                        )}
+                        {selectedEducator.contact_linkedin && (
+                          <a href={selectedEducator.contact_linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50/50 transition-all group">
+                            <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-[#0A66C2]">
+                              <ExternalLink size={14} />
+                            </div>
+                            <span className="text-xs font-semibold text-navy truncate flex-1">LinkedIn</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* View count — engagement signal */}
+                  <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl">
+                    <Eye size={15} className="text-gray-400" />
+                    <span className="text-xs font-bold text-gray-500">
+                      {selectedEducator.view_count ?? 0} {(selectedEducator.view_count ?? 0) === 1 ? "visita" : "visitas"} al perfil
+                    </span>
+                  </div>
                 </div>
               </div>
 

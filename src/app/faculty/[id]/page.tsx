@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
+import { ProfileViewTracker } from "@/components/profile/ProfileViewTracker";
 
 const AVAIL_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   open:          { label: "Disponible ahora",     color: "#059669", bg: "#F0FDF4" },
@@ -83,7 +84,11 @@ export default async function PublicFacultyProfilePage({
   const locationStr = [(faculty as any)?.city, (faculty as any)?.country || (faculty as any)?.location].filter(Boolean).join(", ");
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      {/* Track profile view */}
+      <ProfileViewTracker facultyId={resolvedId} />
+
+      <div className="min-h-screen bg-gray-50">
       {/* Nav */}
       <nav className="bg-white border-b border-gray-100 px-4 sm:px-6 py-4 sticky top-0 z-40 shadow-sm">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
@@ -342,5 +347,6 @@ export default async function PublicFacultyProfilePage({
         </p>
       </footer>
     </div>
+    </>
   );
 }

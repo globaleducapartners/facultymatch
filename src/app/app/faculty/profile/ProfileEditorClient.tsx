@@ -25,6 +25,7 @@ import { DegreeEditor } from "@/components/profile/DegreeEditor";
 import { InstitutionsTaughtEditor } from "@/components/profile/InstitutionsTaughtEditor";
 import { CVUpload } from "@/components/profile/CVUpload";
 import { InstitutionSelector } from "@/components/profile/InstitutionSelector";
+import { getDocumentUrl } from "@/lib/utils";
 
 // ─── Design tokens ─────────────────────────────────────────────────────────────
 const SANS = `'Inter', system-ui, -apple-system, sans-serif`;
@@ -806,9 +807,9 @@ export function ProfileEditorClient({
                       }}>
                         <FileText size={16} color={D.blue} />
                         <span style={{ fontFamily: SANS, fontSize: 13, color: D.ink, flex: 1 }}>
-                          {doc.file_name || "CV.pdf"}
+                          {doc.name || doc.file_name || "CV.pdf"}
                         </span>
-                        <a href={doc.file_url} target="_blank" rel="noopener noreferrer"
+                        <a href={getDocumentUrl(doc.file_path)} target="_blank" rel="noopener noreferrer"
                           style={{ color: D.blue, display: "flex", alignItems: "center" }}>
                           <ExternalLink size={14} />
                         </a>

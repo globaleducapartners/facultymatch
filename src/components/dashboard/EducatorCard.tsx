@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, ChevronRight, CheckCircle2, MapPin, Globe, Award, Mail, Briefcase, Lock } from "lucide-react";
+import { Star, ChevronRight, CheckCircle2, MapPin, Globe, Award, Mail, Briefcase, Lock, Building2, GraduationCap, FileText } from "lucide-react";
 import Link from "next/link";
 import { ContactModal } from "./ContactModal";
 import { toggleFavorite } from "@/app/auth/actions";
@@ -72,6 +72,8 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
   const avail = educator.availability ? (AVAIL_LABELS[educator.availability] || AVAIL_LABELS.open) : null;
   const initials = educator.full_name?.substring(0, 2).toUpperCase() || "??";
   const locationStr = [educator.city, educator.country || educator.location].filter(Boolean).join(", ");
+  const hasBanner = !!educator.banner_url;
+  const degreesCount = Array.isArray(educator.degrees) ? educator.degrees.length : 0;
 
   // ─── LinkedIn-style compact card ─────────────────────────────────────────
   if (compact) {
@@ -89,8 +91,15 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
 
         {/* Cover + Avatar */}
         <div className="relative">
-          {/* Cover strip */}
-          <div className="h-16 bg-gradient-to-br from-[#0D2240] to-[#1B4FD8]" />
+          {/* Cover strip — show banner if available */}
+          {hasBanner ? (
+            <div
+              className="h-16 bg-cover bg-center"
+              style={{ backgroundImage: `url(${educator.banner_url})` }}
+            />
+          ) : (
+            <div className="h-16 bg-gradient-to-br from-[#0D2240] to-[#1B4FD8]" />
+          )}
           {/* Avatar */}
           <div className="absolute left-1/2 -translate-x-1/2 -bottom-8">
             <div className="w-16 h-16 rounded-full border-[3px] border-white overflow-hidden shadow-lg bg-[#0D2240] flex items-center justify-center">
@@ -129,6 +138,14 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
             </div>
           )}
 
+          {/* Current institution */}
+          {educator.current_institution && (
+            <div className="flex items-center justify-center gap-1 text-[#9CA3AF]">
+              <Building2 size={10} />
+              <span className="text-[11px] font-medium truncate">{educator.current_institution}</span>
+            </div>
+          )}
+
           {/* Availability */}
           {avail && (
             <div className="flex justify-center">
@@ -160,7 +177,23 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
                 ANECA
               </span>
             )}
+            {degreesCount > 0 && (
+              <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                <GraduationCap size={8} />
+                {degreesCount} tít.
+              </span>
+            )}
           </div>
+
+          {/* Document count indicator */}
+          {Array.isArray(educator.faculty_documents) && educator.faculty_documents.length > 0 && (
+            <div className="flex justify-center">
+              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                <FileText size={8} />
+                {educator.faculty_documents.length} doc{educator.faculty_documents.length > 1 ? "s" : ""}.
+              </span>
+            </div>
+          )}
 
           {/* Language */}
           {mainLanguage && (

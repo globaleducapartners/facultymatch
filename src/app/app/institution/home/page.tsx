@@ -29,7 +29,8 @@ export default async function InstitutionHomePage() {
     .eq("id", user.id)
     .single();
 
-  const isPro = userProfile?.plan === "institution-pro" && userProfile?.subscription_status === "active";
+  const isPro = (userProfile?.plan === "institution-pro" || userProfile?.plan === "institution-growth") &&
+    (userProfile?.subscription_status === "active" || userProfile?.subscription_status === "trialing");
 
   const currentMonth = new Date().toISOString().slice(0, 7);
   const [year, monthNum] = currentMonth.split("-").map(Number);

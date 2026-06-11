@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ContactModalWrapper } from "@/components/dashboard/ContactModalWrapper";
 import { FavoriteButton } from "@/components/dashboard/FavoriteButton";
+import { ProfileViewTracker } from "@/components/profile/ProfileViewTracker";
+import { getDocumentUrl } from "@/lib/utils";
 
 const AVAIL: Record<string, { label: string; color: string; bg: string }> = {
   open:          { label: "Disponible ahora",     color: "#059669", bg: "#F0FDF4" },
@@ -135,7 +137,9 @@ export default async function FacultyProfilePage({
   const hasLinks          = !!faculty?.linkedin_url || !!faculty?.website;
 
   return (
-    <div className="animate-in fade-in duration-500 pb-12 font-sans">
+    <>
+      <ProfileViewTracker facultyId={facultyId} />
+      <div className="animate-in fade-in duration-500 pb-12 font-sans">
       {/* ── Breadcrumb ── */}
       <nav className="flex items-center gap-2 text-sm font-semibold text-slate-400 mb-6">
         <Link
@@ -492,7 +496,7 @@ export default async function FacultyProfilePage({
                 {facultyDocs?.map((doc: any) => (
                   <a
                     key={doc.id}
-                    href={doc.file_url}
+                    href={getDocumentUrl(doc.file_path)}
                     target="_blank" rel="noopener noreferrer"
                     className="flex items-center justify-between p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl hover:bg-blue-50/50 hover:border-[#1B4FD8]/30 transition-all group shadow-3xs"
                   >
@@ -502,7 +506,7 @@ export default async function FacultyProfilePage({
                       </div>
                       <div>
                         <p className="text-sm font-bold text-[#0D2240]">{doc.name || doc.file_name || "Documento"}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">{doc.type || "PDF"}</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">{doc.doc_type || "PDF"}</p>
                       </div>
                     </div>
                     <ExternalLink size={15} className="text-slate-300 group-hover:text-[#1B4FD8] transition-colors mr-1" />
@@ -704,5 +708,6 @@ export default async function FacultyProfilePage({
         </aside>
       </div>
     </div>
+    </>
   );
 }
