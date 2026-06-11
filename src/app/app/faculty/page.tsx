@@ -517,39 +517,67 @@ export default async function EducatorDashboard() {
                 {progress >= 80 ? "PUBLICADO" : "BORRADOR"}
               </Badge>
             </div>
-            {/* Mini profile preview */}
-            <div className="rounded-2xl border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-navy to-[#1B4FD8] h-10 relative">
-                <div className="absolute -bottom-5 left-4">
-                  <div className="w-10 h-10 rounded-xl bg-white border-2 border-white shadow flex items-center justify-center text-navy font-black text-xs">
-                    {profile?.full_name
-                      ? profile.full_name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")
-                      : "?"}
+            {/* Mini profile preview — como apareces en el directorio */}
+            <div className="rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+              {/* Cover strip */}
+              <div className="relative">
+                {facultyProfile?.banner_url ? (
+                  <div className="h-14 bg-cover bg-center" style={{ backgroundImage: `url(${facultyProfile.banner_url})` }} />
+                ) : (
+                  <div className="h-14 bg-gradient-to-br from-[#0D2240] to-[#1B4FD8]" />
+                )}
+                {/* Avatar */}
+                <div className="absolute left-1/2 -translate-x-1/2 -bottom-7">
+                  <div className="w-[52px] h-[52px] rounded-full border-[3px] border-white overflow-hidden shadow-lg bg-[#0D2240] flex items-center justify-center">
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt={profile.full_name} className="object-cover w-full h-full" />
+                    ) : (
+                      <span className="text-white text-sm font-black">
+                        {profile?.full_name?.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase() || "?"}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
-              <div className="bg-white px-4 pt-8 pb-4 space-y-1">
-                <p className="font-black text-navy text-sm leading-tight">{profile?.full_name || "Tu nombre"}</p>
-                <p className="text-xs text-talentia-blue font-medium leading-tight truncate">
-                  {facultyProfile?.headline || <span className="text-gray-300 italic">Sin titular</span>}
-                </p>
-                <div className="flex items-center gap-2 mt-1.5 text-[10px] text-gray-400 font-medium flex-wrap">
-                  {facultyProfile?.location && (
-                    <span className="flex items-center gap-0.5"><MapPin size={9} />{facultyProfile.location}</span>
-                  )}
-                  {(facultyProfile?.years_experience ?? 0) > 0 && (
-                    <span className="flex items-center gap-0.5"><Briefcase size={9} />{facultyProfile.years_experience}a exp.</span>
+              {/* Info */}
+              <div className="pt-9 px-4 pb-4 flex flex-col items-center gap-1.5 text-center">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-sm font-black text-[#0C1018] leading-tight truncate max-w-[180px]">
+                    {profile?.full_name || "Tu nombre"}
+                  </h3>
+                  {isPro && (
+                    <span className="text-[8px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full border border-amber-200 flex-shrink-0">Pro</span>
                   )}
                 </div>
-                {areas.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {areas.slice(0, 3).map((a) => (
-                      <span key={a.id} className="bg-blue-50 text-talentia-blue text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        {a.area}
-                      </span>
-                    ))}
+                <p className="text-[11px] text-[#6B7280] font-medium line-clamp-2 leading-snug">
+                  {facultyProfile?.headline || <span className="text-gray-300 italic">Sin titular</span>}
+                </p>
+                {(facultyProfile?.location || facultyProfile?.city) && (
+                  <div className="flex items-center gap-1 text-[#9CA3AF]">
+                    <MapPin size={9} />
+                    <span className="text-[10px] font-medium truncate">
+                      {[facultyProfile.city, facultyProfile.location].filter(Boolean).join(", ")}
+                    </span>
                   </div>
                 )}
+                {facultyProfile?.availability && (
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-200">
+                    {facultyProfile.availability === "open" ? "Disponible ahora" : facultyProfile.availability}
+                  </span>
+                )}
+                {/* Areas & experience tags */}
+                <div className="flex items-center justify-center flex-wrap gap-1 mt-0.5">
+                  {areas.slice(0, 2).map((a: any) => (
+                    <span key={a.id} className="text-[9px] font-bold text-[#1B4FD8] bg-[#EFF6FF] px-2 py-0.5 rounded-lg truncate max-w-[110px]">
+                      {a.area}
+                    </span>
+                  ))}
+                  {(facultyProfile?.years_experience ?? 0) > 0 && (
+                    <span className="text-[9px] font-bold text-[#6B7280] bg-[#F2F6FC] border border-[#D8E2EF] px-2 py-0.5 rounded-lg flex items-center gap-0.5">
+                      <Briefcase size={7} />{facultyProfile.years_experience}a
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             <div className="space-y-1.5">
@@ -688,81 +716,6 @@ export default async function EducatorDashboard() {
         </div>
       </div>
 
-      {/* ── Profile preview: how you look in the directory ── */}
-      <div className="mt-12">
-        <div className="flex items-center gap-2 mb-4">
-          <Eye size={14} className="text-gray-400" />
-          <h3 className="text-xs font-black uppercase tracking-widest text-gray-400">
-            Vista previa — como apareces en el directorio
-          </h3>
-        </div>
-        <div className="bg-white rounded-2xl border border-[#D8E2EF] shadow-sm max-w-[280px] flex flex-col overflow-hidden">
-          {/* Cover strip */}
-          <div className="relative">
-            {facultyProfile?.banner_url ? (
-              <div className="h-16 bg-cover bg-center" style={{ backgroundImage: `url(${facultyProfile.banner_url})` }} />
-            ) : (
-              <div className="h-16 bg-gradient-to-br from-[#0D2240] to-[#1B4FD8]" />
-            )}
-            {/* Avatar */}
-            <div className="absolute left-1/2 -translate-x-1/2 -bottom-8">
-              <div className="w-16 h-16 rounded-full border-[3px] border-white overflow-hidden shadow-lg bg-[#0D2240] flex items-center justify-center">
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt={profile.full_name} className="object-cover w-full h-full" />
-                ) : (
-                  <span className="text-white text-base font-black">
-                    {profile?.full_name?.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase() || "?"}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-          {/* Info */}
-          <div className="pt-10 px-4 pb-4 flex flex-col gap-2 text-center">
-            <div className="flex items-center justify-center gap-1.5 flex-wrap">
-              <h3 className="text-sm font-black text-[#0C1018] leading-tight">
-                {profile?.full_name || "Tu nombre"}
-              </h3>
-              {profile?.plan === "faculty-pro" && profile?.subscription_status === "active" && (
-                <span className="text-[9px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full border border-amber-200">Pro</span>
-              )}
-            </div>
-            <p className="text-xs text-[#6B7280] font-medium line-clamp-2 leading-snug">
-              {facultyProfile?.headline || <span className="text-gray-300 italic">Sin titular</span>}
-            </p>
-            {(facultyProfile?.location || facultyProfile?.city) && (
-              <div className="flex items-center justify-center gap-1 text-[#9CA3AF]">
-                <MapPin size={10} />
-                <span className="text-[11px] font-medium truncate">
-                  {[facultyProfile.city, facultyProfile.location].filter(Boolean).join(", ")}
-                </span>
-              </div>
-            )}
-            {facultyProfile?.availability && (
-              <div className="flex justify-center">
-                <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-green-50 text-green-600">
-                  {facultyProfile.availability === "open" ? "Disponible ahora" : facultyProfile.availability}
-                </span>
-              </div>
-            )}
-            <div className="flex items-center justify-center flex-wrap gap-1 mt-1">
-              {areas.slice(0, 2).map((a: any) => (
-                <span key={a.id} className="text-[10px] font-bold text-[#1B4FD8] bg-[#EFF6FF] px-2 py-0.5 rounded-lg truncate max-w-[120px]">
-                  {a.area}
-                </span>
-              ))}
-              {(facultyProfile?.years_experience ?? 0) > 0 && (
-                <span className="text-[10px] font-bold text-[#6B7280] bg-[#F2F6FC] border border-[#D8E2EF] px-2 py-0.5 rounded-lg flex items-center gap-1">
-                  <Briefcase size={8} />{facultyProfile.years_experience}a
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-        <p className="text-xs text-gray-400 mt-3">
-          Así ven tu perfil las instituciones en el buscador y el directorio.
-        </p>
       </div>
-    </div>
   );
 }

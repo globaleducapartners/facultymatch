@@ -60,6 +60,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
     setSent(true);
     setShowFollowUp(false);
     setFollowUpMsg("");
+    setTimeout(() => window.location.reload(), 600);
   };
 
   return (
