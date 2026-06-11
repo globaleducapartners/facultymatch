@@ -1,392 +1,544 @@
 import { createAdminClient } from "@/lib/supabase-server";
+import Stripe from "stripe";
 import {
-  Users, Building2, GraduationCap, Clock, CheckCircle2, XCircle,
-  TrendingUp, Mail, UserPlus, Repeat2, Award, Globe, MapPin,
-  BookOpen, Eye, Send,
+  AlertTriangle, DollarSign, Users, Eye, TrendingUp,
+  GraduationCap, Award, Linkedin,
+  ChevronRight, MessageSquare, Star, Globe,
 } from "lucide-react";
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  sub,
-  color = "blue",
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: number | string;
-  sub?: string;
-  color?: "blue" | "green" | "orange" | "red" | "purple" | "gray";
-}) {
-  const colors = {
-    blue:   "bg-blue-50 text-talentia-blue",
-    green:  "bg-green-50 text-green-600",
-    orange: "bg-orange-50 text-energy-orange",
-    red:    "bg-red-50 text-red-600",
-    purple: "bg-purple-50 text-purple-600",
-    gray:   "bg-gray-50 text-gray-600",
-  };
-  return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${colors[color]}`}>
-        <Icon size={22} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate">{label}</p>
-        <p className="text-2xl lg:text-3xl font-black text-navy mt-0.5">{value}</p>
-        {sub && <p className="text-xs text-gray-400 font-medium mt-0.5">{sub}</p>}
-      </div>
-    </div>
-  );
+// ── Stripe MRR Helper ──────────────────────────────────────────────────────
+
+async function getMRR(): Promise<{ mrr: number; activeSubscriptions: number }> {
+  if (!process.env.STRIPE_SECRET_KEY) return { mrr: 0, activeSubscriptions: 0 };
+  try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const subscriptions = await stripe.subscriptions.list({
+      status: "active",
+      limit: 100,
+      expand: ["data.items.data.price"],
+    });
+    let mrr = 0;
+    for (const sub of subscriptions.data) {
+      const price = sub.items.data[0]?.price;
+      if (price && "unit_amount" in price && price.unit_amount) {
+        mrr += price.unit_amount;
+      }
+    }
+    return { mrr: mrr / 100, activeSubscriptions: subscriptions.data.length };
+  } catch {
+    return { mrr: 0, activeSubscriptions: 0 };
+  }
 }
+
+// ── Profile Completeness Calculator ───────────────────────────────────────
+
+function calculateCompleteness(fp: any): number {
+  const fields = [
+    fp.headline,
+    fp.bio,
+    fp.country,
+    fp.linkedin_url,
+    fp.is_phd,
+    fp.aneca_accreditation,
+    fp.faculty_areas && Array.isArray(fp.faculty_areas) && fp.faculty_areas.length > 0,
+    fp.levels && Array.isArray(fp.levels) && fp.levels.length > 0,
+    fp.languages && Array.isArray(fp.languages) && fp.languages.length > 0,
+    fp.avatar_url || fp.photo,
+  ];
+  const filled = fields.filter(Boolean).length;
+  return Math.round((filled / fields.length) * 100);
+}
+
+// ── ───────────────────────────────────────────────────────────────────────
 
 export default async function MetricsPage() {
   const admin = createAdminClient();
 
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const last7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  // ── Section 1: Alerts data ─────────────────────────────────────────────
 
-  const [
-    { count: totalFaculty },
-    { count: totalInstitutions },
-    { count: pendingInstitutions },
-    { count: activeInstitutions },
-    { count: totalContacts },
-    { count: contactsMonth },
-    { count: facultyThisWeek },
-    { count: facultyThisMonth },
-    { count: instThisMonth },
-    { count: dualModeUsers },
-    { count: totalUsers },
-    { count: phdCount },
-    { count: anecaCount },
-  ] = await Promise.all([
-    admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("role", "faculty"),
-    admin.from("institutions").select("*", { count: "exact", head: true }),
-    admin.from("institutions").select("*", { count: "exact", head: true }).eq("status", "pending"),
-    admin.from("institutions").select("*", { count: "exact", head: true }).or("status.eq.active,status.eq.approved"),
-    admin.from("contacts").select("*", { count: "exact", head: true }),
-    admin.from("contacts").select("*", { count: "exact", head: true }).gte("created_at", startOfMonth.toISOString()),
-    admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("role", "faculty").gte("created_at", last7.toISOString()),
-    admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("role", "faculty").gte("created_at", startOfMonth.toISOString()),
-    admin.from("institutions").select("*", { count: "exact", head: true }).gte("created_at", startOfMonth.toISOString()),
-    admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("can_switch_role", true),
-    admin.from("user_profiles").select("*", { count: "exact", head: true }),
-    admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("role", "faculty").eq("is_phd", true),
-    admin.from("user_profiles").select("*", { count: "exact", head: true }).eq("role", "faculty").eq("aneca_accreditation", true),
-  ]);
+  const { count: totalFaculty } = await admin
+    .from("user_profiles")
+    .select("*", { count: "exact", head: true })
+    .eq("role", "faculty");
 
-  // View count from faculty_profiles
+  // Faculty without email
+  const { data: facultyUsers } = await admin
+    .from("user_profiles")
+    .select("id, email")
+    .eq("role", "faculty");
+  const facultyNoEmail = (facultyUsers ?? []).filter((u) => !u.email).length;
+
+  // Faculty profiles for completeness check
+  const { data: allFacultyProfiles } = await admin
+    .from("faculty_profiles")
+    .select("user_id, profile_completeness, headline, bio, country, linkedin_url, is_phd, aneca_accreditation, faculty_areas, levels, languages, avatar_url")
+    .limit(500);
+
+  let completenessZeroCount = 0;
+  if (allFacultyProfiles && allFacultyProfiles.length > 0) {
+    const hasStoredCompleteness = allFacultyProfiles.some(
+      (fp: any) => fp.profile_completeness !== null && fp.profile_completeness !== 0
+    );
+    if (!hasStoredCompleteness) {
+      completenessZeroCount = allFacultyProfiles.filter(
+        (fp: any) => calculateCompleteness(fp) === 0
+      ).length;
+    } else {
+      completenessZeroCount = allFacultyProfiles.filter(
+        (fp: any) => fp.profile_completeness === null || fp.profile_completeness === 0
+      ).length;
+    }
+  }
+  const completenessPct =
+    allFacultyProfiles?.length
+      ? (completenessZeroCount / allFacultyProfiles.length) * 100
+      : 0;
+
+  const { mrr, activeSubscriptions } = await getMRR();
+
+  const alerts: { message: string; type: "warning" | "danger" | "info" }[] = [];
+  if (facultyNoEmail > 0) {
+    alerts.push({
+      message: `${facultyNoEmail} docente${facultyNoEmail !== 1 ? "s" : ""} sin email — no contactable${facultyNoEmail !== 1 ? "s" : ""}`,
+      type: "warning",
+    });
+  }
+  if (activeSubscriptions === 0) {
+    alerts.push({
+      message: "0 suscripciones Pro activas — prioridad: convertir instituciones",
+      type: "danger",
+    });
+  }
+  if (completenessPct > 80) {
+    alerts.push({
+      message: "Completeness no calculado — ejecutar actualización SQL",
+      type: "info",
+    });
+  }
+
+  // ── Section 2: KPIs ────────────────────────────────────────────────────
+
+  const { count: activeFaculty } = await admin
+    .from("faculty_profiles")
+    .select("*", { count: "exact", head: true })
+    .eq("is_active", true);
+
+  // Distinct faculty who have received at least one contact
+  const { data: contactFacultyIds } = await admin
+    .from("contacts")
+    .select("faculty_id")
+    .limit(5000);
+  const uniqueContactFaculty = new Set(
+    (contactFacultyIds ?? []).map((c: any) => c.faculty_id)
+  ).size;
+  const activationRate =
+    totalFaculty && totalFaculty > 0
+      ? Math.round((uniqueContactFaculty / totalFaculty) * 100)
+      : 0;
+
   const { data: viewData } = await admin
     .from("faculty_profiles")
     .select("view_count")
     .limit(1000);
-  const totalViews = (viewData ?? []).reduce((sum, fp: any) => sum + (fp.view_count || 0), 0);
+  const totalViews = (viewData ?? []).reduce(
+    (sum: number, fp: any) => sum + (fp.view_count || 0),
+    0
+  );
 
-  // Email logs count
-  const { count: emailLogCount } = await admin
-    .from("email_logs")
-    .select("*", { count: "exact", head: true });
+  // ── Section 3: Funnel ──────────────────────────────────────────────────
 
-  // Acquisition channels breakdown
+  const { count: funnelProfileOver50 } = await admin
+    .from("faculty_profiles")
+    .select("*", { count: "exact", head: true })
+    .gt("profile_completeness", 50);
+
+  const { count: funnelVisited } = await admin
+    .from("faculty_profiles")
+    .select("*", { count: "exact", head: true })
+    .gt("view_count", 0);
+
+  const { count: funnelPro } = await admin
+    .from("user_profiles")
+    .select("*", { count: "exact", head: true })
+    .eq("subscription_status", "active");
+
+  const funnelSteps = [
+    { label: "Total registrados", value: totalFaculty ?? 0, prev: totalFaculty ?? 0 },
+    { label: "Perfil > 50%", value: funnelProfileOver50 ?? 0, prev: totalFaculty ?? 0 },
+    { label: "Han recibido visita", value: funnelVisited ?? 0, prev: funnelProfileOver50 ?? 0 },
+    { label: "Han recibido contacto", value: uniqueContactFaculty, prev: funnelVisited ?? 0 },
+    { label: "Suscripción Pro", value: funnelPro ?? 0, prev: uniqueContactFaculty },
+  ];
+
+  // ── Section 3: Institution Signals ────────────────────────────────────
+
+  const { data: institutions } = await admin
+    .from("institutions")
+    .select("id, name")
+    .limit(200);
+
+  const institutionSignals = await Promise.all(
+    (institutions ?? []).map(async (inst: any) => {
+      const { count: contactCount } = await admin
+        .from("contacts")
+        .select("*", { count: "exact", head: true })
+        .eq("institution_id", inst.id);
+
+      const { count: favCount } = await admin
+        .from("favorites")
+        .select("*", { count: "exact", head: true })
+        .eq("institution_id", inst.id);
+
+      let intention: "Alta" | "Media" | "Baja" = "Baja";
+      if ((contactCount ?? 0) > 0) intention = "Alta";
+      else if ((favCount ?? 0) > 0) intention = "Media";
+
+      return {
+        name: inst.name || "Sin nombre",
+        contacts: contactCount ?? 0,
+        favorites: favCount ?? 0,
+        intention,
+      };
+    })
+  );
+  institutionSignals.sort((a, b) => {
+    const order = { Alta: 3, Media: 2, Baja: 1 };
+    return (order[b.intention] ?? 0) - (order[a.intention] ?? 0);
+  });
+
+  // ── Section 4: Acquisition Channels ───────────────────────────────────
+
   const { data: acqData } = await admin
     .from("user_profiles")
-    .select("acquisition_channel")
-    .not("acquisition_channel", "is", null);
+    .select("acquisition_channel");
+
   const acqCounts: Record<string, number> = {};
+  let hasChannels = false;
   (acqData ?? []).forEach((r: any) => {
-    const ch = r.acquisition_channel || "direct";
-    acqCounts[ch] = (acqCounts[ch] ?? 0) + 1;
+    if (r.acquisition_channel) {
+      hasChannels = true;
+      acqCounts[r.acquisition_channel] = (acqCounts[r.acquisition_channel] ?? 0) + 1;
+    }
   });
   const acqEntries = Object.entries(acqCounts).sort((a, b) => b[1] - a[1]);
+  const acqTotal = acqEntries.reduce((s, [, c]) => s + c, 0);
+
   const CHANNEL_LABELS: Record<string, string> = {
     direct: "Directo",
     organic_search: "Búsqueda orgánica",
     linkedin: "LinkedIn",
     social: "Redes sociales",
     referral: "Referral",
+    google: "Google",
+    email: "Email",
   };
 
-  // Top viewed profiles
-  const { data: topProfiles } = await admin
+  // ── Section 4: Academic Profile ───────────────────────────────────────
+
+  const { count: phdCount } = await admin
     .from("faculty_profiles")
-    .select("user_id, view_count, headline")
-    .order("view_count", { ascending: false })
-    .limit(5);
+    .select("*", { count: "exact", head: true })
+    .eq("is_phd", true);
 
-  let topNames: Record<string, string> = {};
-  if (topProfiles?.length) {
-    const ids = topProfiles.map((p: any) => p.user_id);
-    const { data: users } = await admin
-      .from("user_profiles")
-      .select("id, full_name")
-      .in("id", ids);
-    if (users) {
-      users.forEach((u: any) => { topNames[u.id] = u.full_name || "Sin nombre"; });
-    }
-  }
-
-  // Recent signups
-  const [{ data: recentFaculty }, { data: recentInstitutions }] = await Promise.all([
-    admin.from("user_profiles").select("id, full_name, created_at, role").eq("role", "faculty")
-      .order("created_at", { ascending: false }).limit(10),
-    admin.from("institutions").select("id, name, country, created_at, status")
-      .order("created_at", { ascending: false }).limit(10),
-  ]);
-
-  // Richer analytics: faculty profiles for areas/countries
-  const { data: facultyProfiles } = await admin
+  const { count: anecaCount } = await admin
     .from("faculty_profiles")
-    .select("faculty_areas, country")
-    .limit(500);
+    .select("*", { count: "exact", head: true })
+    .not("aneca_accreditation", "is", null)
+    .neq("aneca_accreditation", "");
 
-  // Count by area
-  const areaCounts: Record<string, number> = {};
-  (facultyProfiles ?? []).forEach((fp: any) => {
-    (fp.faculty_areas ?? []).forEach((area: string) => {
-      if (area) areaCounts[area] = (areaCounts[area] ?? 0) + 1;
-    });
-  });
-  const topAreas = Object.entries(areaCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8);
+  const { count: linkedinCount } = await admin
+    .from("faculty_profiles")
+    .select("*", { count: "exact", head: true })
+    .not("linkedin_url", "is", null)
+    .neq("linkedin_url", "");
 
-  // Count by country
-  const countryCounts: Record<string, number> = {};
-  (facultyProfiles ?? []).forEach((fp: any) => {
-    if (fp.country) countryCounts[fp.country] = (countryCounts[fp.country] ?? 0) + 1;
-  });
-  const topCountries = Object.entries(countryCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8);
+  const { count: profileOver80 } = await admin
+    .from("faculty_profiles")
+    .select("*", { count: "exact", head: true })
+    .gt("profile_completeness", 80);
 
-  function fmtDate(iso: string | null | undefined) {
-    if (!iso) return "—";
-    return new Date(iso).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" });
+  // ── ────────────────────────────────────────────────────────────────────
+
+  function pctOf(part: number, total: number): string {
+    if (!total) return "—";
+    return `${Math.round((part / total) * 100)}%`;
   }
-
-  const instStatusBadge = (s: string | null) => {
-    if (s === "active" || s === "approved") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-100 text-green-700">Activa</span>;
-    if (s === "blocked") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-red-100 text-red-700">Bloqueada</span>;
-    if (s === "rejected") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Rechazada</span>;
-    return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Pendiente</span>;
-  };
-
-  const conversionRate = totalFaculty
-    ? `${Math.round(((dualModeUsers ?? 0) / (totalFaculty ?? 1)) * 100)}%`
-    : "—";
-  const phdPct = totalFaculty && totalFaculty > 0
-    ? `${Math.round(((phdCount ?? 0) / totalFaculty) * 100)}%`
-    : "—";
-  const anecaPct = totalFaculty && totalFaculty > 0
-    ? `${Math.round(((anecaCount ?? 0) / totalFaculty) * 100)}%`
-    : "—";
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-black text-navy tracking-tight">Panel operacional</h1>
-        <p className="text-gray-500 font-medium mt-1">Métricas y actividad de la plataforma en tiempo real.</p>
+        <h1 className="text-3xl font-black text-navy tracking-tight">Dashboard de negocio</h1>
+        <p className="text-gray-500 font-medium mt-1">Métricas accionables en tiempo real.</p>
       </div>
 
-      {/* Platform overview */}
-      <section className="space-y-3">
-        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Resumen global</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard icon={Users}        label="Usuarios totales"       value={totalUsers ?? 0}        color="blue" />
-          <StatCard icon={GraduationCap} label="Docentes registrados"  value={totalFaculty ?? 0}      color="purple" />
-          <StatCard icon={Building2}    label="Instituciones"          value={totalInstitutions ?? 0} color="orange" sub={`${activeInstitutions ?? 0} activas`} />
-          <StatCard icon={Mail}         label="Contactos totales"      value={totalContacts ?? 0}     color="green" sub={`${contactsMonth ?? 0} este mes`} />
-        </div>
-      </section>
-
-      {/* Growth */}
-      <section className="space-y-3">
-        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Crecimiento</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard icon={UserPlus}   label="Docentes esta semana"     value={facultyThisWeek ?? 0}      color="blue" />
-          <StatCard icon={TrendingUp} label="Docentes este mes"        value={facultyThisMonth ?? 0}     color="purple" />
-          <StatCard icon={Building2}  label="Instituciones este mes"   value={instThisMonth ?? 0}        color="orange" />
-          <StatCard icon={Clock}      label="Pendientes aprobación"    value={pendingInstitutions ?? 0}  color="red" sub="Instituciones" />
-        </div>
-      </section>
-
-      {/* Academic credentials */}
-      <section className="space-y-3">
-        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Perfil académico del directorio</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard icon={GraduationCap} label="Doctores / PhD"           value={phdCount ?? 0}      color="blue"   sub={`${phdPct} del total`} />
-          <StatCard icon={Award}         label="Acreditación ANECA"       value={anecaCount ?? 0}    color="purple" sub={`${anecaPct} del total`} />
-          <StatCard icon={Repeat2}       label="Usuarios dual-mode"       value={dualModeUsers ?? 0} color="green"  sub="Docente + institución" />
-          <StatCard icon={TrendingUp}    label="Tasa de conversión"       value={conversionRate}      color="orange" sub="Docentes → institución" />
-        </div>
-      </section>
-
-      {/* Acquisition channels */}
-      <section className="space-y-3">
-        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Canales de adquisición</h2>
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          {acqEntries.length > 0 ? (
-            <div className="p-5 space-y-3">
-              {acqEntries.map(([channel, count]) => {
-                const total = acqEntries.reduce((s, [, c]) => s + c, 0);
-                const pct = Math.round((count / total) * 100);
-                return (
-                  <div key={channel} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-navy">{CHANNEL_LABELS[channel] || channel}</span>
-                      <span className="text-gray-400">{count} ({pct}%)</span>
-                    </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-talentia-blue" style={{ width: `${Math.max(4, pct)}%` }} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="p-5 text-sm text-gray-400 text-center py-8">Sin datos de adquisición aún</div>
-          )}
-        </div>
-      </section>
-
-      {/* Engagement */}
-      <section className="space-y-3">
-        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Engagement & comunicación</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard icon={Eye}   label="Visitas a perfiles"   value={totalViews}          color="blue"   sub="Totales acumuladas" />
-          <StatCard icon={Send}  label="Emails enviados"      value={emailLogCount ?? 0}  color="purple" sub="Desde el panel admin" />
-          <StatCard icon={Mail}  label="Contactos totales"    value={totalContacts ?? 0}  color="green"  sub={`${contactsMonth ?? 0} este mes`} />
-          <StatCard icon={Users} label="Docentes registrados" value={totalFaculty ?? 0}   color="orange" sub={`${facultyThisMonth ?? 0} este mes`} />
-        </div>
-      </section>
-
-      {/* Top viewed profiles */}
-      {topProfiles && topProfiles.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-            <Eye size={16} className="text-talentia-blue" />
-            <h3 className="text-sm font-black text-navy">Perfiles más vistos</h3>
+      {/* ── SECTION 1: Alertas automáticas ───────────────────────────── */}
+      {alerts.length > 0 && (
+        <section className="bg-amber-50 border border-amber-200 rounded-2xl p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={18} className="text-amber-600" />
+            <h2 className="text-xs font-black uppercase tracking-widest text-amber-800">
+              Alertas automáticas
+            </h2>
           </div>
-          <div className="divide-y divide-gray-50">
-            {topProfiles.map((fp: any, i: number) => (
-              <div key={fp.user_id} className="flex items-center gap-3 px-5 py-3">
-                <span className="w-6 text-center text-xs font-black text-gray-400">#{i + 1}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-navy truncate">{topNames[fp.user_id] || "Sin nombre"}</p>
-                  {fp.headline && <p className="text-[11px] text-gray-400 truncate">{fp.headline}</p>}
+          <div className="space-y-2">
+            {alerts.map((alert, i) => {
+              const colors = {
+                warning: "bg-amber-100 text-amber-800 border-amber-300",
+                danger: "bg-red-100 text-red-800 border-red-300",
+                info: "bg-blue-100 text-blue-800 border-blue-300",
+              };
+              return (
+                <div
+                  key={i}
+                  className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl border text-sm font-bold ${colors[alert.type]}`}
+                >
+                  <div className="w-2 h-2 rounded-full bg-current flex-shrink-0" />
+                  {alert.message}
                 </div>
-                <div className="flex items-center gap-1 text-sm font-black text-talentia-blue">
-                  <Eye size={14} />
-                  {fp.view_count ?? 0}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Areas & Nationalities */}
-      <div className="grid lg:grid-cols-2 gap-6">
-
-        {/* Top knowledge areas */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-            <BookOpen size={16} className="text-talentia-blue" />
-            <h3 className="text-sm font-black text-navy">Áreas de conocimiento (top 8)</h3>
+      {/* ── SECTION 2: KPIs principales ──────────────────────────────── */}
+      <section className="space-y-3">
+        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">KPIs principales</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* MRR */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${mrr === 0 ? "bg-red-50 text-red-600" : "bg-green-50 text-green-600"}`}>
+              <DollarSign size={22} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate">MRR</p>
+              <p className={`text-2xl lg:text-3xl font-black mt-0.5 ${mrr === 0 ? "text-red-600" : "text-navy"}`}>
+                {mrr.toLocaleString("es-ES", { style: "currency", currency: "EUR", minimumFractionDigits: 0 })}
+              </p>
+              <p className="text-xs font-medium mt-0.5">
+                {activeSubscriptions > 0
+                  ? `${activeSubscriptions} suscripción${activeSubscriptions !== 1 ? "es" : ""} activa${activeSubscriptions !== 1 ? "s" : ""}`
+                  : <span className="text-red-500 font-bold">Sin suscripciones activas</span>}
+              </p>
+            </div>
           </div>
-          <div className="p-5 space-y-3">
-            {topAreas.length > 0 ? topAreas.map(([area, count]) => {
-              const pct = facultyProfiles?.length ? Math.round((count / facultyProfiles.length) * 100) : 0;
+
+          {/* Docentes activos */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-blue-50 text-talentia-blue flex items-center justify-center flex-shrink-0">
+              <Users size={22} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate">Docentes activos</p>
+              <p className="text-2xl lg:text-3xl font-black text-navy mt-0.5">{activeFaculty ?? 0}</p>
+              <p className="text-xs text-gray-400 font-medium mt-0.5">{pctOf(activeFaculty ?? 0, totalFaculty ?? 0)} del total</p>
+            </div>
+          </div>
+
+          {/* Tasa de activación */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center flex-shrink-0">
+              <TrendingUp size={22} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate">Tasa de activación</p>
+              <p className="text-2xl lg:text-3xl font-black text-navy mt-0.5">{activationRate}%</p>
+              <p className="text-xs text-gray-400 font-medium mt-0.5">{uniqueContactFaculty} han recibido contacto</p>
+            </div>
+          </div>
+
+          {/* Visitas totales */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-orange-50 text-energy-orange flex items-center justify-center flex-shrink-0">
+              <Eye size={22} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest truncate">Visitas totales</p>
+              <p className="text-2xl lg:text-3xl font-black text-navy mt-0.5">{totalViews.toLocaleString()}</p>
+              <p className="text-xs text-gray-400 font-medium mt-0.5">Acumuladas</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 3: Funnel + Institution Signals ──────────────────── */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Funnel */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h3 className="text-sm font-black text-navy">Funnel de docentes</h3>
+          </div>
+          <div className="p-5 space-y-5">
+            {funnelSteps.map((step, i) => {
+              const pctOverPrev =
+                step.prev > 0 ? Math.round((step.value / step.prev) * 100) : 0;
+              const isLow = pctOverPrev < 20 && i > 0;
+              const barColor = isLow
+                ? "bg-red-400"
+                : pctOverPrev < 50 && i > 0
+                  ? "bg-orange-400"
+                  : "bg-talentia-blue";
               return (
-                <div key={area} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-navy truncate flex-1 mr-3">{area}</span>
-                    <span className="text-gray-400 flex-shrink-0">{count} ({pct}%)</span>
+                <div key={i} className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {i > 0 && <ChevronRight size={14} className="text-gray-300" />}
+                      <span className="text-sm font-bold text-navy">{step.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-black text-navy">{step.value}</span>
+                      {i > 0 && (
+                        <span className={`text-xs font-bold ${isLow ? "text-red-500" : "text-gray-400"}`}>
+                          ({pctOverPrev}%)
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-talentia-blue rounded-full" style={{ width: `${Math.max(4, pct)}%` }} />
+                  <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${barColor}`}
+                      style={{ width: `${Math.max(4, pctOverPrev)}%` }}
+                    />
                   </div>
                 </div>
               );
-            }) : <p className="text-sm text-gray-400 text-center py-4">Sin datos aún</p>}
+            })}
           </div>
         </div>
 
-        {/* Top nationalities */}
+        {/* Institution Signals */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-            <Globe size={16} className="text-talentia-blue" />
-            <h3 className="text-sm font-black text-navy">Principales países (top 8)</h3>
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h3 className="text-sm font-black text-navy">Señales de intención — Instituciones</h3>
           </div>
-          <div className="p-5 space-y-3">
-            {topCountries.length > 0 ? topCountries.map(([country, count]) => {
-              const pct = facultyProfiles?.length ? Math.round((count / facultyProfiles.length) * 100) : 0;
-              return (
-                <div key={country} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-navy flex items-center gap-1.5 flex-1 mr-3 truncate">
-                      <MapPin size={10} className="text-gray-400 flex-shrink-0" />
-                      {country}
+          <div className="divide-y divide-gray-50 max-h-[400px] overflow-y-auto">
+            {institutionSignals.length > 0 ? (
+              institutionSignals.map((inst, i) => {
+                const badgeColors: Record<string, string> = {
+                  Alta: "bg-green-100 text-green-700",
+                  Media: "bg-amber-100 text-amber-700",
+                  Baja: "bg-gray-100 text-gray-500",
+                };
+                return (
+                  <div key={i} className="px-5 py-3.5 flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-navy truncate">{inst.name}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                          <MessageSquare size={12} />
+                          {inst.contacts} contactos
+                        </span>
+                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                          <Star size={12} />
+                          {inst.favorites} favoritos
+                        </span>
+                      </div>
+                    </div>
+                    <span
+                      className={`text-[10px] font-black px-2.5 py-1 rounded-full flex-shrink-0 ${badgeColors[inst.intention]}`}
+                    >
+                      {inst.intention}
                     </span>
-                    <span className="text-gray-400 flex-shrink-0">{count} ({pct}%)</span>
                   </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-energy-orange rounded-full" style={{ width: `${Math.max(4, pct)}%` }} />
-                  </div>
-                </div>
-              );
-            }) : <p className="text-sm text-gray-400 text-center py-4">Sin datos aún</p>}
+                );
+              })
+            ) : (
+              <div className="px-5 py-8 text-center text-sm text-gray-400">
+                No hay instituciones registradas
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Recent activity */}
+      {/* ── SECTION 4: Acquisition Channels + Academic Profile ────────── */}
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Recent faculty */}
+        {/* Acquisition Channels */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="text-sm font-black text-navy">Últimos docentes registrados</h3>
-            <span className="text-xs font-black text-gray-300 uppercase tracking-widest">10 recientes</span>
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h3 className="text-sm font-black text-navy">Canales de adquisición</h3>
           </div>
-          <div className="divide-y divide-gray-50">
-            {(recentFaculty || []).map(f => (
-              <div key={f.id} className="px-5 py-3 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-talentia-blue flex items-center justify-center font-black text-xs flex-shrink-0">
-                  {(f.full_name || "?").slice(0, 2).toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-navy truncate">{f.full_name || "Sin nombre"}</p>
-                  <p className="text-xs text-gray-400">{fmtDate(f.created_at)}</p>
-                </div>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-50 text-talentia-blue">Docente</span>
+          <div className="p-5">
+            {hasChannels ? (
+              <div className="space-y-3">
+                {acqEntries.map(([channel, count]) => {
+                  const pct = Math.round((count / acqTotal) * 100);
+                  return (
+                    <div key={channel} className="space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-navy">{CHANNEL_LABELS[channel] || channel}</span>
+                        <span className="text-gray-400">{count} ({pct}%)</span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-talentia-blue"
+                          style={{ width: `${Math.max(4, pct)}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-            {!recentFaculty?.length && <p className="px-5 py-4 text-sm text-gray-400">Sin datos</p>}
+            ) : (
+              <div className="text-sm text-gray-400 text-center py-8">
+                Sin datos aún — se llenará con próximos registros
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Recent institutions */}
+        {/* Academic Profile */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 className="text-sm font-black text-navy">Últimas instituciones registradas</h3>
-            <span className="text-xs font-black text-gray-300 uppercase tracking-widest">10 recientes</span>
+          <div className="px-5 py-4 border-b border-gray-100">
+            <h3 className="text-sm font-black text-navy">Perfil académico del directorio</h3>
           </div>
-          <div className="divide-y divide-gray-50">
-            {(recentInstitutions || []).map(inst => (
-              <div key={inst.id} className="px-5 py-3 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-orange-50 text-energy-orange flex items-center justify-center font-black text-xs flex-shrink-0">
-                  {(inst.name || "?").slice(0, 2).toUpperCase()}
+          <div className="p-5 space-y-4">
+            {[
+              {
+                icon: GraduationCap,
+                label: "PhD / Doctores",
+                value: phdCount ?? 0,
+                pct: pctOf(phdCount ?? 0, totalFaculty ?? 0),
+                color: "bg-blue-50 text-talentia-blue",
+              },
+              {
+                icon: Award,
+                label: "Acred. ANECA",
+                value: anecaCount ?? 0,
+                pct: pctOf(anecaCount ?? 0, totalFaculty ?? 0),
+                color: "bg-purple-50 text-purple-600",
+              },
+              {
+                icon: Linkedin,
+                label: "Con LinkedIn",
+                value: linkedinCount ?? 0,
+                pct: pctOf(linkedinCount ?? 0, totalFaculty ?? 0),
+                color: "bg-sky-50 text-sky-600",
+              },
+              {
+                icon: Globe,
+                label: "Perfil > 80%",
+                value: profileOver80 ?? 0,
+                pct: pctOf(profileOver80 ?? 0, totalFaculty ?? 0),
+                color: "bg-green-50 text-green-600",
+              },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <div
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}
+                >
+                  <item.icon size={18} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-navy truncate">{inst.name || "Sin nombre"}</p>
-                  <p className="text-xs text-gray-400">{inst.country || "—"} · {fmtDate(inst.created_at)}</p>
+                  <p className="text-xs font-bold text-gray-400">{item.label}</p>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-lg font-black text-navy">{item.value}</span>
+                    <span className="text-xs text-gray-400 font-medium">{item.pct}</span>
+                  </div>
                 </div>
-                {instStatusBadge(inst.status)}
               </div>
             ))}
-            {!recentInstitutions?.length && <p className="px-5 py-4 text-sm text-gray-400">Sin datos</p>}
           </div>
         </div>
       </div>

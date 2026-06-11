@@ -1,6 +1,30 @@
 import { createAdminClient } from "@/lib/supabase-server";
 import Link from "next/link";
-import { Search, CheckCircle2, XCircle, Clock, EyeOff, Eye, GraduationCap, Award, FileCheck } from "lucide-react";
+import {
+  CheckCircle2, XCircle, Clock, EyeOff, Eye,
+  GraduationCap, Award, MessageSquare, AlertCircle,
+} from "lucide-react";
+
+// ── Profile Completeness Calculator ───────────────────────────────────────
+
+function calculateCompleteness(fp: any): number {
+  const fields = [
+    fp.headline,
+    fp.bio,
+    fp.country,
+    fp.linkedin_url,
+    fp.is_phd,
+    fp.aneca_accreditation,
+    fp.faculty_areas && Array.isArray(fp.faculty_areas) && fp.faculty_areas.length > 0,
+    fp.levels && Array.isArray(fp.levels) && fp.levels.length > 0,
+    fp.languages && Array.isArray(fp.languages) && fp.languages.length > 0,
+    fp.avatar_url || fp.photo,
+  ];
+  const filled = fields.filter(Boolean).length;
+  return Math.round((filled / fields.length) * 100);
+}
+
+// ── ───────────────────────────────────────────────────────────────────────
 
 function StatusBadge({ status, visibility }: { status?: string | null; visibility?: string | null }) {
   if (visibility === "hidden") {
@@ -20,36 +44,79 @@ export default async function FacultyListPage({
   const admin = createAdminClient();
   const params = await searchParams;
 
-  let query = admin
-    .from("user_profiles")
-    .select("id, full_name, email, created_at, verification_status, onboarding_completed")
-    .eq("role", "faculty")
-    .order("created_at", { ascending: false });
+  // Fetch faculty_profiles ordered by view_count DESC (primary sort)
+  let profileQuery = admin
+    .from("faculty_profiles")
+    .select("user_id, view_count, visibility, headline, country, profile_completeness, is_phd, aneca_accreditation, bio, linkedin_url, faculty_areas, levels, languages, avatar_url")
+    .order("view_count", { ascending: false })
+    .limit(200);
 
+  const { data: allProfiles } = await profileQuery;
+
+  // Check if any profile has stored non-zero completeness
+  const hasStoredCompleteness = (allProfiles ?? []).some(
+    (fp: any) => fp.profile_completeness !== null && fp.profile_completeness !== 0
+  );
+
+  // Build resolved profile data
+  const profileIds = (allProfiles ?? []).map((fp: any) => fp.user_id);
+
+  // Fetch user_profiles matching these faculty
+  let userMap: Record<string, any> = {};
+  if (profileIds.length > 0) {
+    const { data: users } = await admin
+      .from("user_profiles")
+      .select("id, full_name, email, created_at, verification_status, onboarding_completed")
+      .in("id", profileIds)
+      .eq("role", "faculty");
+
+    if (users) {
+      users.forEach((u: any) => { userMap[u.id] = u; });
+    }
+  }
+
+  // Build combined faculty list sorted by view_count DESC
+  const facultyList = (allProfiles ?? [])
+    .filter((fp: any) => userMap[fp.user_id])
+    .map((fp: any) => {
+      const user = userMap[fp.user_id];
+      const completeness = hasStoredCompleteness
+        ? (fp.profile_completeness ?? 0)
+        : calculateCompleteness(fp);
+      return { ...user, _profile: { ...fp, _completeness: completeness } };
+    });
+
+  // Apply status filter on the combined list
+  let filteredFaculty = facultyList;
   if (params.status && params.status !== "all") {
     if (params.status === "pending") {
-      query = query.or("verification_status.eq.pending,verification_status.is.null");
+      filteredFaculty = facultyList.filter(
+        (f: any) => !f.verification_status || f.verification_status === "pending"
+      );
     } else {
-      query = query.eq("verification_status", params.status);
+      filteredFaculty = facultyList.filter(
+        (f: any) => f.verification_status === params.status
+      );
     }
   }
 
-  const { data: faculty } = await query.limit(200);
+  // ── Contact counts per faculty ──────────────────────────────────────────
 
-  // Fetch faculty_profiles for additional info (view_count, visibility, completeness, etc.)
-  let profileMap: Record<string, any> = {};
-  if (faculty?.length) {
-    const ids = faculty.map((f) => f.id);
-    const { data: profiles } = await admin
-      .from("faculty_profiles")
-      .select("user_id, view_count, visibility, headline, country, profile_completeness, is_phd, aneca_accreditation")
-      .in("user_id", ids);
-    if (profiles) {
-      profiles.forEach((p: any) => { profileMap[p.user_id] = p; });
+  let contactCountMap: Record<string, number> = {};
+  if (profileIds.length > 0) {
+    const { data: contactRows } = await admin
+      .from("contacts")
+      .select("faculty_id")
+      .in("faculty_id", profileIds);
+    if (contactRows) {
+      contactRows.forEach((c: any) => {
+        contactCountMap[c.faculty_id] = (contactCountMap[c.faculty_id] ?? 0) + 1;
+      });
     }
   }
 
-  // Fetch auth.users metadata for last_sign_in_at
+  // ── Auth users for last_sign_in ─────────────────────────────────────────
+
   let authUserMap: Record<string, string | null> = {};
   try {
     const { data: authData } = await admin.auth.admin.listUsers({ perPage: 1000 });
@@ -59,8 +126,10 @@ export default async function FacultyListPage({
       });
     }
   } catch (e) {
-    // last_sign_in_at not critical; fallback to user_profiles.created_at
+    // last_sign_in_at not critical
   }
+
+  // ── ─────────────────────────────────────────────────────────────────────
 
   function fmtDate(iso: string | null | undefined) {
     if (!iso) return "—";
@@ -69,27 +138,42 @@ export default async function FacultyListPage({
 
   const statusFilter = params.status || "all";
 
-  function ProfileBar({ value }: { value: number | null | undefined }) {
-    const pct = value ?? 0;
+  function ProfileBar({ value }: { value: number }) {
+    const pct = Math.min(value, 100);
     let color = "";
-    if (pct >= 80) color = "bg-green-500";
-    else if (pct >= 50) color = "bg-yellow-500";
-    else color = "bg-orange-400";
+    if (pct >= 70) color = "bg-green-500";
+    else if (pct >= 30) color = "bg-orange-400";
+    else color = "bg-red-400";
     return (
       <div className="flex items-center gap-2">
         <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden min-w-[60px]">
-          <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${Math.min(pct, 100)}%` }} />
+          <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${Math.max(4, pct)}%` }} />
         </div>
-        <span className="text-xs font-bold text-gray-500 w-8 text-right">{pct}%</span>
+        <span className={`text-xs font-bold w-8 text-right ${pct >= 70 ? "text-green-600" : pct >= 30 ? "text-orange-500" : "text-red-500"}`}>
+          {pct}%
+        </span>
       </div>
     );
+  }
+
+  function ActionBadge({ viewCount, contactCount, completeness }: { viewCount: number; contactCount: number; completeness: number }) {
+    if (viewCount > 3 && contactCount === 0) {
+      return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 whitespace-nowrap">Perfil sin conversión</span>;
+    }
+    if (completeness < 40) {
+      return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-red-100 text-red-700 whitespace-nowrap">Completar perfil</span>;
+    }
+    if (contactCount > 0) {
+      return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-100 text-green-700 whitespace-nowrap">Activo</span>;
+    }
+    return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 whitespace-nowrap">Sin actividad</span>;
   }
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div>
         <h1 className="text-3xl font-black text-navy tracking-tight">Todos los docentes</h1>
-        <p className="text-gray-500 font-medium mt-1">{faculty?.length ?? 0} docentes registrados</p>
+        <p className="text-gray-500 font-medium mt-1">{filteredFaculty.length} docentes</p>
       </div>
 
       {/* Status filter tabs */}
@@ -123,39 +207,61 @@ export default async function FacultyListPage({
               <tr className="border-b border-gray-100">
                 <th className="text-left px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Nombre</th>
                 <th className="text-left px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Email</th>
-                <th className="text-left px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">País</th>
-                <th className="text-left px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Perfil</th>
+                <th className="text-center px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Perfil</th>
+                <th className="text-center px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Visitas</th>
+                <th className="text-center px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Contactos</th>
                 <th className="text-center px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">PhD</th>
                 <th className="text-center px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">ANECA</th>
                 <th className="text-center px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Estado</th>
-                <th className="text-center px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Visitas</th>
+                <th className="text-center px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Acción recomendada</th>
                 <th className="text-right px-5 py-3 text-[10px] font-black text-gray-400 uppercase tracking-widest">Último acceso</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {(faculty ?? []).length === 0 ? (
-                <tr><td colSpan={9} className="px-5 py-8 text-center text-sm text-gray-400">No hay docentes registrados</td></tr>
+              {filteredFaculty.length === 0 ? (
+                <tr><td colSpan={10} className="px-5 py-8 text-center text-sm text-gray-400">No hay docentes registrados</td></tr>
               ) : (
-                (faculty ?? []).map((f) => {
-                  const fp = profileMap[f.id] || {};
+                filteredFaculty.map((f: any) => {
+                  const fp = f._profile || {};
+                  const completeness = fp._completeness ?? 0;
+                  const viewCount = fp.view_count ?? 0;
+                  const contactCount = contactCountMap[f.id] ?? 0;
                   return (
                     <tr key={f.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-5 py-3">
                         <Link
                           href={`/control/faculty/${f.id}`}
-                          className="text-sm font-bold text-navy hover:text-talentia-blue truncate block max-w-[200px]"
+                          className="text-sm font-bold text-navy hover:text-talentia-blue truncate block max-w-[180px]"
                         >
                           {f.full_name || "Sin nombre"}
                         </Link>
                         {fp.headline && (
-                          <p className="text-[11px] text-gray-400 truncate max-w-[200px]">{fp.headline}</p>
+                          <p className="text-[11px] text-gray-400 truncate max-w-[180px]">{fp.headline}</p>
                         )}
                       </td>
                       <td className="px-5 py-3 text-sm text-gray-500">{f.email || "—"}</td>
-                      <td className="px-5 py-3 text-sm text-gray-500">{fp.country || "—"}</td>
-                      <td className="px-5 py-3 min-w-[120px]">
-                        <ProfileBar value={fp.profile_completeness} />
+
+                      {/* Profile progress bar */}
+                      <td className="px-5 py-3 min-w-[130px]">
+                        <ProfileBar value={completeness} />
                       </td>
+
+                      {/* Visits */}
+                      <td className="px-5 py-3 text-center">
+                        <span className="inline-flex items-center gap-1.5 text-sm text-gray-500 font-bold">
+                          <Eye size={13} className="text-gray-400" />
+                          {viewCount}
+                        </span>
+                      </td>
+
+                      {/* Contacts received */}
+                      <td className="px-5 py-3 text-center">
+                        <span className="inline-flex items-center gap-1.5 text-sm text-gray-500 font-bold">
+                          <MessageSquare size={13} className="text-gray-400" />
+                          {contactCount}
+                        </span>
+                      </td>
+
                       <td className="px-5 py-3 text-center">
                         {fp.is_phd ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-black"><GraduationCap size={10} /> PhD</span>
@@ -173,12 +279,12 @@ export default async function FacultyListPage({
                       <td className="px-5 py-3 text-center">
                         <StatusBadge status={f.verification_status} visibility={fp.visibility} />
                       </td>
+
+                      {/* Recommended action */}
                       <td className="px-5 py-3 text-center">
-                        <span className="inline-flex items-center gap-1.5 text-sm text-gray-500 font-bold">
-                          <Eye size={13} className="text-gray-400" />
-                          {fp.view_count ?? 0}
-                        </span>
+                        <ActionBadge viewCount={viewCount} contactCount={contactCount} completeness={completeness} />
                       </td>
+
                       <td className="px-5 py-3 text-right text-sm text-gray-400">
                         {authUserMap[f.id] ? fmtDate(authUserMap[f.id]) : (
                           <span className="text-gray-300" title="Usando fecha de registro">{fmtDate(f.created_at)} <span className="text-[9px]">(Registro)</span></span>
