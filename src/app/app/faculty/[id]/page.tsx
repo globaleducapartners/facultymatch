@@ -14,6 +14,7 @@ import { ContactModalWrapper } from "@/components/dashboard/ContactModalWrapper"
 import { FavoriteButton } from "@/components/dashboard/FavoriteButton";
 import { ProfileViewTracker } from "@/components/profile/ProfileViewTracker";
 import { getDocumentUrl } from "@/lib/utils";
+import { switchActiveMode } from "@/app/auth/actions";
 
 const AVAIL: Record<string, { label: string; color: string; bg: string }> = {
   open:          { label: "Disponible ahora",     color: "#059669", bg: "#F0FDF4" },
@@ -60,12 +61,15 @@ export default async function FacultyProfilePage({
 
   const [{ data: institution }, { data: viewerProfile }] = await Promise.all([
     supabase.from("institutions").select("*").eq("user_id", user.id).maybeSingle(),
-    supabase.from("user_profiles").select("plan, subscription_status").eq("id", user.id).single(),
+    supabase.from("user_profiles").select("plan, subscription_status, can_switch_role, active_mode").eq("id", user.id).single(),
   ]);
 
   const isPro =
     (viewerProfile?.plan === "institution-pro" || viewerProfile?.plan === "institution-growth") &&
     (viewerProfile?.subscription_status === "active" || viewerProfile?.subscription_status === "trialing");
+
+  const canSwitchRole = viewerProfile?.can_switch_role === true;
+  const activeMode = viewerProfile?.active_mode;
 
   // Fetch faculty profile user, documents, and auth user details
   const [facultyUserProfileResult, facultyResult, facultyDocsResult, facultyAuthUserResult] = await Promise.all([
@@ -672,6 +676,28 @@ export default async function FacultyProfilePage({
                 <Zap size={14} /> Activar Plan Professional
               </Link>
               <FavoriteButton facultyId={facultyId} institutionId={institution.id} initialIsFavorite={isFavorite} />
+            </div>
+
+          ) : canSwitchRole && activeMode !== "institution" ? (
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-3xl p-6 text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center mx-auto">
+                <Building2 size={28} className="text-[#1B4FD8]" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-[#0D2240] mb-1">Tienes acceso como institución</h3>
+                <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                  Cambia al modo institución para contactar docentes, guardar favoritos y acceder a todas las funcionalidades.
+                </p>
+              </div>
+              <form action={switchActiveMode}>
+                <input type="hidden" name="mode" value="institution" />
+                <button
+                  type="submit"
+                  className="flex items-center justify-center gap-2 w-full bg-[#1B4FD8] hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-colors shadow-sm"
+                >
+                  <Building2 size={14} /> Cambiar a modo institución
+                </button>
+              </form>
             </div>
 
           ) : (
