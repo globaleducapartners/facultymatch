@@ -163,7 +163,7 @@ export function InstitutionSearchPage({
     setSelectedId(id);
     const params = new URLSearchParams(window.location.search);
     params.set("faculty", id);
-    window.history.replaceState(null, "", `/app/institution/search?${params.toString()}`);
+    window.history.replaceState(null, "", `${basePath}?${params.toString()}`);
   };
 
   const closeDrawer = () => {
@@ -171,7 +171,7 @@ export function InstitutionSearchPage({
     const params = new URLSearchParams(window.location.search);
     params.delete("faculty");
     const str = params.toString();
-    window.history.replaceState(null, "", `/app/institution/search${str ? `?${str}` : ""}`);
+    window.history.replaceState(null, "", `${basePath}${str ? `?${str}` : ""}`);
   };
 
   // ── Direct contact from card (no drawer) ──────────────────────────────────
@@ -584,8 +584,35 @@ export function InstitutionSearchPage({
               </div>
 
               {/* Scrollable body */}
-              <div className="flex-1 overflow-y-auto">
-                <div className="p-6 space-y-6">
+              {isReadOnly && !isAlreadyInstitution ? (
+                /* ── Restricted preview for faculty browsing ── */
+                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                  <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
+                    <Lock size={36} className="text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-black text-navy mb-2">
+                    Perfiles bloqueados
+                  </h3>
+                  <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto mb-8">
+                    Si quieres acceder a los datos de los perfiles del directorio debes registrarte como recruiter o institución.
+                  </p>
+                  <Link
+                    href="/signup/institution"
+                    className="inline-flex items-center justify-center gap-2 bg-[#1B4FD8] hover:bg-[#0D2240] text-white font-bold h-12 px-8 rounded-xl transition-colors text-sm w-full max-w-xs"
+                  >
+                    <Building2 size={16} />
+                    Registrarme como institución
+                  </Link>
+                  <p className="text-xs text-gray-400 mt-4">
+                    ¿Ya tienes cuenta?{" "}
+                    <Link href="/login" className="text-talentia-blue font-bold hover:underline">
+                      Inicia sesión
+                    </Link>
+                  </p>
+                </div>
+              ) : (
+                <div className="flex-1 overflow-y-auto">
+                  <div className="p-6 space-y-6">
                   {/* Actions */}
                   <div className="space-y-2">
                     <div className="flex gap-3">
@@ -890,8 +917,10 @@ export function InstitutionSearchPage({
                   </div>
                 </div>
               </div>
+              )}
 
-              {/* Footer */}
+              {/* Footer — hidden for restricted preview */}
+              {!(isReadOnly && !isAlreadyInstitution) && (
               <div className="p-5 border-t border-gray-100 flex-shrink-0 bg-gray-50/50 flex items-center justify-between">
                 <Link
                   href={`/app/faculty/${selectedEducator.id}`}
@@ -902,6 +931,7 @@ export function InstitutionSearchPage({
                   Ver perfil completo
                 </Link>
               </div>
+              )}
             </>
           )}
         </SheetContent>
