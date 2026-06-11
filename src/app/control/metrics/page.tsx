@@ -89,6 +89,25 @@ export default async function MetricsPage() {
     .from("email_logs")
     .select("*", { count: "exact", head: true });
 
+  // Acquisition channels breakdown
+  const { data: acqData } = await admin
+    .from("user_profiles")
+    .select("acquisition_channel")
+    .not("acquisition_channel", "is", null);
+  const acqCounts: Record<string, number> = {};
+  (acqData ?? []).forEach((r: any) => {
+    const ch = r.acquisition_channel || "direct";
+    acqCounts[ch] = (acqCounts[ch] ?? 0) + 1;
+  });
+  const acqEntries = Object.entries(acqCounts).sort((a, b) => b[1] - a[1]);
+  const CHANNEL_LABELS: Record<string, string> = {
+    direct: "Directo",
+    organic_search: "Búsqueda orgánica",
+    linkedin: "LinkedIn",
+    social: "Redes sociales",
+    referral: "Referral",
+  };
+
   // Top viewed profiles
   const { data: topProfiles } = await admin
     .from("faculty_profiles")
@@ -201,6 +220,34 @@ export default async function MetricsPage() {
           <StatCard icon={Award}         label="Acreditación ANECA"       value={anecaCount ?? 0}    color="purple" sub={`${anecaPct} del total`} />
           <StatCard icon={Repeat2}       label="Usuarios dual-mode"       value={dualModeUsers ?? 0} color="green"  sub="Docente + institución" />
           <StatCard icon={TrendingUp}    label="Tasa de conversión"       value={conversionRate}      color="orange" sub="Docentes → institución" />
+        </div>
+      </section>
+
+      {/* Acquisition channels */}
+      <section className="space-y-3">
+        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Canales de adquisición</h2>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          {acqEntries.length > 0 ? (
+            <div className="p-5 space-y-3">
+              {acqEntries.map(([channel, count]) => {
+                const total = acqEntries.reduce((s, [, c]) => s + c, 0);
+                const pct = Math.round((count / total) * 100);
+                return (
+                  <div key={channel} className="space-y-1">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-navy">{CHANNEL_LABELS[channel] || channel}</span>
+                      <span className="text-gray-400">{count} ({pct}%)</span>
+                    </div>
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bg-talentia-blue" style={{ width: `${Math.max(4, pct)}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="p-5 text-sm text-gray-400 text-center py-8">Sin datos de adquisición aún</div>
+          )}
         </div>
       </section>
 

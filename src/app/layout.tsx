@@ -5,6 +5,7 @@ import { VisualEditsMessenger } from "orchids-visual-edits";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { AcquisitionTracker } from "@/components/AcquisitionTracker";
 import Script from "next/script";
 
 const inter = Inter({
@@ -86,6 +87,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <CookieConsent />
           <VisualEditsMessenger />
           <GoogleAnalytics />
+          <AcquisitionTracker />
 
       </body>
     </html>

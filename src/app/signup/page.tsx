@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
+import { submitAcquisitionData } from "@/lib/acquisition";
 import { Logo } from "@/components/ui/Logo";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
@@ -203,7 +204,7 @@ function SignupForm() {
       );
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.facultymatch.app").replace(/\/$/, "");
 
-      const { error } = await supabase.auth.signUp({
+      const { data: signUpData, error } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
         password,
         options: {
@@ -244,6 +245,9 @@ function SignupForm() {
         return;
       }
 
+      if (signUpData?.user?.id) {
+        submitAcquisitionData(signUpData.user.id);
+      }
       router.push(wantsInst ? "/signup/institution/confirm" : "/signup/faculty/confirm");
     } catch {
       setServerError("Error de red. Inténtalo de nuevo.");
