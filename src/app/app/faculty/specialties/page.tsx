@@ -78,8 +78,8 @@ export default async function SpecialtiesPage() {
         </p>
       </div>
 
-      {/* Two-column layout */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 280px", gap: 20, alignItems: "start" }}>
+      {/* Two-column layout — responsive: 1 col mobile, 2 cols lg+ */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-5 items-start">
 
         {/* Left column */}
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -90,35 +90,36 @@ export default async function SpecialtiesPage() {
             borderRadius: 16, overflow: "hidden",
           }}>
             <div style={{
-              display: "flex", alignItems: "center", gap: 12,
-              padding: "18px 22px", borderBottom: `1px solid ${D.border}`,
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "14px 16px", borderBottom: `1px solid ${D.border}`,
             }}>
               <div style={{
-                width: 36, height: 36, borderRadius: 8, background: "#EFF6FF",
+                width: 34, height: 34, borderRadius: 8, background: "#EFF6FF",
                 display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
               }}>
                 <BookOpen size={16} color={D.blue} />
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: SANS, fontSize: 16, fontWeight: 800, color: D.ink, letterSpacing: "-0.02em" }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: SANS, fontSize: 15, fontWeight: 800, color: D.ink, letterSpacing: "-0.02em" }}>
                   Tus áreas de conocimiento
                 </div>
-                <div style={{ fontFamily: SANS, fontSize: 12, color: D.muted, marginTop: 1 }}>
+                <div style={{ fontFamily: SANS, fontSize: 11, color: D.muted, marginTop: 1 }}>
                   Las instituciones te encontrarán principalmente por estos temas
                 </div>
               </div>
               {specialties.length > 0 && (
                 <span style={{
-                  fontFamily: SANS, fontSize: 11, fontWeight: 700,
+                  fontFamily: SANS, fontSize: 10, fontWeight: 700,
                   color: D.blue, background: "#EFF6FF",
-                  padding: "3px 8px", borderRadius: 999,
+                  padding: "3px 8px", borderRadius: 999, whiteSpace: "nowrap", flexShrink: 0,
                 }}>
                   {specialties.length} activas
                 </span>
               )}
             </div>
 
-            <div style={{ padding: "16px 22px" }}>
+            <div style={{ padding: "14px 16px" }}>
               {specialties.length > 0 ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {specialties.map((item: { id: string; area: string; subarea?: string; topics?: string[] }) => (
@@ -163,12 +164,12 @@ export default async function SpecialtiesPage() {
                       }}>
                         <button type="submit" style={{
                           display: "flex", alignItems: "center", justifyContent: "center",
-                          width: 30, height: 30, borderRadius: 8,
+                          width: 36, height: 36, borderRadius: 10,
                           background: D.white, border: `1px solid ${D.border}`,
                           color: D.faint, cursor: "pointer",
                           transition: "all 0.15s",
                         }}>
-                          <X size={14} />
+                          <X size={15} />
                         </button>
                       </form>
                     </div>
@@ -203,32 +204,33 @@ export default async function SpecialtiesPage() {
             borderRadius: 16, overflow: "hidden",
           }}>
             <div style={{
-              display: "flex", alignItems: "center", gap: 12,
-              padding: "18px 22px", borderBottom: `1px solid ${D.border}`,
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "14px 16px", borderBottom: `1px solid ${D.border}`,
             }}>
               <div style={{
-                width: 36, height: 36, borderRadius: 8, background: "#EFF6FF",
+                width: 34, height: 34, borderRadius: 8, background: "#EFF6FF",
                 display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
               }}>
                 <span style={{ fontSize: 18, lineHeight: 1 }}>+</span>
               </div>
               <div>
-                <div style={{ fontFamily: SANS, fontSize: 16, fontWeight: 800, color: D.ink, letterSpacing: "-0.02em" }}>
+                <div style={{ fontFamily: SANS, fontSize: 15, fontWeight: 800, color: D.ink, letterSpacing: "-0.02em" }}>
                   Añadir nueva especialidad
                 </div>
-                <div style={{ fontFamily: SANS, fontSize: 12, color: D.muted, marginTop: 1 }}>
+                <div style={{ fontFamily: SANS, fontSize: 11, color: D.muted, marginTop: 1 }}>
                   Selecciona el área UNESCO y añade temas específicos
                 </div>
               </div>
             </div>
-            <div style={{ padding: "22px 24px" }}>
+            <div style={{ padding: "16px" }}>
               <SpecialtyForm action={addSpecialty} />
             </div>
           </div>
         </div>
 
-        {/* Right sidebar */}
-        <div style={{ position: "sticky", top: 24 }}>
+        {/* Right sidebar — sticky only on lg+ */}
+        <div className="lg:sticky lg:top-6">
           <div style={{
             background: D.navy, borderRadius: 16, padding: "22px",
           }}>
