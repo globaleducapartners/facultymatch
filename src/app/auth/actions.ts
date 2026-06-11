@@ -5,6 +5,7 @@ import { sendWelcomeEmail } from "@/lib/emails/service";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Resend } from 'resend';
+import { extractDomainFromWebsite, extractDomainFromEmail } from "@/lib/domain";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || 'FacultyMatch <noreply@facultymatch.app>';
@@ -148,6 +149,28 @@ export async function signUpInstitution(formData: FormData) {
 
   if (!email || !password || !fullName || !institutionName) {
     return { error: "Faltan datos obligatorios." };
+  }
+  if (!website) {
+    return { error: "La web institucional es obligatoria. Debe tener el mismo dominio que tu correo electrónico." };
+  }
+
+  // Domain validation: the institution account email must belong to the institution's domain
+  const websiteDomain = extractDomainFromWebsite(website);
+  const emailDomain = extractDomainFromEmail(email);
+  if (websiteDomain && emailDomain) {
+    // Check if email domain matches the website domain (or is a subdomain of it)
+    const emailDomainLower = emailDomain.toLowerCase();
+    const websiteDomainLower = websiteDomain.toLowerCase();
+    const isValidDomain = emailDomainLower === websiteDomainLower ||
+      emailDomainLower.endsWith("." + websiteDomainLower);
+    if (!isValidDomain) {
+      return {
+        error: `El correo electrónico debe pertenecer al dominio de la institución (${websiteDomain}). Ejemplo: usuario@${websiteDomain}`,
+      };
+    }
+  }
+  if (!websiteDomain) {
+    return { error: "La URL de la web institucional no es válida. Asegúrate de incluir el dominio completo (ej: https://www.universidad.es)." };
   }
 
   const admin = createAdminClient();
@@ -746,6 +769,25 @@ export async function saveInstitutionOnboarding(formData: FormData) {
   const description = formData.get("description") as string;
 
   if (!name?.trim()) return { error: "El nombre de la institución es obligatorio." };
+  if (!website) return { error: "La web institucional es obligatoria. Debe tener el mismo dominio que tu correo electrónico." };
+
+  // Domain validation: the account email must belong to the institution's domain
+  const websiteDomain = extractDomainFromWebsite(website);
+  const emailDomain = extractDomainFromEmail(user.email);
+  if (websiteDomain && emailDomain) {
+    const emailDomainLower = emailDomain.toLowerCase();
+    const websiteDomainLower = websiteDomain.toLowerCase();
+    const isValidDomain = emailDomainLower === websiteDomainLower ||
+      emailDomainLower.endsWith("." + websiteDomainLower);
+    if (!isValidDomain) {
+      return {
+        error: `El correo electrónico debe pertenecer al dominio de la institución (${websiteDomain}). Usa un correo como usuario@${websiteDomain}`,
+      };
+    }
+  }
+  if (!websiteDomain) {
+    return { error: "La URL de la web institucional no es válida. Asegúrate de incluir el dominio completo (ej: https://www.universidad.es)." };
+  }
 
   // Check for duplicate institution name (different user) — soft warning only
   const { data: existingByName } = await admin

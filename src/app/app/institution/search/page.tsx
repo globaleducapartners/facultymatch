@@ -2,6 +2,7 @@ import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { InstitutionSearchPage } from "@/components/dashboard/InstitutionSearchPage";
 import { InstitutionWelcomeBanner } from "@/components/dashboard/InstitutionWelcomeBanner";
 import { redirect } from "next/navigation";
+import { matchesBlockedDomain } from "@/lib/domain";
 
 // ─── Area → Spanish keywords mapping ──────────────────────────────────────────
 const AREA_KEYWORDS: Record<string, string[]> = {
@@ -217,9 +218,9 @@ export default async function InstitutionSearchRoute({
     institution.name
       ? admin.from("visibility_rules").select("faculty_id").ilike("institution_name", institution.name).eq("rule", "block")
       : Promise.resolve({ data: null as null | { faculty_id: string }[] }),
-    userEmailDomain
-      ? admin.from("visibility_rules").select("faculty_id").eq("domain", userEmailDomain).eq("rule", "block")
-      : Promise.resolve({ data: null as null | { faculty_id: string }[] }),
+    // Fetch all blocked rules by domain (not just exact match),
+    // then filter in code to support subdomain matching
+    admin.from("visibility_rules").select("faculty_id, domain").not("domain", "is", "null").eq("rule", "block"),
     areaExpertiseQuery,
     areaProfilesQuery,
     namePreQuery,
@@ -228,10 +229,22 @@ export default async function InstitutionSearchRoute({
 
   const favorites = favoritesData?.map((f: any) => f.faculty_id) || [];
 
+  // Subdomain-aware domain blocking: if the user's email domain matches a blocked
+  // domain or is a subdomain of it (e.g. alu.ucam.edu matches blocked ucam.edu),
+  // include that faculty_id in the blocked set.
+  const domainBlockedIds: string[] = [];
+  if (userEmailDomain && blockedByDomain) {
+    for (const rule of blockedByDomain) {
+      if (matchesBlockedDomain(userEmailDomain, (rule as any).domain)) {
+        domainBlockedIds.push(rule.faculty_id);
+      }
+    }
+  }
+
   const blockedFacultyIds = new Set([
     ...(blockedById     || []).map((r: any) => r.faculty_id),
     ...(blockedByName   || []).map((r: any) => r.faculty_id),
-    ...(blockedByDomain || []).map((r: any) => r.faculty_id),
+    ...domainBlockedIds,
   ]);
 
   // Merge area matches from faculty_expertise AND faculty_profiles headline/bio

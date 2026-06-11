@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { extractDomainFromWebsite, extractDomainFromEmail, matchesBlockedDomain } from "@/lib/domain";
 
 export default async function PrivacyPage({
   searchParams,
@@ -130,27 +131,45 @@ export default async function PrivacyPage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const admin = createAdminClient();
-    // Look up institution UUID + user_id if it has a registered account
+
+    // 1. Look up institution UUID + user_id if it has a registered account
     const { data: inst } = await admin
       .from("institutions")
-      .select("id, user_id")
+      .select("id, user_id, website")
       .ilike("name", name)
       .limit(1)
       .maybeSingle();
 
-    // Try to extract email domain from the institution's registered account
+    // 2. Extract domain: try multiple sources
     let institutionDomain: string | null = null;
-    if (inst?.user_id) {
+
+    // 2a. From registered institution website
+    if (inst?.website) {
+      institutionDomain = extractDomainFromWebsite(inst.website);
+    }
+    // 2b. From registered institution user email
+    if (!institutionDomain && inst?.user_id) {
       try {
         const { data: { user: instUser } } = await admin.auth.admin.getUserById(inst.user_id);
         if (instUser?.email) {
-          const parts = instUser.email.split("@");
-          if (parts.length === 2 && parts[1]) institutionDomain = parts[1].toLowerCase();
+          institutionDomain = extractDomainFromEmail(instUser.email);
         }
       } catch {}
     }
+    // 2c. From universities_es domain (for unregistered but known universities)
+    if (!institutionDomain) {
+      const { data: univ } = await admin
+        .from("universities_es")
+        .select("domain")
+        .ilike("name", name)
+        .limit(1)
+        .maybeSingle();
+      if (univ?.domain) {
+        institutionDomain = univ.domain.toLowerCase();
+      }
+    }
 
-    // Check for duplicate: by institution_id if registered, otherwise by institution_name
+    // 3. Check for duplicate
     let existing = null;
     if (inst) {
       const { data } = await admin
@@ -171,44 +190,45 @@ export default async function PrivacyPage({
         .maybeSingle();
       existing = data;
     }
-    if (!existing) {
-      // Try insert with institution_name + domain
-      const { error: insertError } = await admin.from("visibility_rules").insert({
+
+    if (existing) {
+      revalidatePath("/app/faculty/privacy");
+      redirect("/app/faculty/privacy?blocked=1");
+    }
+
+    // 4. Insert the block rule
+    const { error: insertError } = await admin.from("visibility_rules").insert({
+      faculty_id: user.id,
+      institution_id: inst?.id ?? null,
+      institution_name: name,
+      domain: institutionDomain,
+      rule: "block",
+    });
+    if (insertError) {
+      // Fallback: without domain column
+      const { error: noDomainError } = await admin.from("visibility_rules").insert({
         faculty_id: user.id,
         institution_id: inst?.id ?? null,
         institution_name: name,
-        domain: institutionDomain,
         rule: "block",
       });
-      if (insertError) {
-        // Fallback: try without domain column
-        const { error: noDomainError } = await admin.from("visibility_rules").insert({
+      if (noDomainError && inst?.id) {
+        // Last fallback: only institution_id
+        const { error: fallbackError } = await admin.from("visibility_rules").insert({
           faculty_id: user.id,
-          institution_id: inst?.id ?? null,
-          institution_name: name,
+          institution_id: inst.id,
           rule: "block",
         });
-        if (noDomainError) {
-          // Last fallback: only institution_id (only if registered)
-          if (inst?.id) {
-            const { error: fallbackError } = await admin.from("visibility_rules").insert({
-              faculty_id: user.id,
-              institution_id: inst.id,
-              rule: "block",
-            });
-            if (fallbackError) {
-              console.error("[blockInstitution] All inserts failed:", fallbackError.message);
-              revalidatePath("/app/faculty/privacy");
-              redirect("/app/faculty/privacy?error=save-failed");
-            }
-          } else {
-            console.error("[blockInstitution] Insert failed:", noDomainError.message);
-            revalidatePath("/app/faculty/privacy");
-            redirect("/app/faculty/privacy?error=save-failed");
-          }
+        if (fallbackError) {
+          console.error("[blockInstitution] All inserts failed:", fallbackError.message);
+          redirect("/app/faculty/privacy?error=save-failed");
         }
+      } else if (noDomainError) {
+        console.error("[blockInstitution] Insert failed:", noDomainError.message);
+        redirect("/app/faculty/privacy?error=save-failed");
       }
     }
+
     revalidatePath("/app/faculty/privacy");
     redirect("/app/faculty/privacy?blocked=1");
   }
@@ -383,7 +403,7 @@ export default async function PrivacyPage({
                 Bloqueo de instituciones
               </CardTitle>
               <CardDescription className="font-medium">
-                Bloquea instituciones específicas para que nunca puedan ver tu perfil. Si el centro está registrado en FacultyMatch, el bloqueo se aplica también a todos los correos de su dominio. Gratuito para todos los planes.
+                Bloquea instituciones específicas para que nunca puedan ver tu perfil. El bloqueo se aplica a <strong>todos los usuarios</strong> cuyo correo tenga el mismo dominio o subdominio (ej: @ucam.edu, @alu.ucam.edu). Gratuito para todos los planes.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -433,7 +453,7 @@ export default async function PrivacyPage({
                             <p className="text-sm font-bold text-navy">{inst.name}</p>
                             {inst.domain && (
                               <p className="text-xs text-gray-400 font-medium mt-0.5">
-                                Bloquea accesos desde @{inst.domain}
+                                Bloquea accesos desde @{inst.domain} y todos sus subdominios
                               </p>
                             )}
                           </div>

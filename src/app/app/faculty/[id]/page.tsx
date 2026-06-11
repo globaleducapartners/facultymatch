@@ -14,6 +14,7 @@ import { ContactModalWrapper } from "@/components/dashboard/ContactModalWrapper"
 import { FavoriteButton } from "@/components/dashboard/FavoriteButton";
 import { ProfileViewTracker } from "@/components/profile/ProfileViewTracker";
 import { getDocumentUrl } from "@/lib/utils";
+import { matchesBlockedDomain, extractDomainFromEmail } from "@/lib/domain";
 import { switchActiveMode } from "@/app/auth/actions";
 
 const AVAIL: Record<string, { label: string; color: string; bg: string }> = {
@@ -104,11 +105,42 @@ export default async function FacultyProfilePage({
     );
   }
 
-  if (faculty?.visibility === "hidden") {
+  // Domain-based blocking check: if the viewer is from an institution whose email
+  // domain matches a blocked domain for this faculty member, treat as hidden.
+  let isDomainBlocked = false;
+  if (institution && user.email) {
+    const viewerEmailDomain = extractDomainFromEmail(user.email);
+    if (viewerEmailDomain) {
+      const { data: domainBlockRules } = await admin
+        .from("visibility_rules")
+        .select("domain")
+        .eq("faculty_id", faculty?.id ?? id)
+        .eq("rule", "block")
+        .not("domain", "is", "null");
+      if (domainBlockRules) {
+        isDomainBlocked = domainBlockRules.some(
+          (rule: any) => matchesBlockedDomain(viewerEmailDomain, rule.domain)
+        );
+      }
+    }
+  }
+
+  if (faculty?.visibility === "hidden" || isDomainBlocked) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center gap-6 p-8">
-        <div className="bg-gray-50 p-5 rounded-full"><ShieldCheck size={40} className="text-gray-300" /></div>
-        <div><h1 className="text-xl font-bold text-[#0D2240]">Perfil oculto</h1></div>
+        <div className={`p-5 rounded-full ${isDomainBlocked ? 'bg-red-50' : 'bg-gray-50'}`}>
+          <ShieldCheck size={40} className={isDomainBlocked ? 'text-red-400' : 'text-gray-300'} />
+        </div>
+        <div>
+          <h1 className="text-xl font-bold text-[#0D2240]">
+            {isDomainBlocked ? 'Acceso bloqueado' : 'Perfil oculto'}
+          </h1>
+          <p className="text-sm text-gray-500 font-medium mt-2 max-w-sm">
+            {isDomainBlocked
+              ? 'Has sido bloqueado por este docente. No puedes ver su perfil porque tu institución está en su lista de bloqueo.'
+              : 'Este perfil no está visible actualmente.'}
+          </p>
+        </div>
         <Button asChild variant="outline" className="rounded-xl font-bold">
           <Link href={institution ? "/app/institution/search" : "/app/faculty/directory"}>Volver</Link>
         </Button>

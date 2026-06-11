@@ -1,6 +1,7 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { BecomeInstitutionClient } from "./BecomeInstitutionClient";
+import { extractDomainFromWebsite, extractDomainFromEmail } from "@/lib/domain";
 
 export default async function BecomeInstitutionPage() {
   const supabase = await createClient();
@@ -41,6 +42,25 @@ export default async function BecomeInstitutionPage() {
     if (!country)      return { error: "Selecciona el país." };
     if (!contactEmail) return { error: "El email institucional es obligatorio." };
     if (!/\S+@\S+\.\S+/.test(contactEmail)) return { error: "Email no válido." };
+    if (!website)      return { error: "La web institucional es obligatoria. Debe tener el mismo dominio que tu correo electrónico." };
+
+    // Domain validation: the institution account email must belong to the institution's domain
+    const websiteDomain = extractDomainFromWebsite(website);
+    const emailDomain = extractDomainFromEmail(contactEmail);
+    if (websiteDomain && emailDomain) {
+      const emailDomainLower = emailDomain.toLowerCase();
+      const websiteDomainLower = websiteDomain.toLowerCase();
+      const isValidDomain = emailDomainLower === websiteDomainLower ||
+        emailDomainLower.endsWith("." + websiteDomainLower);
+      if (!isValidDomain) {
+        return {
+          error: `El email institucional debe pertenecer al dominio de la institución (${websiteDomain}). Ejemplo: contacto@${websiteDomain}`,
+        };
+      }
+    }
+    if (!websiteDomain) {
+      return { error: "La URL de la web institucional no es válida. Asegúrate de incluir el dominio completo (ej: https://www.universidad.es)." };
+    }
 
     const location = [city, country].filter(Boolean).join(", ");
 

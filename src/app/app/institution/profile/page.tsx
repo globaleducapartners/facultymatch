@@ -2,6 +2,7 @@ import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
+import { extractDomainFromWebsite, extractDomainFromEmail } from "@/lib/domain";
 import { Building2, Globe, MapPin, Phone, Mail, Users, Calendar, Link as LinkIcon, Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,9 +15,9 @@ const FROM = process.env.RESEND_FROM_EMAIL || "FacultyMatch <noreply@facultymatc
 export default async function InstitutionProfilePage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string }>;
+  searchParams: Promise<{ saved?: string; error?: string }>;
 }) {
-  const { saved } = await searchParams;
+  const { saved, error: errorParam } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -76,6 +77,25 @@ export default async function InstitutionProfilePage({
     const linkedinUrl = formData.get("linkedinUrl") as string;
     const modality = formData.get("modality") as string;
     const cityCountry = [city, country].filter(Boolean).join(", ");
+
+    // Domain validation: if website changed, verify it matches the account email domain
+    if (website && user.email) {
+      const websiteDomain = extractDomainFromWebsite(website);
+      const emailDomain = extractDomainFromEmail(user.email);
+      if (websiteDomain && emailDomain) {
+        const emailDomainLower = emailDomain.toLowerCase();
+        const websiteDomainLower = websiteDomain.toLowerCase();
+        const isValidDomain = emailDomainLower === websiteDomainLower ||
+          emailDomainLower.endsWith("." + websiteDomainLower);
+        if (!isValidDomain) {
+          revalidatePath("/app/institution/profile");
+          redirect(`/app/institution/profile?error=domain-mismatch`);
+        }
+      } else if (!websiteDomain) {
+        revalidatePath("/app/institution/profile");
+        redirect(`/app/institution/profile?error=invalid-website`);
+      }
+    }
 
     const { data: existing } = await supabase.from("institutions").select("id").eq("user_id", user.id).maybeSingle();
 
@@ -161,6 +181,16 @@ export default async function InstitutionProfilePage({
       {saved === "1" && (
         <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
           ✓ Cambios guardados correctamente
+        </div>
+      )}
+      {errorParam === "domain-mismatch" && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-red-700 font-bold text-sm">
+          ✗ El dominio de la web debe coincidir con el dominio de tu correo electrónico institucional.
+        </div>
+      )}
+      {errorParam === "invalid-website" && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-red-700 font-bold text-sm">
+          ✗ La URL de la web institucional no es válida. Asegúrate de incluir el dominio completo.
         </div>
       )}
       {/* Header */}

@@ -166,6 +166,7 @@ export function BecomeInstitutionClient({
     if (!instName.trim()) e.instName = "El nombre es obligatorio.";
     if (!instType)         e.instType = "Selecciona el tipo de institución.";
     if (!country)          e.country  = "Selecciona el país.";
+    if (!website.trim())   e.website  = "La web institucional es obligatoria.";
     setFieldErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -379,14 +380,20 @@ export function BecomeInstitutionClient({
             </div>
 
             <div>
-              <label style={lbl}>Web institucional <span style={{ fontWeight: 400, color: D.faint }}>(opcional)</span></label>
+              <label style={lbl}>Web institucional <span style={{ color: D.error }}>*</span></label>
+              <p style={{ fontFamily: SANS, fontSize: 12, color: D.faint, margin: "0 0 8px" }}>
+                Es obligatoria. Debe coincidir con el dominio de tu correo (ej: universidad.es).
+              </p>
               <input
-                style={inp()}
+                style={inp(!!fieldErrors.website)}
                 value={website}
                 onChange={e => setWebsite(e.target.value)}
                 placeholder="https://www.tuuniversidad.es"
                 type="url"
               />
+              {fieldErrors.website && (
+                <p style={{ fontFamily: SANS, fontSize: 12, color: D.error, marginTop: 4 }}>{fieldErrors.website}</p>
+              )}
             </div>
           </div>
         )}
