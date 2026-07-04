@@ -338,7 +338,7 @@ export default function ResourcesPage() {
                 </button>
               </div>
               <p style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.25)", margin: 0, textAlign: "center" as const }}>
-                Más de 8.000 académicos ya suscritos
+                Una vez al mes. Sin spam. Cancela cuando quieras.
               </p>
             </div>
           </div>

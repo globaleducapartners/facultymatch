@@ -115,8 +115,8 @@ function LoginContent() {
             gap: 12,
           }}>
             {[
-              { n: "500+", label: "expertos verificados" },
-              { n: "80+",  label: "instituciones educativas" },
+              { n: "Verificados", label: "Expertos y docentes con experiencia REAL confirmada" },
+              { n: "Activas",  label: "Universidades y escuelas de negocio" },
             ].map(({ n, label }) => (
               <div key={label} style={{
                 background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",

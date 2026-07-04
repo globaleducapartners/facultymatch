@@ -169,58 +169,45 @@ export default async function EducatorDashboard() {
     <div className="space-y-8 animate-in fade-in duration-500 pb-20 lg:pb-0">
 
       {/* ── Hero ── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#2563EB] p-8 text-white">
-        {/* Decorative dots */}
-        <div className="absolute top-0 right-0 w-64 h-64 opacity-10">
-          <svg viewBox="0 0 200 200" className="w-full h-full">
-            {Array.from({ length: 8 }).map((_, r) =>
-              Array.from({ length: 8 }).map((_, c) => (
-                <circle key={`${r}-${c}`} cx={c * 28 + 14} cy={r * 28 + 14} r="3" fill="white" />
-              ))
-            )}
-          </svg>
+      <div className="relative overflow-hidden rounded-3xl bg-white border border-gray-100 shadow-sm p-8">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
+          <div>
+            <p className="text-gray-400 text-sm font-bold uppercase tracking-widest mb-1">Panel docente</p>
+            <h1 className="text-3xl font-black tracking-tight text-navy mb-1">Hola, {firstName} 👋</h1>
+            <p className="text-gray-500 font-medium text-sm">
+              {progress === 100
+                ? "Tu perfil está completo. Las instituciones pueden encontrarte fácilmente."
+                : `Completa tu perfil para maximizar tu visibilidad ante instituciones.`}
+            </p>
+          </div>
+          <Button
+            asChild
+            className="bg-talentia-blue hover:bg-navy text-white font-bold rounded-xl h-10 px-5 whitespace-nowrap flex-shrink-0"
+          >
+            <Link href="/app/faculty/profile" className="flex items-center gap-2">
+              Editar perfil <ArrowRight size={15} />
+            </Link>
+          </Button>
         </div>
 
-        <div className="relative z-10">
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
-            <div>
-              <p className="text-blue-200 text-sm font-bold uppercase tracking-widest mb-1">Panel docente</p>
-              <h1 className="text-3xl font-black tracking-tight mb-1">Hola, {firstName} 👋</h1>
-              <p className="text-blue-100 font-medium text-sm">
-                {progress === 100
-                  ? "Tu perfil está completo. Las instituciones pueden encontrarte fácilmente."
-                  : `Completa tu perfil para maximizar tu visibilidad ante instituciones.`}
-              </p>
-            </div>
-            <Button
-              asChild
-              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 font-bold rounded-xl h-10 px-5 backdrop-blur-sm whitespace-nowrap flex-shrink-0"
-            >
-              <Link href="/app/faculty/profile" className="flex items-center gap-2">
-                Editar perfil <ArrowRight size={15} />
-              </Link>
-            </Button>
+        {/* Progress */}
+        <div className="mt-6 space-y-2">
+          <div className="flex justify-between text-sm font-bold text-gray-500">
+            <span>Perfil completado</span>
+            <span className="text-navy font-black">{progress}%</span>
           </div>
-
-          {/* Progress */}
-          <div className="mt-6 space-y-2">
-            <div className="flex justify-between text-sm font-bold text-blue-100">
-              <span>Perfil completado</span>
-              <span className="text-white font-black">{progress}%</span>
-            </div>
-            <div className="h-2.5 bg-white/20 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all duration-1000 ${progress === 100 ? "bg-green-400" : "bg-white"}`}
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            {pendingItems.length > 0 && (
-              <p className="text-blue-200 text-xs font-medium">
-                Faltan {pendingItems.length} sección{pendingItems.length !== 1 ? "es" : ""}:{" "}
-                {pendingItems.map((i) => i.label).join(", ")}.
-              </p>
-            )}
+          <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-1000 bg-energy-orange"
+              style={{ width: `${progress}%` }}
+            />
           </div>
+          {pendingItems.length > 0 && (
+            <p className="text-gray-500 text-xs font-medium">
+              Faltan {pendingItems.length} sección{pendingItems.length !== 1 ? "es" : ""}:{" "}
+              {pendingItems.map((i) => i.label).join(", ")}.
+            </p>
+          )}
         </div>
       </div>
 

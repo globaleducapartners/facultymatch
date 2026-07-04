@@ -362,8 +362,8 @@ function Hero() {
                 </svg>
               </div>
               <div>
-                <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>+500</div>
-                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>Expertos verificados</div>
+                <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>Verificados</div>
+                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>Expertos y docentes con experiencia REAL confirmada</div>
               </div>
             </div>
 
@@ -386,8 +386,8 @@ function Hero() {
                 </svg>
               </div>
               <div>
-                <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>+80</div>
-                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>Instituciones activas</div>
+                <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>Activas</div>
+                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>Universidades y escuelas de negocio</div>
               </div>
             </div>
 
@@ -410,8 +410,8 @@ function Hero() {
                 </svg>
               </div>
               <div>
-                <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>3 días</div>
-                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>Tiempo medio hasta primer contacto</div>
+                <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>Directo</div>
+                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>Contacto sin intermediarios entre institución y docente</div>
               </div>
             </div>
           </div>
@@ -474,10 +474,10 @@ function StatsStrip() {
   const { ref, inView } = useInView(0.2);
 
   const stats = [
-    { value: 500, suffix: "", label: "Expertos verificados" },
-    { value: 80, suffix: "", label: "Instituciones educativas" },
-    { value: 3, suffix: " días", label: "Hasta primer contacto" },
-    { value: 100, suffix: "%", label: "Perfiles revisados a mano" },
+    { display: "91", label: "universidades en España" },
+    { display: "1,76M", label: "Estudiantes universitarios matriculados" },
+    { display: "200k", label: "Alumnos internacionales cada curso" },
+    { display: "4K", label: "Titulaciones de máster impartidas en España" },
   ];
 
   return (
@@ -509,7 +509,7 @@ function StatsStrip() {
               transition: `transform 0.5s ease ${i * 0.12}s`,
               transform: inView ? "translateY(0)" : "translateY(10px)",
             }}>
-              {inView ? <Counter to={s.value} suffix={s.suffix} /> : `+${s.value}${s.suffix}`}
+              {s.display}
             </div>
             <div style={{
               fontFamily: SANS, fontSize: 13, fontWeight: 500,
