@@ -219,53 +219,17 @@ function Hero() {
   const isMob = useIsMobile();
 
   return (
-    <div style={{
-      position: "relative", minHeight: "100svh",
-      display: "flex", alignItems: "center",
-      overflow: "hidden", background: D.dark,
-    }}>
-      {/* Video BG (desktop) / Static image (mobile) */}
-      {isMob ? (
-        <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: `url(https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=85&w=1200)`,
-          backgroundSize: "cover", backgroundPosition: "center 30%",
-        }} />
-      ) : (
-        <video
-          autoPlay muted loop playsInline
-          poster="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=85&w=1800"
-          style={{
-            position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover", objectPosition: "center 30%",
-          }}
-        >
-          <source src="https://assets.mixkit.co/videos/36827/36827-720.mp4" type="video/mp4" />
-        </video>
-      )}
-
-      {/* Gradient overlay */}
+    <>
+      {/* Dark compact section */}
       <div style={{
-        position: "absolute", inset: 0,
-        background: isMob
-          ? "rgba(7,19,38,0.85)"
-          : "linear-gradient(105deg, rgba(7,19,38,0.97) 0%, rgba(7,19,38,0.88) 42%, rgba(7,19,38,0.38) 70%, rgba(7,19,38,0.08) 100%)",
-      }} />
-
-      {/* Content */}
-      <div style={{
-        position: "relative", zIndex: 2,
-        maxWidth: 1120, margin: "0 auto",
-        padding: isMob ? "120px 24px 80px" : "96px 32px 80px",
-        width: "100%",
-        display: "grid",
-        gridTemplateColumns: isMob ? "1fr" : "1fr 1fr",
-        gap: isMob ? 48 : 60,
-        alignItems: "center",
+        background: D.dark,
+        padding: isMob ? "120px 24px 48px" : "140px 32px 60px",
       }}>
-        {/* Left: Text */}
-        <div className="fm-animate-up">
+        <div style={{
+          maxWidth: 1120, margin: "0 auto",
+          textAlign: "center",
+        }}>
+          {/* Badge */}
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8,
             background: "rgba(27,79,216,0.25)", border: "1px solid rgba(27,79,216,0.4)",
@@ -281,24 +245,26 @@ function Hero() {
             </span>
           </div>
 
+          {/* Title */}
           <h1 style={{
             fontFamily: SANS,
-            fontSize: isMob ? 38 : "clamp(42px, 5vw, 64px)",
+            fontSize: isMob ? 34 : "clamp(38px, 4.5vw, 56px)",
             fontWeight: 900,
             color: "#fff",
-            lineHeight: 1.05,
+            lineHeight: 1.08,
             letterSpacing: "-0.04em",
-            margin: "0 0 22px",
+            margin: "0 auto 20px",
+            maxWidth: 720,
           }}>
-            En la era de la IA,<br />
-            lo más valioso<br />
-            <span style={{ color: D.gold }}>no es tu contenido,<br />es tu experiencia.</span>
+            En la era de la IA, lo más valioso<br />
+            <span style={{ color: D.gold }}>no es tu contenido, es tu experiencia.</span>
           </h1>
 
+          {/* Description */}
           <p style={{
             fontFamily: SANS, fontSize: isMob ? 15 : 17,
             color: "rgba(255,255,255,0.62)",
-            lineHeight: 1.75, margin: "0 0 40px", maxWidth: 480,
+            lineHeight: 1.75, margin: "0 auto 36px", maxWidth: 560,
           }}>
             FacultyMatch conecta directivos, médicos, investigadores,
             comunicadores y expertos con universidades y escuelas de negocio.
@@ -306,7 +272,8 @@ function Hero() {
             de la educación del siglo XXI.
           </p>
 
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const }}>
+          {/* Buttons */}
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" as const }}>
             <Link href="/signup">
               <button style={{
                 fontFamily: SANS, fontWeight: 700, fontSize: 15,
@@ -330,112 +297,51 @@ function Hero() {
               </button>
             </Link>
           </div>
-          {isMob && (
-            <Link href="/login" style={{ marginTop: 20, display: "inline-block" }}>
-              <span style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.5)" }}>
-                ¿Ya tienes cuenta?{" "}
-                <span style={{ color: D.gold, fontWeight: 700 }}>Acceder →</span>
-              </span>
-            </Link>
-          )}
+
+          {/* Trust line */}
+          <p style={{
+            fontFamily: SANS, fontSize: 13, fontWeight: 500,
+            color: "rgba(255,255,255,0.35)",
+            margin: "20px 0 0",
+          }}>
+            Perfiles verificados a mano. Sin bots, sin currículums sin comprobar.
+          </p>
         </div>
-
-        {/* Right: Floating stat cards — desktop only */}
-        {!isMob && (
-          <div className="fm-animate-up fm-animate-up-delay-2" style={{ display: "flex", flexDirection: "column", gap: 14, alignItems: "flex-end" }}>
-            {/* Card 1 */}
-            <div style={{
-              background: "rgba(255,255,255,0.07)",
-              border: "1px solid rgba(255,255,255,0.14)",
-              backdropFilter: "blur(20px)",
-              borderRadius: 16, padding: "18px 24px",
-              display: "flex", alignItems: "center", gap: 16,
-              minWidth: 240,
-            }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: 12,
-                background: "rgba(27,79,216,0.4)",
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-              }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                </svg>
-              </div>
-              <div>
-                <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>Verificados</div>
-                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>Expertos y docentes con experiencia REAL confirmada</div>
-              </div>
-            </div>
-
-            {/* Card 2 */}
-            <div style={{
-              background: "rgba(255,255,255,0.07)",
-              border: "1px solid rgba(255,255,255,0.14)",
-              backdropFilter: "blur(20px)",
-              borderRadius: 16, padding: "18px 24px",
-              display: "flex", alignItems: "center", gap: 16,
-              minWidth: 260,
-            }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: 12,
-                background: "rgba(233,160,48,0.3)",
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-              }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={D.gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-                </svg>
-              </div>
-              <div>
-                <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>Activas</div>
-                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>Universidades y escuelas de negocio</div>
-              </div>
-            </div>
-
-            {/* Card 3 */}
-            <div style={{
-              background: `rgba(27,79,216,0.25)`,
-              border: "1px solid rgba(27,79,216,0.4)",
-              backdropFilter: "blur(20px)",
-              borderRadius: 16, padding: "18px 24px",
-              display: "flex", alignItems: "center", gap: 16,
-              minWidth: 280,
-            }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: 12,
-                background: "rgba(27,79,216,0.4)",
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-              }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                </svg>
-              </div>
-              <div>
-                <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.03em" }}>Directo</div>
-                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>Contacto sin intermediarios entre institución y docente</div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Scroll indicator */}
+      {/* Product mockup */}
       <div style={{
-        position: "absolute", bottom: 28, left: "50%", transform: "translateX(-50%)",
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 8, zIndex: 2,
+        background: D.surf,
+        padding: 0,
+        overflow: "hidden",
       }}>
         <div style={{
-          width: 1, height: 40,
-          background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.4))",
-        }} />
-        <span style={{
-          fontFamily: SANS, fontSize: 9, fontWeight: 700,
-          letterSpacing: "0.2em", textTransform: "uppercase" as const,
-          color: "rgba(255,255,255,0.3)",
+          maxWidth: 1120, margin: "0 auto",
+          padding: isMob ? "0 24px" : "0 32px",
+          marginTop: isMob ? -40 : -60,
+          position: "relative" as const,
+          zIndex: 2,
         }}>
-          Scroll
-        </span>
+          <div style={{
+            borderRadius: 12,
+            overflow: "hidden",
+            boxShadow: "0 8px 40px rgba(7,19,38,0.15), 0 2px 8px rgba(7,19,38,0.08)",
+          }}>
+            <img
+              src="/mockup-directorio.svg"
+              alt="Vista del directorio de docentes en FacultyMatch"
+              style={{
+                width: "100%",
+                height: "auto",
+                display: "block",
+              }}
+            />
+          </div>
+        </div>
+        {/* Spacer below mockup */}
+        <div style={{ height: isMob ? 48 : 64 }} />
       </div>
-    </div>
+    </>
   );
 }
 
