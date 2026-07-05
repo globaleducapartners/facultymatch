@@ -219,129 +219,115 @@ function Hero() {
   const isMob = useIsMobile();
 
   return (
-    <>
-      {/* Dark compact section */}
+    <div style={{
+      background: D.dark,
+      padding: isMob ? "120px 24px 64px" : "140px 32px 80px",
+    }}>
       <div style={{
-        background: D.dark,
-        padding: isMob ? "120px 24px 48px" : "140px 32px 60px",
+        maxWidth: 1120, margin: "0 auto",
+        textAlign: "center",
       }}>
+        {/* Badge */}
         <div style={{
-          maxWidth: 1120, margin: "0 auto",
-          textAlign: "center",
+          display: "inline-flex", alignItems: "center", gap: 8,
+          background: "rgba(27,79,216,0.25)", border: "1px solid rgba(27,79,216,0.4)",
+          borderRadius: 999, padding: "5px 14px", marginBottom: 28,
         }}>
-          {/* Badge */}
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            background: "rgba(27,79,216,0.25)", border: "1px solid rgba(27,79,216,0.4)",
-            borderRadius: 999, padding: "5px 14px", marginBottom: 28,
+          <div style={{ width: 6, height: 6, borderRadius: "50%", background: D.gold }} />
+          <span style={{
+            fontFamily: SANS, fontSize: 10, fontWeight: 700,
+            letterSpacing: "0.16em", textTransform: "uppercase" as const,
+            color: "rgba(255,255,255,0.8)",
           }}>
-            <div style={{ width: 6, height: 6, borderRadius: "50%", background: D.gold }} />
-            <span style={{
-              fontFamily: SANS, fontSize: 10, fontWeight: 700,
-              letterSpacing: "0.16em", textTransform: "uppercase" as const,
-              color: "rgba(255,255,255,0.8)",
+            Talento real para la educación superior
+          </span>
+        </div>
+
+        {/* Title */}
+        <h1 style={{
+          fontFamily: SANS,
+          fontSize: isMob ? 34 : "clamp(38px, 4.5vw, 56px)",
+          fontWeight: 900,
+          color: "#fff",
+          lineHeight: 1.08,
+          letterSpacing: "-0.04em",
+          margin: "0 auto 20px",
+          maxWidth: 720,
+        }}>
+          En la era de la IA, lo más valioso<br />
+          <span style={{ color: D.gold }}>no es tu contenido, es tu experiencia.</span>
+        </h1>
+
+        {/* Description */}
+        <p style={{
+          fontFamily: SANS, fontSize: isMob ? 15 : 17,
+          color: "rgba(255,255,255,0.62)",
+          lineHeight: 1.75, margin: "0 auto 36px", maxWidth: 560,
+        }}>
+          FacultyMatch conecta directivos, médicos, investigadores,
+          comunicadores y expertos con universidades y escuelas de negocio.
+          Tu experiencia real es el activo más buscado
+          de la educación del siglo XXI.
+        </p>
+
+        {/* Buttons */}
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" as const }}>
+          <Link href="/signup">
+            <button style={{
+              fontFamily: SANS, fontWeight: 700, fontSize: 15,
+              background: D.white, color: D.ink,
+              border: "none", padding: "14px 32px", borderRadius: 10,
+              cursor: "pointer",
+              boxShadow: "0 2px 20px rgba(255,255,255,0.15)",
             }}>
-              Talento real para la educación superior
-            </span>
-          </div>
-
-          {/* Title */}
-          <h1 style={{
-            fontFamily: SANS,
-            fontSize: isMob ? 34 : "clamp(38px, 4.5vw, 56px)",
-            fontWeight: 900,
-            color: "#fff",
-            lineHeight: 1.08,
-            letterSpacing: "-0.04em",
-            margin: "0 auto 20px",
-            maxWidth: 720,
-          }}>
-            En la era de la IA, lo más valioso<br />
-            <span style={{ color: D.gold }}>no es tu contenido, es tu experiencia.</span>
-          </h1>
-
-          {/* Description */}
-          <p style={{
-            fontFamily: SANS, fontSize: isMob ? 15 : 17,
-            color: "rgba(255,255,255,0.62)",
-            lineHeight: 1.75, margin: "0 auto 36px", maxWidth: 560,
-          }}>
-            FacultyMatch conecta directivos, médicos, investigadores,
-            comunicadores y expertos con universidades y escuelas de negocio.
-            Tu experiencia real es el activo más buscado
-            de la educación del siglo XXI.
-          </p>
-
-          {/* Buttons */}
-          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" as const }}>
-            <Link href="/signup">
-              <button style={{
-                fontFamily: SANS, fontWeight: 700, fontSize: 15,
-                background: D.white, color: D.ink,
-                border: "none", padding: "14px 32px", borderRadius: 10,
-                cursor: "pointer",
-                boxShadow: "0 2px 20px rgba(255,255,255,0.15)",
-              }}>
-                Publicar mi perfil →
-              </button>
-            </Link>
-            <Link href="/signup?intent=institution">
-              <button style={{
-                fontFamily: SANS, fontWeight: 500, fontSize: 15,
-                background: "transparent",
-                color: "rgba(255,255,255,0.82)",
-                border: "1px solid rgba(255,255,255,0.28)",
-                padding: "14px 32px", borderRadius: 10, cursor: "pointer",
-              }}>
-                Buscar docentes
-              </button>
-            </Link>
-          </div>
-
-          {/* Trust line */}
-          <p style={{
-            fontFamily: SANS, fontSize: 13, fontWeight: 500,
-            color: "rgba(255,255,255,0.35)",
-            margin: "20px 0 0",
-          }}>
-            Perfiles verificados a mano. Sin bots, sin currículums sin comprobar.
-          </p>
+              Publicar mi perfil →
+            </button>
+          </Link>
+          <Link href="/signup?intent=institution">
+            <button style={{
+              fontFamily: SANS, fontWeight: 500, fontSize: 15,
+              background: "transparent",
+              color: "rgba(255,255,255,0.82)",
+              border: "1px solid rgba(255,255,255,0.28)",
+              padding: "14px 32px", borderRadius: 10, cursor: "pointer",
+            }}>
+              Buscar docentes
+            </button>
+          </Link>
         </div>
+
+        {/* Trust line */}
+        <p style={{
+          fontFamily: SANS, fontSize: 13, fontWeight: 500,
+          color: "rgba(255,255,255,0.35)",
+          margin: "20px 0 0",
+        }}>
+          Perfiles verificados a mano. Sin bots, sin currículums sin comprobar.
+        </p>
       </div>
 
-      {/* Product mockup */}
+      {/* Product mockup — contained within the dark section */}
       <div style={{
-        background: D.surf,
-        padding: 0,
-        overflow: "hidden",
+        maxWidth: isMob ? "calc(100% - 0px)" : 960,
+        margin: isMob ? "40px auto 0" : "56px auto 0",
       }}>
         <div style={{
-          maxWidth: 1120, margin: "0 auto",
-          padding: isMob ? "0 24px" : "0 32px",
-          marginTop: isMob ? -40 : -60,
-          position: "relative" as const,
-          zIndex: 2,
+          borderRadius: isMob ? 8 : 12,
+          overflow: "hidden",
+          boxShadow: "0 8px 40px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.15)",
         }}>
-          <div style={{
-            borderRadius: 12,
-            overflow: "hidden",
-            boxShadow: "0 8px 40px rgba(7,19,38,0.15), 0 2px 8px rgba(7,19,38,0.08)",
-          }}>
-            <img
-              src="/mockup-directorio.svg"
-              alt="Vista del directorio de docentes en FacultyMatch"
-              style={{
-                width: "100%",
-                height: "auto",
-                display: "block",
-              }}
-            />
-          </div>
+          <img
+            src="/mockup-directorio.svg"
+            alt="Vista del directorio de docentes en FacultyMatch"
+            style={{
+              width: "100%",
+              height: "auto",
+              display: "block",
+            }}
+          />
         </div>
-        {/* Spacer below mockup */}
-        <div style={{ height: isMob ? 48 : 64 }} />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -801,189 +787,239 @@ function SplitInstituciones() {
   );
 }
 
-// ─── TESTIMONIALS ─────────────────────────────────────────────────────────
-const TESTIMONIALS = [
-  {
-    quote: "Recibí tres solicitudes en la primera semana. No esperaba esa respuesta tan rápida.",
-    name: "Dr. Alejandro M.",
-    role: "Médico especialista · Docente en Máster Universitario",
-    img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    quote: "Encontramos en 48 horas un experto en IA con experiencia clínica real. Imposible con LinkedIn.",
-    name: "Rosa T.",
-    role: "Directora de Programas · Escuela de Negocios",
-    img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    quote: "Compaginar mi consultoría con la docencia siempre fue mi objetivo. FacultyMatch lo hizo posible.",
-    name: "Javier L.",
-    role: "Director de Operaciones · Experto en Logística y Supply Chain",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=600",
-  },
-];
-
-function Testimonials() {
+// ─── SECTOR METRICS ────────────────────────────────────────────────────────
+function SectorMetrics() {
   const isMob = useIsMobile();
   const { ref, inView } = useInView(0.1);
 
   return (
     <section style={{
-      background: D.surf,
+      background: D.white,
       padding: isMob ? "64px 24px" : "88px 32px",
     }}>
       <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: isMob ? 40 : 60 }}>
+        <div style={{ textAlign: "center", marginBottom: isMob ? 48 : 64 }}>
           <div style={{
             fontFamily: SANS, fontSize: 11, fontWeight: 700,
             letterSpacing: "0.16em", textTransform: "uppercase" as const,
             color: D.gold, marginBottom: 14,
           }}>
-            Experiencias reales
+            Sector educación superior en España
           </div>
           <h2 style={{
             fontFamily: SANS,
-            fontSize: isMob ? 26 : "clamp(28px, 3vw, 40px)",
+            fontSize: isMob ? 28 : "clamp(30px, 3.5vw, 44px)",
             fontWeight: 800,
             color: D.ink, letterSpacing: "-0.04em",
             margin: 0, lineHeight: 1.1,
           }}>
-            Lo que dicen quienes<br />ya están en FacultyMatch.
+            Un mercado en crecimiento<br />que necesita talento docente.
           </h2>
         </div>
 
         <div ref={ref} style={{
           display: "grid",
-          gridTemplateColumns: isMob ? "1fr" : "repeat(3,1fr)",
-          gap: 20,
+          gridTemplateColumns: isMob ? "1fr" : "repeat(4,1fr)",
+          gap: 16,
         }}>
-          {TESTIMONIALS.map((t, i) => (
+          {[
+            { value: "91", label: "universidades", detail: "50 públicas y 41 privadas", icon: "🏛️" },
+            { value: "50+", label: "escuelas de negocio", detail: "Activas en todo el país", icon: "🎯" },
+            { value: "4.200+", label: "másteres al año", detail: "Nuevos programas cada curso", icon: "📋" },
+            { value: "600K+", label: "estudiantes de máster", detail: "Matriculados anualmente", icon: "👨‍🎓" },
+          ].map((m, i) => (
             <div key={i} style={{
-              position: "relative" as const,
+              background: D.surf,
+              border: `1px solid ${D.border}`,
               borderRadius: 16,
-              overflow: "hidden",
-              height: 340,
-              cursor: "pointer",
+              padding: isMob ? "28px 20px" : "32px 24px",
+              textAlign: "center",
               opacity: 1,
               transform: inView ? "translateY(0)" : "translateY(12px)",
-              transition: `transform 0.6s ease ${i * 0.15}s`,
+              transition: `transform 0.5s ease ${i * 0.1}s`,
             }}>
-              {/* Background image */}
               <div style={{
-                position: "absolute", inset: 0,
-                backgroundImage: `url(${t.img})`,
-                backgroundSize: "cover", backgroundPosition: "center top",
-              }} />
-              {/* Gradient overlay */}
-              <div style={{
-                position: "absolute", inset: 0,
-                background: "linear-gradient(0deg, rgba(7,19,38,0.92) 0%, rgba(7,19,38,0.55) 55%, rgba(7,19,38,0.15) 100%)",
-              }} />
-
-              {/* Play button */}
-              <div style={{
-                position: "absolute", top: "50%", left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: 52, height: 52,
-                background: "rgba(255,255,255,0.18)",
-                border: "2px solid rgba(255,255,255,0.4)",
-                backdropFilter: "blur(8px)",
-                borderRadius: "50%",
-                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 32, marginBottom: 12, lineHeight: 1,
               }}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="white">
-                  <path d="M4 2l11 6-11 6V2z"/>
-                </svg>
+                {m.icon}
               </div>
-
-              {/* Bottom content */}
               <div style={{
-                position: "absolute", bottom: 0, left: 0, right: 0,
-                padding: "20px 22px",
+                fontFamily: SANS,
+                fontSize: isMob ? 36 : "clamp(36px, 3.5vw, 48px)",
+                fontWeight: 900,
+                color: D.navy,
+                letterSpacing: "-0.04em",
+                lineHeight: 1,
+                marginBottom: 8,
               }}>
-                <p style={{
-                  fontFamily: SANS, fontSize: 14, fontStyle: "italic" as const,
-                  color: "rgba(255,255,255,0.9)", lineHeight: 1.6,
-                  margin: "0 0 12px",
-                }}>
-                  "{t.quote}"
-                </p>
-                <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 2 }}>
-                  {t.name}
-                </div>
-                <div style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
-                  {t.role}
-                </div>
+                {m.value}
+              </div>
+              <div style={{
+                fontFamily: SANS, fontSize: 14, fontWeight: 700,
+                color: D.ink, marginBottom: 4,
+              }}>
+                {m.label}
+              </div>
+              <div style={{
+                fontFamily: SANS, fontSize: 12, fontWeight: 500,
+                color: D.muted,
+              }}>
+                {m.detail}
               </div>
             </div>
           ))}
+        </div>
+
+        <div style={{
+          maxWidth: 640, margin: "40px auto 0",
+          textAlign: "center",
+          padding: isMob ? "24px 20px" : "32px 40px",
+          background: D.surf,
+          border: `1px solid ${D.border}`,
+          borderRadius: 16,
+        }}>
+          <p style={{
+            fontFamily: SANS, fontSize: 14, color: D.muted,
+            lineHeight: 1.7, margin: "0 0 20px",
+          }}>
+            <strong style={{ color: D.navy }}>Fuente:</strong> Ministerio de Ciencia, Innovación y Universidades.
+            Datos del curso 2023-2024. La educación superior en España genera
+            una demanda constante de profesionales con experiencia real que
+            puedan impartir docencia en programas de máster y formación ejecutiva.
+          </p>
+          <Link href="/signup">
+            <button style={{
+              fontFamily: SANS, fontSize: 14, fontWeight: 700,
+              background: D.blue, color: "#fff",
+              border: "none", padding: "12px 28px", borderRadius: 10,
+              cursor: "pointer",
+            }}>
+              Publicar mi perfil →
+            </button>
+          </Link>
         </div>
       </div>
     </section>
   );
 }
 
-// ─── PULL QUOTE (video bg) ─────────────────────────────────────────────────
-function PullQuote() {
+// ─── MATCHING SPEED ────────────────────────────────────────────────────────
+function MatchingSpeed() {
   const isMob = useIsMobile();
+  const { ref, inView } = useInView(0.15);
+
   return (
-    <div style={{ position: "relative", overflow: "hidden", minHeight: isMob ? 260 : 320 }}>
-      {isMob ? (
+    <section style={{
+      background: D.dark,
+      padding: isMob ? "64px 24px" : "80px 32px",
+    }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto" }}>
         <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: `url(https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&q=80&w=1200)`,
-          backgroundSize: "cover", backgroundPosition: "center 45%",
-        }} />
-      ) : (
-        <video
-          autoPlay muted loop playsInline
-          poster="https://images.unsplash.com/photo-1531545514256-b1400bc00f31?auto=format&fit=crop&q=80&w=1800"
-          style={{
-            position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover", objectPosition: "center 45%",
-          }}
-        >
-          <source src="https://assets.mixkit.co/videos/4640/4640-720.mp4" type="video/mp4" />
-        </video>
-      )}
-      <div style={{ position: "absolute", inset: 0, background: "rgba(7,19,38,0.82)" }} />
-      <div style={{
-        position: "relative", zIndex: 2,
-        minHeight: "inherit",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        textAlign: "center", padding: "60px 32px",
-      }}>
-        <div style={{ maxWidth: 640 }}>
-          <div style={{
-            display: "flex", justifyContent: "center", gap: 10,
-            marginBottom: 24,
+          display: "grid",
+          gridTemplateColumns: isMob ? "1fr" : "1fr 1fr",
+          gap: isMob ? 40 : 80,
+          alignItems: "center",
+        }}>
+          {/* Left: data */}
+          <div ref={ref} style={{
+            opacity: 1,
+            transform: inView ? "translateY(0)" : "translateY(12px)",
+            transition: "transform 0.6s ease",
           }}>
-            <div style={{ width: 32, height: 1, background: D.gold, opacity: 0.6, alignSelf: "center" }} />
-            <div style={{ width: 5, height: 5, borderRadius: "50%", background: D.gold, alignSelf: "center" }} />
-            <div style={{ width: 32, height: 1, background: D.gold, opacity: 0.6, alignSelf: "center" }} />
+            <div style={{
+              fontFamily: SANS, fontSize: 11, fontWeight: 700,
+              letterSpacing: "0.16em", textTransform: "uppercase" as const,
+              color: D.gold, marginBottom: 16,
+            }}>
+              Resultados reales
+            </div>
+            <h2 style={{
+              fontFamily: SANS,
+              fontSize: isMob ? 28 : "clamp(30px, 3.5vw, 44px)",
+              fontWeight: 800,
+              color: "#fff", letterSpacing: "-0.04em",
+              margin: "0 0 18px", lineHeight: 1.08,
+            }}>
+              Los docentes reciben su<br />
+              primer contacto en una<br />
+              <span style={{ color: D.gold }}>media de 3 días.</span>
+            </h2>
+            <p style={{
+              fontFamily: SANS, fontSize: 15, color: "rgba(255,255,255,0.6)",
+              lineHeight: 1.8, margin: "0 0 32px", maxWidth: 440,
+            }}>
+              Las instituciones educativas buscan profesionales con experiencia real.
+              No esperan a que el perfil perfecto aparezca — lo encuentran en FacultyMatch.
+            </p>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const }}>
+              <Link href="/signup">
+                <button style={{
+                  fontFamily: SANS, fontWeight: 700, fontSize: 14,
+                  background: D.white, color: D.ink,
+                  border: "none", padding: "13px 30px", borderRadius: 10,
+                  cursor: "pointer",
+                }}>
+                  Publicar mi perfil →
+                </button>
+              </Link>
+              <Link href="/signup?intent=institution">
+                <button style={{
+                  fontFamily: SANS, fontWeight: 600, fontSize: 14,
+                  background: "transparent",
+                  color: "rgba(255,255,255,0.8)",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  padding: "13px 30px", borderRadius: 10, cursor: "pointer",
+                }}>
+                  Buscar docentes
+                </button>
+              </Link>
+            </div>
           </div>
-          <blockquote style={{
-            fontFamily: `Georgia, 'Times New Roman', serif`,
-            fontSize: isMob ? 18 : 24,
-            fontStyle: "italic" as const, fontWeight: 400,
-            color: "rgba(255,255,255,0.88)", lineHeight: 1.65,
-            margin: "0 0 20px",
-          }}>
-            "En un mundo donde la IA genera contenido infinito,
-            el único conocimiento que no se puede replicar
-            es el de quien ha estado ahí."
-          </blockquote>
+
+          {/* Right: stats */}
           <div style={{
-            fontFamily: SANS, fontSize: 11, fontWeight: 700,
-            color: "rgba(255,255,255,0.3)",
-            letterSpacing: "0.14em", textTransform: "uppercase" as const,
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 16,
           }}>
-            FacultyMatch · Talento real para la educación superior
+            {[
+              { value: "3 días", label: "Tiempo medio hasta primer contacto", highlight: true },
+              { value: "100%", label: "Perfiles revisados a mano", highlight: false },
+              { value: "Directo", label: "Sin intermediarios ni comisiones", highlight: false },
+              { value: "Real", label: "Experiencia confirmada, no currículums", highlight: false },
+            ].map((s, i) => (
+              <div key={i} style={{
+                background: s.highlight ? "rgba(233,160,48,0.12)" : "rgba(255,255,255,0.04)",
+                border: s.highlight ? "1px solid rgba(233,160,48,0.3)" : "1px solid rgba(255,255,255,0.08)",
+                borderRadius: 14,
+                padding: isMob ? "20px 16px" : "24px 20px",
+                opacity: 1,
+                transform: inView ? "translateY(0)" : "translateY(12px)",
+                transition: `transform 0.5s ease ${i * 0.1}s`,
+              }}>
+                <div style={{
+                  fontFamily: SANS,
+                  fontSize: isMob ? 22 : "clamp(22px, 2.5vw, 30px)",
+                  fontWeight: 900,
+                  color: s.highlight ? D.gold : "#fff",
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1,
+                  marginBottom: 6,
+                }}>
+                  {s.value}
+                </div>
+                <div style={{
+                  fontFamily: SANS, fontSize: 12, fontWeight: 500,
+                  color: "rgba(255,255,255,0.45)", lineHeight: 1.4,
+                }}>
+                  {s.label}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -1158,8 +1194,8 @@ export default function LandingClient() {
       <HowItWorks />
       <SplitDocentes />
       <SplitInstituciones />
-      <Testimonials />
-      <PullQuote />
+      <SectorMetrics />
+      <MatchingSpeed />
       <PrivacyFeature />
       <CtaFinal />
       <Footer />
