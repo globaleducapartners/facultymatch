@@ -306,19 +306,33 @@ function Hero() {
         </p>
       </div>
 
-      {/* Product mockup — contained within the dark section */}
+      {/* Product mockup — real screenshot in browser frame */}
       <div style={{
         maxWidth: isMob ? "calc(100% - 0px)" : 960,
         margin: isMob ? "40px auto 0" : "56px auto 0",
       }}>
         <div style={{
-          borderRadius: isMob ? 8 : 12,
+          borderRadius: 12,
           overflow: "hidden",
           boxShadow: "0 8px 40px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.15)",
+          background: "#1E1E1E",
         }}>
+          {/* Browser chrome bar — macOS style */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "14px 18px",
+            background: "#2C2C2E",
+          }}>
+            <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FF5F57" }} />
+            <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#FFBD2E" }} />
+            <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#28C840" }} />
+          </div>
+          {/* Screenshot */}
           <img
-            src="/mockup-directorio.svg"
-            alt="Vista del directorio de docentes en FacultyMatch"
+            src="/images/panel-docente-mockup.png"
+            alt="Panel docente en FacultyMatch — vista del dashboard"
             style={{
               width: "100%",
               height: "auto",
