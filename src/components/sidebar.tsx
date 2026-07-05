@@ -7,10 +7,11 @@ import {
   Home, User, Award, ShieldCheck, Mail,
   CheckCircle2, Settings, HelpCircle, Menu, X,
   Search, Star, Building2, CreditCard, Users,
-  FileCheck, Gift, ChevronRight,
+  FileCheck, Gift,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { Logo } from "@/components/ui/Logo";
 
 const educatorItems = [
   { label: "Inicio",         href: "/app/faculty",              icon: Home,         group: "principal" },
@@ -149,9 +150,13 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-[#E2E8F0] flex flex-col transition-transform duration-300 transform",
+        "fixed lg:static inset-y-0 left-0 z-40 w-64 bg-[#0D2240] border-r border-white/10 flex flex-col transition-transform duration-300 transform",
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
+        {/* Logo at top */}
+        <div className="p-4 pb-2 border-b border-white/10">
+          <Logo variant="light" />
+        </div>
         {/* Nav items */}
         <div className="flex-1 overflow-y-auto py-3 px-3 pb-20 lg:pb-3">
           <nav className="space-y-0.5">
@@ -167,7 +172,7 @@ export function Sidebar() {
               return (
                 <div key={item.href}>
                   {showGroupLabel && (
-                    <p className="text-[9px] font-black uppercase tracking-widest text-gray-300 px-3 pt-4 pb-1.5 select-none">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-[#F7F5F0]/40 px-3 pt-4 pb-1.5 select-none">
                       {GROUP_LABELS[(item as typeof educatorItems[0]).group]}
                     </p>
                   )}
@@ -177,18 +182,15 @@ export function Sidebar() {
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 relative",
                       isActive
-                        ? "bg-[#EEF4FF] text-[#1B4FD8]"
-                        : "text-[#4B5A7A] hover:bg-[#F2F6FC] hover:text-[#0D2240]"
+                        ? "bg-white text-[#0D2240]"
+                        : "text-[#F7F5F0]/70 hover:bg-white/5 hover:text-white"
                     )}
                   >
-                    {isActive && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#1B4FD8] rounded-r-full" />
-                    )}
                     <item.icon
                       size={18}
                       className={cn(
                         "flex-shrink-0 ml-0.5",
-                        isActive ? "text-[#1B4FD8]" : "text-gray-400"
+                        isActive ? "text-[#0D2240]" : "text-[#F7F5F0]/50"
                       )}
                     />
                     <span className="flex-1">{item.label}</span>
@@ -200,12 +202,12 @@ export function Sidebar() {
         </div>
 
         {/* Bottom: help */}
-        <div className="p-3 border-t border-[#E2E8F0]">
+        <div className="p-3 border-t border-white/10">
           <a
             href="mailto:support@facultymatch.app"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#4B5A7A] hover:bg-[#F2F6FC] hover:text-[#0D2240] transition-all duration-150"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#F7F5F0]/70 hover:bg-white/5 hover:text-white transition-all duration-150"
           >
-            <HelpCircle size={18} className="text-gray-400 flex-shrink-0" />
+            <HelpCircle size={18} className="text-[#F7F5F0]/50 flex-shrink-0" />
             <span>Centro de ayuda</span>
           </a>
         </div>
