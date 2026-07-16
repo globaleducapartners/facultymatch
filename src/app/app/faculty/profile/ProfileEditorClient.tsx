@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
+import { OrcidImportModal } from "./OrcidImportModal";
+import { saveOrcidImport } from "./actions";
 
 function useIsMobile() {
   const [mob, setMob] = useState(false);
@@ -89,6 +91,7 @@ interface Props {
   documents: any[];
   viewCount: number;
   saved: boolean;
+  tab?: string;
   saveBasicInfo: (fd: FormData) => Promise<void>;
   saveExperience: (fd: FormData) => Promise<void>;
   saveFormacion: (fd: FormData) => Promise<void>;
@@ -191,14 +194,20 @@ function SaveButton({ pending, label = "Guardar cambios" }: { pending?: boolean;
 
 // ─── Main component ────────────────────────────────────────────────────────────
 export function ProfileEditorClient({
-  user, userMeta, profile, facultyProfile, documents, viewCount, saved,
+  user, userMeta, profile, facultyProfile, documents, viewCount, saved, tab,
   saveBasicInfo, saveExperience, saveFormacion, saveLanguages,
   saveResearch, saveLinks, updateContactPreferences,
 }: Props) {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [isPending] = useTransition();
   const [bannerPickerOpen, setBannerPickerOpen] = useState(false);
+  const [orcidImportOpen, setOrcidImportOpen] = useState(false);
   const isMob = useIsMobile();
+
+  // Auto-open section based on tab query param
+  useEffect(() => {
+    if (tab) setEditingSection(tab);
+  }, [tab]);
 
   const avatarUrl = profile?.avatar_url || facultyProfile?.avatar_url;
   const bannerUrl = (facultyProfile as any)?.banner_url || null;
@@ -784,6 +793,24 @@ export function ProfileEditorClient({
                       defaultValue={facultyProfile?.orcid_id} />
                   </Field>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setOrcidImportOpen(true)}
+                  style={{
+                    fontFamily: SANS, background: "#EFF6FF", color: D.blue,
+                    border: `1px solid ${D.blue}`, padding: "10px 20px", borderRadius: 10,
+                    fontSize: 13, fontWeight: 700, cursor: "pointer",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                    width: "100%",
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                    <path d="M2 17l10 5 10-5" />
+                    <path d="M2 12l10 5 10-5" />
+                  </svg>
+                  Importar mi trayectoria desde ORCID
+                </button>
                 <SaveButton pending={isPending} />
               </form>
             }
@@ -1100,6 +1127,16 @@ export function ProfileEditorClient({
             />
           </div>
         </div>
+      )}
+
+      {/* ORCID Import Modal */}
+      {orcidImportOpen && (
+        <OrcidImportModal
+          user={{ id: user.id }}
+          facultyProfile={facultyProfile}
+          onClose={() => setOrcidImportOpen(false)}
+          onSave={saveOrcidImport}
+        />
       )}
     </div>
   );

@@ -211,6 +211,28 @@ export default async function EducatorDashboard() {
         </div>
       </div>
 
+      {/* ── ORCID Import Banner ── */}
+      {!facultyProfile?.orcid_import_data && (
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-4">
+          <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B4FD8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <p className="font-black text-blue-800 text-sm">¡Tráete tu perfil de ORCID!</p>
+            <p className="text-sm text-blue-600 font-medium">
+              Impórtalo y rellena tu perfil en segundos. Afiliaciones, publicaciones, citas y más — todo desde tu ORCID.
+            </p>
+            <Link href="/app/faculty/profile?tab=research" className="text-sm font-black text-blue-700 hover:underline mt-1 inline-block">
+              Ir a importar →
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* ── Verification banners ── */}
       {verificationStatus === "approved" && (
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-start gap-4">

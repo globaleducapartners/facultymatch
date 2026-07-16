@@ -260,6 +260,7 @@ export default async function ProfilePage({
       documents={documents || []}
       viewCount={viewCount}
       saved={saved === "1"}
+      tab={tab}
       saveBasicInfo={saveBasicInfo}
       saveExperience={saveExperience}
       saveFormacion={saveFormacion}
