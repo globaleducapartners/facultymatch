@@ -84,7 +84,7 @@ export function Navbar() {
           justifyContent: "space-between", padding: "0 32px",
         }}>
           {/* Logo */}
-          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+          <Link href={user ? dashboardHref : "/"} style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
             <div style={{
               width: 34, height: 34, borderRadius: 8,
               background: D.navy,
@@ -193,18 +193,17 @@ export function Navbar() {
             ) : (
               <>
                 <Link href="/login" onClick={() => setMenuOpen(false)} style={{
-                  fontFamily: SANS, background: "transparent",
-                  border: `1px solid ${D.border}`, color: D.ink,
-                  padding: "12px", borderRadius: 8, fontSize: 14, fontWeight: 500,
-                  cursor: "pointer", textDecoration: "none",
-                  display: "block", textAlign: "center",
+                  fontFamily: SANS, background: D.blue, color: "#fff",
+                  border: "none", padding: "12px", borderRadius: 8,
+                  fontSize: 14, fontWeight: 700, cursor: "pointer",
+                  textDecoration: "none", display: "block", textAlign: "center",
                 }}>
                   Acceder
                 </Link>
                 <Link href="/signup" onClick={() => setMenuOpen(false)} style={{
-                  fontFamily: SANS, background: D.blue, color: "#fff",
-                  border: "none", padding: "12px", borderRadius: 8,
-                  fontSize: 14, fontWeight: 700, cursor: "pointer",
+                  fontFamily: SANS, background: D.white, color: D.ink,
+                  border: `1.5px solid ${D.border}`, padding: "12px", borderRadius: 8,
+                  fontSize: 14, fontWeight: 600, cursor: "pointer",
                   textDecoration: "none", display: "block", textAlign: "center",
                 }}>
                   Publicar perfil

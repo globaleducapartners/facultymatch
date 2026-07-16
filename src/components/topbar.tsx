@@ -54,6 +54,12 @@ export function Topbar({ user, profile }: TopbarProps) {
   const [notifLoaded, setNotifLoaded] = useState(false);
   const bellRef = useRef<HTMLDivElement>(null);
 
+  const dashboardHref =
+    profile?.role === "faculty"      ? "/app/faculty" :
+    profile?.role === "institution"  ? "/app/institution/home" :
+    profile?.role === "admin" || profile?.role === "super_admin" ? "/control" :
+    "/app/faculty";
+
   // Close on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -154,7 +160,7 @@ export function Topbar({ user, profile }: TopbarProps) {
   return (
     <header className="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
       <div className="flex items-center gap-4">
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href={dashboardHref} className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-[#0D2240] flex items-center justify-center flex-shrink-0">
             <span className="text-white text-xs font-black">FM</span>
           </div>
