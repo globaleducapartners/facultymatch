@@ -46,7 +46,7 @@ interface WizardData {
   unescoArea: string;
   unescoSubarea: string;
   unescoTopics: string;
-  hasAneca: boolean;
+  selectedAccreditations: string[];
   otherAccreditation: string;
   isPhd: boolean;
   researchPublications: string;
@@ -72,15 +72,12 @@ export function Step3Specialty({ data, updateData }: Props) {
 
   // Accreditation multi-select
   const getAccreditationSelected = (): string[] => {
-    const selected: string[] = [];
-    if (data.hasAneca) selected.push("aneca_titular");
-    return selected;
+    return data.selectedAccreditations || [];
   };
 
   const handleAccreditationChange = (vals: string | string[]) => {
     const arr = vals as string[];
-    const hasAneca = arr.includes("aneca_titular") || arr.includes("aneca_catedratico");
-    updateData({ hasAneca });
+    updateData({ selectedAccreditations: arr });
   };
 
   const handleSubareaChange = (val: string) => {

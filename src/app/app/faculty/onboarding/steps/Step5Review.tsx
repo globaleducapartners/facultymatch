@@ -40,7 +40,7 @@ interface WizardData {
   unescoArea: string;
   unescoSubarea: string;
   unescoTopics: string;
-  hasAneca: boolean;
+  selectedAccreditations: string[];
   otherAccreditation: string;
   isPhd: boolean;
   researchPublications: string;
@@ -169,7 +169,12 @@ export function Step5Review({ data }: Props) {
         <Row label="Área UNESCO" value={data.unescoArea || null} />
         <Row label="Subárea" value={data.unescoSubarea || null} />
         <Row label="Temas" value={data.unescoTopics || null} />
-        {data.hasAneca && <Row label="ANECA" value="Titular de Universidad (ANECA)" />}
+                {data.selectedAccreditations?.includes("aneca_titular") && <Row label="ANECA" value="Titular de Universidad (ANECA)" />}
+        {data.selectedAccreditations?.includes("aneca_catedratico") && <Row label="ANECA" value="Catedrático de Universidad (ANECA)" />}
+        {data.selectedAccreditations?.includes("aneca_ayudante") && <Row label="ANECA" value="Ayudante Doctor (ANECA)" />}
+        {data.selectedAccreditations?.filter(v => !v.startsWith("aneca_")).length > 0 && (
+          <Row label="Otras acreditaciones" value={data.selectedAccreditations.filter(v => !v.startsWith("aneca_")).map(v => v.toUpperCase()).join(", ")} />
+        )}
         <Row label="Otra acreditación" value={data.otherAccreditation || null} />
         {data.isPhd && <Row label="PhD" value="Sí" />}
         <Row label="Google Scholar" value={data.googleScholarId || null} />
@@ -180,7 +185,7 @@ export function Step5Review({ data }: Props) {
             <p style={{ fontSize: 13, color: D.ink, lineHeight: 1.6, margin: 0 }}>{data.researchPublications}</p>
           </div>
         )}
-        {!data.unescoArea && !data.unescoSubarea && !data.hasAneca && !data.isPhd && !data.researchPublications && (
+        {!data.unescoArea && !data.unescoSubarea && !data.selectedAccreditations?.length && !data.isPhd && !data.researchPublications && (
           <p style={{ fontSize: 13, color: D.faint, fontStyle: "italic" }}>No has añadido especialidades ni acreditaciones</p>
         )}
       </Section>

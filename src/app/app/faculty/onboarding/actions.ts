@@ -21,7 +21,7 @@ interface WizardData {
   unesco_area?: string;
   unesco_subarea?: string;
   unesco_topics?: string;
-  has_aneca?: boolean;
+  selected_accreditations?: string[];
   other_accreditation?: string;
   is_phd?: boolean;
   research_publications?: string;
@@ -95,12 +95,20 @@ export async function saveWizardStep(data: WizardData) {
   if (data.career_description !== undefined) updateData.career_description = data.career_description;
 
   // Step 3 fields
-  if (data.unesco_area !== undefined) updateData.unesco_area = data.unesco_area;
-  if (data.unesco_subarea !== undefined) updateData.unesco_subarea = data.unesco_subarea;
-  if (data.unesco_topics !== undefined) updateData.unesco_topics = data.unesco_topics;
-  if (data.has_aneca !== undefined || data.other_accreditation !== undefined) {
+  if (data.unesco_area && data.unesco_area.trim()) updateData.unesco_area = data.unesco_area.trim();
+  if (data.unesco_subarea && data.unesco_subarea.trim()) updateData.unesco_subarea = data.unesco_subarea.trim();
+  if (data.unesco_topics && data.unesco_topics.trim()) updateData.unesco_topics = data.unesco_topics.trim();
+  if (data.selected_accreditations !== undefined || data.other_accreditation !== undefined) {
     const parts: string[] = [];
-    if (data.has_aneca) parts.push("Titular de Universidad (ANECA)");
+    const arr = data.selected_accreditations || [];
+    if (arr.includes("aneca_titular")) parts.push("Titular de Universidad (ANECA)");
+    if (arr.includes("aneca_catedratico")) parts.push("Catedrático de Universidad (ANECA)");
+    if (arr.includes("aneca_ayudante")) parts.push("Ayudante Doctor (ANECA)");
+    const otherLabels = arr
+      .filter((v: string) => !["aneca_titular", "aneca_catedratico", "aneca_ayudante"].includes(v))
+      .map((v: string) => v.toUpperCase())
+      .filter(Boolean);
+    parts.push(...otherLabels);
     if (data.other_accreditation && data.other_accreditation.trim()) parts.push(data.other_accreditation.trim());
     updateData.aneca_accreditation = parts.length > 0 ? parts.join(" · ") : null;
   }

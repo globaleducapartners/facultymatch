@@ -52,7 +52,7 @@ interface WizardData {
   unescoArea: string;
   unescoSubarea: string;
   unescoTopics: string;
-  hasAneca: boolean;
+  selectedAccreditations: string[];
   otherAccreditation: string;
   isPhd: boolean;
   researchPublications: string;
@@ -104,8 +104,15 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
     unescoArea: "",
     unescoSubarea: "",
     unescoTopics: "",
-    hasAneca: !!(facultyProfile?.aneca_accreditation?.includes("ANECA")),
-    otherAccreditation: facultyProfile?.aneca_accreditation?.replace("Titular de Universidad (ANECA)", "").replace(" · ", "").trim() || "",
+    selectedAccreditations: (() => {
+      const acc = facultyProfile?.aneca_accreditation || "";
+      const chips: string[] = [];
+      if (acc.includes("ANECA")) chips.push("aneca_titular");
+      return chips;
+    })(),
+    otherAccreditation: (facultyProfile?.aneca_accreditation || "")
+      .replace("Titular de Universidad (ANECA)", "")
+      .replace(" · ", "").trim() || "",
     isPhd: facultyProfile?.is_phd ?? false,
     researchPublications: facultyProfile?.research_publications || "",
     googleScholarId: facultyProfile?.google_scholar_id || "",
@@ -146,7 +153,7 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
         payload.unesco_area = data.unescoArea;
         payload.unesco_subarea = data.unescoSubarea;
         payload.unesco_topics = data.unescoTopics;
-        payload.has_aneca = data.hasAneca;
+        payload.selected_accreditations = data.selectedAccreditations;
         payload.other_accreditation = data.otherAccreditation;
         payload.is_phd = data.isPhd;
         payload.research_publications = data.researchPublications;
