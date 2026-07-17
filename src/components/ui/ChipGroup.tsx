@@ -188,7 +188,7 @@ export function SearchableChipGroup({
           i.value.toLowerCase().includes(query.toLowerCase()) ||
           (i.group && i.group.toLowerCase().includes(query.toLowerCase()))
       )
-    : items;
+    : [];
 
   // Group by category
   const grouped: Record<string, typeof items> = {};
@@ -211,7 +211,7 @@ export function SearchableChipGroup({
           fontSize: 14,
           color: "#0C1018",
           background: "#FFFFFF",
-          border: "1px solid #D8E2EF",
+          border: `1px solid ${selected ? "#1B4FD8" : "#D8E2EF"}`,
           borderRadius: 10,
           padding: "10px 14px",
           outline: "none",
@@ -220,36 +220,52 @@ export function SearchableChipGroup({
           transition: "border-color 0.2s",
         }}
       />
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        {filtered.length === 0 && (
-          <div style={{ fontFamily: SANS, fontSize: 13, color: "#9CA3AF", padding: 8 }}>
-            Sin resultados para &ldquo;{query}&rdquo;
-          </div>
-        )}
-        {filtered.map((item) => (
-          <button
-            key={item.value}
-            type="button"
-            role="radio"
-            aria-checked={selected === item.value}
-            tabIndex={0}
-            onClick={() => {
-              onChange(item.value);
-              setQuery("");
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
+      {selected && !query && (
+        <div style={{
+          fontFamily: SANS, fontSize: 13, color: "#059669",
+          background: "#F0FDF4", border: "1px solid #BBF7D0",
+          borderRadius: 10, padding: "10px 14px", marginBottom: 12,
+        }}>
+          Seleccionado: <strong>{selected}</strong>
+        </div>
+      )}
+      {!query && !selected && (
+        <div style={{ fontFamily: SANS, fontSize: 13, color: "#9CA3AF", padding: "8px 0" }}>
+          Empieza a escribir para buscar tu área de especialidad…
+        </div>
+      )}
+      {query && filtered.length === 0 && (
+        <div style={{ fontFamily: SANS, fontSize: 13, color: "#9CA3AF", padding: "8px 0" }}>
+          Sin resultados para &ldquo;{query}&rdquo;
+        </div>
+      )}
+      {query && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {filtered.map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              role="radio"
+              aria-checked={selected === item.value}
+              tabIndex={0}
+              onClick={() => {
                 onChange(item.value);
                 setQuery("");
-              }
-            }}
-            style={chipBase(selected === item.value, "md")}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onChange(item.value);
+                  setQuery("");
+                }
+              }}
+              style={chipBase(selected === item.value, "md")}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

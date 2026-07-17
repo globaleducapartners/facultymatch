@@ -101,8 +101,8 @@ export async function saveWizardStep(data: WizardData) {
   if (data.has_aneca !== undefined || data.other_accreditation !== undefined) {
     const parts: string[] = [];
     if (data.has_aneca) parts.push("Titular de Universidad (ANECA)");
-    if (data.other_accreditation) parts.push(data.other_accreditation);
-    updateData.aneca_accreditation = parts.join(" · ") || null;
+    if (data.other_accreditation && data.other_accreditation.trim()) parts.push(data.other_accreditation.trim());
+    updateData.aneca_accreditation = parts.length > 0 ? parts.join(" · ") : null;
   }
   if (data.is_phd !== undefined) updateData.is_phd = data.is_phd;
   if (data.research_publications !== undefined) updateData.research_publications = data.research_publications;

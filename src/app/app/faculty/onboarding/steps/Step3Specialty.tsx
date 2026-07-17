@@ -40,7 +40,6 @@ const ACCREDITATION_CHIPS = [
   { value: "deva", label: "DEVA" },
   { value: "unibasq", label: "UNIBASQ" },
   { value: "acap", label: "ACAP" },
-  { value: "otra", label: "Otra acreditación" },
 ];
 
 interface WizardData {
@@ -75,28 +74,13 @@ export function Step3Specialty({ data, updateData }: Props) {
   const getAccreditationSelected = (): string[] => {
     const selected: string[] = [];
     if (data.hasAneca) selected.push("aneca_titular");
-    if (data.otherAccreditation) {
-      const matched = ACCREDITATION_CHIPS.find(
-        (c) => c.value !== "aneca_titular" && c.label.toLowerCase().includes(data.otherAccreditation.toLowerCase())
-      );
-      if (matched) selected.push(matched.value);
-      else selected.push("otra");
-    }
     return selected;
   };
 
   const handleAccreditationChange = (vals: string | string[]) => {
     const arr = vals as string[];
     const hasAneca = arr.includes("aneca_titular") || arr.includes("aneca_catedratico");
-    const other = arr
-      .filter((v) => !["aneca_titular", "aneca_catedratico", "aneca_ayudante", "aqu", "acsucyl", "deva", "unibasq", "acap"].includes(v))
-      .map((v) => {
-        const chip = ACCREDITATION_CHIPS.find((c) => c.value === v);
-        return chip?.label.replace(/^(ANECA|AQU|ACSUCYL|DEVA|UNIBASQ|ACAP) — /, "");
-      })
-      .filter(Boolean)
-      .join(", ");
-    updateData({ hasAneca, otherAccreditation: other || "" });
+    updateData({ hasAneca });
   };
 
   const handleSubareaChange = (val: string) => {
@@ -164,11 +148,17 @@ export function Step3Specialty({ data, updateData }: Props) {
             selected={getAccreditationSelected()}
             onChange={handleAccreditationChange}
             multi
-            allowOther
-            otherValue="otra"
-            otherLabel="Otra"
-            otherPlaceholder="Especifica tu acreditación…"
             size="sm"
+          />
+        </div>
+        {/* Optional custom accreditation */}
+        <div>
+          <label style={lbl}>Otra acreditación (opcional)</label>
+          <input
+            style={inp}
+            placeholder="Ej: CERTIF, Diplomatura en Docencia Universitaria…"
+            value={data.otherAccreditation}
+            onChange={(e) => updateData({ otherAccreditation: e.target.value })}
           />
         </div>
       </div>

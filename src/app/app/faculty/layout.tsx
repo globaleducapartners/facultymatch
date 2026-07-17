@@ -30,8 +30,13 @@ export default async function FacultyLayout({
   }
 
   // Check onboarding status for faculty users
-  const headersList = await headers();
-  const url = headersList.get("x-url") || headersList.get("x-invoke-path") || "";
+  let url = "";
+  try {
+    const headersList = await headers();
+    url = headersList.get("x-url") || headersList.get("x-invoke-path") || "";
+  } catch {
+    // headers() may throw in edge cases — fall back to empty
+  }
   const isOnboardingRoute = url.includes("/onboarding");
 
   if (role === "faculty" && !isOnboardingRoute) {
