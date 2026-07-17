@@ -1,5 +1,6 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
-import { ShieldCheck, Eye, EyeOff, Lock, UserPlus, Search, X, AlertCircle, Sparkles, Star } from "lucide-react";
+import { ShieldCheck, Eye, EyeOff, Lock, UserPlus, Search, X, AlertCircle, Sparkles, Star, Globe, ExternalLink } from "lucide-react";
+import { CopyButton } from "@/components/profile/CopyButton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { toSlug } from "@/lib/utils";
 import { extractDomainFromWebsite, extractDomainFromEmail, matchesBlockedDomain } from "@/lib/domain";
 
 export default async function PrivacyPage({
@@ -29,7 +31,7 @@ export default async function PrivacyPage({
   // Plan lives in user_profiles (set by Stripe webhook)
   const { data: userProfile } = await supabase
     .from("user_profiles")
-    .select("plan, subscription_status, subscription_current_period_end")
+    .select("plan, subscription_status, subscription_current_period_end, full_name")
     .eq("id", user.id)
     .single();
 
@@ -108,6 +110,49 @@ export default async function PrivacyPage({
     await admin.from("faculty_profiles")
       .upsert({ id: user.id, user_id: user.id, profile_token: token }, { onConflict: "id" });
     revalidatePath("/app/faculty/privacy");
+  }
+
+  async function generateProfileSlug() {
+    "use server";
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Fetch full_name from user_profiles
+    const { data: up } = await supabase
+      .from("user_profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+
+    const fullName = up?.full_name;
+    if (!fullName) {
+      redirect("/app/faculty/privacy?error=no-name");
+      return;
+    }
+
+    const admin = createAdminClient();
+    const base = toSlug(fullName);
+    let candidate = base;
+    let counter = 1;
+
+    // Check for collisions
+    while (true) {
+      const { data: taken } = await admin
+        .from("faculty_profiles")
+        .select("id")
+        .eq("profile_slug", candidate)
+        .neq("id", user.id)
+        .maybeSingle();
+      if (!taken) break;
+      candidate = `${base}-${++counter}`;
+    }
+
+    await admin.from("faculty_profiles")
+      .upsert({ id: user.id, user_id: user.id, profile_slug: candidate }, { onConflict: "id" });
+
+    revalidatePath("/app/faculty/privacy");
+    redirect("/app/faculty/privacy?saved=slug");
   }
 
   async function unblockInstitution(ruleId: string) {
@@ -284,9 +329,19 @@ export default async function PrivacyPage({
           ✓ Institución bloqueada correctamente
         </div>
       )}
+      {saved === "slug" && (
+        <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
+          ✓ Enlace público generado correctamente. Ya puedes compartir tu perfil.
+        </div>
+      )}
       {error === "save-failed" && (
         <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-red-700 font-bold text-sm">
           ✗ No se pudo guardar el bloqueo. Inténtalo de nuevo.
+        </div>
+      )}
+      {error === "no-name" && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-amber-800 font-bold text-sm">
+          ⚠ Primero completa tu nombre en la sección <a href="/app/faculty/profile" className="underline font-black">Editar perfil</a> para generar el enlace público.
         </div>
       )}
 
@@ -529,6 +584,79 @@ export default async function PrivacyPage({
                   </button>
                 </form>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* ── Perfil público ── */}
+          <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
+                <Globe size={20} className="text-talentia-blue" />
+                Perfil público
+              </CardTitle>
+              <CardDescription className="font-medium">
+                Comparte tu perfil público con instituciones o en tu web.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {facultyProfile?.profile_slug ? (
+                <>
+                  <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
+                      <Globe size={18} className="text-talentia-blue" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-navy truncate">
+                        facultymatch.app/docentes/{facultyProfile.profile_slug}
+                      </p>
+                      <p className="text-[10px] text-blue-600 font-medium">
+                        Enlace público — visible para cualquier persona
+                      </p>
+                    </div>
+                    <CopyButton url={`${siteUrl}/docentes/${facultyProfile.profile_slug}`} />
+                  </div>
+                  {facultyProfile?.visibility !== "public" && (
+                    <div className="flex items-start gap-2.5 p-3 bg-amber-50 rounded-xl border border-amber-100">
+                      <AlertCircle size={15} className="text-amber-600 shrink-0 mt-0.5" />
+                      <p className="text-xs text-amber-800 font-medium leading-relaxed">
+                        Tu visibilidad no está configurada como <strong>Pública</strong>. El enlace solo funcionará
+                        cuando cambies la visibilidad a <strong>Pública</strong> en la sección superior.
+                      </p>
+                    </div>
+                  )}
+                  <a
+                    href={`${siteUrl}/docentes/${facultyProfile.profile_slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full bg-white border border-gray-200 hover:border-talentia-blue hover:bg-blue-50/50 text-navy font-bold py-3 rounded-xl text-sm transition-all"
+                  >
+                    <ExternalLink size={14} />
+                    Abrir perfil público
+                  </a>
+                </>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                    <Globe size={18} className="text-gray-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-bold text-navy">Aún no tienes un enlace público</p>
+                      <p className="text-xs text-gray-500 font-medium mt-1 leading-relaxed">
+                        Genera un enlace único para compartir tu perfil con instituciones. Se creará
+                        automáticamente a partir de tu nombre.
+                      </p>
+                    </div>
+                  </div>
+                  <form action={generateProfileSlug}>
+                    <Button
+                      type="submit"
+                      className="w-full bg-talentia-blue hover:bg-blue-700 text-white font-bold h-12 rounded-xl text-sm"
+                    >
+                      <Globe size={15} />
+                      Generar enlace público
+                    </Button>
+                  </form>
+                </div>
+              )}
             </CardContent>
           </Card>
 

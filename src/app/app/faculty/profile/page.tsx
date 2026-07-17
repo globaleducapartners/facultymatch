@@ -1,18 +1,8 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { toSlug } from "@/lib/utils";
 import { ProfileEditorClient } from "./ProfileEditorClient";
-
-function toSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
-}
 
 export default async function ProfilePage({
   searchParams,
@@ -70,11 +60,12 @@ export default async function ProfilePage({
 
     let profileSlug = existing?.profile_slug;
     if (!profileSlug && fullName) {
+      const admin = createAdminClient();
       const base = toSlug(fullName);
       let candidate = base;
       let counter = 1;
       while (true) {
-        const { data: taken } = await supabase
+        const { data: taken } = await admin
           .from("faculty_profiles")
           .select("id")
           .eq("profile_slug", candidate)

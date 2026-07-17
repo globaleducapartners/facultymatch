@@ -6,6 +6,21 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Convert a name to a URL-friendly slug (e.g. "Miguel Ángel" → "miguel-angel").
+ * Removes accents, lowercases, replaces spaces/special chars with hyphens.
+ */
+export function toSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+/**
  * Generate a public storage URL for a faculty document from its file_path.
  * The faculty_documents bucket is public, so we can construct the URL directly.
  */

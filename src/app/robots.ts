@@ -12,6 +12,8 @@ export default function robots(): MetadataRoute.Robots {
           "/",
           "/faculty",
           "/faculty/",       // public faculty profiles (/faculty/[id])
+          "/docentes",
+          "/docentes/",      // public faculty profiles (/docentes/[slug])
           "/institutions",
           "/resources",
           "/resources/",

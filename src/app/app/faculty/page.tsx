@@ -18,6 +18,7 @@ import {
   CalendarDays,
   Gift,
   Globe,
+  ExternalLink,
   Zap,
   Star,
   Bell,
@@ -647,6 +648,30 @@ export default async function EducatorDashboard() {
               </div>
             </div>
           </div>
+
+          {/* Public profile */}
+          {facultyProfile?.profile_slug && (
+            <a
+              href={`https://facultymatch.app/docentes/${facultyProfile.profile_slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-3 hover:border-talentia-blue/30 hover:shadow-md transition-all group"
+            >
+              <div className="flex items-center gap-2">
+                <Globe size={16} className="text-talentia-blue" />
+                <h3 className="font-black text-navy text-sm">Perfil público</h3>
+              </div>
+              <p className="text-xs font-semibold text-talentia-blue truncate">
+                facultymatch.app/docentes/{facultyProfile.profile_slug}
+              </p>
+              <p className="text-xs text-gray-500 font-medium leading-relaxed">
+                Comparte este enlace para que cualquier institución pueda ver tu perfil académico.
+              </p>
+              <div className="flex items-center gap-1.5 text-xs font-black text-talentia-blue group-hover:underline">
+                Abrir perfil público <ExternalLink size={12} />
+              </div>
+            </a>
+          )}
 
           {/* Download verified PDF */}
           <a

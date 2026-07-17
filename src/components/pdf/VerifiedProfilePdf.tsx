@@ -403,7 +403,7 @@ export function VerifiedProfilePdf({
   const shortHash = `${blockchainHash.slice(0, 16)}...${blockchainHash.slice(-16)}`;
 
   const profileUrl = profileSlug
-    ? `https://www.facultymatch.app/faculty/${profileSlug}`
+    ? `https://www.facultymatch.app/docentes/${profileSlug}`
     : "https://www.facultymatch.app";
 
   // Build detail lines
