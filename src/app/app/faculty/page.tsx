@@ -21,6 +21,7 @@ import {
   Zap,
   Star,
   Bell,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -646,6 +647,24 @@ export default async function EducatorDashboard() {
               </div>
             </div>
           </div>
+
+          {/* Download verified PDF */}
+          <a
+            href="/api/perfil-pdf"
+            download
+            className="block bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-3 hover:border-talentia-blue/30 hover:shadow-md transition-all group"
+          >
+            <div className="flex items-center gap-2">
+              <Download size={16} className="text-talentia-blue" />
+              <h3 className="font-black text-navy text-sm">Descargar perfil verificado (PDF)</h3>
+            </div>
+            <p className="text-xs text-gray-500 font-medium leading-relaxed">
+              Genera un PDF con tus datos académicos verificados, ideal para adjuntar en candidaturas o compartir con instituciones.
+            </p>
+            <div className="flex items-center gap-1.5 text-xs font-black text-talentia-blue group-hover:underline">
+              Descargar PDF <ArrowRight size={12} />
+            </div>
+          </a>
 
           {/* Plan card */}
           {isPro ? (
