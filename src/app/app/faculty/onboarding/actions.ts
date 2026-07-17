@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { revalidatePath } from "next/cache";
 
 interface WizardData {
@@ -42,15 +42,17 @@ export async function saveWizardStep(data: WizardData) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("No autenticado");
 
+  const admin = createAdminClient();
+
   // Ensure user_profiles row exists (foreign key constraint)
-  const { data: existingProfile } = await supabase
+  const { data: existingProfile } = await admin
     .from("user_profiles")
     .select("id")
     .eq("id", user.id)
     .maybeSingle();
 
   if (!existingProfile) {
-    await supabase
+    await admin
       .from("user_profiles")
       .insert({
         id: user.id,
@@ -76,7 +78,7 @@ export async function saveWizardStep(data: WizardData) {
 
   // Step 1 fields
   if (data.full_name !== undefined) {
-    await supabase
+    await admin
       .from("user_profiles")
       .update({ full_name: data.full_name })
       .eq("id", user.id);
@@ -118,7 +120,7 @@ export async function saveWizardStep(data: WizardData) {
 
   // Build location
   if (data.city !== undefined || data.country !== undefined) {
-    const existing = await supabase
+    const existing = await admin
       .from("faculty_profiles")
       .select("city, country")
       .eq("user_id", user.id)
@@ -128,7 +130,7 @@ export async function saveWizardStep(data: WizardData) {
     updateData.location = [city, country].filter(Boolean).join(", ") || null;
   }
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("faculty_profiles")
     .upsert(
       { id: user.id, user_id: user.id, ...updateData },
@@ -148,7 +150,8 @@ export async function publishProfile() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("No autenticado");
 
-  const { error } = await supabase
+  const admin = createAdminClient();
+  const { error } = await admin
     .from("faculty_profiles")
     .update({
       onboarding_status: "completed",
@@ -188,15 +191,17 @@ export async function saveOrcidImportFromWizard(payload: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("No autenticado");
 
+  const admin = createAdminClient();
+
   // Ensure user_profiles row exists (foreign key constraint)
-  const { data: existingUserProfile } = await supabase
+  const { data: existingUserProfile } = await admin
     .from("user_profiles")
     .select("id")
     .eq("id", user.id)
     .maybeSingle();
 
   if (!existingUserProfile) {
-    await supabase
+    await admin
       .from("user_profiles")
       .insert({
         id: user.id,
@@ -209,7 +214,7 @@ export async function saveOrcidImportFromWizard(payload: {
       });
   }
 
-  const { data: existingProfile } = await supabase
+  const { data: existingProfile } = await admin
     .from("faculty_profiles")
     .select("*")
     .eq("user_id", user.id)
@@ -267,7 +272,7 @@ export async function saveOrcidImportFromWizard(payload: {
   importData.temas_seleccionados = payload.saveTemas;
   updateData.orcid_import_data = importData;
 
-  const { error } = await supabase
+  const { error } = await admin
     .from("faculty_profiles")
     .upsert(
       { id: user.id, user_id: user.id, ...updateData },

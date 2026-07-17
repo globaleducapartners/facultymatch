@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function RoleSelectPage() {
-  redirect("/app/faculty");
+  redirect("/app/faculty/onboarding");
 }

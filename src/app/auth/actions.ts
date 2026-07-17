@@ -84,8 +84,29 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
       return { error: "No se pudo crear la cuenta. Inténtalo de nuevo." };
     }
 
-    // If institution role, create institution record
-    if (role === "institution") {
+    // Ensure user_profiles and faculty_profiles records exist
+    // (database trigger may not be set up, so we do it explicitly)
+    await admin.from("user_profiles").upsert({
+      id: data.user.id,
+      role,
+      full_name: fullName,
+      terms_accepted_at: new Date().toISOString(),
+      privacy_accepted_at: new Date().toISOString(),
+      marketing_opt_in: marketingOptIn,
+      consent_version: "v1",
+    }, { onConflict: "id" });
+
+    if (role === "faculty") {
+      await admin.from("faculty_profiles").upsert({
+        id: data.user.id,
+        user_id: data.user.id,
+        visibility: "public",
+        is_active: true,
+        is_verified: false,
+        onboarding_status: "not_started",
+        onboarding_step: 0,
+      }, { onConflict: "user_id" });
+    } else if (role === "institution") {
       await admin.from("institutions").upsert({
         user_id: data.user.id,
         name: institutionName || fullName,
@@ -114,7 +135,14 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
     }).catch(e => console.warn("[SignUp] Support notification email failed:", e));
   }
 
-  return { success: true };
+  // Redirect to the correct page — redirect() in server actions ensures
+  // session cookies set by signInWithPassword() are included in the response
+  if (role === "faculty") {
+    redirect("/app/faculty/onboarding");
+  } else if (role === "institution") {
+    redirect("/app/institution");
+  }
+  redirect("/app/faculty/onboarding");
 }
 
 // Institution-specific signup: uses admin client to auto-confirm (no Supabase email sent)
@@ -301,7 +329,7 @@ export async function signUpInstitution(formData: FormData) {
     html: buildSupportNotification("institution", fullName, email.toLowerCase(), institutionName, country, city, institutionType),
   }).catch(e => console.warn("[signUpInstitution] Support notification email failed:", e));
 
-  return { success: true };
+  redirect("/app/institution");
 }
 
 export async function updateEmail(formData: FormData) {
@@ -393,7 +421,7 @@ export async function signIn(formData: FormData) {
       .from("user_profiles")
       .select("role, onboarding_completed")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     if (!profile?.role) {
       redirect("/app/faculty");

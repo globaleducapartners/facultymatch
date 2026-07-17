@@ -12,12 +12,12 @@ export default async function OnboardingPage() {
     .from("user_profiles")
     .select("*")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
     .select("*")
-    .eq("id", user.id)
+    .eq("user_id", user.id)
     .maybeSingle();
 
   // If onboarding is already completed, redirect to profile

@@ -186,33 +186,62 @@ export function Step2CareerType({ data, updateData, user, facultyProfile }: Prop
 
       {/* Academic section */}
       {isAcademic && (
-        <div style={{
-          background: D.surf, border: `1px solid ${D.border}`, borderRadius: 12, padding: 20,
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-            <GraduationCap size={18} color={D.blue} />
-            <span style={{ fontSize: 14, fontWeight: 700, color: D.ink }}>Perfil académico</span>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{
+            background: D.surf, border: `1px solid ${D.border}`, borderRadius: 12, padding: 20,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+              <GraduationCap size={18} color={D.blue} />
+              <span style={{ fontSize: 14, fontWeight: 700, color: D.ink }}>Perfil académico</span>
+            </div>
+            <p style={{ fontSize: 13, color: D.muted, lineHeight: 1.6, margin: "0 0 16px" }}>
+              Importa automáticamente tu trayectoria desde ORCID. Tus datos académicos (afiliaciones, titulaciones, publicaciones) se rellenarán al instante.
+            </p>
+            <button
+              type="button"
+              onClick={() => setOrcidOpen(true)}
+              style={{
+                fontFamily: SANS, background: D.blue, color: "#fff",
+                border: "none", padding: "11px 22px", borderRadius: 10,
+                fontSize: 14, fontWeight: 700, cursor: "pointer",
+                display: "inline-flex", alignItems: "center", gap: 8,
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+              Importar desde ORCID
+            </button>
           </div>
-          <p style={{ fontSize: 13, color: D.muted, lineHeight: 1.6, margin: "0 0 16px" }}>
-            Importa automáticamente tu trayectoria desde ORCID. O puedes añadir tus datos manualmente en los siguientes pasos.
-          </p>
-          <button
-            type="button"
-            onClick={() => setOrcidOpen(true)}
-            style={{
-              fontFamily: SANS, background: D.blue, color: "#fff",
-              border: "none", padding: "11px 22px", borderRadius: 10,
-              fontSize: 14, fontWeight: 700, cursor: "pointer",
-              display: "inline-flex", alignItems: "center", gap: 8,
-            }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
-            Importar desde ORCID
-          </button>
+
+          {/* Tip for academic users without ORCID */}
+          {data.careerType === "academica" && data.careerType !== "combinado" && (
+            <div style={{
+              background: "#F0FDF4", border: "1px solid #BBF7D0",
+              borderRadius: 12, padding: "14px 18px",
+              display: "flex", alignItems: "flex-start", gap: 10,
+            }}>
+              <div style={{
+                width: 24, height: 24, borderRadius: 8,
+                background: D.green, display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0, marginTop: 1,
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+              </div>
+              <div>
+                <p style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: "#166534", margin: "0 0 4px" }}>
+                  ¿No tienes ORCID? No hay problema
+                </p>
+                <p style={{ fontFamily: SANS, fontSize: 12, color: "#15803D", margin: 0, lineHeight: 1.6 }}>
+                  Puedes continuar y añadir tu especialidad, acreditaciones y publicaciones en los siguientes pasos. Todo de forma manual y sin prisas.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

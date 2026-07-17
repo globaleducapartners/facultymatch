@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function OldInstitutionOnboardingPage() {
-  redirect('/signup/institution');
+  redirect('/app/institution');
 }

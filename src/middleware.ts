@@ -16,8 +16,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(callbackUrl);
   }
 
-  // Forward search params so server layouts can read them via headers()
+  // Forward pathname + search params so server layouts can read them via headers()
   const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-url', request.nextUrl.pathname);
   requestHeaders.set('x-url-search', request.nextUrl.search || '');
 
   let response = NextResponse.next({ request: { headers: requestHeaders } });

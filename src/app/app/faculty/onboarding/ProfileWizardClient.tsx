@@ -75,7 +75,12 @@ interface Props {
 }
 
 export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }: Props) {
-  const initialStep = facultyProfile?.onboarding_step ?? 0;
+  // Safeguard: if onboarding hasn't started yet, force step 0
+  // This prevents a stale onboarding_step from jumping ahead
+  const initialStep =
+    facultyProfile?.onboarding_status === "not_started"
+      ? 0
+      : (facultyProfile?.onboarding_step ?? 0);
   const initialCareerType = facultyProfile?.career_type ?? null;
 
   const [step, setStep] = useState(initialStep);
@@ -255,7 +260,7 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
             Crear tu perfil
           </h1>
           <p style={{ fontSize: 13, color: D.muted, margin: "4px 0 0" }}>
-            Paso {step + 1} de 5 — {STEP_LABELS[step]}
+            Paso {Math.min(step + 1, 5)} de 5 — {STEP_LABELS[Math.min(step, 4)]}
           </p>
         </div>
         <button
@@ -275,8 +280,9 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
       {/* Step indicator */}
       <div style={{ display: "flex", gap: 6, marginBottom: 32 }}>
         {STEP_LABELS.map((label, i) => {
-          const isActive = i === step;
-          const isDone = i < step;
+          const clampedStep = Math.min(step, 4);
+          const isActive = i === clampedStep;
+          const isDone = i < clampedStep;
           return (
             <div
               key={i}
@@ -301,7 +307,7 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
         {step === 1 && <Step2CareerType data={data} updateData={updateData} user={user} facultyProfile={facultyProfile} />}
         {step === 2 && <Step3Specialty data={data} updateData={updateData} />}
         {step === 3 && <Step4Modality data={data} updateData={updateData} />}
-        {step === 4 && <Step5Review data={data} facultyProfile={facultyProfile} userMeta={userMeta} />}
+        {(step === 4 || step >= 5) && <Step5Review data={data} facultyProfile={facultyProfile} userMeta={userMeta} />}
       </div>
 
       {/* Navigation buttons */}

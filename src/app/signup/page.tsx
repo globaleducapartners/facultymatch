@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createBrowserClient } from "@supabase/ssr";
+import { signUp } from "@/app/auth/actions";
 import { submitAcquisitionData } from "@/lib/acquisition";
 import { Logo } from "@/components/ui/Logo";
 
@@ -45,7 +45,6 @@ const errStyle: React.CSSProperties = {
 function SignupForm() {
   const router       = useRouter();
   const searchParams = useSearchParams();
-  const isInstitution = searchParams.get("intent") === "institution";
 
   const [loading,     setLoading]     = useState(false);
   const [serverError, setServerError] = useState("");
@@ -57,10 +56,6 @@ function SignupForm() {
   const [showPwd,   setShowPwd]   = useState(false);
   const [terms,     setTerms]     = useState(false);
   const [errors,    setErrors]    = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    // no-op, just keeping isInstitution for potential future use
-  }, [isInstitution]);
 
   // ── Validación ──────────────────────────────────────────────────────────────
   const validate = () => {
@@ -80,50 +75,44 @@ function SignupForm() {
     setServerError("");
 
     try {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.facultymatch.app").replace(/\/$/, "");
+      const formData = new FormData();
+      formData.append("email", email.trim().toLowerCase());
+      formData.append("password", password);
+      formData.append("fullName", `${firstName.trim()} ${lastName.trim()}`);
+      formData.append("role", "faculty");
+      formData.append("terms_accepted", terms ? "on" : "off");
+      formData.append("privacy_accepted", terms ? "on" : "off");
+      formData.append("marketing_opt_in", "off");
 
-      const { data: signUpData, error } = await supabase.auth.signUp({
-        email: email.trim().toLowerCase(),
-        password,
-        options: {
-          emailRedirectTo: `${siteUrl}/auth/callback`,
-          data: {
-            full_name:    `${firstName.trim()} ${lastName.trim()}`,
-            first_name:   firstName.trim(),
-            last_name:    lastName.trim(),
-            role:         "faculty",
-            terms_accepted:       true,
-            privacy_accepted:     true,
-            marketing_opt_in:     false,
-            consent_version:      "v1",
-          },
-        },
-      });
+      const result = await signUp(formData);
 
-      if (error) {
-        const msg = error.message.toLowerCase();
-        if (msg.includes("already registered") || error.status === 400) {
-          setServerError("duplicate");
-        } else {
-          setServerError(error.message);
-        }
+      if (result?.error) {
+        setServerError(result.error);
         setLoading(false);
         return;
       }
 
-      if (signUpData?.user?.id) {
-        submitAcquisitionData(signUpData.user.id);
+      // Track acquisition
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id) {
+        submitAcquisitionData(user.id);
       }
-      router.push("/signup/faculty/confirm");
-    } catch {
+
+      // Redirect directly to onboarding (user is auto-logged in)
+      window.location.href = "/app/faculty/onboarding";
+    } catch (err) {
+      console.error("[Signup] Unexpected error:", err);
       setServerError("Error de red. Inténtalo de nuevo.");
       setLoading(false);
     }
   };
+
+  const isInstitution = searchParams.get("intent") === "institution";
 
   return (
     <div id="fm-signup-layout" style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "2fr 3fr", fontFamily: SANS }}>
@@ -201,7 +190,7 @@ function SignupForm() {
           {serverError && (
             <div style={{ background: D.errBg, border: "1px solid #FCA5A5", borderRadius: 8, padding: "12px 14px", marginBottom: 20 }}>
               <p style={{ fontFamily: SANS, fontSize: 13, color: D.error, margin: 0 }}>
-                {serverError === "duplicate"
+                {serverError === "duplicate" || serverError.toLowerCase().includes("already registered")
                   ? <>Este email ya está registrado. <Link href="/login" style={{ fontWeight: 600, color: D.error }}>Acceder →</Link></>
                   : serverError
                 }
@@ -279,6 +268,15 @@ function SignupForm() {
             ¿Ya tienes cuenta?{" "}
             <Link href="/login" style={{ color: D.blue, fontWeight: 500 }}>Acceder</Link>
           </p>
+
+          {isInstitution && (
+            <p style={{ fontFamily: SANS, fontSize: 12, color: D.muted, textAlign: "center", marginTop: 12 }}>
+              ¿Eres una institución?{" "}
+              <Link href="/signup/institution" style={{ color: D.blue, fontWeight: 500 }}>
+                Registra tu institución aquí
+              </Link>
+            </p>
+          )}
         </div>
       </div>
 

@@ -18,11 +18,14 @@ export default async function FacultyLayout({
     .from("user_profiles")
     .select("role, can_switch_role, active_mode")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
+
+  // Use user_metadata fallback if DB profile is missing
+  const role = profile?.role || (user.user_metadata?.role as string) || null;
 
   // Institution users can view individual faculty profiles (/app/faculty/[id])
   // but not the faculty dashboard pages (profile editing, settings, etc.)
-  if (profile?.role && profile.role !== "faculty" && profile.role !== "institution") {
+  if (role && role !== "faculty" && role !== "institution") {
     redirect("/app/institution");
   }
 
@@ -31,11 +34,11 @@ export default async function FacultyLayout({
   const url = headersList.get("x-url") || headersList.get("x-invoke-path") || "";
   const isOnboardingRoute = url.includes("/onboarding");
 
-  if (profile?.role === "faculty" && !isOnboardingRoute) {
+  if (role === "faculty" && !isOnboardingRoute) {
     const { data: facultyProfile } = await supabase
       .from("faculty_profiles")
       .select("onboarding_status")
-      .eq("id", user.id)
+      .eq("user_id", user.id)
       .maybeSingle();
 
     const onboardingStatus = facultyProfile?.onboarding_status || "not_started";

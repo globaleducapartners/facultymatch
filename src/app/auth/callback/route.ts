@@ -190,7 +190,7 @@ export async function GET(request: Request) {
     .from('user_profiles')
     .select('role, onboarding_completed')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   // Recovery: if the DB trigger failed silently, rebuild profile from user metadata
   if (!profile?.role && user.user_metadata?.role) {
