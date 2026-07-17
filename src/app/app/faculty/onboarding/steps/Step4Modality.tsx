@@ -195,7 +195,7 @@ export function Step4Modality({ data, updateData }: Props) {
         <InstitutionSelector
           name="currentInstitution"
           initialValue={data.currentInstitution}
-          placeholder="Buscar institución…"
+          placeholder="Escribe el centro donde impartes formación, si actualmente no tienes, déjalo en blanco, no pasa nada"
           onChange={(value) => updateData({ currentInstitution: value })}
         />
       </div>
