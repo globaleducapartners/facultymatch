@@ -114,7 +114,7 @@ function ConfirmContent() {
 
           {/* Actions */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <Link href="/login" style={{
+            <Link href="/login?next=/app/faculty/onboarding" style={{
               fontFamily: SANS, display: "flex", alignItems: "center", justifyContent: "center",
               width: "100%", background: D.blue, color: D.white,
               padding: "13px", borderRadius: 10,

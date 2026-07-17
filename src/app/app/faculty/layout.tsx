@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { switchActiveMode } from "@/app/auth/actions";
 import { Building2, ArrowRight } from "lucide-react";
 
@@ -23,6 +24,24 @@ export default async function FacultyLayout({
   // but not the faculty dashboard pages (profile editing, settings, etc.)
   if (profile?.role && profile.role !== "faculty" && profile.role !== "institution") {
     redirect("/app/institution");
+  }
+
+  // Check onboarding status for faculty users
+  const headersList = await headers();
+  const url = headersList.get("x-url") || headersList.get("x-invoke-path") || "";
+  const isOnboardingRoute = url.includes("/onboarding");
+
+  if (profile?.role === "faculty" && !isOnboardingRoute) {
+    const { data: facultyProfile } = await supabase
+      .from("faculty_profiles")
+      .select("onboarding_status")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const onboardingStatus = facultyProfile?.onboarding_status || "not_started";
+    if (onboardingStatus !== "completed") {
+      redirect("/app/faculty/onboarding");
+    }
   }
 
   const showInstitutionBanner = profile?.can_switch_role === true && profile?.active_mode !== "institution";

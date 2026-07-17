@@ -5,9 +5,10 @@ import { UniversityAutocomplete } from "@/components/ui/UniversityAutocomplete";
 
 interface Props {
   initialInstitutions: string[];
+  onChange?: (institutions: string[]) => void;
 }
 
-export function InstitutionsTaughtEditor({ initialInstitutions }: Props) {
+export function InstitutionsTaughtEditor({ initialInstitutions, onChange }: Props) {
   // Normalize: JSONB may return objects instead of plain strings
   const normalize = (arr: string[]) =>
     (arr ?? [])
@@ -20,7 +21,10 @@ export function InstitutionsTaughtEditor({ initialInstitutions }: Props) {
       <input type="hidden" name="institutionsTaught" value={JSON.stringify(institutions)} />
       <UniversityAutocomplete
         value={institutions}
-        onChange={setInstitutions}
+        onChange={(val) => {
+          setInstitutions(val);
+          onChange?.(val);
+        }}
         placeholder="Busca universidades donde has impartido clases..."
       />
     </div>

@@ -14,9 +14,10 @@ interface Props {
   name: string;
   initialValue?: string;
   placeholder?: string;
+  onChange?: (value: string) => void;
 }
 
-export function InstitutionSelector({ name, initialValue = "", placeholder = "Buscar institución..." }: Props) {
+export function InstitutionSelector({ name, initialValue = "", placeholder = "Buscar institución...", onChange }: Props) {
   const [query, setQuery] = useState(initialValue);
   const [results, setResults] = useState<Institution[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -63,6 +64,7 @@ export function InstitutionSelector({ name, initialValue = "", placeholder = "Bu
   const handleSelect = (inst: Institution) => {
     setQuery(inst.name);
     setShowDropdown(false);
+    onChange?.(inst.name);
   };
 
   const exactMatch = results.some(
@@ -87,7 +89,7 @@ export function InstitutionSelector({ name, initialValue = "", placeholder = "Bu
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => { setQuery(e.target.value); onChange?.(e.target.value); }}
           onFocus={() => query.length >= 2 && setShowDropdown(true)}
           placeholder={placeholder}
           className={inputCls}

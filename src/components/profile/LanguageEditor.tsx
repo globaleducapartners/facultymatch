@@ -12,9 +12,10 @@ const CEFR_LEVELS = ["Nativo", "C2", "C1", "B2", "B1", "A2", "A1"];
 
 interface Props {
   initialLanguages: Language[];
+  onChange?: (languages: Language[]) => void;
 }
 
-export function LanguageEditor({ initialLanguages }: Props) {
+export function LanguageEditor({ initialLanguages, onChange }: Props) {
   const [languages, setLanguages] = useState<Language[]>(initialLanguages ?? []);
   const [newLang, setNewLang] = useState("");
   const [newLevel, setNewLevel] = useState("B2");
@@ -23,13 +24,17 @@ export function LanguageEditor({ initialLanguages }: Props) {
     const trimmed = newLang.trim();
     if (!trimmed) return;
     if (languages.some((l) => l.lang.toLowerCase() === trimmed.toLowerCase())) return;
-    setLanguages([...languages, { lang: trimmed, level: newLevel }]);
+    const updated = [...languages, { lang: trimmed, level: newLevel }];
+    setLanguages(updated);
     setNewLang("");
     setNewLevel("B2");
+    onChange?.(updated);
   };
 
   const remove = (index: number) => {
-    setLanguages(languages.filter((_, i) => i !== index));
+    const updated = languages.filter((_, i) => i !== index);
+    setLanguages(updated);
+    onChange?.(updated);
   };
 
   return (
