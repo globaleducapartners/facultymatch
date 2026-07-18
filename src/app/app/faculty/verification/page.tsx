@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase-server";
 import {
   CheckCircle2, ShieldCheck, Upload, FileText, GraduationCap,
-  AlertCircle, ArrowRight, Loader2, Languages, MapPin, Eye,
+  AlertCircle, ArrowRight, Loader2, Languages, MapPin, Eye, Download,
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -217,12 +217,20 @@ export default async function VerificationPage() {
                     </p>
                   </div>
                 ) : verificationStatus === "verificado" ? (
-                  <div className="p-6 rounded-2xl bg-blue-50 border border-blue-100 flex flex-col items-center text-center space-y-3">
+                  <div className="p-6 rounded-2xl bg-blue-50 border border-blue-100 flex flex-col items-center text-center space-y-4">
                     <ShieldCheck className="text-talentia-blue" size={32} />
                     <h4 className="text-sm font-bold text-navy">¡Eres un docente Verificado!</h4>
                     <p className="text-xs text-gray-500 font-medium max-w-sm">
                       Tu perfil ahora goza de máxima visibilidad y confianza institucional.
                     </p>
+                    <a
+                      href="/api/perfil-pdf"
+                      download
+                      className="inline-flex items-center gap-2 bg-talentia-blue hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors mt-2"
+                    >
+                      <Download size={16} />
+                      Descargar perfil verificado (PDF)
+                    </a>
                   </div>
                 ) : (
                   <form action={requestVerification}>
