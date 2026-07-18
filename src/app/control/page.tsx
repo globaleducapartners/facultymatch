@@ -29,7 +29,7 @@ export default async function ControlPage() {
   // Fetch pending users (en_revision = waiting for admin review)
   const { data: pendingRaw, error: pendingError } = await admin
     .from('faculty_profiles')
-    .select('user_id, estado_perfil, verification_notes, updated_at, created_at, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline, degrees, languages, website, google_scholar_id, orcid_id, is_phd, aneca_accreditation, academic_level, name_visibility, banner_url')
+    .select('user_id, estado_perfil, verification_notes, updated_at, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline, degrees, languages, website, google_scholar_id, orcid_id, is_phd, aneca_accreditation, academic_level, name_visibility, banner_url')
     .eq('estado_perfil', 'en_revision')
     .order('updated_at', { ascending: true })
     .limit(100);
@@ -93,7 +93,7 @@ export default async function ControlPage() {
       id: p.user_id,
       full_name: user.full_name || null,
       email: user.email || null,
-      created_at: p.created_at || user.created_at || null,
+      created_at: user.created_at || null,
       verification_status: p.estado_perfil,
       verification_notes: p.verification_notes || null,
       faculty_areas: p.faculty_areas?.length > 0 ? p.faculty_areas : (user.knowledge_areas || []),
