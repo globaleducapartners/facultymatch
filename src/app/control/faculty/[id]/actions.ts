@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 
 export async function hideFaculty(facultyId: string) {
   const admin = createAdminClient();
-  await admin.from("faculty_profiles").update({ visibility: "hidden" }).eq("user_id", facultyId);
+  await admin.from("faculty_profiles").update({ visibility: "private" }).eq("user_id", facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
@@ -17,19 +17,21 @@ export async function unhideFaculty(facultyId: string) {
 
 export async function revokeFaculty(facultyId: string) {
   const admin = createAdminClient();
-  await admin.from("user_profiles").update({
-    verification_status: "rejected",
-    verified_at: new Date().toISOString(),
-  }).eq("id", facultyId);
+  await admin.from("faculty_profiles").update({
+    estado_perfil: "rechazado",
+    is_verified: false,
+    verificado_en: new Date().toISOString(),
+  }).eq("user_id", facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
 export async function activateFaculty(facultyId: string) {
   const admin = createAdminClient();
-  await admin.from("user_profiles").update({
-    verification_status: "approved",
-    verified_at: new Date().toISOString(),
-  }).eq("id", facultyId);
+  await admin.from("faculty_profiles").update({
+    estado_perfil: "verificado",
+    is_verified: true,
+    verificado_en: new Date().toISOString(),
+  }).eq("user_id", facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 

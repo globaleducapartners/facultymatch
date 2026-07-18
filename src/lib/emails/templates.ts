@@ -163,3 +163,39 @@ export const getConfirmEmail = (link: string) => baseTemplate(`
   <p class="small">Si el botón no funciona, copia este enlace en tu navegador:</p>
   <p class="link-text">${link}</p>
 `);
+
+export const getActivationEmail = (name: string, activationLink: string) => baseTemplate(`
+  <div class="greeting">Activa tu cuenta, ${name}</div>
+  <p class="body-text">
+    Tu cuenta en FacultyMatch ha sido creada. Solo falta un paso: confirma tu correo electrónico para empezar a completar tu perfil y conectar con instituciones universitarias de todo el mundo.
+  </p>
+
+  <div class="cta-box">
+    <div class="cta-label">Paso siguiente</div>
+    <p style="font-size:14px;color:#475569;margin:0 0 18px;">Haz clic en el botón para activar tu cuenta y acceder al asistente de creación de perfil.</p>
+    <a href="${activationLink}" class="button">Activar mi cuenta &rarr;</a>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text"><span class="step-title">Confirma tu email</span><br>Haz clic en el enlace de arriba para verificar tu dirección de correo.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text"><span class="step-title">Completa tu perfil</span><br>Rellena tu información académica, experiencia y preferencias en unos minutos.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text"><span class="step-title">Empieza a recibir ofertas</span><br>Tu perfil estará visible para instituciones verificadas de todo el mundo.</div>
+    </div>
+  </div>
+
+  <p class="body-text" style="font-size:13px;color:#94a3b8;">
+    Este enlace expira en 24 horas. Si no solicitaste esta cuenta, puedes ignorar este correo.
+  </p>
+
+  <div class="divider"></div>
+  <p class="small">Si el botón no funciona, copia este enlace en tu navegador:</p>
+  <p class="link-text">${activationLink}</p>
+`);

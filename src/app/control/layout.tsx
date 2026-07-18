@@ -20,12 +20,11 @@ export default async function ControlLayout({ children }: { children: React.Reac
     redirect("/?error=no-access");
   }
 
-  // Pending count for sidebar badge
+  // Pending count for sidebar badge (en_revision = submitted for review)
   const { count: pendingCount } = await admin
-    .from('user_profiles')
+    .from('faculty_profiles')
     .select('*', { count: 'exact', head: true })
-    .eq('role', 'faculty')
-    .or('verification_status.eq.pending,verification_status.is.null');
+    .eq('estado_perfil', 'en_revision');
 
   return (
     <div className="min-h-screen flex bg-[#F8FAFC]">

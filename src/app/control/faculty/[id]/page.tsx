@@ -17,13 +17,17 @@ function fmtDate(iso: string | null | undefined) {
 }
 
 function StatusBadge({ status }: { status?: string | null }) {
-  if (status === "approved")
+  if (status === "verificado")
     return <span className="text-xs font-black px-2.5 py-1 rounded-full bg-green-100 text-green-700 flex items-center gap-1.5 w-fit"><CheckCircle2 size={12} /> Verificado</span>;
-  if (status === "rejected")
+  if (status === "rechazado")
     return <span className="text-xs font-black px-2.5 py-1 rounded-full bg-red-100 text-red-700 flex items-center gap-1.5 w-fit"><XCircle size={12} /> Rechazado</span>;
-  if (status === "requires_info")
-    return <span className="text-xs font-black px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 flex items-center gap-1.5 w-fit"><AlertTriangle size={12} /> Info requerida</span>;
-  return <span className="text-xs font-black px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 flex items-center gap-1.5 w-fit"><Clock size={12} /> Pendiente</span>;
+  if (status === "en_revision")
+    return <span className="text-xs font-black px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 flex items-center gap-1.5 w-fit"><Clock size={12} /> En revisión</span>;
+  if (status === "incompleto")
+    return <span className="text-xs font-black px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 flex items-center gap-1.5 w-fit"><AlertTriangle size={12} /> Incompleto</span>;
+  if (status === "pendiente_verificacion")
+    return <span className="text-xs font-black px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 flex items-center gap-1.5 w-fit"><Clock size={12} /> Pendiente verificación</span>;
+  return <span className="text-xs font-black px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 flex items-center gap-1.5 w-fit"><Clock size={12} /> {status || "Desconocido"}</span>;
 }
 
 function StatCard({ icon: Icon, label, value, color = "blue" }: {
@@ -136,8 +140,8 @@ export default async function FacultyDetailPage({
   const fp = facultyProfile || {};
   const visibility = fp.visibility || "public";
   const viewCount = fp.view_count ?? 0;
-  const isHidden = visibility === "hidden";
-  const isVerified = userProfile.verification_status === "approved";
+  const isHidden = visibility === "private";
+  const isVerified = fp.estado_perfil === "verificado";
 
   // Calculate profile completeness
   const fields = [fp.headline, fp.bio, fp.location, fp.country, fp.website, fp.contact_email, fp.avatar_url, fp.banner_url];
@@ -162,7 +166,7 @@ export default async function FacultyDetailPage({
             <h1 className="text-2xl font-black text-navy tracking-tight">{userProfile.full_name || "Sin nombre"}</h1>
             <p className="text-gray-500 font-medium mt-0.5">{fp.headline || "Sin cargo académico"}</p>
             <div className="flex items-center gap-2 mt-2">
-              <StatusBadge status={userProfile.verification_status} />
+              <StatusBadge status={fp.estado_perfil} />
               {isHidden && (
                 <span className="text-xs font-black px-2.5 py-1 rounded-full bg-gray-200 text-gray-700 flex items-center gap-1.5">
                   <EyeOff size={12} /> Oculto
@@ -178,7 +182,7 @@ export default async function FacultyDetailPage({
         facultyId={id}
         isHidden={isHidden}
         isVerified={isVerified}
-        verificationStatus={userProfile.verification_status}
+        verificationStatus={fp.estado_perfil}
         facultyName={userProfile.full_name?.split(" ")[0] || "Docente"}
       />
 
@@ -198,8 +202,8 @@ export default async function FacultyDetailPage({
               )}
               {fp.country && !fp.city && <InfoRow icon={Globe} label="País" value={fp.country} />}
               <InfoRow icon={Calendar} label="Registro" value={fmtDate(userProfile.created_at)} />
-              {userProfile.verified_at && (
-                <InfoRow icon={CheckCircle2} label="Verificado el" value={fmtDate(userProfile.verified_at)} />
+              {fp.verificado_en && (
+                <InfoRow icon={CheckCircle2} label="Verificado el" value={fmtDate(fp.verificado_en)} />
               )}
               <InfoRow icon={User} label="Rol" value={userProfile.role} />
               <InfoRow icon={CheckCircle2} label="Onboarding completado" value={userProfile.onboarding_completed ? "Sí" : "No"} />

@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { getFacultyWelcomeEmail, getInstitutionWelcomeEmail, getFacultyConfirmEmail } from './templates';
+import { getFacultyWelcomeEmail, getInstitutionWelcomeEmail, getFacultyConfirmEmail, getActivationEmail } from './templates';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM = process.env.RESEND_FROM_EMAIL || 'FacultyMatch <noreply@facultymatch.app>';
@@ -42,5 +42,24 @@ export async function sendConfirmationEmail(email: string, name: string, confirm
     } catch (e) {
       console.error('Confirmation email failed:', e);
     }
+  }
+}
+
+export async function sendActivationEmail(email: string, name: string, activationLink: string) {
+  const subject = `¡Bienvenido a FacultyMatch, ${name}! Activa tu cuenta`;
+  const html = getActivationEmail(name, activationLink);
+
+  console.log(`[EMAIL] Sending activation to ${email}`);
+
+  if (resend) {
+    try {
+      const { data, error } = await resend.emails.send({ from: FROM, to: email, subject, html });
+      if (error) console.error('Resend activation error:', error);
+      return { data, error };
+    } catch (e) {
+      console.error('Activation email failed:', e);
+    }
+  } else {
+    console.warn('RESEND_API_KEY not set. Activation email skipped.');
   }
 }

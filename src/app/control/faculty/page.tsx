@@ -27,13 +27,15 @@ function calculateCompleteness(fp: any): number {
 // ── ───────────────────────────────────────────────────────────────────────
 
 function StatusBadge({ status, visibility }: { status?: string | null; visibility?: string | null }) {
-  if (visibility === "hidden") {
+  if (visibility === "private") {
     return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-gray-200 text-gray-700 flex items-center gap-1"><EyeOff size={10} /> Oculto</span>;
   }
-  if (status === "approved") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-100 text-green-700 flex items-center gap-1"><CheckCircle2 size={10} /> Verificado</span>;
-  if (status === "rejected") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-red-100 text-red-700 flex items-center gap-1"><XCircle size={10} /> Rechazado</span>;
-  if (status === "requires_info") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Info requerida</span>;
-  return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 flex items-center gap-1"><Clock size={10} /> Pendiente</span>;
+  if (status === "verificado") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-100 text-green-700 flex items-center gap-1"><CheckCircle2 size={10} /> Verificado</span>;
+  if (status === "rechazado") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-red-100 text-red-700 flex items-center gap-1"><XCircle size={10} /> Rechazado</span>;
+  if (status === "en_revision") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 flex items-center gap-1"><Clock size={10} /> En revisión</span>;
+  if (status === "incompleto") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 flex items-center gap-1"><AlertCircle size={10} /> Incompleto</span>;
+  if (status === "pendiente_verificacion") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Sin verificar email</span>;
+  return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 flex items-center gap-1"><Clock size={10} /> {status || "Desconocido"}</span>;
 }
 
 export default async function FacultyListPage({
@@ -47,7 +49,7 @@ export default async function FacultyListPage({
   // Fetch faculty_profiles ordered by view_count DESC (primary sort)
   let profileQuery = admin
     .from("faculty_profiles")
-    .select("user_id, view_count, visibility, headline, country, profile_completeness, is_phd, aneca_accreditation, bio, linkedin_url, faculty_areas, levels, languages, avatar_url")
+    .select("user_id, view_count, visibility, headline, country, profile_completeness, is_phd, aneca_accreditation, bio, linkedin_url, faculty_areas, levels, languages, avatar_url, estado_perfil")
     .order("view_count", { ascending: false })
     .limit(200);
 
@@ -66,7 +68,7 @@ export default async function FacultyListPage({
   if (profileIds.length > 0) {
     const { data: users } = await admin
       .from("user_profiles")
-      .select("id, full_name, email, created_at, verification_status, onboarding_completed")
+      .select("id, full_name, email, created_at, onboarding_completed")
       .in("id", profileIds)
       .eq("role", "faculty");
 
@@ -86,18 +88,19 @@ export default async function FacultyListPage({
       return { ...user, _profile: { ...fp, _completeness: completeness } };
     });
 
-  // Apply status filter on the combined list
+  // Apply status filter on the combined list using estado_perfil from faculty_profiles
   let filteredFaculty = facultyList;
   if (params.status && params.status !== "all") {
-    if (params.status === "pending") {
-      filteredFaculty = facultyList.filter(
-        (f: any) => !f.verification_status || f.verification_status === "pending"
-      );
-    } else {
-      filteredFaculty = facultyList.filter(
-        (f: any) => f.verification_status === params.status
-      );
-    }
+    const statusMap: Record<string, string> = {
+      "pending": "en_revision",
+      "approved": "verificado",
+      "rejected": "rechazado",
+      "requires_info": "incompleto",
+    };
+    const targetStatus = statusMap[params.status] || params.status;
+    filteredFaculty = facultyList.filter(
+      (f: any) => f._profile?.estado_perfil === targetStatus
+    );
   }
 
   // ── Contact counts per faculty ──────────────────────────────────────────
@@ -277,7 +280,7 @@ export default async function FacultyListPage({
                         )}
                       </td>
                       <td className="px-5 py-3 text-center">
-                        <StatusBadge status={f.verification_status} visibility={fp.visibility} />
+                        <StatusBadge status={fp.estado_perfil} visibility={fp.visibility} />
                       </td>
 
                       {/* Recommended action */}

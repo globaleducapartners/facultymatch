@@ -131,8 +131,8 @@ export default async function EducatorDashboard() {
   ]);
 
   const userMeta = user.user_metadata || {};
-  const verificationStatus: string = profile?.verification_status || "pending";
-  const verificationNotes: string | null = profile?.verification_notes || null;
+  const verificationStatus: string = facultyProfile?.estado_perfil || "incompleto";
+  const verificationNotes: string | null = facultyProfile?.verification_notes || null;
 
   const languages: any[] = facultyProfile?.languages || [];
   const history: any[] = facultyProfile?.institutions_taught || [];
@@ -236,7 +236,7 @@ export default async function EducatorDashboard() {
       )}
 
       {/* ── Verification banners ── */}
-      {verificationStatus === "approved" && (
+      {verificationStatus === "verificado" && (
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-start gap-4">
           <div className="w-9 h-9 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
             <CheckCircle2 size={18} className="text-green-600" />
@@ -247,7 +247,7 @@ export default async function EducatorDashboard() {
           </div>
         </div>
       )}
-      {verificationStatus === "pending" && (
+      {verificationStatus === "en_revision" && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-4">
           <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
             <Clock size={18} className="text-amber-600" />
@@ -260,13 +260,13 @@ export default async function EducatorDashboard() {
           </div>
         </div>
       )}
-      {verificationStatus === "requires_info" && (
+      {verificationStatus === "incompleto" && (
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-4">
           <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
             <AlertCircle size={18} className="text-blue-600" />
           </div>
           <div>
-            <p className="font-black text-blue-800 text-sm">Necesitamos más información</p>
+            <p className="font-black text-blue-800 text-sm">Perfil incompleto</p>
             {verificationNotes && <p className="text-sm text-blue-600 font-medium">{verificationNotes}</p>}
             <Link href="/app/faculty/profile" className="text-sm font-black text-blue-700 hover:underline mt-1 inline-block">
               Completar mi perfil →
@@ -274,7 +274,7 @@ export default async function EducatorDashboard() {
           </div>
         </div>
       )}
-      {verificationStatus === "rejected" && (
+      {verificationStatus === "rechazado" && (
         <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-4">
           <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
             <XCircle size={18} className="text-red-600" />

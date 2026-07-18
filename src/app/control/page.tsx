@@ -8,40 +8,45 @@ export default async function ControlPage() {
   today.setHours(0, 0, 0, 0);
   const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-  // Counts
+  // Counts — now from faculty_profiles.estado_perfil
   const [
     { count: pendingCount },
     { count: approvedToday },
     { count: approvedMonth },
     { count: totalFaculty },
   ] = await Promise.all([
-    admin.from('user_profiles').select('*', { count: 'exact', head: true })
-      .eq('role', 'faculty').or('verification_status.eq.pending,verification_status.is.null'),
-    admin.from('user_profiles').select('*', { count: 'exact', head: true })
-      .eq('role', 'faculty').eq('verification_status', 'approved')
-      .gte('verified_at', today.toISOString()),
-    admin.from('user_profiles').select('*', { count: 'exact', head: true })
-      .eq('role', 'faculty').eq('verification_status', 'approved')
-      .gte('verified_at', startOfMonth.toISOString()),
-    admin.from('user_profiles').select('*', { count: 'exact', head: true })
-      .eq('role', 'faculty'),
+    admin.from('faculty_profiles').select('*', { count: 'exact', head: true })
+      .eq('estado_perfil', 'en_revision'),
+    admin.from('faculty_profiles').select('*', { count: 'exact', head: true })
+      .eq('estado_perfil', 'verificado')
+      .gte('verificado_en', today.toISOString()),
+    admin.from('faculty_profiles').select('*', { count: 'exact', head: true })
+      .eq('estado_perfil', 'verificado')
+      .gte('verificado_en', startOfMonth.toISOString()),
+    admin.from('faculty_profiles').select('*', { count: 'exact', head: true }),
   ]);
 
-  // Fetch pending users (no join — avoids FK resolution issues)
+  // Fetch pending users (en_revision = waiting for admin review)
   const { data: pendingRaw, error: pendingError } = await admin
-    .from('user_profiles')
-    .select('id, full_name, created_at, verification_status, verification_notes')
-    .eq('role', 'faculty')
-    .or('verification_status.eq.pending,verification_status.is.null')
-    .order('created_at', { ascending: true })
+    .from('faculty_profiles')
+    .select('user_id, estado_perfil, verification_notes, updated_at, created_at, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline, degrees, languages, website, google_scholar_id, orcid_id, is_phd, aneca_accreditation, academic_level, name_visibility, banner_url')
+    .eq('estado_perfil', 'en_revision')
+    .order('updated_at', { ascending: true })
     .limit(100);
 
-  let metaMap: Record<string, any> = {};
-  let fpMap: Record<string, any> = {};
+  let userMap: Record<string, any> = {};
   let docsMap: Record<string, any[]> = {};
 
   if (pendingRaw && pendingRaw.length > 0) {
-    const ids = pendingRaw.map((p) => p.id);
+    const ids = pendingRaw.map((p) => p.user_id);
+
+    // Fetch user_profiles for full_name and email
+    const { data: users } = await admin
+      .from("user_profiles")
+      .select("id, full_name, email, created_at")
+      .in("id", ids)
+      .eq("role", "faculty");
+    if (users) users.forEach((u: any) => { userMap[u.id] = u; });
 
     // Auth user metadata (email, academic_level, phone, areas, etc.)
     const { data: authData } = await admin.auth.admin.listUsers({ perPage: 1000 });
@@ -49,7 +54,9 @@ export default async function ControlPage() {
       const idSet = new Set(ids);
       authData.users.forEach((u) => {
         if (idSet.has(u.id)) {
-          metaMap[u.id] = {
+          userMap[u.id] = {
+            ...(userMap[u.id] || {}),
+            id: u.id,
             email: u.email,
             academic_level: u.user_metadata?.academic_level,
             phone: u.user_metadata?.phone,
@@ -60,20 +67,11 @@ export default async function ControlPage() {
             website: u.user_metadata?.website,
             google_scholar: u.user_metadata?.google_scholar_id,
             orcid: u.user_metadata?.orcid_id,
-            is_phd: u.user_metadata?.is_phd || false,
+            is_phd_u: u.user_metadata?.is_phd || false,
             languages: u.user_metadata?.languages || [],
           };
         }
       });
-    }
-
-    // Faculty profiles batch (for those who completed onboarding)
-    const { data: fps } = await admin
-      .from('faculty_profiles')
-      .select('user_id, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline, updated_at, degrees, languages, website, google_scholar_id, orcid_id, is_phd, aneca_accreditation, academic_level, contact_email, contact_whatsapp, contact_linkedin, banner_url, name_visibility')
-      .in('user_id', ids);
-    if (fps) {
-      fps.forEach((fp: any) => { fpMap[fp.user_id] = fp; });
     }
 
     // Faculty documents
@@ -90,36 +88,35 @@ export default async function ControlPage() {
   }
 
   const pendingFaculty = (pendingRaw ?? []).map((p: any) => {
-    const meta = metaMap[p.id] || {};
-    const fp = fpMap[p.id] || {};
+    const user = userMap[p.user_id] || {};
     return {
-      id: p.id,
-      full_name: p.full_name,
-      email: meta.email || null,
-      created_at: p.created_at,
-      verification_status: p.verification_status,
-      verification_notes: p.verification_notes,
-      faculty_areas: fp.faculty_areas?.length > 0 ? fp.faculty_areas : (meta.knowledge_areas || []),
-      availability: fp.availability || meta.availability || null,
-      modalities: fp.modalities?.length > 0 ? fp.modalities : (meta.modalities || []),
-      linkedin_url: fp.linkedin_url || null,
-      bio: fp.bio || null,
-      location: fp.location || null,
-      city: fp.city || null,
-      country: fp.country || null,
-      headline: fp.headline || null,
-      profile_updated_at: fp.updated_at || null,
-      academic_level: meta.academic_level || fp.academic_level || null,
-      phone: meta.phone || null,
-      aneca_accreditation: meta.aneca_accreditation || fp.aneca_accreditation || false,
-      degrees: fp.degrees || [],
-      languages: fp.languages?.length > 0 ? fp.languages : (meta.languages || []),
-      website: fp.website || meta.website || null,
-      google_scholar_id: fp.google_scholar_id || meta.google_scholar || null,
-      orcid_id: fp.orcid_id || meta.orcid || null,
-      is_phd: fp.is_phd || meta.is_phd || false,
-      name_visibility: fp.name_visibility || 'public',
-      documents: docsMap[p.id] || [],
+      id: p.user_id,
+      full_name: user.full_name || null,
+      email: user.email || null,
+      created_at: p.created_at || user.created_at || null,
+      verification_status: p.estado_perfil,
+      verification_notes: p.verification_notes || null,
+      faculty_areas: p.faculty_areas?.length > 0 ? p.faculty_areas : (user.knowledge_areas || []),
+      availability: p.availability || user.availability || null,
+      modalities: p.modalities?.length > 0 ? p.modalities : (user.modalities || []),
+      linkedin_url: p.linkedin_url || null,
+      bio: p.bio || null,
+      location: p.location || null,
+      city: p.city || null,
+      country: p.country || null,
+      headline: p.headline || null,
+      profile_updated_at: p.updated_at || null,
+      academic_level: user.academic_level || p.academic_level || null,
+      phone: user.phone || null,
+      aneca_accreditation: user.aneca_accreditation || p.aneca_accreditation || false,
+      degrees: p.degrees || [],
+      languages: p.languages?.length > 0 ? p.languages : (user.languages || []),
+      website: p.website || user.website || null,
+      google_scholar_id: p.google_scholar_id || user.google_scholar || null,
+      orcid_id: p.orcid_id || user.orcid || null,
+      is_phd: p.is_phd || user.is_phd_u || false,
+      name_visibility: p.name_visibility || 'public',
+      documents: docsMap[p.user_id] || [],
     };
   });
 

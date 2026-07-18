@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { toSlug } from "@/lib/utils";
 import { ProfileEditorClient } from "./ProfileEditorClient";
+import { SENSITIVE_FIELDS } from "@/lib/profile-sensitivity";
 
 export default async function ProfilePage({
   searchParams,
@@ -36,6 +37,37 @@ export default async function ProfilePage({
     .select("*")
     .eq("faculty_id", user.id)
     .order("created_at", { ascending: false });
+
+  // ─── Re-verification helper ─────────────────────────────────────────────
+  // When a verified profile updates a sensitive field, downgrade to en_revision
+  // so an admin must re-verify before the profile is considered trusted again.
+
+  async function checkReVerification(userId: string, dbColumns: string[]) {
+    "use server";
+    const supabase = await createClient();
+    const { data: fp } = await supabase
+      .from("faculty_profiles")
+      .select("estado_perfil")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (!fp || fp.estado_perfil !== "verificado") return;
+
+    const hasSensitive = dbColumns.some((col) =>
+      (SENSITIVE_FIELDS as readonly string[]).includes(col)
+    );
+    if (!hasSensitive) return;
+
+    const admin = createAdminClient();
+    await admin.from("faculty_profiles").update({
+      estado_perfil: "en_revision",
+      is_verified: false,
+      verificado_por: null,
+      verificado_en: null,
+      verification_notes: null,
+      updated_at: new Date().toISOString(),
+    }).eq("id", userId);
+  }
 
   // ─── Server Actions (one per tab) ────────────────────────────────────────
 
@@ -86,6 +118,9 @@ export default async function ProfilePage({
         updated_at: new Date().toISOString(),
       }, { onConflict: "id" });
 
+    // Re-verification: full_name is a sensitive field
+    await checkReVerification(user.id, ["full_name"]);
+
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
     redirect("/app/faculty/profile?saved=1&tab=basic");
@@ -116,6 +151,11 @@ export default async function ProfilePage({
         updated_at: new Date().toISOString(),
       }).eq("id", user.id);
 
+    // Re-verification: current_institution, is_phd, academic_level, institutions_taught
+    await checkReVerification(user.id, [
+      "current_institution", "is_phd", "academic_level", "institutions_taught",
+    ]);
+
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
     redirect("/app/faculty/profile?saved=1&tab=experience");
@@ -132,6 +172,9 @@ export default async function ProfilePage({
 
     await supabase.from("faculty_profiles")
       .update({ degrees, updated_at: new Date().toISOString() }).eq("id", user.id);
+
+    // Re-verification: degrees is a sensitive field
+    await checkReVerification(user.id, ["degrees"]);
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -179,6 +222,9 @@ export default async function ProfilePage({
         orcid_id: orcidId,
         updated_at: new Date().toISOString(),
       }).eq("id", user.id);
+
+    // Re-verification: aneca_accreditation, google_scholar_id, orcid_id
+    await checkReVerification(user.id, ["aneca_accreditation", "google_scholar_id", "orcid_id"]);
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");

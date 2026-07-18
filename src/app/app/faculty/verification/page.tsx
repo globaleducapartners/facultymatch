@@ -17,15 +17,9 @@ export default async function VerificationPage() {
 
   if (!user) return null;
 
-  const { data: userProfile } = await supabase
-    .from("user_profiles")
-    .select("verification_status, verification_notes")
-    .eq("id", user.id)
-    .single();
-
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")
-    .select("*")
+    .select("*, verification_notes")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -35,8 +29,8 @@ export default async function VerificationPage() {
     .eq("faculty_id", user.id)
     .order("created_at", { ascending: false });
 
-  const verificationStatus = userProfile?.verification_status || "pending";
-  const verificationNotes = userProfile?.verification_notes;
+  const verificationStatus = facultyProfile?.estado_perfil || "incompleto";
+  const verificationNotes = facultyProfile?.verification_notes;
 
   const { data: expertiseData } = await supabase
     .from("faculty_expertise")
@@ -110,17 +104,17 @@ export default async function VerificationPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     await supabase
-      .from("user_profiles")
-      .update({ verification_status: "pending" })
-      .eq("id", user.id);
+      .from("faculty_profiles")
+      .update({ estado_perfil: "en_revision" })
+      .eq("user_id", user.id);
     revalidatePath("/app/faculty/verification");
   }
 
   const badges: Record<string, { label: string; cls: string }> = {
-    approved: { label: "Verificado", cls: "bg-tech-cyan text-white border-tech-cyan" },
-    pending: { label: "En revisión", cls: "bg-orange-50 text-energy-orange border-energy-orange/30" },
-    requires_info: { label: "Requiere info", cls: "bg-blue-50 text-talentia-blue border-talentia-blue/30" },
-    rejected: { label: "Rechazado", cls: "bg-red-50 text-red-600 border-red-200" },
+    verificado: { label: "Verificado", cls: "bg-tech-cyan text-white border-tech-cyan" },
+    en_revision: { label: "En revisión", cls: "bg-orange-50 text-energy-orange border-energy-orange/30" },
+    incompleto: { label: "Incompleto", cls: "bg-blue-50 text-talentia-blue border-talentia-blue/30" },
+    rechazado: { label: "Rechazado", cls: "bg-red-50 text-red-600 border-red-200" },
   };
 
   const statusBadge = badges[verificationStatus as string] ?? { label: "Sin verificar", cls: "bg-gray-50 text-gray-400 border-gray-100" };
@@ -142,7 +136,7 @@ export default async function VerificationPage() {
         </Badge>
       </div>
 
-      {verificationStatus === "requires_info" && verificationNotes && (
+      {verificationStatus === "incompleto" && verificationNotes && (
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
           <AlertCircle size={18} className="text-talentia-blue shrink-0 mt-0.5" />
           <div>
@@ -213,7 +207,7 @@ export default async function VerificationPage() {
               </div>
 
               <div className="pt-4">
-                {verificationStatus === "pending" && completedCount > 0 ? (
+                {verificationStatus === "en_revision" && completedCount > 0 ? (
                   <div className="p-6 rounded-2xl bg-orange-50 border border-orange-100 flex flex-col items-center text-center space-y-3">
                     <Loader2 className="animate-spin text-energy-orange" size={24} />
                     <h4 className="text-sm font-bold text-navy">Tu solicitud está en revisión</h4>
@@ -222,7 +216,7 @@ export default async function VerificationPage() {
                       notificación en un plazo de 48-72 horas.
                     </p>
                   </div>
-                ) : verificationStatus === "approved" ? (
+                ) : verificationStatus === "verificado" ? (
                   <div className="p-6 rounded-2xl bg-blue-50 border border-blue-100 flex flex-col items-center text-center space-y-3">
                     <ShieldCheck className="text-talentia-blue" size={32} />
                     <h4 className="text-sm font-bold text-navy">¡Eres un docente Verificado!</h4>

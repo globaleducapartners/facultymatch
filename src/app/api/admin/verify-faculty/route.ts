@@ -48,19 +48,19 @@ export async function POST(request: Request) {
     "Docente";
 
   if (action === "approve") {
-    // Update user_profiles
-    await admin.from("user_profiles").update({
-      verification_status: "approved",
-      verified_at: new Date().toISOString(),
-      verified_by: user.email,
+    // Update faculty_profiles (single source of truth)
+    await admin.from("faculty_profiles").update({
+      estado_perfil: "verificado",
+      is_verified: true,
+      verificado_por: user.id,
+      verificado_en: new Date().toISOString(),
       verification_notes: notes || null,
+    }).eq("user_id", facultyId);
+
+    // Mark onboarding as completed in user_profiles (legacy, kept for reference)
+    await admin.from("user_profiles").update({
       onboarding_completed: true,
     }).eq("id", facultyId);
-
-    // Update faculty_profiles
-    await admin.from("faculty_profiles").update({
-      is_verified: true,
-    }).eq("user_id", facultyId);
 
     // Send approval email
     if (facultyEmail) {
@@ -78,12 +78,13 @@ export async function POST(request: Request) {
   if (action === "reject") {
     const reason = rejectionReason || "Perfil incompleto o datos no verificables.";
 
-    await admin.from("user_profiles").update({
-      verification_status: "rejected",
-      verified_at: new Date().toISOString(),
-      verified_by: user.email,
+    await admin.from("faculty_profiles").update({
+      estado_perfil: "rechazado",
+      is_verified: false,
+      verificado_por: user.id,
+      verificado_en: new Date().toISOString(),
       verification_notes: notes ? `${notes}\n\nMotivo rechazo: ${reason}` : `Motivo rechazo: ${reason}`,
-    }).eq("id", facultyId);
+    }).eq("user_id", facultyId);
 
     if (facultyEmail) {
       await resend.emails.send({
@@ -100,10 +101,10 @@ export async function POST(request: Request) {
   if (action === "requires_info") {
     const message = infoMessage || "Necesitamos información adicional para verificar tu perfil.";
 
-    await admin.from("user_profiles").update({
-      verification_status: "requires_info",
+    await admin.from("faculty_profiles").update({
+      estado_perfil: "incompleto",
       verification_notes: notes ? `${notes}\n\nInfo solicitada: ${message}` : `Info solicitada: ${message}`,
-    }).eq("id", facultyId);
+    }).eq("user_id", facultyId);
 
     if (facultyEmail) {
       await resend.emails.send({
@@ -118,12 +119,13 @@ export async function POST(request: Request) {
   }
 
   if (action === "reactivate") {
-    await admin.from("user_profiles").update({
-      verification_status: "pending",
-      verified_at: null,
-      verified_by: null,
+    await admin.from("faculty_profiles").update({
+      estado_perfil: "en_revision",
+      is_verified: false,
+      verificado_por: null,
+      verificado_en: null,
       verification_notes: null,
-    }).eq("id", facultyId);
+    }).eq("user_id", facultyId);
     return NextResponse.json({ success: true, action: "reactivated" });
   }
 

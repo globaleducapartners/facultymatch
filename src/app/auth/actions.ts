@@ -1,7 +1,8 @@
 "use server";
 
 import { createClient, createAdminClient } from "@/lib/supabase-server";
-import { sendWelcomeEmail } from "@/lib/emails/service";
+import { sendWelcomeEmail, sendActivationEmail } from "@/lib/emails/service";
+import { generateToken, getTokenExpiry } from "@/lib/activation-token";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Resend } from 'resend';
@@ -105,7 +106,28 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
         is_verified: false,
         onboarding_status: "not_started",
         onboarding_step: 0,
+        estado_perfil: "pendiente_verificacion",
       }, { onConflict: "user_id" });
+
+      // Generate activation token and send confirmation email
+      const { token, hash } = generateToken();
+      const expiresAt = getTokenExpiry();
+
+      await admin.from("activation_tokens").insert({
+        user_id: data.user.id,
+        token_hash: hash,
+        expires_at: expiresAt,
+        used: false,
+      });
+
+      const origin =
+        process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+        "https://www.facultymatch.app";
+      const activationLink = `${origin}/auth/activar?token=${token}`;
+
+      sendActivationEmail(email, fullName, activationLink).catch(e =>
+        console.error("[SignUp] Activation email failed:", e)
+      );
     } else if (role === "institution") {
       await admin.from("institutions").upsert({
         user_id: data.user.id,
@@ -138,11 +160,11 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
   // Redirect to the correct page — redirect() in server actions ensures
   // session cookies set by signInWithPassword() are included in the response
   if (role === "faculty") {
-    redirect("/app/faculty/onboarding");
+    redirect("/auth/verificar-email?email=" + encodeURIComponent(email));
   } else if (role === "institution") {
     redirect("/app/institution");
   }
-  redirect("/app/faculty/onboarding");
+  redirect("/auth/verificar-email?email=" + encodeURIComponent(email));
 }
 
 // Institution-specific signup: uses admin client to auto-confirm (no Supabase email sent)

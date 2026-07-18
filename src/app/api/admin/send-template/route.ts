@@ -86,8 +86,8 @@ export async function POST(request: Request) {
       const hasBio = new Set((fps ?? []).map((fp: any) => fp.user_id));
       ids = (allFaculty ?? []).filter((f: any) => !hasBio.has(f.id)).map((f: any) => f.id);
     } else if (segment === "pending_verification") {
-      const { data: pending } = await admin.from("user_profiles").select("id").eq("role", "faculty").or("verification_status.eq.pending,verification_status.is.null").limit(1000);
-      ids = (pending ?? []).map((f: any) => f.id);
+      const { data: pending } = await admin.from("faculty_profiles").select("user_id").eq("estado_perfil", "en_revision").limit(1000);
+      ids = (pending ?? []).map((f: any) => f.user_id);
     }
 
     targetIds = ids;

@@ -5,43 +5,42 @@ export default async function ApprovedPage() {
   const admin = createAdminClient();
 
   const { data: raw } = await admin
-    .from("user_profiles")
-    .select("id, full_name, created_at, verified_at, verification_notes")
-    .eq("role", "faculty")
-    .eq("verification_status", "approved")
-    .order("verified_at", { ascending: false })
+    .from("faculty_profiles")
+    .select("user_id, estado_perfil, verificado_en, verification_notes, onboarding_status")
+    .eq("estado_perfil", "verificado")
+    .order("verificado_en", { ascending: false, nulls: "last" })
     .limit(200);
 
-  let metaMap: Record<string, any> = {};
+  let userMap: Record<string, any> = {};
   let fpMap: Record<string, any> = {};
   let docsMap: Record<string, any[]> = {};
 
   if (raw && raw.length > 0) {
-    const ids = raw.map((p) => p.id);
+    const ids = raw.map((p) => p.user_id);
 
+    // Fetch user_profiles to get full_name
+    const { data: users } = await admin
+      .from("user_profiles")
+      .select("id, full_name, email, created_at")
+      .in("id", ids)
+      .eq("role", "faculty");
+    if (users) users.forEach((u: any) => { userMap[u.id] = u; });
+
+    // Auth user metadata (email, academic_level, etc.)
     const { data: authData } = await admin.auth.admin.listUsers({ perPage: 1000 });
     if (authData?.users) {
       const idSet = new Set(ids);
       authData.users.forEach((u) => {
         if (idSet.has(u.id)) {
-          metaMap[u.id] = {
-            email: u.email,
-            academic_level: u.user_metadata?.academic_level,
-            phone: u.user_metadata?.phone,
-            aneca_accreditation: u.user_metadata?.aneca_accreditation,
-            knowledge_areas: u.user_metadata?.knowledge_areas || [],
-            modalities: u.user_metadata?.modalities || [],
-            availability: u.user_metadata?.availability,
-            website: u.user_metadata?.website,
-            is_phd: u.user_metadata?.is_phd || false,
-          };
+          userMap[u.id] = { ...(userMap[u.id] || {}), id: u.id, ...u.user_metadata };
         }
       });
     }
 
+    // Fetch faculty_profiles data (we already have the main rows, but this gives us more fields)
     const { data: fps } = await admin
       .from("faculty_profiles")
-      .select("user_id, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline, updated_at, degrees, languages, website, google_scholar_id, orcid_id, is_phd, aneca_accreditation, academic_level")
+      .select("user_id, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline, updated_at, degrees, languages, website, google_scholar_id, orcid_id, is_phd, aneca_accreditation, academic_level, name_visibility")
       .in("user_id", ids);
     if (fps) fps.forEach((fp: any) => { fpMap[fp.user_id] = fp; });
 
@@ -58,19 +57,19 @@ export default async function ApprovedPage() {
   }
 
   const faculty = (raw ?? []).map((p: any) => {
-    const meta = metaMap[p.id] || {};
-    const fp = fpMap[p.id] || {};
+    const user = userMap[p.user_id] || {};
+    const fp = fpMap[p.user_id] || {};
     return {
-      id: p.id,
-      full_name: p.full_name,
-      email: meta.email || null,
-      created_at: p.created_at,
-      verified_at: p.verified_at,
+      id: p.user_id,
+      full_name: user.full_name || null,
+      email: user.email || null,
+      created_at: user.created_at || null,
+      verified_at: p.verificado_en,
       verification_status: "approved",
       verification_notes: p.verification_notes,
-      faculty_areas: fp.faculty_areas?.length > 0 ? fp.faculty_areas : (meta.knowledge_areas || []),
-      availability: fp.availability || meta.availability || null,
-      modalities: fp.modalities?.length > 0 ? fp.modalities : (meta.modalities || []),
+      faculty_areas: fp.faculty_areas?.length > 0 ? fp.faculty_areas : (user.knowledge_areas || []),
+      availability: fp.availability || user.availability || null,
+      modalities: fp.modalities?.length > 0 ? fp.modalities : (user.modalities || []),
       linkedin_url: fp.linkedin_url || null,
       bio: fp.bio || null,
       location: fp.location || null,
@@ -78,17 +77,17 @@ export default async function ApprovedPage() {
       country: fp.country || null,
       headline: fp.headline || null,
       profile_updated_at: fp.updated_at || null,
-      academic_level: meta.academic_level || fp.academic_level || null,
-      phone: meta.phone || null,
-      aneca_accreditation: meta.aneca_accreditation || fp.aneca_accreditation || false,
+      academic_level: user.academic_level || fp.academic_level || null,
+      phone: user.phone || null,
+      aneca_accreditation: user.aneca_accreditation || fp.aneca_accreditation || false,
       degrees: fp.degrees || [],
       languages: fp.languages || [],
-      website: fp.website || meta.website || null,
+      website: fp.website || user.website || null,
       google_scholar_id: fp.google_scholar_id || null,
       orcid_id: fp.orcid_id || null,
-      is_phd: fp.is_phd || meta.is_phd || false,
+      is_phd: fp.is_phd || user.is_phd || false,
       name_visibility: fp.name_visibility || "public",
-      documents: docsMap[p.id] || [],
+      documents: docsMap[p.user_id] || [],
     };
   });
 

@@ -163,6 +163,7 @@ export async function publishProfile() {
     .from("faculty_profiles")
     .update({
       onboarding_status: "completed",
+      estado_perfil: "en_revision",
       updated_at: new Date().toISOString(),
     })
     .eq("user_id", user.id);

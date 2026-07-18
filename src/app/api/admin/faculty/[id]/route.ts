@@ -33,7 +33,7 @@ export async function PATCH(
 
   switch (action) {
     case "hide": {
-      await session.admin.from("faculty_profiles").update({ visibility: "hidden" }).eq("user_id", id);
+      await session.admin.from("faculty_profiles").update({ visibility: "private" }).eq("user_id", id);
       return NextResponse.json({ success: true, action: "hidden" });
     }
     case "unhide": {
@@ -41,17 +41,19 @@ export async function PATCH(
       return NextResponse.json({ success: true, action: "unhidden" });
     }
     case "revoke": {
-      await session.admin.from("user_profiles").update({
-        verification_status: "rejected",
-        verified_at: new Date().toISOString(),
-      }).eq("id", id);
+      await session.admin.from("faculty_profiles").update({
+        estado_perfil: "rechazado",
+        is_verified: false,
+        verificado_en: new Date().toISOString(),
+      }).eq("user_id", id);
       return NextResponse.json({ success: true, action: "revoked" });
     }
     case "activate": {
-      await session.admin.from("user_profiles").update({
-        verification_status: "approved",
-        verified_at: new Date().toISOString(),
-      }).eq("id", id);
+      await session.admin.from("faculty_profiles").update({
+        estado_perfil: "verificado",
+        is_verified: true,
+        verificado_en: new Date().toISOString(),
+      }).eq("user_id", id);
       return NextResponse.json({ success: true, action: "activated" });
     }
     case "delete": {

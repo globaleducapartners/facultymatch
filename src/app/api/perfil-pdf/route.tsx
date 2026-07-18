@@ -17,7 +17,7 @@ export async function GET() {
       await Promise.all([
         supabase
           .from("user_profiles")
-          .select("full_name, avatar_url, verification_status")
+          .select("full_name, avatar_url")
           .eq("id", user.id)
           .single(),
         admin
