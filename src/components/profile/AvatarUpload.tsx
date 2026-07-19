@@ -173,7 +173,6 @@ export function AvatarUpload({ userId, currentAvatarUrl, name }: AvatarUploadPro
       const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
       await supabase.from("user_profiles").update({ avatar_url: publicUrl }).eq("id", userId);
-      await supabase.from("faculty_profiles").update({ avatar_url: publicUrl }).eq("user_id", userId);
 
       setPreview(publicUrl);
       setCropSrc(null);

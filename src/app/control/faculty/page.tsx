@@ -7,7 +7,7 @@ import {
 
 // ── Profile Completeness Calculator ───────────────────────────────────────
 
-function calculateCompleteness(fp: any): number {
+function calculateCompleteness(fp: any, user?: any): number {
   const fields = [
     fp.headline,
     fp.bio,
@@ -18,7 +18,7 @@ function calculateCompleteness(fp: any): number {
     fp.faculty_areas && Array.isArray(fp.faculty_areas) && fp.faculty_areas.length > 0,
     fp.levels && Array.isArray(fp.levels) && fp.levels.length > 0,
     fp.languages && Array.isArray(fp.languages) && fp.languages.length > 0,
-    fp.avatar_url || fp.photo,
+    user?.avatar_url,                   // avatar en user_profiles, no en faculty_profiles
   ];
   const filled = fields.filter(Boolean).length;
   return Math.round((filled / fields.length) * 100);
@@ -49,7 +49,7 @@ export default async function FacultyListPage({
   // Fetch faculty_profiles ordered by view_count DESC (primary sort)
   let profileQuery = admin
     .from("faculty_profiles")
-    .select("user_id, view_count, visibility, headline, country, profile_completeness, is_phd, aneca_accreditation, bio, linkedin_url, faculty_areas, levels, languages, avatar_url, estado_perfil")
+    .select("user_id, view_count, visibility, headline, country, profile_completeness, is_phd, aneca_accreditation, bio, linkedin_url, faculty_areas, levels, languages, estado_perfil")
     .order("view_count", { ascending: false })
     .limit(200);
 
@@ -68,7 +68,7 @@ export default async function FacultyListPage({
   if (profileIds.length > 0) {
     const { data: users } = await admin
       .from("user_profiles")
-      .select("id, full_name, email, created_at, onboarding_completed")
+      .select("id, full_name, email, avatar_url, created_at, onboarding_completed")
       .in("id", profileIds)
       .eq("role", "faculty");
 
@@ -84,7 +84,7 @@ export default async function FacultyListPage({
       const user = userMap[fp.user_id];
       const completeness = hasStoredCompleteness
         ? (fp.profile_completeness ?? 0)
-        : calculateCompleteness(fp);
+        : calculateCompleteness(fp, user);
       return { ...user, _profile: { ...fp, _completeness: completeness } };
     });
 

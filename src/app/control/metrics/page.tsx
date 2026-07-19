@@ -32,7 +32,7 @@ async function getMRR(): Promise<{ mrr: number; activeSubscriptions: number }> {
 
 // ── Profile Completeness Calculator ───────────────────────────────────────
 
-function calculateCompleteness(fp: any): number {
+function calculateCompleteness(fp: any, avatarUrl?: string | null): number {
   const fields = [
     fp.headline,
     fp.bio,
@@ -43,7 +43,7 @@ function calculateCompleteness(fp: any): number {
     fp.faculty_areas && Array.isArray(fp.faculty_areas) && fp.faculty_areas.length > 0,
     fp.levels && Array.isArray(fp.levels) && fp.levels.length > 0,
     fp.languages && Array.isArray(fp.languages) && fp.languages.length > 0,
-    fp.avatar_url || fp.photo,
+    avatarUrl,                          // avatar en user_profiles, no en faculty_profiles
   ];
   const filled = fields.filter(Boolean).length;
   return Math.round((filled / fields.length) * 100);
@@ -61,18 +61,39 @@ export default async function MetricsPage() {
     .select("*", { count: "exact", head: true })
     .eq("role", "faculty");
 
-  // Faculty without email
-  const { data: facultyUsers } = await admin
+  // Faculty without email (check auth.users, not user_profiles.email)
+  const { data: facultyNoEmailCheck } = await admin
     .from("user_profiles")
-    .select("id, email")
+    .select("id")
     .eq("role", "faculty");
-  const facultyNoEmail = (facultyUsers ?? []).filter((u) => !u.email).length;
+  const facultyIds = (facultyNoEmailCheck ?? []).map((u: any) => u.id);
+  let facultyNoEmail = 0;
+  if (facultyIds.length > 0) {
+    const { data: authUsers } = await admin.auth.admin.listUsers({ perPage: 1000 });
+    if (authUsers?.users) {
+      const authUserIds = new Set(authUsers.users.map((u) => u.id));
+      facultyNoEmail = facultyIds.filter((id: string) => !authUserIds.has(id)).length;
+    }
+  }
 
   // Faculty profiles for completeness check
   const { data: allFacultyProfiles } = await admin
     .from("faculty_profiles")
-    .select("user_id, profile_completeness, headline, bio, country, linkedin_url, is_phd, aneca_accreditation, faculty_areas, levels, languages, avatar_url")
+    .select("user_id, profile_completeness, headline, bio, country, linkedin_url, is_phd, aneca_accreditation, faculty_areas, levels, languages")
     .limit(500);
+
+  // Fetch user_profiles.avatar_url for completeness calculation
+  let avatarMap: Record<string, string | null> = {};
+  const fpUserIds = (allFacultyProfiles ?? []).map((fp: any) => fp.user_id).filter(Boolean);
+  if (fpUserIds.length > 0) {
+    const { data: avatarProfiles } = await admin
+      .from("user_profiles")
+      .select("id, avatar_url")
+      .in("id", fpUserIds);
+    if (avatarProfiles) {
+      avatarProfiles.forEach((u: any) => { avatarMap[u.id] = u.avatar_url; });
+    }
+  }
 
   let completenessZeroCount = 0;
   if (allFacultyProfiles && allFacultyProfiles.length > 0) {
@@ -81,7 +102,7 @@ export default async function MetricsPage() {
     );
     if (!hasStoredCompleteness) {
       completenessZeroCount = allFacultyProfiles.filter(
-        (fp: any) => calculateCompleteness(fp) === 0
+        (fp: any) => calculateCompleteness(fp, avatarMap[fp.user_id]) === 0
       ).length;
     } else {
       completenessZeroCount = allFacultyProfiles.filter(

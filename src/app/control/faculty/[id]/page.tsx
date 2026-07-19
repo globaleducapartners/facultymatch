@@ -100,7 +100,7 @@ export default async function FacultyDetailPage({
     .from("faculty_profiles")
     .select("*")
     .eq("user_id", id)
-    .single();
+    .maybeSingle();
 
   // Fetch expertise
   const { data: expertise } = await admin

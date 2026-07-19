@@ -30,7 +30,12 @@ export default async function RejectedPage() {
       const idSet = new Set(ids);
       authData.users.forEach((u) => {
         if (idSet.has(u.id)) {
-          userMap[u.id] = { ...(userMap[u.id] || {}), id: u.id, ...u.user_metadata };
+          userMap[u.id] = {
+            ...(userMap[u.id] || {}),
+            id: u.id,
+            email: u.email || userMap[u.id]?.email,
+            ...u.user_metadata,
+          };
         }
       });
     }
