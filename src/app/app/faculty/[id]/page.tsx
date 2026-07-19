@@ -746,22 +746,25 @@ export default async function FacultyProfilePage({
             </div>
           )}
 
-          {/* Public profile link — compact */}
-          <a
-            href={faculty?.profile_slug
-              ? `https://facultymatch.app/docentes/${faculty.profile_slug}`
-              : `https://facultymatch.app/faculty/${id}`}
-            target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-3 bg-white rounded-2xl border border-[#E2E8F0] hover:border-[#1B4FD8] transition-colors group shadow-3xs"
-          >
-            <Globe size={13} className="text-slate-400 group-hover:text-[#1B4FD8] shrink-0 transition-colors" />
-            <span className="text-xs font-semibold text-slate-400 group-hover:text-[#1B4FD8] transition-colors truncate">
-              {faculty?.profile_slug
-                ? `facultymatch.app/docentes/${faculty.profile_slug}`
-                : `Ver perfil público`}
-            </span>
-            <ExternalLink size={11} className="text-slate-300 group-hover:text-[#1B4FD8] shrink-0 transition-colors ml-auto" />
-          </a>
+          {/* Public profile link — compact (only when the profile actually has a public URL) */}
+          {faculty?.profile_slug ? (
+            <a
+              href={`https://facultymatch.app/docentes/${faculty.profile_slug}`}
+              target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-3 bg-white rounded-2xl border border-[#E2E8F0] hover:border-[#1B4FD8] transition-colors group shadow-3xs"
+            >
+              <Globe size={13} className="text-slate-400 group-hover:text-[#1B4FD8] shrink-0 transition-colors" />
+              <span className="text-xs font-semibold text-slate-400 group-hover:text-[#1B4FD8] transition-colors truncate">
+                {`facultymatch.app/docentes/${faculty.profile_slug}`}
+              </span>
+              <ExternalLink size={11} className="text-slate-300 group-hover:text-[#1B4FD8] shrink-0 transition-colors ml-auto" />
+            </a>
+          ) : (
+            <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 rounded-2xl border border-[#E2E8F0] text-slate-400">
+              <Globe size={13} className="shrink-0" />
+              <span className="text-xs font-semibold">Este docente aún no tiene enlace público generado</span>
+            </div>
+          )}
 
         </aside>
       </div>

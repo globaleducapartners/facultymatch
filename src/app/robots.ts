@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: [
           "/",
           "/faculty",
-          "/faculty/",       // public faculty profiles (/faculty/[id])
+          "/faculty/",       // legacy profile URLs, redirect to /docentes/[slug]
           "/docentes",
           "/docentes/",      // public faculty profiles (/docentes/[slug])
           "/institutions",
