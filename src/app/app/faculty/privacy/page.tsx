@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { toSlug } from "@/lib/utils";
+import { ensureProfileSlug } from "@/lib/profile-slug";
 import { extractDomainFromWebsite, extractDomainFromEmail, matchesBlockedDomain } from "@/lib/domain";
 
 export default async function PrivacyPage({
@@ -118,38 +118,12 @@ export default async function PrivacyPage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Fetch full_name from user_profiles
-    const { data: up } = await supabase
-      .from("user_profiles")
-      .select("full_name")
-      .eq("id", user.id)
-      .single();
-
-    const fullName = up?.full_name;
-    if (!fullName) {
+    const admin = createAdminClient();
+    const slug = await ensureProfileSlug(admin, user.id);
+    if (!slug) {
       redirect("/app/faculty/privacy?error=no-name");
       return;
     }
-
-    const admin = createAdminClient();
-    const base = toSlug(fullName);
-    let candidate = base;
-    let counter = 1;
-
-    // Check for collisions
-    while (true) {
-      const { data: taken } = await admin
-        .from("faculty_profiles")
-        .select("id")
-        .eq("profile_slug", candidate)
-        .neq("id", user.id)
-        .maybeSingle();
-      if (!taken) break;
-      candidate = `${base}-${++counter}`;
-    }
-
-    await admin.from("faculty_profiles")
-      .upsert({ id: user.id, user_id: user.id, profile_slug: candidate }, { onConflict: "id" });
 
     revalidatePath("/app/faculty/privacy");
     redirect("/app/faculty/privacy?saved=slug");

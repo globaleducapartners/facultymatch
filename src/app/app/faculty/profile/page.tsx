@@ -1,7 +1,7 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { toSlug } from "@/lib/utils";
+import { ensureProfileSlug } from "@/lib/profile-slug";
 import { ProfileEditorClient } from "./ProfileEditorClient";
 import { SENSITIVE_FIELDS } from "@/lib/profile-sensitivity";
 
@@ -83,38 +83,17 @@ export default async function ProfilePage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Generate slug only if not already set
-    const { data: existing } = await supabase
-      .from("faculty_profiles")
-      .select("profile_slug")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    let profileSlug = existing?.profile_slug;
-    if (!profileSlug && fullName) {
-      const admin = createAdminClient();
-      const base = toSlug(fullName);
-      let candidate = base;
-      let counter = 1;
-      while (true) {
-        const { data: taken } = await admin
-          .from("faculty_profiles")
-          .select("id")
-          .eq("profile_slug", candidate)
-          .neq("id", user.id)
-          .maybeSingle();
-        if (!taken) { profileSlug = candidate; break; }
-        candidate = `${base}-${++counter}`;
-      }
-    }
-
+    // Save the name first so a slug (if not set yet) is generated from it
     await supabase.from("user_profiles").update({ full_name: fullName }).eq("id", user.id);
+
+    const admin = createAdminClient();
+    await ensureProfileSlug(admin, user.id);
+
     await supabase.from("faculty_profiles")
       .upsert({
         id: user.id, user_id: user.id,
         headline, bio, country, city,
         location: [city, country].filter(Boolean).join(", ") || null,
-        profile_slug: profileSlug || null,
         updated_at: new Date().toISOString(),
       }, { onConflict: "id" });
 

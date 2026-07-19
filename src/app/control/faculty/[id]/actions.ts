@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { ensureProfileSlug } from "@/lib/profile-slug";
 import { revalidatePath } from "next/cache";
 
 export async function hideFaculty(facultyId: string) {
@@ -51,6 +52,8 @@ export async function activateFaculty(facultyId: string, force = false) {
       throw new Error("ONBOARDING_INCOMPLETE");
     }
   }
+
+  await ensureProfileSlug(admin, facultyId);
 
   await admin.from("faculty_profiles").update({
     estado_perfil: "verificado",

@@ -1,4 +1,5 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { ensureProfileSlug } from "@/lib/profile-slug";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
@@ -48,6 +49,10 @@ export async function POST(request: Request) {
     "Docente";
 
   if (action === "approve") {
+    // A verified profile is the platform's most valuable asset — make sure
+    // it has a public URL even if the faculty never visited profile/privacy.
+    await ensureProfileSlug(admin, facultyId);
+
     // Update faculty_profiles (single source of truth)
     await admin.from("faculty_profiles").update({
       estado_perfil: "verificado",

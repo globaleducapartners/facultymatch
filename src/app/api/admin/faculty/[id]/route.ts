@@ -1,4 +1,5 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { ensureProfileSlug } from "@/lib/profile-slug";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
@@ -60,6 +61,8 @@ export async function PATCH(
           return NextResponse.json({ error: "ONBOARDING_INCOMPLETE" }, { status: 409 });
         }
       }
+      await ensureProfileSlug(session.admin, id);
+
       await session.admin.from("faculty_profiles").update({
         estado_perfil: "verificado",
         is_verified: true,
