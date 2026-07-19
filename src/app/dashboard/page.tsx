@@ -25,7 +25,7 @@ export default async function DashboardPage() {
 
   // Only faculty has an onboarding wizard
   if (!profile.onboarding_completed && profile.role === "faculty") {
-    redirect("/onboarding");
+    redirect("/app/faculty/onboarding");
   }
 
   if (profile.role === "faculty") {
