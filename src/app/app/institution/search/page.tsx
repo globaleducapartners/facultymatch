@@ -280,6 +280,7 @@ export default async function InstitutionSearchRoute({
   let educatorQuery = admin
     .from("faculty_profiles")
     .select(`*, user:user_profiles(full_name, avatar_url, plan, subscription_status), expertise:faculty_expertise(*)`)
+    .eq("estado_perfil", "verificado")
     .or("visibility.eq.public,visibility.eq.private,visibility.is.null");
 
   // Exclude blocked faculty

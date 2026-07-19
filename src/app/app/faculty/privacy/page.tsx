@@ -387,6 +387,15 @@ export default async function PrivacyPage({
                 <p className="text-sm font-black text-navy mb-3 flex items-center gap-2">
                   <ShieldCheck size={15} className="text-talentia-blue" /> Modo de visibilidad del perfil
                 </p>
+                {(facultyProfile as any)?.estado_perfil !== "verificado" && (
+                  <div className="mb-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                    <ShieldCheck size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-amber-800 font-medium leading-relaxed">
+                      Elegir "Público" no te hace visible de inmediato: tu perfil solo aparece en el
+                      directorio y en los resultados de búsqueda una vez que nuestro equipo lo verifica.
+                    </p>
+                  </div>
+                )}
                 <RadioGroup
                   name="visibilityMode"
                   defaultValue={facultyProfile?.visibility || "public"}

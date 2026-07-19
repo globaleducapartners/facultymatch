@@ -27,8 +27,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const admin = createAdminClient();
   const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
   const { data: faculty } = isUUID
-    ? await admin.from("faculty_profiles").select("id, full_name, headline").eq("id", id).maybeSingle()
-    : await admin.from("faculty_profiles").select("id, full_name, headline").eq("profile_slug", id).maybeSingle();
+    ? await admin.from("faculty_profiles").select("id, full_name, headline, estado_perfil").eq("id", id).maybeSingle()
+    : await admin.from("faculty_profiles").select("id, full_name, headline, estado_perfil").eq("profile_slug", id).maybeSingle();
+  if (faculty && (faculty as any).estado_perfil !== "verificado") return {};
   const resolvedId = faculty?.id || id;
   const { data: up } = await admin.from("user_profiles").select("full_name").eq("id", resolvedId).maybeSingle();
   const name = up?.full_name || faculty?.full_name || "Docente";
@@ -65,6 +66,9 @@ export default async function PublicFacultyProfilePage({
 
   // No user record at all → 404
   if (!userProfile) return notFound();
+
+  // Not verified → 404 (never expose unverified profiles publicly)
+  if ((faculty as any)?.estado_perfil !== "verificado") return notFound();
 
   // Explicitly hidden → 404
   if ((faculty as any)?.visibility === "hidden") return notFound();

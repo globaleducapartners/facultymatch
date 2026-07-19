@@ -39,6 +39,7 @@ export async function generateMetadata({
     .eq("profile_slug", slug)
     .eq("visibility", "public")
     .eq("is_active", true)
+    .eq("estado_perfil", "verificado")
     .maybeSingle();
 
   if (!faculty) return {};
@@ -86,9 +87,10 @@ export default async function PublicFacultyProfilePage({
     .eq("profile_slug", slug)
     .eq("visibility", "public")
     .eq("is_active", true)
+    .eq("estado_perfil", "verificado")
     .maybeSingle();
 
-  // If not found or not public → 404
+  // If not found, not public, or not verified → 404
   if (!faculty) notFound();
 
   // Fetch user profile for name and avatar

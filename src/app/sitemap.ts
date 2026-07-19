@@ -12,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select("profile_slug, updated_at")
     .eq("visibility", "public")
     .eq("is_active", true)
+    .eq("estado_perfil", "verificado")
     .not("profile_slug", "is", "null");
 
   const docentesUrls: MetadataRoute.Sitemap = (profiles || []).map((p) => ({
