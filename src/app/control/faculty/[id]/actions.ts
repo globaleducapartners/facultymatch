@@ -25,11 +25,37 @@ export async function revokeFaculty(facultyId: string) {
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
-export async function activateFaculty(facultyId: string) {
+export async function activateFaculty(facultyId: string, force = false) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
   const admin = createAdminClient();
+
+  const { data: adminProfile } = await admin
+    .from("user_profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  if (!adminProfile || (adminProfile.role !== "admin" && adminProfile.role !== "super_admin")) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!force) {
+    const { data: fp } = await admin
+      .from("faculty_profiles")
+      .select("onboarding_status")
+      .eq("user_id", facultyId)
+      .maybeSingle();
+    if (fp?.onboarding_status !== "completed") {
+      throw new Error("ONBOARDING_INCOMPLETE");
+    }
+  }
+
   await admin.from("faculty_profiles").update({
     estado_perfil: "verificado",
     is_verified: true,
+    verificado_por: user.id,
     verificado_en: new Date().toISOString(),
   }).eq("user_id", facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);

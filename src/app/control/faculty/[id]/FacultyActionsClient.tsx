@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  EyeOff, Eye, CheckCircle2, XCircle, Trash2, Send, Loader2,
+  EyeOff, Eye, CheckCircle2, XCircle, Trash2, Send, Loader2, AlertTriangle,
 } from "lucide-react";
 import {
   hideFaculty, unhideFaculty, revokeFaculty, activateFaculty,
@@ -23,6 +23,7 @@ export function FacultyActions({ facultyId, isHidden, isVerified, verificationSt
   const [loading, setLoading] = useState<string | null>(null);
   const [showNotifyModal, setShowNotifyModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showActivateConfirm, setShowActivateConfirm] = useState(false);
   const [notifyType, setNotifyType] = useState("admin_message");
   const [notifySubject, setNotifySubject] = useState("");
   const [notifyBody, setNotifyBody] = useState("");
@@ -38,6 +39,25 @@ export function FacultyActions({ facultyId, isHidden, isVerified, verificationSt
       router.refresh();
     } catch (e: any) {
       setMessage({ type: "error", text: e?.message || "Error al ejecutar la acción" });
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  async function handleActivate(force = false) {
+    setLoading("activate");
+    setMessage(null);
+    try {
+      await activateFaculty(facultyId, force);
+      setMessage({ type: "success", text: "Acción completada correctamente" });
+      setShowActivateConfirm(false);
+      router.refresh();
+    } catch (e: any) {
+      if (e?.message?.includes("ONBOARDING_INCOMPLETE")) {
+        setShowActivateConfirm(true);
+      } else {
+        setMessage({ type: "error", text: e?.message || "Error al ejecutar la acción" });
+      }
     } finally {
       setLoading(null);
     }
@@ -131,7 +151,7 @@ export function FacultyActions({ facultyId, isHidden, isVerified, verificationSt
           </button>
         ) : (
           <button
-            onClick={() => handleAction("activate", () => activateFaculty(facultyId))}
+            onClick={() => handleActivate()}
             disabled={loading !== null}
             className={`${btnBase} bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50`}
           >
@@ -236,6 +256,38 @@ export function FacultyActions({ facultyId, isHidden, isVerified, verificationSt
               >
                 {loading === "notify" ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                 Enviar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Activate confirmation — onboarding incomplete */}
+      {showActivateConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowActivateConfirm(false)}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mx-auto">
+              <AlertTriangle size={24} className="text-amber-600" />
+            </div>
+            <h3 className="text-lg font-black text-navy text-center">Onboarding incompleto</h3>
+            <p className="text-sm text-gray-500 text-center">
+              {facultyName} no ha completado el onboarding. Verificarlo igualmente puede
+              exponer un perfil sin revisar en el directorio público. ¿Confirmas la verificación?
+            </p>
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setShowActivateConfirm(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-black text-gray-500 hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleActivate(true)}
+                disabled={loading === "activate"}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-amber-600 text-white text-sm font-black hover:bg-amber-700 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loading === "activate" ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+                Verificar igualmente
               </button>
             </div>
           </div>

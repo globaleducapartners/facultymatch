@@ -49,9 +49,21 @@ export async function PATCH(
       return NextResponse.json({ success: true, action: "revoked" });
     }
     case "activate": {
+      const { force } = payload;
+      if (!force) {
+        const { data: fp } = await session.admin
+          .from("faculty_profiles")
+          .select("onboarding_status")
+          .eq("user_id", id)
+          .maybeSingle();
+        if (fp?.onboarding_status !== "completed") {
+          return NextResponse.json({ error: "ONBOARDING_INCOMPLETE" }, { status: 409 });
+        }
+      }
       await session.admin.from("faculty_profiles").update({
         estado_perfil: "verificado",
         is_verified: true,
+        verificado_por: session.userId,
         verificado_en: new Date().toISOString(),
       }).eq("user_id", id);
       return NextResponse.json({ success: true, action: "activated" });
