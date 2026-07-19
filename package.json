@@ -11,6 +11,7 @@
     "fix-admin": "bun scripts/fix-admin.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.112.3",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -50,6 +51,7 @@
     "framer-motion": "^12.23.24",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.554.0",
+    "mammoth": "^1.12.0",
     "next": "^15.5.7",
     "next-themes": "^0.4.6",
     "orchids-visual-edits": "^1.0.12",
@@ -63,6 +65,7 @@
     "sonner": "^2.0.7",
     "stripe": "^20.4.1",
     "tailwind-merge": "^3.4.0",
+    "unpdf": "^1.6.2",
     "vaul": "^1.1.2",
     "zod": "^4.1.12"
   },
