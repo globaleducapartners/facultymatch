@@ -38,6 +38,18 @@ export async function GET() {
       );
     }
 
+    // El certificado solo puede generarse para el propio perfil (no hay
+    // parámetro de id en este endpoint, así que ya no es posible pedir el
+    // de otro docente) y solo si está verificado — evita que la URL,
+    // compartida o adivinada, sirva un "certificado verificado" para un
+    // perfil que no lo está.
+    if (facultyProfile.estado_perfil !== "verificado") {
+      return NextResponse.json(
+        { error: "Tu perfil todavía no está verificado" },
+        { status: 403 }
+      );
+    }
+
     const areas = [
       ...(facultyProfile.faculty_areas || []),
       ...(expertise || []).map((e: any) => e.area),

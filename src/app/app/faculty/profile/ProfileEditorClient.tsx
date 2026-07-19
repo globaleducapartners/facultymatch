@@ -18,7 +18,7 @@ import {
   Globe, MapPin, Briefcase, GraduationCap, FileText,
   Bell, BookOpen, Languages,
   Eye, CheckCircle2, Clock, Building2, ChevronRight,
-  Pencil, Check, X, ExternalLink, Award, Download,
+  Pencil, Check, X, ExternalLink, Award, Download, Lock,
 } from "lucide-react";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { BannerUpload } from "@/components/profile/BannerUpload";
@@ -1061,40 +1061,63 @@ export function ProfileEditorClient({
             </div>
           </div>
 
-          {/* Descargar perfil PDF */}
-          <a
-            href="/api/perfil-pdf"
-            download
-            style={{
-              display: "block", background: D.white,
-              border: `1px solid ${D.border}`, borderRadius: 16,
-              padding: "20px", marginBottom: 12,
-              textDecoration: "none", cursor: "pointer",
-            }}
-            onMouseOver={(e) => { (e.currentTarget as HTMLElement).style.borderColor = D.blue; }}
-            onMouseOut={(e) => { (e.currentTarget as HTMLElement).style.borderColor = D.border; }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: 8, background: "#EFF6FF",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <Download size={16} color={D.blue} />
+          {/* Certificado de perfil verificado — solo si estado_perfil === 'verificado' */}
+          {facultyProfile?.estado_perfil === "verificado" ? (
+            <a
+              href="/api/perfil-pdf"
+              download
+              style={{
+                display: "block", background: D.white,
+                border: `1px solid ${D.border}`, borderRadius: 16,
+                padding: "20px", marginBottom: 12,
+                textDecoration: "none", cursor: "pointer",
+              }}
+              onMouseOver={(e) => { (e.currentTarget as HTMLElement).style.borderColor = D.blue; }}
+              onMouseOut={(e) => { (e.currentTarget as HTMLElement).style.borderColor = D.border; }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 8, background: "#EFF6FF",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <Download size={16} color={D.blue} />
+                </div>
+                <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: D.ink, letterSpacing: "-0.02em" }}>
+                  Certificado de perfil verificado
+                </span>
               </div>
-              <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: D.ink, letterSpacing: "-0.02em" }}>
-                Descargar perfil PDF
-              </span>
+              <p style={{ fontFamily: SANS, fontSize: 12, color: D.muted, lineHeight: 1.5, margin: 0 }}>
+                Descarga tu certificado oficial de FacultyMatch, que acredita que tu perfil ha sido revisado y verificado por nuestro equipo.
+              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 12 }}>
+                <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: D.blue }}>
+                  Descargar certificado
+                </span>
+                <ChevronRight size={13} color={D.blue} />
+              </div>
+            </a>
+          ) : (
+            <div style={{
+              display: "block", background: D.surf,
+              border: `1px dashed ${D.border}`, borderRadius: 16,
+              padding: "20px", marginBottom: 12,
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 8, background: D.white,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <Lock size={16} color={D.faint} />
+                </div>
+                <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: D.faint, letterSpacing: "-0.02em" }}>
+                  Certificado de perfil verificado
+                </span>
+              </div>
+              <p style={{ fontFamily: SANS, fontSize: 12, color: D.muted, lineHeight: 1.5, margin: 0 }}>
+                Cuando tu perfil esté verificado, podrás descargar aquí tu certificado oficial.
+              </p>
             </div>
-            <p style={{ fontFamily: SANS, fontSize: 12, color: D.muted, lineHeight: 1.5, margin: 0 }}>
-              Genera un PDF con todos tus datos académicos verificado, ideal para candidaturas.
-            </p>
-            <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 12 }}>
-              <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: D.blue }}>
-                Descargar PDF
-              </span>
-              <ChevronRight size={13} color={D.blue} />
-            </div>
-          </a>
+          )}
 
           {/* Tips card */}
           {completeness < 80 && (() => {
