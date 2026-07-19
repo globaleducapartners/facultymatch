@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { ArrowLeft, ArrowRight, Save, CheckCircle2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Save, CheckCircle2, X, Sparkles, ListChecks, Shield } from "lucide-react";
 import { Step1BasicInfo } from "./steps/Step1BasicInfo";
 import { Step2CareerType } from "./steps/Step2CareerType";
 import { Step3Specialty } from "./steps/Step3Specialty";
 import { Step4Modality } from "./steps/Step4Modality";
 import { Step5Review } from "./steps/Step5Review";
 import { saveWizardStep, publishProfile } from "./actions";
+import { CvImportStep } from "./CvImportStep";
+import type { CvWizardPrefill } from "@/lib/cv-import-mapping";
 
 // ─── Design tokens ─────────────────────────────────────────────────────────────
 const SANS = `'Inter', system-ui, -apple-system, sans-serif`;
@@ -65,6 +67,8 @@ interface WizardData {
   modalities: string[];
   institutionsTaught: string[];
   currentInstitution: string;
+  // Vía IA del onboarding — sin paso propio en el wizard
+  degrees: any[];
 }
 
 interface Props {
@@ -82,6 +86,14 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
       ? 0
       : (facultyProfile?.onboarding_step ?? 0);
   const initialCareerType = facultyProfile?.career_type ?? null;
+
+  // Tarjeta opcional "Crea tu perfil con IA" — solo para quien todavía no
+  // ha empezado el wizard. Si ya tiene progreso guardado, no interrumpir.
+  const [showCvIntro, setShowCvIntro] = useState(
+    facultyProfile?.onboarding_status === "not_started" || !facultyProfile
+  );
+  // Dentro de la intro: elegir entre las dos tarjetas, o ya dentro del flujo de IA
+  const [introMode, setIntroMode] = useState<"choice" | "ai">("choice");
 
   const [step, setStep] = useState(initialStep);
   const [saving, setSaving] = useState(false);
@@ -123,11 +135,17 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
     institutionsTaught: facultyProfile?.institutions_taught || [],
     currentInstitution: facultyProfile?.current_institution || "",
     modalities: facultyProfile?.modalities || [],
+    degrees: facultyProfile?.degrees || [],
   });
 
   const updateData = useCallback((partial: Partial<WizardData>) => {
     setData(prev => ({ ...prev, ...partial }));
   }, []);
+
+  const handleCvImportConfirm = useCallback((prefill: CvWizardPrefill) => {
+    updateData(prefill as Partial<WizardData>);
+    setShowCvIntro(false);
+  }, [updateData]);
 
   const handleSaveAndContinue = useCallback(async () => {
     setSaving(true);
@@ -136,6 +154,7 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
       const payload: Record<string, any> = { onboarding_step: step + 1 };
 
       if (data.careerType) payload.career_type = data.careerType;
+      if (data.degrees && data.degrees.length > 0) payload.degrees = data.degrees;
 
       if (step === 0) {
         payload.full_name = data.fullName;
@@ -227,6 +246,136 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
     }
     return true;
   }, [step, data]);
+
+  if (showCvIntro) {
+    return (
+      <div style={{ fontFamily: SANS, maxWidth: 780, margin: "24px auto" }}>
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <h1 style={{ fontSize: 26, fontWeight: 900, color: D.ink, letterSpacing: "-0.03em", margin: 0 }}>
+            Crea tu perfil
+          </h1>
+          <p style={{ fontSize: 14, color: D.muted, margin: "8px 0 0" }}>
+            Elige cómo quieres empezar — puedes cambiar de opción en cualquier momento.
+          </p>
+        </div>
+
+        {introMode === "ai" ? (
+          <div style={{
+            background: D.white, border: `1px solid ${D.border}`, borderRadius: 20,
+            padding: 32, boxShadow: "0 1px 3px rgba(13,34,64,0.06)",
+          }}>
+            <CvImportStep
+              userId={user.id}
+              onConfirm={handleCvImportConfirm}
+              onBack={() => setIntroMode("choice")}
+            />
+          </div>
+        ) : (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+              {/* Card destacada: IA */}
+              <button
+                onClick={() => setIntroMode("ai")}
+                style={{
+                  position: "relative", textAlign: "left", cursor: "pointer",
+                  fontFamily: SANS, padding: 28, borderRadius: 20,
+                  background: "linear-gradient(180deg, #EEF3FF 0%, #FFFFFF 65%)",
+                  border: `2px solid ${D.blue}`,
+                  boxShadow: "0 4px 16px rgba(27,79,216,0.12)",
+                  display: "flex", flexDirection: "column", gap: 14,
+                  transition: "transform 0.15s, box-shadow 0.15s",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(27,79,216,0.18)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(27,79,216,0.12)"; }}
+              >
+                <span style={{
+                  position: "absolute", top: 18, right: 18,
+                  fontFamily: SANS, fontSize: 10, fontWeight: 800, color: "#fff",
+                  background: D.gold, padding: "4px 10px", borderRadius: 999,
+                  letterSpacing: "0.04em", textTransform: "uppercase",
+                }}>
+                  Recomendado
+                </span>
+                <div style={{
+                  width: 48, height: 48, borderRadius: 14, background: D.blue,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: "0 4px 10px rgba(27,79,216,0.35)",
+                }}>
+                  <Sparkles size={22} color="#fff" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 17, fontWeight: 800, color: D.ink, margin: "0 0 6px" }}>
+                    Crea tu perfil con IA en 1 minuto
+                  </h3>
+                  <p style={{ fontSize: 13, color: D.muted, lineHeight: 1.5, margin: 0 }}>
+                    Sube tu CV (o el PDF de tu LinkedIn) y te preparamos un borrador de perfil
+                    listo para revisar antes de publicarlo.
+                  </p>
+                </div>
+                <span style={{
+                  marginTop: "auto", fontSize: 14, fontWeight: 700, color: D.blue,
+                  display: "flex", alignItems: "center", gap: 6,
+                }}>
+                  Subir mi CV <ArrowRight size={15} />
+                </span>
+              </button>
+
+              {/* Card secundaria: formulario manual */}
+              <button
+                onClick={() => setShowCvIntro(false)}
+                style={{
+                  textAlign: "left", cursor: "pointer",
+                  fontFamily: SANS, padding: 28, borderRadius: 20,
+                  background: D.white, border: `1px solid ${D.border}`,
+                  display: "flex", flexDirection: "column", gap: 14,
+                  transition: "transform 0.15s, box-shadow 0.15s",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 4px 14px rgba(13,34,64,0.08)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+              >
+                <div style={{
+                  width: 48, height: 48, borderRadius: 14, background: D.surf,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <ListChecks size={22} color={D.navy} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 17, fontWeight: 800, color: D.ink, margin: "0 0 6px" }}>
+                    Rellenar el formulario paso a paso
+                  </h3>
+                  <p style={{ fontSize: 13, color: D.muted, lineHeight: 1.5, margin: 0 }}>
+                    Un asistente guiado de 5 pasos. Tú decides y escribes cada campo de tu perfil.
+                  </p>
+                </div>
+                <span style={{
+                  marginTop: "auto", fontSize: 14, fontWeight: 700, color: D.navy,
+                  display: "flex", alignItems: "center", gap: 6,
+                }}>
+                  Empezar formulario <ArrowRight size={15} />
+                </span>
+              </button>
+            </div>
+
+            <p style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              fontSize: 12, color: D.faint, margin: "20px 0 0",
+            }}>
+              <Shield size={13} /> Tu CV solo se usa para rellenar tu perfil y se borra en cuanto termina la lectura.
+            </p>
+
+            <div style={{ textAlign: "center", marginTop: 20 }}>
+              <a
+                href="/app/faculty"
+                style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: D.muted, textDecoration: "none" }}
+              >
+                Saltar por ahora
+              </a>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
 
   if (published) {
     return (

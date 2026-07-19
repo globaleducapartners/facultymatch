@@ -63,6 +63,16 @@ BEGIN
 END;
 $$;
 
+-- SECURITY DEFINER + PostgreSQL concede EXECUTE a PUBLIC por defecto en el
+-- CREATE FUNCTION de arriba. Sin este REVOKE, cualquier usuario autenticado
+-- podría llamar a la RPC directamente (bypaseando el endpoint) con el
+-- p_user_id de OTRO docente y quemarle sus 3 intentos diarios. Solo el
+-- service_role (que ya usa el endpoint) debe poder ejecutarla.
+REVOKE EXECUTE ON FUNCTION public.increment_cv_extraction_usage(uuid, date, integer)
+  FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.increment_cv_extraction_usage(uuid, date, integer)
+  TO service_role;
+
 COMMIT;
 
 -- =============================================================================
@@ -71,6 +81,12 @@ COMMIT;
 
 -- 1. La función debe existir
 -- SELECT proname FROM pg_proc WHERE proname = 'increment_cv_extraction_usage';
+
+-- 1b. anon y authenticated NO deben poder ejecutarla; service_role sí
+-- SELECT has_function_privilege('anon', 'public.increment_cv_extraction_usage(uuid,date,integer)', 'EXECUTE') AS anon_puede,
+--        has_function_privilege('authenticated', 'public.increment_cv_extraction_usage(uuid,date,integer)', 'EXECUTE') AS authenticated_puede,
+--        has_function_privilege('service_role', 'public.increment_cv_extraction_usage(uuid,date,integer)', 'EXECUTE') AS service_role_puede;
+-- Debe dar: false, false, true
 
 -- 2. Prueba manual: debe dar true, true, true, false para 4 llamadas seguidas
 --    con el mismo usuario y día (sustituye el uuid por uno real de prueba)

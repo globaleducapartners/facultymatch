@@ -34,15 +34,24 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => null);
   const storagePath = body?.storagePath;
-  if (!storagePath || typeof storagePath !== "string") {
-    return NextResponse.json({ error: "missing_storage_path" }, { status: 400 });
+  const pastedText = body?.text;
+
+  const hasStoragePath = typeof storagePath === "string" && storagePath.length > 0;
+  const hasPastedText = typeof pastedText === "string" && pastedText.trim().length > 0;
+
+  if (!hasStoragePath && !hasPastedText) {
+    return NextResponse.json({ error: "missing_input" }, { status: 400 });
   }
 
   // Defensa en profundidad: aunque la policy de Storage ya impide subir
   // fuera de la propia carpeta, nunca confiar en un path que llega en el
   // body de la petición sin volver a comprobar que es del usuario.
-  if (!storagePath.startsWith(`${user.id}/`)) {
+  if (hasStoragePath && !storagePath.startsWith(`${user.id}/`)) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
+
+  if (hasPastedText && pastedText.length > 50000) {
+    return NextResponse.json({ error: "file_too_large" }, { status: 413 });
   }
 
   // (b) Rate limit atado al user_id autenticado, no a IP
@@ -54,37 +63,42 @@ export async function POST(request: Request) {
   });
 
   if (!allowed) {
-    await admin.storage.from(BUCKET).remove([storagePath]);
+    if (hasStoragePath) await admin.storage.from(BUCKET).remove([storagePath]);
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
   try {
-    const { data: file, error: downloadError } = await admin.storage
-      .from(BUCKET)
-      .download(storagePath);
+    let text: string;
 
-    if (downloadError || !file) {
-      return NextResponse.json({ error: "file_not_found" }, { status: 404 });
-    }
+    if (hasPastedText) {
+      text = pastedText;
+    } else {
+      const { data: file, error: downloadError } = await admin.storage
+        .from(BUCKET)
+        .download(storagePath);
 
-    const arrayBuffer = await file.arrayBuffer();
+      if (downloadError || !file) {
+        return NextResponse.json({ error: "file_not_found" }, { status: 404 });
+      }
 
-    if (arrayBuffer.byteLength > MAX_FILE_BYTES) {
+      const arrayBuffer = await file.arrayBuffer();
+
+      if (arrayBuffer.byteLength > MAX_FILE_BYTES) {
+        await admin.storage.from(BUCKET).remove([storagePath]);
+        return NextResponse.json({ error: "file_too_large" }, { status: 413 });
+      }
+
+      text = await extractText(storagePath, arrayBuffer);
+      // Privacidad: el CV se borra en cuanto se ha extraído el texto,
+      // no hace falta esperar a que termine la llamada al modelo
       await admin.storage.from(BUCKET).remove([storagePath]);
-      return NextResponse.json({ error: "file_too_large" }, { status: 413 });
     }
-
-    const text = await extractText(storagePath, arrayBuffer);
 
     if (!text || text.trim().length < 20) {
-      await admin.storage.from(BUCKET).remove([storagePath]);
       return NextResponse.json({ error: "empty_document" }, { status: 422 });
     }
 
     const result = await extractWithRetry(text);
-
-    // Privacidad: el CV se borra en cuanto termina la extracción, éxito o no
-    await admin.storage.from(BUCKET).remove([storagePath]);
 
     if (!result) {
       return NextResponse.json({ error: "extraction_failed" }, { status: 422 });
@@ -96,7 +110,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, profile: result });
   } catch (e) {
-    await admin.storage.from(BUCKET).remove([storagePath]).catch(() => {});
+    if (hasStoragePath) await admin.storage.from(BUCKET).remove([storagePath]).catch(() => {});
     console.error("[extract-cv] error:", e);
     // Nunca mostrar detalles de parsing/errores del modelo al usuario
     return NextResponse.json({ error: "extraction_failed" }, { status: 500 });
@@ -113,6 +127,15 @@ async function extractText(storagePath: string, arrayBuffer: ArrayBuffer): Promi
   return text;
 }
 
+// Claude a veces envuelve el JSON en un fence de markdown (```json ... ```)
+// pese a la regla 9 del prompt ("Sin markdown"). Se quita aquí en vez de
+// tocar el prompt — es una robustez de parsing nuestra, no una regla de la IA.
+function extractJsonFromModelText(text: string): string {
+  const trimmed = text.trim();
+  const fenceMatch = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
+  return fenceMatch ? fenceMatch[1] : trimmed;
+}
+
 async function extractWithRetry(cvText: string): Promise<CvExtractionResponse | null> {
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
@@ -125,13 +148,18 @@ async function extractWithRetry(cvText: string): Promise<CvExtractionResponse | 
       });
 
       const textBlock = message.content.find((b) => b.type === "text");
-      if (!textBlock || textBlock.type !== "text") continue;
+      if (!textBlock || textBlock.type !== "text") {
+        console.error(`[extract-cv] attempt ${attempt + 1}: no text block in response`);
+        continue;
+      }
 
-      const parsed = JSON.parse(textBlock.text);
+      const parsed = JSON.parse(extractJsonFromModelText(textBlock.text));
       const validated = CvExtractionResponseSchema.safeParse(parsed);
       if (validated.success) return validated.data;
-    } catch {
-      // deja que el bucle reintente una vez; el error se registra arriba
+
+      console.error(`[extract-cv] attempt ${attempt + 1}: schema validation failed`, validated.error.format());
+    } catch (e) {
+      console.error(`[extract-cv] attempt ${attempt + 1}: threw`, e);
     }
   }
   return null;

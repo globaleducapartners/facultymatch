@@ -67,7 +67,7 @@ export default async function FacultyLayout({
     const { data: facultyProfile } = await admin
       .from("faculty_profiles")
       .select("onboarding_status, estado_perfil")
-      .eq("user_id", user.id)
+      .eq("id", user.id)
       .maybeSingle();
 
     estadoPerfil = facultyProfile?.estado_perfil;

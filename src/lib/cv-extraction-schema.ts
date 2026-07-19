@@ -56,8 +56,9 @@ const CvProfileSchema = z.object({
     z.object({
       puesto: z.string().nullable(),
       institucion: z.string().nullable(),
-      inicio: z.string().nullable(),
-      fin: z.string().nullable(),
+      // Puede venir como año (2018) o como fecha en texto ("marzo 2018")
+      inicio: anio,
+      fin: anio,
       evidence: z.string().nullable(),
     })
   ),

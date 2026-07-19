@@ -27,18 +27,25 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
 
     // Update user_profiles with role and name
     const admin = createAdminClient();
-    await admin.from("user_profiles").upsert({
+    const { error: ssoProfileError } = await admin.from("user_profiles").upsert({
       id: user.id,
       role,
       full_name: fullName || user.user_metadata?.full_name || user.email?.split("@")[0],
     }, { onConflict: "id" });
+    if (ssoProfileError) {
+      console.error("[SignUp][SSO] Error upserting user_profiles:", ssoProfileError);
+    }
 
     if (role === "institution") {
-      await admin.from("institutions").upsert({
+      const { error: ssoInstitutionError } = await admin.from("institutions").upsert({
+        id: user.id,
         user_id: user.id,
         name: institutionName || user.email?.split("@")[0] || "Mi Institución",
         updated_at: new Date().toISOString(),
-      }, { onConflict: "user_id" });
+      }, { onConflict: "id" });
+      if (ssoInstitutionError) {
+        console.error("[SignUp][SSO] Error upserting institutions:", ssoInstitutionError);
+      }
     }
   } else {
     const termsAccepted = formData.get("terms_accepted") === "on";
@@ -87,7 +94,7 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
 
     // Ensure user_profiles and faculty_profiles records exist
     // (database trigger may not be set up, so we do it explicitly)
-    await admin.from("user_profiles").upsert({
+    const { error: userProfileError } = await admin.from("user_profiles").upsert({
       id: data.user.id,
       role,
       full_name: fullName,
@@ -96,9 +103,12 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
       marketing_opt_in: marketingOptIn,
       consent_version: "v1",
     }, { onConflict: "id" });
+    if (userProfileError) {
+      console.error("[SignUp] Error upserting user_profiles:", userProfileError);
+    }
 
     if (role === "faculty") {
-      await admin.from("faculty_profiles").upsert({
+      const { error: facultyProfileError } = await admin.from("faculty_profiles").upsert({
         id: data.user.id,
         user_id: data.user.id,
         visibility: "public",
@@ -107,18 +117,24 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
         onboarding_status: "not_started",
         onboarding_step: 0,
         estado_perfil: "pendiente_verificacion",
-      }, { onConflict: "user_id" });
+      }, { onConflict: "id" });
+      if (facultyProfileError) {
+        console.error("[SignUp] Error upserting faculty_profiles:", facultyProfileError);
+      }
 
       // Generate activation token and send confirmation email
       const { token, hash } = generateToken();
       const expiresAt = getTokenExpiry();
 
-      await admin.from("activation_tokens").insert({
+      const { error: activationTokenError } = await admin.from("activation_tokens").insert({
         user_id: data.user.id,
         token_hash: hash,
         expires_at: expiresAt,
         used: false,
       });
+      if (activationTokenError) {
+        console.error("[SignUp] Error inserting activation_tokens:", activationTokenError);
+      }
 
       const origin =
         process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
@@ -129,11 +145,15 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
         console.error("[SignUp] Activation email failed:", e)
       );
     } else if (role === "institution") {
-      await admin.from("institutions").upsert({
+      const { error: institutionError } = await admin.from("institutions").upsert({
+        id: data.user.id,
         user_id: data.user.id,
         name: institutionName || fullName,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "user_id" });
+      }, { onConflict: "id" });
+      if (institutionError) {
+        console.error("[SignUp] Error upserting institutions:", institutionError);
+      }
     }
 
     // Auto-login with the newly created confirmed account
@@ -143,10 +163,17 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
       return redirect("/login?message=¡Cuenta creada! Accede con tu correo y contraseña.");
     }
 
-    // Send welcome email to new user
-    sendWelcomeEmail(email, fullName, role, institutionName || fullName).catch(e =>
-      console.error("[SignUp] Welcome email failed:", e)
-    );
+    // Email de bienvenida — solo instituciones (se activan al momento, sin
+    // paso de verificación). Para faculty, el email de activación de arriba
+    // ya es la bienvenida; enviar además "tu perfil está activo" a la vez
+    // que "activa tu cuenta" es contradictorio y venía del flujo antiguo
+    // previo a estado_perfil. La bienvenida real de faculty es la propia
+    // pantalla de onboarding tras activar.
+    if (role === "institution") {
+      sendWelcomeEmail(email, fullName, role, institutionName || fullName).catch(e =>
+        console.error("[SignUp] Welcome email failed:", e)
+      );
+    }
 
     // Notify support team of new registration
     resend.emails.send({
@@ -271,6 +298,7 @@ export async function signUpInstitution(formData: FormData) {
   // Create institution record immediately with all signup data
   const cityCountry = [city, country].filter(Boolean).join(', ');
   const institutionRecord: Record<string, unknown> = {
+    id: data.user.id,
     user_id: data.user.id,
     name: nameToSave,
     institution_type: institutionType || null,
@@ -286,7 +314,7 @@ export async function signUpInstitution(formData: FormData) {
   if (autoVerify) institutionRecord.verified = true;
   if (universityId != null && !isNaN(universityId)) institutionRecord.university_id = universityId;
 
-  const { error: upsertError } = await admin.from("institutions").upsert(institutionRecord, { onConflict: "user_id" });
+  const { error: upsertError } = await admin.from("institutions").upsert(institutionRecord, { onConflict: "id" });
   if (upsertError) {
     console.error("[signUpInstitution] institutions upsert failed:", upsertError.message, "| record:", JSON.stringify({ auto_verify: autoVerify, university_id: universityId, verified: institutionRecord.verified }));
   }
@@ -724,240 +752,6 @@ export async function toggleFavorite(facultyId: string, institutionId: string) {
     if (error) return { error: error.message };
     revalidatePath("/app/institution/favorites");
     return { success: true, action: 'added' };
-  }
-}
-
-export async function saveOnboarding(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "No se encontró usuario autenticado." };
-
-  const admin = createAdminClient();
-
-  try {
-    const headline = formData.get("headline") as string;
-    const location = formData.get("location") as string;
-    const bio = formData.get("bio") as string;
-    const visibility = formData.get("visibility") as 'public' | 'hidden' | 'private';
-    const fullName = formData.get("full_name") as string;
-    const termsAccepted = formData.get("terms_accepted") === "on";
-    const privacyAccepted = formData.get("privacy_accepted") === "on";
-    
-    const areas = formData.getAll("faculty_areas") as string[]; 
-    const levels = formData.getAll("levels") as string[];
-    const degrees = formData.getAll("degrees") as string[];
-    const modalities = formData.getAll("modalities") as string[];
-    const availability = formData.get("availability") as string;
-    const linkedinUrl = formData.get("linkedin_url") as string;
-    const languagesStr = formData.get("languages") as string;
-    const historyStr = formData.get("history") as string;
-
-    let languages: any[] = [];
-    try { languages = JSON.parse(languagesStr || "[]"); } catch (e) {}
-
-    let history: any[] = [];
-    try { history = JSON.parse(historyStr || "[]"); } catch (e) {}
-
-    // Update user_profiles via admin (bypasses RLS)
-    const profileUpdate: any = { onboarding_completed: true };
-    if (fullName) profileUpdate.full_name = fullName;
-    if (termsAccepted) profileUpdate.terms_accepted_at = new Date().toISOString();
-    if (privacyAccepted) profileUpdate.privacy_accepted_at = new Date().toISOString();
-    
-    const { error: userError } = await admin.from("user_profiles").update(profileUpdate).eq("id", user.id);
-    if (userError) {
-      console.error("[Onboarding] Error updating user_profile:", userError);
-    }
-
-    const { error: facultyError } = await admin
-      .from("faculty_profiles")
-      .upsert({
-        user_id: user.id,
-        headline,
-        location,
-        bio,
-        visibility,
-        is_active: true,
-        languages,
-        modalities,
-        degrees,
-        institutions_taught: history,
-        faculty_areas: areas,
-        levels,
-        availability,
-        linkedin_url: linkedinUrl,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id' });
-
-    if (facultyError) {
-      console.error("[Onboarding] Error upserting faculty_profile:", facultyError);
-      if (facultyError.message.includes("schema cache")) {
-        return { error: "Error de configuración en el servidor. Por favor, intenta de nuevo." };
-      }
-      return { error: facultyError.message };
-    }
-    
-    revalidatePath("/app/faculty");
-    return { success: true };
-  } catch (err: any) {
-    console.error("[Onboarding] Unexpected error during saveOnboarding:", err);
-    return { error: "Ocurrió un error inesperado al guardar tu perfil." };
-  }
-}
-
-export async function saveInstitutionOnboarding(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "No autenticado." };
-
-  const admin = createAdminClient();
-  const name = formData.get("name") as string;
-  const type = formData.get("type") as string;
-  const country = formData.get("country") as string;
-  const location = formData.get("location") as string;
-  const website = formData.get("website") as string;
-  const description = formData.get("description") as string;
-
-  if (!name?.trim()) return { error: "El nombre de la institución es obligatorio." };
-  if (!website) return { error: "La web institucional es obligatoria. Debe tener el mismo dominio que tu correo electrónico." };
-
-  // Domain validation: the account email must belong to the institution's domain
-  const websiteDomain = extractDomainFromWebsite(website);
-  const emailDomain = extractDomainFromEmail(user.email);
-  if (websiteDomain && emailDomain) {
-    const emailDomainLower = emailDomain.toLowerCase();
-    const websiteDomainLower = websiteDomain.toLowerCase();
-    const isValidDomain = emailDomainLower === websiteDomainLower ||
-      emailDomainLower.endsWith("." + websiteDomainLower);
-    if (!isValidDomain) {
-      return {
-        error: `El correo electrónico debe pertenecer al dominio de la institución (${websiteDomain}). Usa un correo como usuario@${websiteDomain}`,
-      };
-    }
-  }
-  if (!websiteDomain) {
-    return { error: "La URL de la web institucional no es válida. Asegúrate de incluir el dominio completo (ej: https://www.universidad.es)." };
-  }
-
-  // Check for duplicate institution name (different user) — soft warning only
-  const { data: existingByName } = await admin
-    .from("institutions")
-    .select("id, user_id")
-    .ilike("name", name.trim())
-    .neq("user_id", user.id)
-    .maybeSingle();
-  const duplicateWarning = existingByName
-    ? "Ya existe una institución con este nombre registrada por otra cuenta. Si crees que es un error, contacta con support@facultymatch.app."
-    : undefined;
-
-  const { error: instError } = await admin
-    .from("institutions")
-    .upsert({
-      user_id: user.id,
-      name,
-      type,
-      country,
-      location,
-      website,
-      description,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: "user_id" });
-
-  if (instError) {
-    console.error("[InstitutionOnboarding] upsert error:", instError);
-    return { error: instError.message };
-  }
-
-  const { error: profileError } = await admin
-    .from("user_profiles")
-    .update({ onboarding_completed: true })
-    .eq("id", user.id);
-
-  if (profileError) {
-    console.error("[InstitutionOnboarding] profile update error:", profileError);
-  }
-
-  revalidatePath("/app/institution");
-  return { success: true, warning: duplicateWarning };
-}
-
-export async function assignRole(role: "faculty" | "institution") {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: "No autenticado." };
-
-  const admin = createAdminClient();
-  const { error } = await admin
-    .from("user_profiles")
-    .upsert({ id: user.id, role }, { onConflict: "id" });
-
-  if (error) return { error: error.message };
-  return { success: true };
-}
-
-export async function autosaveOnboarding(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null; // silent fail — not an error
-
-  const admin = createAdminClient();
-
-  try {
-    const headline = formData.get("headline") as string;
-    const location = formData.get("location") as string;
-    const bio = formData.get("bio") as string;
-    const visibility = formData.get("visibility") as 'public' | 'hidden';
-    const fullName = formData.get("full_name") as string;
-    const termsAccepted = formData.get("terms_accepted") === "on";
-    const privacyAccepted = formData.get("privacy_accepted") === "on";
-    
-    const areas = formData.getAll("faculty_areas") as string[];
-    const levels = formData.getAll("levels") as string[];
-    const degrees = formData.getAll("degrees") as string[];
-    const modalities = formData.getAll("modalities") as string[];
-    const availability = formData.get("availability") as string;
-    const linkedinUrl = formData.get("linkedin_url") as string;
-    const languagesStr = formData.get("languages") as string;
-    const historyStr = formData.get("history") as string;
-
-    let languages: any[] = [];
-    try { languages = JSON.parse(languagesStr || "[]"); } catch (e) {}
-
-    let history: any[] = [];
-    try { history = JSON.parse(historyStr || "[]"); } catch (e) {}
-
-    const profileUpdate: any = {};
-    if (fullName) profileUpdate.full_name = fullName;
-    if (termsAccepted) profileUpdate.terms_accepted_at = new Date().toISOString();
-    if (privacyAccepted) profileUpdate.privacy_accepted_at = new Date().toISOString();
-    
-    if (Object.keys(profileUpdate).length > 0) {
-      await admin.from("user_profiles").update(profileUpdate).eq("id", user.id);
-    }
-
-    await admin
-      .from("faculty_profiles")
-      .upsert({
-        user_id: user.id,
-        headline,
-        location,
-        bio,
-        visibility,
-        languages,
-        modalities,
-        degrees,
-        institutions_taught: history,
-        faculty_areas: areas,
-        levels,
-        availability,
-        linkedin_url: linkedinUrl,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id' });
-
-    return { success: true };
-  } catch (err: any) {
-    console.error("[Onboarding] Unexpected error during autosaveOnboarding:", err);
-    return null;
   }
 }
 

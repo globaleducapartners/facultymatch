@@ -265,7 +265,7 @@ export default async function PrivacyPage({
     const current = (fp?.preferred_institutions as string[] | null) || [];
     if (!current.includes(name) && current.length < 5) current.push(name);
     await admin.from("faculty_profiles")
-      .upsert({ user_id: user.id, preferred_institutions: current }, { onConflict: "user_id" });
+      .upsert({ id: user.id, user_id: user.id, preferred_institutions: current }, { onConflict: "id" });
     revalidatePath("/app/faculty/privacy");
   }
 
@@ -280,7 +280,7 @@ export default async function PrivacyPage({
       .from("faculty_profiles").select("preferred_institutions").eq("user_id", user.id).maybeSingle();
     const updated = ((fp?.preferred_institutions as string[] | null) || []).filter(i => i !== name);
     await admin.from("faculty_profiles")
-      .upsert({ user_id: user.id, preferred_institutions: updated }, { onConflict: "user_id" });
+      .upsert({ id: user.id, user_id: user.id, preferred_institutions: updated }, { onConflict: "id" });
     revalidatePath("/app/faculty/privacy");
   }
 

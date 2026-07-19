@@ -58,10 +58,14 @@ export async function GET(request: NextRequest) {
   }
 
   // Update estado_perfil so the user can access the app
-  await admin
+  const { error: activateError } = await admin
     .from("faculty_profiles")
     .update({ estado_perfil: "incompleto" })
-    .eq("user_id", row.user_id);
+    .eq("id", row.user_id);
+
+  if (activateError) {
+    console.error("[activar] Failed to update estado_perfil:", activateError);
+  }
 
   // Check if the user already has an active session (common case: same device)
   const cookieStore = await cookies();

@@ -35,6 +35,9 @@ interface WizardData {
   current_institution?: string;
   years_experience?: number;
   modalities?: string[];
+  // Vía IA del onboarding — no tiene paso propio en el wizard, se guarda
+  // en el primer paso que se confirme tras importar el CV
+  degrees?: any[];
 }
 
 export async function saveWizardStep(data: WizardData) {
@@ -125,6 +128,7 @@ export async function saveWizardStep(data: WizardData) {
   if (data.current_institution !== undefined) updateData.current_institution = data.current_institution;
   if (data.years_experience !== undefined) updateData.years_experience = data.years_experience;
   if (data.modalities !== undefined) updateData.modalities = data.modalities;
+  if (data.degrees !== undefined) updateData.degrees = data.degrees;
 
   // Build location
   if (data.city !== undefined || data.country !== undefined) {
@@ -142,7 +146,7 @@ export async function saveWizardStep(data: WizardData) {
     .from("faculty_profiles")
     .upsert(
       { id: user.id, user_id: user.id, ...updateData },
-      { onConflict: "user_id" }
+      { onConflict: "id" }
     );
 
   if (error) {
@@ -285,7 +289,7 @@ export async function saveOrcidImportFromWizard(payload: {
     .from("faculty_profiles")
     .upsert(
       { id: user.id, user_id: user.id, ...updateData },
-      { onConflict: "user_id" }
+      { onConflict: "id" }
     );
 
   if (error) {
