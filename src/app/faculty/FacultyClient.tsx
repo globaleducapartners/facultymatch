@@ -234,7 +234,7 @@ export default function FacultyClient() {
               <div className="h-[440px] overflow-hidden rounded-[20px]">
                 <div
                   className="h-full w-full bg-cover bg-top"
-                  style={{ backgroundImage: "url(https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800)" }}
+                  style={{ backgroundImage: "url(/images/faculty-benefits.jpg)" }}
                 />
               </div>
             )}
