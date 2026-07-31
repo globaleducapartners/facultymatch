@@ -85,19 +85,15 @@ export function Navbar() {
         }}>
           {/* Logo */}
           <Link href={user ? dashboardHref : "/"} style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <div style={{
-              width: 34, height: 34, borderRadius: 8,
-              background: D.navy,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              flexShrink: 0,
-            }}>
-              <span style={{ color: "#fff", fontSize: 13, fontWeight: 800, fontFamily: SANS }}>FM</span>
-            </div>
+            <svg width="32" height="32" viewBox="0 0 100 100" style={{ flexShrink: 0, filter: "drop-shadow(0 0 8px rgba(255,106,26,0.45))" }}>
+              <circle cx="30" cy="52" r="22" fill="#0D2240" />
+              <circle cx="66" cy="50" r="34" fill="#FF6A1A" />
+            </svg>
             <span style={{
-              fontFamily: SANS, fontSize: 18, fontWeight: 700,
-              color: D.ink, letterSpacing: "-0.03em",
+              fontFamily: SANS, fontSize: 18, fontWeight: 800,
+              color: D.ink, letterSpacing: "-0.02em",
             }}>
-              FacultyMatch
+              facultymatch
             </span>
           </Link>
 

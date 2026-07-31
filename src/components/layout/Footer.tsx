@@ -99,17 +99,12 @@ export function Footer() {
           {/* Brand */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: 8,
-                background: D.navy,
-                border: "1px solid rgba(255,255,255,0.12)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                flexShrink: 0,
-              }}>
-                <span style={{ color: "#fff", fontSize: 13, fontWeight: 800 }}>FM</span>
-              </div>
-              <span style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: "#fff", letterSpacing: "-0.03em" }}>
-                FacultyMatch
+              <svg width="32" height="32" viewBox="0 0 100 100" style={{ flexShrink: 0, filter: "drop-shadow(0 0 8px rgba(255,106,26,0.45))" }}>
+                <circle cx="30" cy="52" r="22" fill="#EAF0F9" />
+                <circle cx="66" cy="50" r="34" fill="#FF6A1A" />
+              </svg>
+              <span style={{ fontFamily: SANS, fontSize: 18, fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
+                facultymatch
               </span>
             </div>
             <p style={{

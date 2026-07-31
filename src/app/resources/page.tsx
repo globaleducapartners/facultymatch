@@ -10,21 +10,6 @@ export const metadata: Metadata = {
     "recursos académicos, guías docentes, reclutamiento universitario, estándares académicos, educación superior",
 };
 
-const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
-
-const D = {
-  dark:   "#071326",
-  navy:   "#0D2240",
-  blue:   "#1B4FD8",
-  gold:   "#E9A030",
-  surf:   "#F2F6FC",
-  white:  "#FFFFFF",
-  ink:    "#0C1018",
-  muted:  "#6B7280",
-  faint:  "#9CA3AF",
-  border: "#D8E2EF",
-};
-
 const RESOURCES = [
   {
     tag: "Instituciones",
@@ -78,73 +63,47 @@ const RESOURCES = [
 
 export default function ResourcesPage() {
   return (
-    <div style={{ background: D.surf, fontFamily: SANS }}>
-      <style>{`
-        .fm-hero-h1 { font-size: 54px; }
-        .fm-section-pad { padding: 80px 40px; }
-        .fm-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
-        .fm-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-        .fm-cta-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 32px; }
-        @media (max-width: 768px) {
-          .fm-hero-h1 { font-size: 34px !important; }
-          .fm-section-pad { padding: 48px 20px !important; }
-          .fm-grid-3 { grid-template-columns: 1fr !important; }
-          .fm-grid-2 { grid-template-columns: 1fr !important; gap: 0 !important; }
-          .fm-cta-row { flex-direction: column !important; align-items: flex-start !important; }
-          .fm-photo-hide { display: none !important; }
-        }
-      `}</style>
-
+    <div className="bg-fm-surface font-sans">
       <Navbar />
 
       {/* ── HERO ── */}
-      <section style={{ position: "relative", overflow: "hidden" }}>
+      <section className="relative overflow-hidden">
         <video
           autoPlay muted loop playsInline
           poster="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1800"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%" }}
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: "center 40%" }}
         >
           <source src="https://assets.mixkit.co/videos/6532/6532-720.mp4" type="video/mp4" />
         </video>
-        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(160deg, rgba(7,19,38,0.55) 0%, rgba(7,19,38,0.75) 60%, rgba(7,19,38,0.94) 100%)` }} />
-        <div style={{
-          position: "relative", zIndex: 2, minHeight: 500,
-          display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center",
-          textAlign: "center", padding: "80px 40px",
-        }}>
-          {/* Eyebrow */}
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 6,
-            background: "rgba(233,160,48,0.15)", border: "1px solid rgba(233,160,48,0.35)",
-            borderRadius: 20, padding: "5px 14px", marginBottom: 24,
-          }}>
-            <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.gold }}>
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(160deg, rgba(7,19,38,0.55) 0%, rgba(7,19,38,0.75) 60%, rgba(7,19,38,0.94) 100%)" }}
+        />
+        <div className="relative z-[2] flex min-h-[500px] flex-col items-center justify-center px-5 py-16 text-center md:px-10 md:py-20">
+          <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-fm-gold/35 bg-fm-gold/15 px-3.5 py-[5px]">
+            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-gold">
               Centro de conocimiento
             </span>
           </div>
 
-          <h1 className="fm-hero-h1" style={{
-            fontFamily: SANS, fontWeight: 900, color: "#fff",
-            lineHeight: 1.05, letterSpacing: "-0.04em",
-            margin: "0 0 20px", maxWidth: 680,
-          }}>
+          <h1 className="mb-5 max-w-[680px] text-[34px] font-black leading-[1.05] tracking-[-0.04em] text-white md:text-[54px]">
             Recursos para docentes<br />e instituciones.
           </h1>
 
-          <p style={{ fontFamily: SANS, fontSize: 16, color: "rgba(255,255,255,0.6)", lineHeight: 1.75, margin: "0 0 36px", maxWidth: 480 }}>
+          <p className="mb-9 max-w-[480px] text-base leading-[1.75] text-white/60">
             Guías, estándares y análisis para elevar los criterios de selección
             de talento académico en la educación superior.
           </p>
 
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" as const, justifyContent: "center" }}>
+          <div className="flex flex-wrap justify-center gap-3">
             <Link href="/signup">
-              <button style={{ fontFamily: SANS, background: D.white, color: D.ink, border: "none", padding: "13px 30px", borderRadius: 7, fontSize: 14, fontWeight: 700, cursor: "pointer", letterSpacing: "-0.01em" }}>
+              <button className="rounded-[7px] bg-white px-[30px] py-3.5 text-sm font-bold tracking-[-0.01em] text-fm-ink">
                 Publicar mi perfil
               </button>
             </Link>
             <Link href="/signup?intent=institution">
-              <button style={{ fontFamily: SANS, background: "transparent", color: "rgba(255,255,255,0.8)", border: "1px solid rgba(255,255,255,0.28)", padding: "13px 30px", borderRadius: 7, fontSize: 14, cursor: "pointer" }}>
+              <button className="rounded-[7px] border border-white/30 px-[30px] py-3.5 text-sm text-white/80">
                 Buscar docentes
               </button>
             </Link>
@@ -153,57 +112,44 @@ export default function ResourcesPage() {
       </section>
 
       {/* ── ARTÍCULOS ── */}
-      <section style={{ background: D.white }}>
-        <div className="fm-section-pad" style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 56 }}>
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              background: "rgba(27,79,216,0.08)", border: "1px solid rgba(27,79,216,0.2)",
-              borderRadius: 20, padding: "4px 14px", marginBottom: 16,
-            }}>
-              <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.blue }}>
+      <section className="bg-white">
+        <div className="mx-auto max-w-[1100px] px-5 py-12 md:px-10 md:py-20">
+          <div className="mb-14 text-center">
+            <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-fm-blue/20 bg-fm-blue/[0.08] px-3.5 py-1">
+              <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-blue">
                 Guías y análisis
               </span>
             </div>
-            <h2 style={{ fontFamily: SANS, fontSize: 32, fontWeight: 900, color: D.ink, letterSpacing: "-0.04em", margin: "0 0 12px", lineHeight: 1.1 }}>
+            <h2 className="mb-3 text-[32px] font-black leading-[1.1] tracking-[-0.04em] text-fm-ink">
               Lo que necesitas saber sobre talento académico.
             </h2>
-            <p style={{ fontFamily: SANS, fontSize: 15, color: D.muted, maxWidth: 460, margin: "0 auto", lineHeight: 1.7 }}>
+            <p className="mx-auto max-w-[460px] text-[15px] leading-[1.7] text-fm-muted">
               Contenido escrito por directores de programa y especialistas en gestión académica.
             </p>
           </div>
 
-          <div className="fm-grid-3">
+          <div className="grid gap-5 md:grid-cols-3">
             {RESOURCES.map((r, i) => (
-              <Link key={i} href={r.href} style={{ textDecoration: "none" }}>
-                <div style={{
-                  background: D.white, border: `1px solid ${D.border}`,
-                  borderRadius: 14, padding: "28px 24px",
-                  borderTop: `3px solid ${D.blue}`,
-                  height: "100%", display: "flex", flexDirection: "column" as const,
-                  cursor: "pointer", transition: "box-shadow 0.2s",
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                    <span style={{
-                      fontFamily: SANS, fontSize: 10, fontWeight: 700,
-                      letterSpacing: "0.1em", textTransform: "uppercase" as const,
-                      color: r.tagColor, background: r.tagBg,
-                      padding: "3px 10px", borderRadius: 20,
-                    }}>
+              <Link key={i} href={r.href} className="no-underline">
+                <div
+                  className="flex h-full cursor-pointer flex-col rounded-2xl border border-fm-border bg-white p-6 transition-shadow hover:shadow-lg"
+                  style={{ borderTop: "3px solid #1B4FD8" }}
+                >
+                  <div className="mb-4 flex items-center gap-2.5">
+                    <span
+                      className="rounded-full px-2.5 py-[3px] text-[10px] font-bold uppercase tracking-[0.1em]"
+                      style={{ color: r.tagColor, background: r.tagBg }}
+                    >
                       {r.tag}
                     </span>
-                    <span style={{ fontFamily: SANS, fontSize: 11, color: D.faint }}>
-                      {r.readTime} lectura
-                    </span>
+                    <span className="text-[11px] text-[#9CA3AF]">{r.readTime} lectura</span>
                   </div>
-                  <h3 style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: D.ink, lineHeight: 1.4, margin: "0 0 12px", letterSpacing: "-0.02em" }}>
+                  <h3 className="mb-3 text-base font-bold leading-snug tracking-[-0.02em] text-fm-ink">
                     {r.title}
                   </h3>
-                  <p style={{ fontFamily: SANS, fontSize: 13, color: D.muted, lineHeight: 1.75, margin: "0 0 20px", flex: 1 }}>
-                    {r.desc}
-                  </p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: SANS, fontSize: 12, color: D.blue, fontWeight: 600 }}>
-                    Leer artículo <span style={{ fontSize: 14 }}>→</span>
+                  <p className="mb-5 flex-1 text-[13px] leading-[1.75] text-fm-muted">{r.desc}</p>
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-fm-blue">
+                    Leer artículo <span className="text-sm">→</span>
                   </div>
                 </div>
               </Link>
@@ -213,59 +159,48 @@ export default function ResourcesPage() {
       </section>
 
       {/* ── SOBRE EL KNOWLEDGE CENTER ── */}
-      <section style={{ background: D.surf }}>
-        <div className="fm-section-pad" style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div className="fm-grid-2">
-            {/* Imagen */}
-            <div className="fm-photo-hide" style={{ borderRadius: 16, overflow: "hidden", height: 420 }}>
-              <div style={{
-                width: "100%", height: "100%",
-                backgroundImage: `url(https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=900)`,
-                backgroundSize: "cover", backgroundPosition: "center top",
-              }} />
+      <section className="bg-fm-surface">
+        <div className="mx-auto max-w-[1100px] px-5 py-12 md:px-10 md:py-20">
+          <div className="grid items-center gap-0 md:grid-cols-2 md:gap-[60px]">
+            <div className="hidden h-[420px] overflow-hidden rounded-2xl md:block">
+              <div
+                className="h-full w-full bg-cover bg-top"
+                style={{ backgroundImage: "url(https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=900)" }}
+              />
             </div>
 
-            {/* Contenido */}
             <div>
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                background: "rgba(233,160,48,0.12)", border: "1px solid rgba(233,160,48,0.25)",
-                borderRadius: 20, padding: "4px 14px", marginBottom: 20,
-              }}>
-                <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.gold }}>
+              <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-fm-gold/25 bg-fm-gold/[0.12] px-3.5 py-1">
+                <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-gold">
                   Por qué publicamos esto
                 </span>
               </div>
-              <h2 style={{ fontFamily: SANS, fontSize: 30, fontWeight: 900, color: D.ink, letterSpacing: "-0.04em", margin: "0 0 18px", lineHeight: 1.15 }}>
+              <h2 className="mb-[18px] text-[30px] font-black leading-[1.15] tracking-[-0.04em] text-fm-ink">
                 La calidad del claustro<br />
                 determina la calidad de la institución.
               </h2>
-              <p style={{ fontFamily: SANS, fontSize: 15, color: D.muted, lineHeight: 1.8, margin: "0 0 24px" }}>
+              <p className="mb-6 text-[15px] leading-[1.8] text-fm-muted">
                 Estos recursos ayudan a directores de programa y coordinadores académicos a tomar mejores decisiones sobre su talento docente. Y a los propios docentes, a entender qué valoran las instituciones.
               </p>
-              <div style={{ display: "flex", flexDirection: "column" as const, gap: 16, marginBottom: 32 }}>
+              <div className="mb-8 flex flex-col gap-4">
                 {[
                   { label: "Estándar universitario", body: "Alineado con los criterios de las agencias de calidad internacionales." },
                   { label: "Red de colaboradores",   body: "Artículos escritos por decanos y directores de programa en activo." },
                   { label: "Actualización continua", body: "El contenido se revisa y actualiza con cada cambio regulatorio relevante." },
                 ].map((item, i) => (
-                  <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: 8,
-                      background: "rgba(27,79,216,0.1)", border: "1px solid rgba(27,79,216,0.2)",
-                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                    }}>
-                      <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: D.blue }}>0{i + 1}</span>
+                  <div key={i} className="flex items-start gap-3.5">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-fm-blue/20 bg-fm-blue/10">
+                      <span className="text-xs font-extrabold text-fm-blue">0{i + 1}</span>
                     </div>
                     <div>
-                      <h4 style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: D.ink, margin: "0 0 3px", letterSpacing: "-0.02em" }}>{item.label}</h4>
-                      <p style={{ fontFamily: SANS, fontSize: 13, color: D.muted, lineHeight: 1.6, margin: 0 }}>{item.body}</p>
+                      <h4 className="mb-0.5 text-sm font-bold tracking-[-0.02em] text-fm-ink">{item.label}</h4>
+                      <p className="text-[13px] leading-[1.6] text-fm-muted">{item.body}</p>
                     </div>
                   </div>
                 ))}
               </div>
               <Link href="mailto:support@facultymatch.app">
-                <button style={{ fontFamily: SANS, background: "transparent", color: D.navy, border: `1px solid ${D.border}`, padding: "11px 26px", borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                <button className="rounded-[7px] border border-fm-border px-6 py-[11px] text-[13px] font-semibold text-fm-navy">
                   Contactar con el equipo
                 </button>
               </Link>
@@ -275,69 +210,54 @@ export default function ResourcesPage() {
       </section>
 
       {/* ── CTA NEWSLETTER ── */}
-      <section style={{ position: "relative", overflow: "hidden" }}>
-        <div style={{
-          position: "absolute", inset: 0,
-          backgroundImage: `url(https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1800)`,
-          backgroundSize: "cover", backgroundPosition: "center 55%",
-        }} />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(7,19,38,0.82)" }} />
-        <div style={{ position: "relative", zIndex: 2, maxWidth: 1100, margin: "0 auto", padding: "72px 40px" }}>
-          <div className="fm-grid-2" style={{ gap: 56 }}>
+      <section className="relative overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover"
+          style={{
+            backgroundImage: "url(https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1800)",
+            backgroundPosition: "center 55%",
+          }}
+        />
+        <div className="absolute inset-0 bg-fm-dark/[0.82]" />
+        <div className="relative z-[2] mx-auto max-w-[1100px] px-5 py-14 md:px-10 md:py-18">
+          <div className="grid gap-8 md:grid-cols-2 md:gap-14">
             <div>
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                background: "rgba(233,160,48,0.15)", border: "1px solid rgba(233,160,48,0.3)",
-                borderRadius: 20, padding: "4px 14px", marginBottom: 20,
-              }}>
-                <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.gold }}>
+              <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-fm-gold/30 bg-fm-gold/15 px-3.5 py-1">
+                <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-gold">
                   FacultyMatch Monthly
                 </span>
               </div>
-              <h2 style={{ fontFamily: SANS, fontSize: 28, fontWeight: 900, color: "#fff", lineHeight: 1.15, margin: "0 0 16px", letterSpacing: "-0.04em" }}>
+              <h2 className="mb-4 text-[28px] font-black leading-[1.15] tracking-[-0.04em] text-white">
                 El reporte mensual de la educación superior.
               </h2>
-              <p style={{ fontFamily: SANS, fontSize: 15, color: "rgba(255,255,255,0.55)", lineHeight: 1.8, margin: "0 0 20px" }}>
+              <p className="mb-5 text-[15px] leading-[1.8] text-white/55">
                 Tendencias de reclutamiento, cambios regulatorios y nuevas oportunidades docentes. Una vez al mes. Sin spam.
               </p>
-              <div style={{ display: "flex", flexDirection: "column" as const, gap: 10 }}>
+              <div className="flex flex-col gap-2.5">
                 {["Cero spam", "Cancelable en cualquier momento", "Solo contenido relevante"].map((item, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{
-                      width: 18, height: 18, borderRadius: "50%",
-                      background: "rgba(27,79,216,0.2)", border: "1px solid rgba(27,79,216,0.3)",
-                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                    }}>
+                  <div key={i} className="flex items-center gap-2.5">
+                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border border-fm-blue/30 bg-fm-blue/20">
                       <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
-                        <path d="M1 3L3 5L7 1" stroke="#1B4FD8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M1 3L3 5L7 1" stroke="#1B4FD8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
-                    <span style={{ fontFamily: SANS, fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{item}</span>
+                    <span className="text-[13px] text-white/50">{item}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <div style={{ display: "flex", flexDirection: "column" as const, justifyContent: "center", gap: 12 }}>
-              <div style={{ display: "flex", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 9, overflow: "hidden" }}>
+            <div className="flex flex-col justify-center gap-3">
+              <div className="flex overflow-hidden rounded-[9px] border border-white/15 bg-white/[0.07]">
                 <input
                   type="email"
                   placeholder="Tu correo electrónico"
-                  style={{
-                    flex: 1, border: "none", outline: "none",
-                    background: "transparent", padding: "14px 18px",
-                    fontFamily: SANS, fontSize: 14, color: "#fff",
-                  }}
+                  className="flex-1 bg-transparent px-[18px] py-3.5 text-sm text-white outline-none placeholder:text-white/40"
                 />
-                <button style={{
-                  fontFamily: SANS, background: D.blue, color: "#fff",
-                  border: "none", padding: "14px 22px",
-                  fontSize: 13, fontWeight: 700, cursor: "pointer",
-                  flexShrink: 0, letterSpacing: "-0.01em",
-                }}>
+                <button className="shrink-0 bg-fm-blue px-[22px] text-[13px] font-bold tracking-[-0.01em] text-white">
                   Suscribirme
                 </button>
               </div>
-              <p style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.25)", margin: 0, textAlign: "center" as const }}>
+              <p className="text-center text-[11px] text-white/25">
                 Una vez al mes. Sin spam. Cancela cuando quieras.
               </p>
             </div>
