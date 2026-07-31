@@ -145,9 +145,12 @@ export default async function VerificationPage() {
   }
 
   const badges: Record<string, { label: string; cls: string }> = {
-    verificado: { label: "Verificado", cls: "bg-tech-cyan text-white border-tech-cyan" },
-    en_revision: { label: "En revisión", cls: "bg-orange-50 text-energy-orange border-energy-orange/30" },
-    incompleto: { label: "Incompleto", cls: "bg-blue-50 text-talentia-blue border-talentia-blue/30" },
+    // Verificado usa el dorado de marca — es la misma señal de confianza
+    // que el resto de la web. En_revision es un estado de espera, no una
+    // señal de marca, así que se queda en el ámbar semántico habitual.
+    verificado: { label: "Verificado", cls: "bg-fm-gold text-white border-fm-gold" },
+    en_revision: { label: "En revisión", cls: "bg-amber-50 text-amber-600 border-amber-200" },
+    incompleto: { label: "Incompleto", cls: "bg-blue-50 text-fm-blue border-fm-blue/30" },
     rechazado: { label: "Rechazado", cls: "bg-red-50 text-red-600 border-red-200" },
   };
 
@@ -172,7 +175,7 @@ export default async function VerificationPage() {
 
       {verificationStatus === "incompleto" && verificationNotes && (
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
-          <AlertCircle size={18} className="text-talentia-blue shrink-0 mt-0.5" />
+          <AlertCircle size={18} className="text-fm-blue shrink-0 mt-0.5" />
           <div>
             <p className="font-bold text-blue-900 text-sm">Información requerida</p>
             <p className="text-sm text-blue-700 mt-1">{verificationNotes}</p>
@@ -212,7 +215,7 @@ export default async function VerificationPage() {
                       <div
                         className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                           step.completed
-                            ? "bg-white text-talentia-blue shadow-sm"
+                            ? "bg-white text-fm-blue shadow-sm"
                             : "bg-white text-gray-300 shadow-sm"
                         }`}
                       >
@@ -227,11 +230,11 @@ export default async function VerificationPage() {
                       </span>
                     </div>
                     {step.completed ? (
-                      <CheckCircle2 size={20} className="text-tech-cyan" />
+                      <CheckCircle2 size={20} className="text-fm-gold" />
                     ) : (
                       <Link
                         href={step.href}
-                        className="flex items-center gap-1 text-talentia-blue hover:text-blue-700 font-bold text-xs uppercase tracking-widest transition-colors"
+                        className="flex items-center gap-1 text-fm-blue hover:text-blue-700 font-bold text-xs uppercase tracking-widest transition-colors"
                       >
                         Completar <ArrowRight size={14} />
                       </Link>
@@ -243,7 +246,7 @@ export default async function VerificationPage() {
               <div className="pt-4">
                 {verificationStatus === "en_revision" && completedCount > 0 ? (
                   <div className="p-6 rounded-2xl bg-orange-50 border border-orange-100 flex flex-col items-center text-center space-y-3">
-                    <Loader2 className="animate-spin text-energy-orange" size={24} />
+                    <Loader2 className="animate-spin text-fm-gold" size={24} />
                     <h4 className="text-sm font-bold text-navy">Tu solicitud está en revisión</h4>
                     <p className="text-xs text-gray-500 font-medium max-w-sm">
                       Nuestro equipo académico está validando tus documentos. Recibirás una
@@ -252,7 +255,7 @@ export default async function VerificationPage() {
                   </div>
                 ) : verificationStatus === "verificado" ? (
                   <div className="p-6 rounded-2xl bg-blue-50 border border-blue-100 flex flex-col items-center text-center space-y-4">
-                    <ShieldCheck className="text-talentia-blue" size={32} />
+                    <ShieldCheck className="text-fm-blue" size={32} />
                     <h4 className="text-sm font-bold text-navy">¡Eres un docente Verificado!</h4>
                     <p className="text-xs text-gray-500 font-medium max-w-sm">
                       Tu perfil ahora goza de máxima visibilidad y confianza institucional.
@@ -260,7 +263,7 @@ export default async function VerificationPage() {
                     <a
                       href="/api/perfil-pdf"
                       download
-                      className="inline-flex items-center gap-2 bg-talentia-blue hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors mt-2"
+                      className="inline-flex items-center gap-2 bg-fm-blue hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors mt-2"
                     >
                       <Download size={16} />
                       Descargar perfil verificado (PDF)
@@ -273,7 +276,7 @@ export default async function VerificationPage() {
                       disabled={progress < 100}
                       className={`w-full h-14 rounded-xl font-bold transition-all shadow-lg ${
                         progress === 100
-                          ? "bg-talentia-blue hover:bg-blue-700 text-white shadow-blue-100"
+                          ? "bg-fm-blue hover:bg-blue-700 text-white shadow-blue-100"
                           : "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
                       }`}
                     >
@@ -296,7 +299,7 @@ export default async function VerificationPage() {
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-navy text-white" id="documents">
             <CardHeader>
               <CardTitle className="text-xl font-bold flex items-center gap-2">
-                <Upload size={22} className="text-tech-cyan" />
+                <Upload size={22} className="text-fm-gold" />
                 Subir documentos
               </CardTitle>
               <CardDescription className="text-gray-400 font-medium">
@@ -309,7 +312,7 @@ export default async function VerificationPage() {
           </Card>
 
           <div className="p-6 rounded-2xl bg-blue-50 border border-blue-100 space-y-4">
-            <div className="flex items-center gap-2 text-talentia-blue">
+            <div className="flex items-center gap-2 text-fm-blue">
               <ShieldCheck size={20} />
               <h4 className="text-sm font-bold">¿Por qué verificarse?</h4>
             </div>
@@ -321,7 +324,7 @@ export default async function VerificationPage() {
                 "Prioridad en resultados",
               ].map((item, idx) => (
                 <li key={idx} className="flex items-center gap-2 text-xs text-gray-600 font-medium">
-                  <div className="w-1.5 h-1.5 rounded-full bg-tech-cyan" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-fm-gold" />
                   {item}
                 </li>
               ))}

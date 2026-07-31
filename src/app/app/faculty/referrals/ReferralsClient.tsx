@@ -30,7 +30,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_CLASS: Record<string, string> = {
   pending: "bg-amber-50 text-amber-700 border-amber-200",
-  registered: "bg-blue-50 text-talentia-blue border-blue-200",
+  registered: "bg-blue-50 text-fm-blue border-blue-200",
   successful: "bg-green-50 text-green-700 border-green-200",
 };
 
@@ -95,8 +95,8 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
       {/* Header */}
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 bg-energy-orange/10 rounded-xl flex items-center justify-center">
-            <Gift size={20} className="text-energy-orange" />
+          <div className="w-10 h-10 bg-fm-gold/10 rounded-xl flex items-center justify-center">
+            <Gift size={20} className="text-fm-gold" />
           </div>
           <h1 className="text-3xl font-black text-navy tracking-tight">
             Invita a colegas y gana 1 año Premium
@@ -115,7 +115,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
           <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden">
             <CardHeader className="pb-4 bg-gray-50/50">
               <CardTitle className="text-lg font-black text-navy flex items-center gap-2">
-                <Link2 size={18} className="text-talentia-blue" />
+                <Link2 size={18} className="text-fm-blue" />
                 Mi enlace de invitación
               </CardTitle>
             </CardHeader>
@@ -132,7 +132,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                   className={`rounded-xl h-12 px-5 font-black shrink-0 transition-all ${
                     copied
                       ? "bg-green-500 hover:bg-green-500 text-white"
-                      : "bg-talentia-blue hover:bg-navy text-white"
+                      : "bg-fm-blue hover:bg-navy text-white"
                   }`}
                 >
                   {copied ? (
@@ -149,7 +149,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
           <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden">
             <CardHeader className="pb-4 bg-gray-50/50">
               <CardTitle className="text-lg font-black text-navy flex items-center gap-2">
-                <Mail size={18} className="text-talentia-blue" />
+                <Mail size={18} className="text-fm-blue" />
                 Invitar por email
               </CardTitle>
             </CardHeader>
@@ -164,12 +164,12 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                   onChange={e => setInviteEmail(e.target.value)}
                   placeholder="colega@universidad.edu"
                   disabled={!canSendMore || sendLoading}
-                  className="flex-1 h-12 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-talentia-blue transition-all disabled:bg-gray-50 disabled:text-gray-400"
+                  className="flex-1 h-12 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-fm-blue transition-all disabled:bg-gray-50 disabled:text-gray-400"
                 />
                 <Button
                   type="submit"
                   disabled={!canSendMore || sendLoading || !inviteEmail.trim()}
-                  className="bg-energy-orange hover:bg-orange-600 text-white font-black rounded-xl h-12 px-5 shrink-0 disabled:opacity-60"
+                  className="bg-fm-gold hover:bg-orange-600 text-white font-black rounded-xl h-12 px-5 shrink-0 disabled:opacity-60"
                 >
                   {sendLoading ? (
                     <Loader2 size={16} className="animate-spin" />
@@ -204,7 +204,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
             <CardHeader className="pb-4 bg-gray-50/50">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-black text-navy flex items-center gap-2">
-                  <Users size={18} className="text-talentia-blue" />
+                  <Users size={18} className="text-fm-blue" />
                   Mis invitaciones enviadas
                 </CardTitle>
                 <span className="text-sm font-bold text-gray-400">{referrals.length}/{MAX_INVITES}</span>
@@ -214,7 +214,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
               {referrals.length === 0 ? (
                 <div className="py-16 text-center px-6">
                   <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Gift size={24} className="text-talentia-blue" />
+                    <Gift size={24} className="text-fm-blue" />
                   </div>
                   <p className="font-black text-navy">Aún no has enviado ninguna invitación</p>
                   <p className="text-sm text-gray-500 font-medium mt-1 max-w-xs mx-auto">
@@ -278,8 +278,8 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
               ) : (
                 <>
                   <div className="flex items-center gap-2">
-                    <Gift size={18} className="text-energy-orange" />
-                    <span className="text-xs font-black uppercase tracking-widest text-energy-orange">Tu progreso</span>
+                    <Gift size={18} className="text-fm-gold" />
+                    <span className="text-xs font-black uppercase tracking-widest text-fm-gold">Tu progreso</span>
                   </div>
                   <div className="text-center py-2">
                     <span className="text-5xl font-black text-navy">{stats.successful_referrals}</span>
@@ -288,18 +288,18 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                   </div>
                   <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-talentia-blue rounded-full transition-all duration-700"
+                      className="h-full bg-fm-blue rounded-full transition-all duration-700"
                       style={{ width: `${progressPct}%` }}
                     />
                   </div>
                   <p className="text-sm font-medium text-gray-600 text-center">
                     <strong className="text-navy">{stats.successful_referrals}</strong> de 10 colegas han completado su perfil.
                     {stats.successful_referrals < 10 && (
-                      <> Te faltan <strong className="text-talentia-blue">{10 - stats.successful_referrals}</strong> más.</>
+                      <> Te faltan <strong className="text-fm-blue">{10 - stats.successful_referrals}</strong> más.</>
                     )}
                   </p>
                   <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 space-y-1">
-                    <p className="text-xs font-black text-energy-orange uppercase tracking-widest">Premio</p>
+                    <p className="text-xs font-black text-fm-gold uppercase tracking-widest">Premio</p>
                     <p className="text-sm font-bold text-navy">1 año de acceso Professional</p>
                     <p className="text-xs text-gray-500 font-medium">Se activa automáticamente al llegar a 10 colegas verificados.</p>
                   </div>
@@ -319,7 +319,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                 { n: "4", text: "Al llegar a 10, recibes 1 año Premium gratis." },
               ].map(step => (
                 <div key={step.n} className="flex items-start gap-3">
-                  <span className="w-6 h-6 rounded-full bg-talentia-blue text-white text-xs font-black flex items-center justify-center flex-shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-fm-blue text-white text-xs font-black flex items-center justify-center flex-shrink-0">
                     {step.n}
                   </span>
                   <p className="text-sm text-gray-600 font-medium leading-snug">{step.text}</p>

@@ -64,7 +64,7 @@ const RESOURCES = [
 ];
 
 const COLOR_MAP: Record<string, { bg: string; text: string; border: string }> = {
-  blue:   { bg: "bg-blue-50",   text: "text-talentia-blue", border: "border-blue-100" },
+  blue:   { bg: "bg-blue-50",   text: "text-fm-blue", border: "border-blue-100" },
   amber:  { bg: "bg-amber-50",  text: "text-amber-600",     border: "border-amber-100" },
   green:  { bg: "bg-green-50",  text: "text-green-600",     border: "border-green-100" },
   purple: { bg: "bg-purple-50", text: "text-purple-600",    border: "border-purple-100" },
@@ -184,7 +184,7 @@ export default async function EducatorDashboard() {
           </div>
           <Button
             asChild
-            className="bg-talentia-blue hover:bg-navy text-white font-bold rounded-xl h-10 px-5 whitespace-nowrap flex-shrink-0"
+            className="bg-fm-blue hover:bg-navy text-white font-bold rounded-xl h-10 px-5 whitespace-nowrap flex-shrink-0"
           >
             <Link href="/app/faculty/profile" className="flex items-center gap-2">
               Editar perfil <ArrowRight size={15} />
@@ -200,7 +200,7 @@ export default async function EducatorDashboard() {
           </div>
           <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full transition-all duration-1000 bg-energy-orange"
+              className="h-full rounded-full transition-all duration-1000 bg-fm-gold"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -310,7 +310,7 @@ export default async function EducatorDashboard() {
       {(progress < 100 || !facultyProfile?.visibility || facultyProfile?.visibility === "hidden" || facultyProfile?.visibility === "private") && (
         <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-4">
           <div className="flex items-center gap-2">
-            <AlertCircle size={18} className="text-talentia-blue" />
+            <AlertCircle size={18} className="text-fm-blue" />
             <h3 className="font-black text-navy text-sm">Avisos importantes sobre tu perfil</h3>
           </div>
           <div className="grid gap-3">
@@ -399,7 +399,7 @@ export default async function EducatorDashboard() {
                   <h2 className="text-lg font-black text-navy">Completa tu perfil</h2>
                   <p className="text-sm text-gray-400 font-medium">{completedCount} de {checklist.length} secciones listas</p>
                 </div>
-                <Badge className="bg-blue-50 text-talentia-blue border-none font-black text-xs px-3 py-1">
+                <Badge className="bg-blue-50 text-fm-blue border-none font-black text-xs px-3 py-1">
                   {progress}%
                 </Badge>
               </div>
@@ -408,13 +408,13 @@ export default async function EducatorDashboard() {
                   <Link
                     key={item.id}
                     href={item.href}
-                    className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-gray-200 hover:border-talentia-blue hover:bg-blue-50/50 transition-all group"
+                    className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-gray-200 hover:border-fm-blue hover:bg-blue-50/50 transition-all group"
                   >
-                    <div className="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 group-hover:border-talentia-blue flex items-center justify-center flex-shrink-0 transition-colors">
-                      <Plus size={13} className="text-gray-300 group-hover:text-talentia-blue transition-colors" />
+                    <div className="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 group-hover:border-fm-blue flex items-center justify-center flex-shrink-0 transition-colors">
+                      <Plus size={13} className="text-gray-300 group-hover:text-fm-blue transition-colors" />
                     </div>
                     <span className="text-sm font-bold text-gray-500 group-hover:text-navy transition-colors flex-1">{item.label}</span>
-                    <ArrowRight size={14} className="text-gray-300 group-hover:text-talentia-blue transition-colors" />
+                    <ArrowRight size={14} className="text-gray-300 group-hover:text-fm-blue transition-colors" />
                   </Link>
                 ))}
               </div>
@@ -424,8 +424,8 @@ export default async function EducatorDashboard() {
           {/* Personal stats */}
           <div className="grid grid-cols-3 gap-4">
             {[
-              { icon: Star, label: "En favoritos", value: (favoritesCount ?? 0).toString(), color: "text-energy-orange", bg: "bg-orange-50" },
-              { icon: Mail, label: "Solicitudes recibidas", value: (contactsCount ?? 0).toString(), color: "text-talentia-blue", bg: "bg-blue-50" },
+              { icon: Star, label: "En favoritos", value: (favoritesCount ?? 0).toString(), color: "text-fm-gold", bg: "bg-orange-50" },
+              { icon: Mail, label: "Solicitudes recibidas", value: (contactsCount ?? 0).toString(), color: "text-fm-blue", bg: "bg-blue-50" },
               { icon: Globe, label: "Idiomas", value: languages.length > 0 ? languages.map((l: any) => (typeof l === "string" ? l : l.lang ?? "")).filter(Boolean).join(", ") : "—", color: "text-purple-600", bg: "bg-purple-50" },
             ].map((stat) => (
               <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-2">
@@ -449,7 +449,7 @@ export default async function EducatorDashboard() {
                 href="https://www.facultymatch.app/resources"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs font-black text-talentia-blue hover:underline flex items-center gap-1"
+                className="text-xs font-black text-fm-blue hover:underline flex items-center gap-1"
               >
                 Ver todos <ArrowRight size={12} />
               </a>
@@ -471,7 +471,7 @@ export default async function EducatorDashboard() {
                       </span>
                       <span className="text-2xl">{r.emoji}</span>
                     </div>
-                    <p className="text-sm font-bold text-navy leading-snug group-hover:text-talentia-blue transition-colors line-clamp-2">
+                    <p className="text-sm font-bold text-navy leading-snug group-hover:text-fm-blue transition-colors line-clamp-2">
                       {r.title}
                     </p>
                     <span className={`text-xs font-black ${c.text} flex items-center gap-1 mt-auto`}>
@@ -487,7 +487,7 @@ export default async function EducatorDashboard() {
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-black text-navy">Solicitudes recientes</h2>
-              <Button variant="ghost" size="sm" className="text-talentia-blue font-black text-xs rounded-xl hover:bg-blue-50" asChild>
+              <Button variant="ghost" size="sm" className="text-fm-blue font-black text-xs rounded-xl hover:bg-blue-50" asChild>
                 <Link href="/app/faculty/requests">Ver todas →</Link>
               </Button>
             </div>
@@ -496,7 +496,7 @@ export default async function EducatorDashboard() {
                 {recentRequests.map((req: any) => (
                   <div key={req.id} className="flex items-start gap-3 p-4 bg-gray-50/60 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
                     <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                      <Mail size={15} className="text-talentia-blue" />
+                      <Mail size={15} className="text-fm-blue" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
@@ -515,7 +515,7 @@ export default async function EducatorDashboard() {
             ) : (
               <div className="text-center py-10 border border-dashed border-gray-200 rounded-2xl">
                 <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Mail size={20} className="text-talentia-blue" />
+                  <Mail size={20} className="text-fm-blue" />
                 </div>
                 <p className="font-bold text-navy text-sm">Aún no tienes solicitudes</p>
                 <p className="text-gray-400 text-xs mt-1 max-w-xs mx-auto">
@@ -603,16 +603,16 @@ export default async function EducatorDashboard() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-bold text-gray-500">
                 <span>Completado</span>
-                <span className={progress === 100 ? "text-green-600 font-black" : "text-talentia-blue font-black"}>{progress}%</span>
+                <span className={progress === 100 ? "text-green-600 font-black" : "text-fm-blue font-black"}>{progress}%</span>
               </div>
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all ${progress === 100 ? "bg-green-500" : "bg-talentia-blue"}`}
+                  className={`h-full rounded-full transition-all ${progress === 100 ? "bg-green-500" : "bg-fm-blue"}`}
                   style={{ width: `${progress}%` }}
                 />
               </div>
             </div>
-            <Button asChild className="w-full bg-talentia-blue hover:bg-navy text-white font-bold h-10 rounded-xl text-sm">
+            <Button asChild className="w-full bg-fm-blue hover:bg-navy text-white font-bold h-10 rounded-xl text-sm">
               <Link href="/app/faculty/profile">Editar perfil</Link>
             </Button>
           </div>
@@ -620,20 +620,20 @@ export default async function EducatorDashboard() {
           {/* Privacy */}
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-3">
             <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-talentia-blue" />
+              <ShieldCheck size={16} className="text-fm-blue" />
               <h3 className="font-black text-navy text-sm">Privacidad</h3>
             </div>
             <div className={`flex items-center justify-between p-3 rounded-xl border transition-all ${facultyProfile?.visibility === "public" ? "bg-blue-50 border-blue-100" : "bg-gray-50 border-gray-100"}`}>
               <div className="flex items-center gap-2">
                 {facultyProfile?.visibility === "public"
-                  ? <Eye size={15} className="text-talentia-blue" />
+                  ? <Eye size={15} className="text-fm-blue" />
                   : <EyeOff size={15} className="text-gray-400" />}
                 <div>
                   <p className="text-xs font-black text-navy">{facultyProfile?.visibility === "public" ? "Pública" : "Privada"}</p>
                   <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">Visibilidad</p>
                 </div>
               </div>
-              <Link href="/app/faculty/privacy" className="text-xs font-black text-talentia-blue hover:underline">
+              <Link href="/app/faculty/privacy" className="text-xs font-black text-fm-blue hover:underline">
                 Cambiar
               </Link>
             </div>
@@ -655,19 +655,19 @@ export default async function EducatorDashboard() {
               href={`https://facultymatch.app/docentes/${facultyProfile.profile_slug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-3 hover:border-talentia-blue/30 hover:shadow-md transition-all group"
+              className="block bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-3 hover:border-fm-blue/30 hover:shadow-md transition-all group"
             >
               <div className="flex items-center gap-2">
-                <Globe size={16} className="text-talentia-blue" />
+                <Globe size={16} className="text-fm-blue" />
                 <h3 className="font-black text-navy text-sm">Perfil público</h3>
               </div>
-              <p className="text-xs font-semibold text-talentia-blue truncate">
+              <p className="text-xs font-semibold text-fm-blue truncate">
                 facultymatch.app/docentes/{facultyProfile.profile_slug}
               </p>
               <p className="text-xs text-gray-500 font-medium leading-relaxed">
                 Comparte este enlace para que cualquier institución pueda ver tu perfil académico.
               </p>
-              <div className="flex items-center gap-1.5 text-xs font-black text-talentia-blue group-hover:underline">
+              <div className="flex items-center gap-1.5 text-xs font-black text-fm-blue group-hover:underline">
                 Abrir perfil público <ExternalLink size={12} />
               </div>
             </a>
@@ -677,8 +677,8 @@ export default async function EducatorDashboard() {
           {isPro ? (
             <div className="bg-gradient-to-br from-navy to-[#1a3a6b] text-white rounded-3xl p-5 space-y-4">
               <div className="flex items-center gap-2">
-                <Sparkles size={15} className="text-energy-orange" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-energy-orange">Plan Professional</span>
+                <Sparkles size={15} className="text-fm-gold" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-fm-gold">Plan Professional</span>
               </div>
               <p className="text-xs font-medium text-white/80 leading-relaxed">
                 Tu perfil aparece <strong className="text-white">prioritario</strong> en búsquedas y tienes privacidad avanzada.
@@ -697,7 +697,7 @@ export default async function EducatorDashboard() {
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-energy-orange rounded-full"
+                          className="h-full bg-fm-gold rounded-full"
                           style={{ width: `${Math.max(5, 100 - Math.round(daysLeft / 3.65))}%` }}
                         />
                       </div>
@@ -708,8 +708,8 @@ export default async function EducatorDashboard() {
               })()}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl border-2 border-dashed border-energy-orange/30 p-5 space-y-4 text-center">
-              <div className="flex items-center justify-center gap-2 text-energy-orange">
+            <div className="bg-white rounded-3xl border-2 border-dashed border-fm-gold/30 p-5 space-y-4 text-center">
+              <div className="flex items-center justify-center gap-2 text-fm-gold">
                 <Zap size={15} />
                 <span className="text-[10px] font-black uppercase tracking-widest">Plan Professional</span>
               </div>
@@ -719,7 +719,7 @@ export default async function EducatorDashboard() {
               <div className="text-xl font-black text-navy">29€ <span className="text-xs text-gray-400 font-bold">/ año</span></div>
               <Link
                 href="/checkout?plan=faculty-pro"
-                className="inline-flex items-center gap-2 w-full justify-center bg-energy-orange hover:bg-orange-600 text-white font-black py-2.5 px-5 rounded-xl text-xs transition-colors"
+                className="inline-flex items-center gap-2 w-full justify-center bg-fm-gold hover:bg-orange-600 text-white font-black py-2.5 px-5 rounded-xl text-xs transition-colors"
               >
                 <Sparkles size={13} /> Activar Plan Professional
               </Link>
@@ -728,10 +728,10 @@ export default async function EducatorDashboard() {
 
           {/* Referral widget */}
           {successfulReferrals < 10 && (
-            <div className="bg-white rounded-3xl border border-dashed border-energy-orange/40 p-5 space-y-3">
+            <div className="bg-white rounded-3xl border border-dashed border-fm-gold/40 p-5 space-y-3">
               <div className="flex items-center gap-2">
-                <Gift size={14} className="text-energy-orange" />
-                <p className="text-[10px] font-black text-energy-orange uppercase tracking-widest">Invita y Gana</p>
+                <Gift size={14} className="text-fm-gold" />
+                <p className="text-[10px] font-black text-fm-gold uppercase tracking-widest">Invita y Gana</p>
               </div>
               <p className="text-xs text-gray-500 font-medium leading-relaxed">
                 Invita compañeros a FacultyMatch y desbloquea meses gratis de Plan Professional.
@@ -743,14 +743,14 @@ export default async function EducatorDashboard() {
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-energy-orange rounded-full transition-all"
+                    className="h-full bg-fm-gold rounded-full transition-all"
                     style={{ width: `${Math.min(100, (successfulReferrals / 10) * 100)}%` }}
                   />
                 </div>
               </div>
               <Link
                 href="/app/faculty/referrals"
-                className="inline-flex items-center gap-1.5 text-xs font-black text-energy-orange hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-black text-fm-gold hover:underline"
               >
                 Ver mis invitaciones <ArrowRight size={11} />
               </Link>

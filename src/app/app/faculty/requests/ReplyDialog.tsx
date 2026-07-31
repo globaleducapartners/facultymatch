@@ -50,7 +50,7 @@ export function ReplyDialog({ contactId, institutionName, isOpen, onClose, onSuc
               onChange={e => setMessage(e.target.value)}
               required
               rows={5}
-              className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium text-sm resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium text-sm resize-none"
               placeholder="Escribe tu respuesta a la institución. Se enviará por email..."
             />
           </div>
@@ -64,7 +64,7 @@ export function ReplyDialog({ contactId, institutionName, isOpen, onClose, onSuc
             <Button
               type="submit"
               disabled={loading || !message.trim()}
-              className="flex-1 bg-talentia-blue hover:bg-blue-700 text-white font-bold py-6 rounded-xl shadow-lg shadow-blue-100"
+              className="flex-1 bg-fm-blue hover:bg-blue-700 text-white font-bold py-6 rounded-xl shadow-lg shadow-blue-100"
             >
               {loading ? <Loader2 className="animate-spin" size={18} /> : <><Send size={15} className="mr-2" />Enviar respuesta</>}
             </Button>

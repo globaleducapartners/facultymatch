@@ -89,7 +89,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="text-base font-bold text-navy truncate">{req.institution?.name}</h4>
             {req.subject && (
-              <Badge variant="secondary" className="bg-blue-50 text-talentia-blue font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 border-blue-100">
+              <Badge variant="secondary" className="bg-blue-50 text-fm-blue font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 border-blue-100">
                 {SUBJECT_LABELS[req.subject] ?? req.subject}
               </Badge>
             )}
@@ -109,7 +109,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
             <>
               <Button
                 onClick={(e) => { e.stopPropagation(); setReplyOpen(true); }}
-                className="bg-talentia-blue hover:bg-blue-700 text-white font-bold rounded-xl h-9 px-4 text-xs"
+                className="bg-fm-blue hover:bg-blue-700 text-white font-bold rounded-xl h-9 px-4 text-xs"
               >
                 <Send size={12} className="mr-1.5" /> Responder
               </Button>
@@ -172,7 +172,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">
                     {isInst ? req.institution?.name : "Tu respuesta"} {msg.created_at ? `· ${formatDateTimeTZ(msg.created_at)}` : ""}
                   </p>
-                  <div className={`max-w-[85%] p-4 rounded-2xl ${isInst ? "bg-gray-100 text-navy rounded-tl-sm" : "bg-talentia-blue text-white rounded-tr-sm"}`}>
+                  <div className={`max-w-[85%] p-4 rounded-2xl ${isInst ? "bg-gray-100 text-navy rounded-tl-sm" : "bg-fm-blue text-white rounded-tr-sm"}`}>
                     {/* Meta tags for first institution message */}
                     {isInst && index === 0 && (req.modality || req.dates) && (
                       <div className="flex flex-wrap gap-2 mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
@@ -198,7 +198,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
               <div className="flex justify-end pt-1">
                 <button
                   onClick={() => setShowFollowUp(true)}
-                  className="flex items-center gap-1.5 text-xs font-bold text-talentia-blue hover:underline"
+                  className="flex items-center gap-1.5 text-xs font-bold text-fm-blue hover:underline"
                 >
                   <Send size={11} /> Enviar seguimiento
                 </button>
@@ -213,7 +213,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
                   value={followUpMsg}
                   onChange={e => setFollowUpMsg(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none text-sm font-medium resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none text-sm font-medium resize-none"
                   placeholder="Escribe tu respuesta..."
                 />
                 {followUpError && (
@@ -227,7 +227,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
                     size="sm"
                     disabled={sending || !followUpMsg.trim()}
                     onClick={handleFollowUp}
-                    className="bg-talentia-blue hover:bg-blue-700 text-white font-bold rounded-xl"
+                    className="bg-fm-blue hover:bg-blue-700 text-white font-bold rounded-xl"
                   >
                     {sending ? <Loader2 size={14} className="animate-spin" /> : <><Send size={12} className="mr-1.5" />Enviar</>}
                   </Button>

@@ -38,7 +38,7 @@ export function NotificationToggles({
                 action(item.key, checked);
               });
             }}
-            className="bg-talentia-blue data-[state=checked]:bg-talentia-blue"
+            className="bg-fm-blue data-[state=checked]:bg-fm-blue"
           />
         </div>
       ))}

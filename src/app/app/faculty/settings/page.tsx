@@ -54,7 +54,7 @@ export default async function SettingsPage() {
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-                <ShieldCheck size={22} className="text-talentia-blue" />
+                <ShieldCheck size={22} className="text-fm-blue" />
                 Seguridad & Acceso
               </CardTitle>
               <CardDescription className="font-medium">
@@ -70,7 +70,7 @@ export default async function SettingsPage() {
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-                <Bell size={22} className="text-energy-orange" />
+                <Bell size={22} className="text-fm-gold" />
                 Preferencias de Notificaciones
               </CardTitle>
               <CardDescription className="font-medium">
@@ -108,7 +108,7 @@ export default async function SettingsPage() {
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-                <Download size={22} className="text-tech-cyan" />
+                <Download size={22} className="text-fm-blue" />
                 Tus datos (GDPR)
               </CardTitle>
               <CardDescription className="font-medium">
@@ -133,7 +133,7 @@ export default async function SettingsPage() {
           {/* Danger zone */}
           <div className="p-8 rounded-2xl bg-gray-50 border border-gray-100 space-y-6">
             <div className="flex items-center gap-2 text-navy">
-              <AlertTriangle size={20} className="text-energy-orange" />
+              <AlertTriangle size={20} className="text-fm-gold" />
               <h4 className="text-sm font-black uppercase tracking-widest">Zona de riesgo</h4>
             </div>
             <p className="text-xs text-gray-500 font-medium leading-relaxed">
@@ -146,7 +146,7 @@ export default async function SettingsPage() {
           {/* Plan card */}
           {isPro ? (
             <div className="p-8 rounded-2xl bg-blue-50/50 border border-blue-100 text-center space-y-4">
-              <Badge className="bg-talentia-blue text-white text-[8px] font-black uppercase tracking-widest border-none">
+              <Badge className="bg-fm-blue text-white text-[8px] font-black uppercase tracking-widest border-none">
                 Plan Profesional
               </Badge>
               <div className="space-y-1">
@@ -184,7 +184,7 @@ export default async function SettingsPage() {
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <Sparkles size={18} className="text-talentia-blue" />
+                  <Sparkles size={18} className="text-fm-blue" />
                   <h4 className="text-base font-black text-navy">Pasa al Plan Profesional</h4>
                 </div>
                 <p className="text-xs text-gray-500 font-medium">
@@ -199,7 +199,7 @@ export default async function SettingsPage() {
                   "Soporte prioritario",
                 ].map((f) => (
                   <li key={f} className="flex items-center gap-2 text-xs text-gray-600 font-medium">
-                    <div className="w-1.5 h-1.5 rounded-full bg-talentia-blue shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-fm-blue shrink-0" />
                     {f}
                   </li>
                 ))}
