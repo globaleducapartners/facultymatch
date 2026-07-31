@@ -53,6 +53,7 @@
   --color-fm-navy:   #0D2240;
   --color-fm-blue:   #1B4FD8;
   --color-fm-gold:   #E9A030;
+  --color-fm-signal: #FF6A1A;
   --color-fm-white:  #FFFFFF;
   --color-fm-surface:#F2F6FC;
   --color-fm-border: #D8E2EF;
@@ -173,3 +174,46 @@
 .fm-animate-up-delay-2 { animation-delay: 0.2s; }
 .fm-animate-up-delay-3 { animation-delay: 0.35s; }
 .fm-animate-up-delay-4 { animation-delay: 0.5s; }
+
+/* ── FacultyMatch v3 — micro-interactions ────────────────────────────────── */
+@keyframes fm-badge-pulse {
+  0%, 42%   { box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
+  48%       { box-shadow: 0 12px 30px rgba(0,0,0,0.25), 0 0 0 9px rgba(255,106,26,0.22); }
+  56%, 100% { box-shadow: 0 12px 30px rgba(0,0,0,0.25); }
+}
+@keyframes fm-cursor-travel {
+  0%   { left:10%; top:16%; opacity:0; }
+  10%  { opacity:1; }
+  40%  { left:75%; top:76%; }
+  52%  { left:75%; top:76%; }
+  90%  { left:75%; top:76%; opacity:1; }
+  100% { left:10%; top:16%; opacity:0; }
+}
+@keyframes fm-ripple-pulse {
+  0%, 44%  { transform:scale(0); opacity:0; }
+  50%      { transform:scale(1); opacity:0.6; }
+  64%      { transform:scale(2.4); opacity:0; }
+  100%     { opacity:0; }
+}
+@keyframes fm-dz-flash {
+  0%, 38%   { border-color: rgba(255,255,255,0.25); background: transparent; }
+  46%, 62%  { border-color: var(--color-fm-signal); background: rgba(255,106,26,0.08); }
+  72%, 100% { border-color: rgba(255,255,255,0.25); background: transparent; }
+}
+@keyframes fm-drag-file {
+  0%   { left:78%; top:6%;  opacity:0; }
+  12%  { opacity:1; }
+  44%  { left:50%; top:52%; }
+  62%  { left:50%; top:52%; }
+  82%  { left:50%; top:52%; opacity:1; }
+  100% { left:78%; top:6%;  opacity:0; }
+}
+@keyframes fm-play-ring {
+  0%   { transform: scale(0.8); opacity:0.8; }
+  100% { transform: scale(1.35); opacity:0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fm-cursor-demo, .fm-shot-badge, .fm-drag-cursor, .fm-dropzone, .fm-play-btn::after {
+    animation: none !important;
+  }
+}

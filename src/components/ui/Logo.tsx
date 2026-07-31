@@ -9,6 +9,8 @@ interface LogoProps {
 
 export function Logo({ className = "", variant = "dark", href = "/" }: LogoProps) {
   const textColor = variant === "light" ? "#ffffff" : "#0C1018";
+  // "Encuentro" mark: two overlapping circles — docente (claro/marino) + institución (naranja).
+  const circleA = variant === "light" ? "#EAF0F9" : "#0D2240";
 
   return (
     <Link
@@ -16,31 +18,20 @@ export function Logo({ className = "", variant = "dark", href = "/" }: LogoProps
       style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}
       className={className}
     >
-      {/* Badge */}
-      <div style={{
-        width: 34, height: 34, borderRadius: 8,
-        background: "#1B4FD8",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        flexShrink: 0,
-      }}>
-        <span style={{
-          color: "#ffffff", fontSize: 13, fontWeight: 800,
-          letterSpacing: "-0.03em",
-          fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-        }}>
-          FM
-        </span>
-      </div>
+      <svg width="30" height="30" viewBox="0 0 100 100" style={{ flexShrink: 0, filter: "drop-shadow(0 0 8px rgba(255,106,26,0.45))" }}>
+        <circle cx="30" cy="52" r="22" fill={circleA} />
+        <circle cx="66" cy="50" r="34" fill="#FF6A1A" />
+      </svg>
 
       {/* Wordmark */}
       <span style={{
-        fontSize: 18, fontWeight: 700,
+        fontSize: 18, fontWeight: 800,
         color: textColor,
-        letterSpacing: "-0.03em",
+        letterSpacing: "-0.02em",
         fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
         lineHeight: 1,
       }}>
-        FacultyMatch
+        facultymatch
       </span>
     </Link>
   );
