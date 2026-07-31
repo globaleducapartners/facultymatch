@@ -26,7 +26,10 @@ export async function revokeFaculty(facultyId: string) {
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
-export async function activateFaculty(facultyId: string, force = false) {
+export async function activateFaculty(
+  facultyId: string,
+  force = false
+): Promise<{ ok: true } | { ok: false; reason: "ONBOARDING_INCOMPLETE" }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Unauthorized");
@@ -49,7 +52,11 @@ export async function activateFaculty(facultyId: string, force = false) {
       .eq("user_id", facultyId)
       .maybeSingle();
     if (fp?.onboarding_status !== "completed") {
-      throw new Error("ONBOARDING_INCOMPLETE");
+      // No lanzar: Next.js censura el mensaje de las excepciones de Server
+      // Actions en producción, y el cliente nunca detectaría este caso para
+      // mostrar el diálogo de confirmación. Se devuelve como resultado normal,
+      // igual que ya hace /api/admin/faculty/[id]/route.ts.
+      return { ok: false, reason: "ONBOARDING_INCOMPLETE" };
     }
   }
 
@@ -62,6 +69,7 @@ export async function activateFaculty(facultyId: string, force = false) {
     verificado_en: new Date().toISOString(),
   }).eq("user_id", facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);
+  return { ok: true };
 }
 
 export async function deleteFaculty(facultyId: string) {

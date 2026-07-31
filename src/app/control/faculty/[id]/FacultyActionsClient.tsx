@@ -48,16 +48,16 @@ export function FacultyActions({ facultyId, isHidden, isVerified, verificationSt
     setLoading("activate");
     setMessage(null);
     try {
-      await activateFaculty(facultyId, force);
+      const result = await activateFaculty(facultyId, force);
+      if (!result.ok) {
+        setShowActivateConfirm(true);
+        return;
+      }
       setMessage({ type: "success", text: "Acción completada correctamente" });
       setShowActivateConfirm(false);
       router.refresh();
     } catch (e: any) {
-      if (e?.message?.includes("ONBOARDING_INCOMPLETE")) {
-        setShowActivateConfirm(true);
-      } else {
-        setMessage({ type: "error", text: e?.message || "Error al ejecutar la acción" });
-      }
+      setMessage({ type: "error", text: e?.message || "Error al ejecutar la acción" });
     } finally {
       setLoading(null);
     }

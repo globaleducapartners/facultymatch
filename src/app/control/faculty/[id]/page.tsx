@@ -264,7 +264,7 @@ export default async function FacultyDetailPage({
                       {exp.subarea && (
                         <p className="text-xs text-gray-500 ml-6 mt-0.5">{exp.subarea}</p>
                       )}
-                      {exp.topics && exp.topics.length > 0 && (
+                      {exp.topics && Array.isArray(exp.topics) && exp.topics.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 ml-6 mt-1.5">
                           {exp.topics.map((t: string, i: number) => (
                             <span key={i} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-talentia-blue">
@@ -390,7 +390,7 @@ export default async function FacultyDetailPage({
           </div>
 
           {/* Modality & Availability */}
-          {fp.modalities && fp.modalities.length > 0 && (
+          {fp.modalities && Array.isArray(fp.modalities) && fp.modalities.length > 0 && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <SectionTitle icon={Calendar} title="Modalidades" />
               <div className="flex flex-wrap gap-2">
