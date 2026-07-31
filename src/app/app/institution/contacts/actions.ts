@@ -14,15 +14,6 @@ export async function sendFollowUp(contactId: string, message: string) {
 
   const admin = createAdminClient();
 
-  // Ensure follow_ups column exists
-  try {
-    await admin.rpc("exec_sql", {
-      sql: "ALTER TABLE contacts ADD COLUMN IF NOT EXISTS follow_ups JSONB DEFAULT '[]'::jsonb;"
-    });
-  } catch (err) {
-    console.warn("Failed to ensure follow_ups column:", err);
-  }
-
   // Verify institution owns this contact
   const { data: contact } = await admin
     .from("contacts")

@@ -619,15 +619,6 @@ export async function replyToContact(contactId: string, replyMessage: string) {
 
   const admin = createAdminClient();
 
-  // Ensure follow_ups column exists
-  try {
-    await admin.rpc("exec_sql", {
-      sql: "ALTER TABLE contacts ADD COLUMN IF NOT EXISTS follow_ups JSONB DEFAULT '[]'::jsonb;"
-    });
-  } catch (err) {
-    console.warn("Failed to ensure follow_ups column:", err);
-  }
-
   // Get contact record + institution + faculty info
   const { data: contact } = await admin
     .from('contacts')
