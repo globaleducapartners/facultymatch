@@ -3,14 +3,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ensureProfileSlug } from "@/lib/profile-slug";
 import { ProfileEditorClient } from "./ProfileEditorClient";
-import { SENSITIVE_FIELDS } from "@/lib/profile-sensitivity";
+import { checkReVerification } from "@/lib/re-verification";
 
 export default async function ProfilePage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; tab?: string }>;
+  searchParams: Promise<{ saved?: string; error?: string; tab?: string }>;
 }) {
-  const { saved, tab } = await searchParams;
+  const { saved, error: saveError, tab } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -38,37 +38,6 @@ export default async function ProfilePage({
     .eq("faculty_id", user.id)
     .order("created_at", { ascending: false });
 
-  // ─── Re-verification helper ─────────────────────────────────────────────
-  // When a verified profile updates a sensitive field, downgrade to en_revision
-  // so an admin must re-verify before the profile is considered trusted again.
-
-  async function checkReVerification(userId: string, dbColumns: string[]) {
-    "use server";
-    const supabase = await createClient();
-    const { data: fp } = await supabase
-      .from("faculty_profiles")
-      .select("estado_perfil")
-      .eq("id", userId)
-      .maybeSingle();
-
-    if (!fp || fp.estado_perfil !== "verificado") return;
-
-    const hasSensitive = dbColumns.some((col) =>
-      (SENSITIVE_FIELDS as readonly string[]).includes(col)
-    );
-    if (!hasSensitive) return;
-
-    const admin = createAdminClient();
-    await admin.from("faculty_profiles").update({
-      estado_perfil: "en_revision",
-      is_verified: false,
-      verificado_por: null,
-      verificado_en: null,
-      verification_notes: null,
-      updated_at: new Date().toISOString(),
-    }).eq("id", userId);
-  }
-
   // ─── Server Actions (one per tab) ────────────────────────────────────────
 
   async function saveBasicInfo(formData: FormData) {
@@ -84,18 +53,24 @@ export default async function ProfilePage({
     if (!user) return;
 
     // Save the name first so a slug (if not set yet) is generated from it
-    await supabase.from("user_profiles").update({ full_name: fullName }).eq("id", user.id);
+    const { error: nameError } = await supabase
+      .from("user_profiles").update({ full_name: fullName }).eq("id", user.id);
 
     const admin = createAdminClient();
     await ensureProfileSlug(admin, user.id);
 
-    await supabase.from("faculty_profiles")
+    const { error } = await supabase.from("faculty_profiles")
       .upsert({
         id: user.id, user_id: user.id,
         headline, bio, country, city,
         location: [city, country].filter(Boolean).join(", ") || null,
         updated_at: new Date().toISOString(),
       }, { onConflict: "id" });
+
+    if (nameError || error) {
+      console.error("[saveBasicInfo]", nameError || error);
+      redirect("/app/faculty/profile?error=1&tab=basic");
+    }
 
     // Re-verification: full_name is a sensitive field
     await checkReVerification(user.id, ["full_name"]);
@@ -119,7 +94,7 @@ export default async function ProfilePage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase.from("faculty_profiles")
+    const { error } = await supabase.from("faculty_profiles")
       .update({
         current_institution: currentInstitution,
         years_experience: yearsExperience,
@@ -129,6 +104,11 @@ export default async function ProfilePage({
         institutions_taught: institutionsTaught,
         updated_at: new Date().toISOString(),
       }).eq("id", user.id);
+
+    if (error) {
+      console.error("[saveExperience]", error);
+      redirect("/app/faculty/profile?error=1&tab=experience");
+    }
 
     // Re-verification: current_institution, is_phd, academic_level, institutions_taught
     await checkReVerification(user.id, [
@@ -149,8 +129,13 @@ export default async function ProfilePage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase.from("faculty_profiles")
+    const { error } = await supabase.from("faculty_profiles")
       .update({ degrees, updated_at: new Date().toISOString() }).eq("id", user.id);
+
+    if (error) {
+      console.error("[saveFormacion]", error);
+      redirect("/app/faculty/profile?error=1&tab=formacion");
+    }
 
     // Re-verification: degrees is a sensitive field
     await checkReVerification(user.id, ["degrees"]);
@@ -169,8 +154,13 @@ export default async function ProfilePage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase.from("faculty_profiles")
+    const { error } = await supabase.from("faculty_profiles")
       .update({ languages, updated_at: new Date().toISOString() }).eq("id", user.id);
+
+    if (error) {
+      console.error("[saveLanguages]", error);
+      redirect("/app/faculty/profile?error=1&tab=idiomas");
+    }
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -193,7 +183,7 @@ export default async function ProfilePage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase.from("faculty_profiles")
+    const { error } = await supabase.from("faculty_profiles")
       .update({
         aneca_accreditation: anecaAccreditation,
         research_publications: researchPublications,
@@ -201,6 +191,11 @@ export default async function ProfilePage({
         orcid_id: orcidId,
         updated_at: new Date().toISOString(),
       }).eq("id", user.id);
+
+    if (error) {
+      console.error("[saveResearch]", error);
+      redirect("/app/faculty/profile?error=1&tab=research");
+    }
 
     // Re-verification: aneca_accreditation, google_scholar_id, orcid_id
     await checkReVerification(user.id, ["aneca_accreditation", "google_scholar_id", "orcid_id"]);
@@ -220,13 +215,18 @@ export default async function ProfilePage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase.from("faculty_profiles")
+    const { error } = await supabase.from("faculty_profiles")
       .update({
         linkedin_url: linkedinUrl || null,
         website: website || null,
         phone: phone || null,
         updated_at: new Date().toISOString(),
       }).eq("id", user.id);
+
+    if (error) {
+      console.error("[saveLinks]", error);
+      redirect("/app/faculty/profile?error=1&tab=links");
+    }
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -247,7 +247,7 @@ export default async function ProfilePage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase.from("faculty_profiles").update({
+    const { error } = await supabase.from("faculty_profiles").update({
       contact_email: contactEmail || null,
       contact_whatsapp: contactWhatsapp || null,
       contact_linkedin: contactLinkedin || null,
@@ -257,6 +257,11 @@ export default async function ProfilePage({
       preferred_contact_method: preferredContact,
       updated_at: new Date().toISOString(),
     }).eq("id", user.id);
+
+    if (error) {
+      console.error("[updateContactPreferences]", error);
+      redirect("/app/faculty/profile?error=1&tab=preferences");
+    }
 
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
@@ -276,6 +281,7 @@ export default async function ProfilePage({
       documents={documents || []}
       viewCount={viewCount}
       saved={saved === "1"}
+      error={saveError === "1"}
       tab={tab}
       saveBasicInfo={saveBasicInfo}
       saveExperience={saveExperience}

@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase-server";
 import { revalidatePath } from "next/cache";
+import { checkReVerification } from "@/lib/re-verification";
 
 interface OrcidSavePayload {
   orcid: string;
@@ -109,6 +110,10 @@ export async function saveOrcidImport(payload: OrcidSavePayload) {
     console.error("[saveOrcidImport]", error);
     throw new Error("Error al guardar los datos: " + error.message);
   }
+
+  // Re-verification: orcid_id always changes here, plus institution/degrees
+  // whenever the import actually touched them.
+  await checkReVerification(user.id, Object.keys(updateData));
 
   revalidatePath("/app/faculty/profile");
   revalidatePath("/app/faculty");

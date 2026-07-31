@@ -83,18 +83,23 @@ export default async function PrivacyPage({
 
   async function updateVisibility(formData: FormData) {
     "use server";
-    const mode = formData.get("visibilityMode") as "public" | "private" | "hidden";
+    const rawMode = formData.get("visibilityMode") as string;
+    const mode: "public" | "private" = rawMode === "public" ? "public" : "private";
     const nameVis = (formData.get("nameVisibility") as string) || "public";
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const admin = createAdminClient();
     // Try with name_visibility first; if column doesn't exist fall back without it
-    const { error } = await admin.from("faculty_profiles")
+    let { error } = await admin.from("faculty_profiles")
       .upsert({ id: user.id, user_id: user.id, visibility: mode, name_visibility: nameVis }, { onConflict: "id" });
     if (error?.message?.includes("name_visibility")) {
-      await admin.from("faculty_profiles")
-        .upsert({ id: user.id, user_id: user.id, visibility: mode }, { onConflict: "id" });
+      ({ error } = await admin.from("faculty_profiles")
+        .upsert({ id: user.id, user_id: user.id, visibility: mode }, { onConflict: "id" }));
+    }
+    if (error) {
+      console.error("[updateVisibility]", error);
+      redirect("/app/faculty/privacy?error=save-failed");
     }
     revalidatePath("/app/faculty/privacy");
     redirect("/app/faculty/privacy?saved=1");
@@ -390,13 +395,6 @@ export default async function PrivacyPage({
                       desc: "Solo las instituciones verificadas en FacultyMatch pueden ver tu perfil completo.",
                       badge: "Recomendado",
                     },
-                    {
-                      value: "hidden",
-                      id: "hidden",
-                      label: "Oculto",
-                      desc: "Nadie podrá encontrarte. Mantienes tu perfil pero no apareces en búsquedas.",
-                      badge: null,
-                    },
                   ].map((opt) => (
                     <div
                       key={opt.id}
@@ -410,9 +408,6 @@ export default async function PrivacyPage({
                             <Badge className="bg-talentia-blue text-white text-[8px] font-black uppercase tracking-widest border-none">
                               {opt.badge}
                             </Badge>
-                          )}
-                          {opt.value === "hidden" && (
-                            <Lock size={14} className="text-gray-400" />
                           )}
                         </div>
                         <p className="text-sm text-gray-500 font-medium leading-relaxed">
@@ -540,7 +535,7 @@ export default async function PrivacyPage({
                 <div className="flex items-start gap-3">
                   <AlertCircle size={18} className="text-tech-cyan shrink-0 mt-0.5" />
                   <p className="text-xs text-gray-300 font-medium leading-relaxed">
-                    Este enlace permite ver tu perfil incluso si está en modo &quot;Oculto&quot;.
+                    Este enlace permite ver tu perfil aunque esté en modo &quot;Solo instituciones&quot;.
                     Caduca en 7 días una vez regenerado.
                   </p>
                 </div>

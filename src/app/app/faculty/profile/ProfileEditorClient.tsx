@@ -19,6 +19,7 @@ import {
   Bell, BookOpen, Languages,
   Eye, CheckCircle2, Clock, Building2, ChevronRight,
   Pencil, Check, X, ExternalLink, Award, Download, Lock,
+  AlertCircle,
 } from "lucide-react";
 import { AvatarUpload } from "@/components/profile/AvatarUpload";
 import { BannerUpload } from "@/components/profile/BannerUpload";
@@ -43,6 +44,8 @@ const D = {
   border:  "#D8E2EF",
   green:   "#059669",
   greenBg: "#F0FDF4",
+  red:     "#DC2626",
+  redBg:   "#FEF2F2",
 };
 
 const inp: React.CSSProperties = {
@@ -91,6 +94,7 @@ interface Props {
   documents: any[];
   viewCount: number;
   saved: boolean;
+  error?: boolean;
   tab?: string;
   saveBasicInfo: (fd: FormData) => Promise<void>;
   saveExperience: (fd: FormData) => Promise<void>;
@@ -194,7 +198,7 @@ function SaveButton({ pending, label = "Guardar cambios" }: { pending?: boolean;
 
 // ─── Main component ────────────────────────────────────────────────────────────
 export function ProfileEditorClient({
-  user, userMeta, profile, facultyProfile, documents, viewCount, saved, tab,
+  user, userMeta, profile, facultyProfile, documents, viewCount, saved, error, tab,
   saveBasicInfo, saveExperience, saveFormacion, saveLanguages,
   saveResearch, saveLinks, updateContactPreferences,
 }: Props) {
@@ -237,6 +241,18 @@ export function ProfileEditorClient({
           fontFamily: SANS, fontSize: 14, fontWeight: 700, color: "#065F46",
         }}>
           <CheckCircle2 size={16} color="#059669" /> Cambios guardados correctamente
+        </div>
+      )}
+
+      {/* Error banner */}
+      {error && (
+        <div style={{
+          background: D.redBg, border: "1px solid #FECACA",
+          borderRadius: 12, padding: "12px 20px", marginBottom: 20,
+          display: "flex", alignItems: "center", gap: 10,
+          fontFamily: SANS, fontSize: 14, fontWeight: 700, color: "#991B1B",
+        }}>
+          <AlertCircle size={16} color={D.red} /> No se pudo guardar. Inténtalo de nuevo.
         </div>
       )}
 
