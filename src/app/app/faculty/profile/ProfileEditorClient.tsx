@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useFormStatus } from "react-dom";
 import { OrcidImportModal } from "./OrcidImportModal";
 import { saveOrcidImport } from "./actions";
 
@@ -178,7 +179,8 @@ function EmptyState({ text }: { text: string }) {
   );
 }
 
-function SaveButton({ pending, label = "Guardar cambios" }: { pending?: boolean; label?: string }) {
+function SaveButton({ label = "Guardar cambios" }: { label?: string }) {
+  const { pending } = useFormStatus();
   return (
     <button type="submit" disabled={pending} style={{
       fontFamily: SANS, background: D.blue, color: "#fff",
@@ -203,7 +205,6 @@ export function ProfileEditorClient({
   saveResearch, saveLinks, updateContactPreferences,
 }: Props) {
   const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [isPending] = useTransition();
   const [bannerPickerOpen, setBannerPickerOpen] = useState(false);
   const [orcidImportOpen, setOrcidImportOpen] = useState(false);
   const isMob = useIsMobile();
@@ -481,7 +482,7 @@ export function ProfileEditorClient({
                       defaultValue={facultyProfile?.bio} />
                   </Field>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <SaveButton pending={isPending} />
+                    <SaveButton />
                     <button type="button" onClick={() => setEditingSection(null)} style={{
                       fontFamily: SANS, fontSize: 14, fontWeight: 600, padding: "11px 20px",
                       borderRadius: 10, border: `1px solid ${D.border}`, background: D.white,
@@ -636,7 +637,7 @@ export function ProfileEditorClient({
                   <InstitutionsTaughtEditor
                     initialInstitutions={(facultyProfile?.institutions_taught as string[] | null) || []} />
                 </Field>
-                <SaveButton pending={isPending} />
+                <SaveButton />
               </form>
             }
           />
@@ -687,7 +688,7 @@ export function ProfileEditorClient({
             form={
               <form action={saveFormacion} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
                 <DegreeEditor initialDegrees={(facultyProfile?.degrees as any[] | null) || []} />
-                <SaveButton pending={isPending} label="Guardar formación" />
+                <SaveButton label="Guardar formación" />
               </form>
             }
           />
@@ -720,7 +721,7 @@ export function ProfileEditorClient({
             form={
               <form action={saveLanguages} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
                 <LanguageEditor initialLanguages={(facultyProfile?.languages as any[] | null) || []} />
-                <SaveButton pending={isPending} label="Guardar idiomas" />
+                <SaveButton label="Guardar idiomas" />
               </form>
             }
           />
@@ -827,7 +828,7 @@ export function ProfileEditorClient({
                   </svg>
                   Importar mi trayectoria desde ORCID
                 </button>
-                <SaveButton pending={isPending} />
+                <SaveButton />
               </form>
             }
           />
@@ -938,7 +939,7 @@ export function ProfileEditorClient({
                   <input name="phone" style={inp} placeholder="+34 600 000 000"
                     defaultValue={facultyProfile?.phone} />
                 </Field>
-                <SaveButton pending={isPending} />
+                <SaveButton />
               </form>
             }
           />
@@ -1012,7 +1013,7 @@ export function ProfileEditorClient({
                     ))}
                   </div>
                 </div>
-                <SaveButton pending={isPending} label="Guardar preferencias" />
+                <SaveButton label="Guardar preferencias" />
               </form>
             }
           />

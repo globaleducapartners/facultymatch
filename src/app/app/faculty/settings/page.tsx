@@ -3,11 +3,13 @@ import { Bell, Trash2, ShieldCheck, Download, AlertTriangle, Sparkles, CheckCirc
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { StripeUpgradeButton } from "@/components/profile/StripeUpgradeButton";
 import { StripeCancelButton } from "@/components/profile/StripeCancelButton";
 import { SecuritySettingsSection } from "@/components/settings/SecuritySettingsSection";
 import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton";
+import { NotificationToggles } from "./NotificationToggles";
+
+const NOTIFICATION_COLUMNS = ["notify_new_offers", "notify_messages", "notify_weekly_digest"] as const;
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -28,6 +30,16 @@ export default async function SettingsPage() {
     .maybeSingle();
 
   const isPro = profile?.plan === "faculty-pro";
+
+  async function updateNotificationPref(key: (typeof NOTIFICATION_COLUMNS)[number], value: boolean) {
+    "use server";
+    if (!NOTIFICATION_COLUMNS.includes(key)) return;
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    await supabase.from("faculty_profiles")
+      .upsert({ id: user.id, user_id: user.id, [key]: value }, { onConflict: "id" });
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -66,36 +78,29 @@ export default async function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="divide-y divide-gray-50">
-                {[
+              <NotificationToggles
+                action={updateNotificationPref}
+                items={[
                   {
-                    title: "Solicitudes de contacto",
+                    key: "notify_new_offers",
+                    title: "Nuevas oportunidades de instituciones",
                     desc: "Recibe un aviso cuando una institución quiera contactarte.",
-                    checked: facultyProfile?.is_active,
+                    checked: facultyProfile?.notify_new_offers ?? true,
                   },
                   {
-                    title: "Estado de verificación",
-                    desc: "Noticias sobre el progreso de tu verificación oficial.",
-                    checked: true,
+                    key: "notify_messages",
+                    title: "Mensajes directos",
+                    desc: "Avisos sobre respuestas y seguimientos en tus conversaciones.",
+                    checked: facultyProfile?.notify_messages ?? true,
                   },
                   {
-                    title: "Actualizaciones de la plataforma",
+                    key: "notify_weekly_digest",
+                    title: "Resumen semanal de actividad",
                     desc: "Novedades y recursos para potenciar tu carrera.",
-                    checked: false,
+                    checked: facultyProfile?.notify_weekly_digest ?? false,
                   },
-                ].map((item) => (
-                  <div key={item.title} className="py-4 flex items-center justify-between gap-8">
-                    <div className="space-y-1">
-                      <h4 className="text-sm font-bold text-navy">{item.title}</h4>
-                      <p className="text-xs text-gray-500 font-medium">{item.desc}</p>
-                    </div>
-                    <Switch
-                      checked={item.checked ?? false}
-                      className="bg-talentia-blue data-[state=checked]:bg-talentia-blue"
-                    />
-                  </div>
-                ))}
-              </div>
+                ]}
+              />
             </CardContent>
           </Card>
 

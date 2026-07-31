@@ -151,6 +151,9 @@ export default async function PrivacyPage({
     "use server";
     const name = (formData.get("institutionName") as string)?.trim();
     if (!name) return;
+    // Escape ilike wildcards so a name containing % or _ can't match
+    // unintended rows (and thus block the wrong institution).
+    const nameFilter = name.replace(/[%_\\]/g, (c) => `\\${c}`);
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
@@ -160,7 +163,7 @@ export default async function PrivacyPage({
     const { data: inst } = await admin
       .from("institutions")
       .select("id, user_id, website")
-      .ilike("name", name)
+      .ilike("name", nameFilter)
       .limit(1)
       .maybeSingle();
 
@@ -185,7 +188,7 @@ export default async function PrivacyPage({
       const { data: univ } = await admin
         .from("universities_es")
         .select("domain")
-        .ilike("name", name)
+        .ilike("name", nameFilter)
         .limit(1)
         .maybeSingle();
       if (univ?.domain) {
@@ -209,7 +212,7 @@ export default async function PrivacyPage({
         .from("visibility_rules")
         .select("id")
         .eq("faculty_id", user.id)
-        .ilike("institution_name", name)
+        .ilike("institution_name", nameFilter)
         .eq("rule", "block")
         .maybeSingle();
       existing = data;

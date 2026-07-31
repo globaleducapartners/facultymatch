@@ -26,12 +26,14 @@ export default async function SpecialtiesPage() {
     .from("faculty_profiles")
     .select("id")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
-  const { data: expertise } = await supabase
-    .from("faculty_expertise")
-    .select("*")
-    .eq("faculty_id", facultyProfile?.id);
+  const { data: expertise } = facultyProfile?.id
+    ? await supabase
+        .from("faculty_expertise")
+        .select("*")
+        .eq("faculty_id", facultyProfile.id)
+    : { data: [] };
 
   const specialties = expertise || [];
 

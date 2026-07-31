@@ -103,10 +103,44 @@ export default async function VerificationPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
+
+    // Re-check completeness against fresh data — never trust the client's
+    // disabled-button state, and never trust a closure captured at an
+    // earlier render (the profile may have changed since this page loaded).
+    const { data: fp } = await supabase
+      .from("faculty_profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (!fp || fp.estado_perfil === "verificado" || fp.estado_perfil === "en_revision") return;
+
+    const { data: docs } = await supabase
+      .from("faculty_documents")
+      .select("id")
+      .eq("faculty_id", user.id)
+      .limit(1);
+    const { data: expertise } = await supabase
+      .from("faculty_expertise")
+      .select("id")
+      .eq("faculty_id", user.id)
+      .limit(1);
+
+    const freshSteps = [
+      !!fp.headline,
+      !!(fp.location || (fp.city && fp.country)),
+      (fp.years_experience ?? 0) > 0,
+      (fp.languages?.length ?? 0) > 0,
+      (expertise?.length ?? 0) > 0 || (fp.faculty_areas?.length ?? 0) > 0,
+      (docs?.length ?? 0) > 0,
+      fp.visibility === "public",
+    ];
+    const complete = freshSteps.every(Boolean);
+    if (!complete) return;
+
     await supabase
       .from("faculty_profiles")
       .update({ estado_perfil: "en_revision" })
-      .eq("user_id", user.id);
+      .eq("id", user.id);
     revalidatePath("/app/faculty/verification");
   }
 

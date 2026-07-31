@@ -177,11 +177,18 @@ export default async function ProfilePage({
     ].filter(Boolean).join(" · ") || null;
     const researchPublications = formData.get("researchPublications") as string;
     const googleScholarId = formData.get("googleScholarId") as string;
-    const orcidId = formData.get("orcidId") as string;
+    const orcidIdRaw = ((formData.get("orcidId") as string) || "").trim();
 
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
+
+    // Same format the ORCID import flow already enforces (see api/import-orcid/route.ts)
+    const ORCID_REGEX = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
+    if (orcidIdRaw && !ORCID_REGEX.test(orcidIdRaw)) {
+      redirect("/app/faculty/profile?error=1&tab=research");
+    }
+    const orcidId = orcidIdRaw;
 
     const { error } = await supabase.from("faculty_profiles")
       .update({

@@ -47,11 +47,17 @@ const CvProfileSchema = z.object({
     })
   ),
   niveles_educativos: z.object({
-    value: z.array(z.enum(NIVELES_EDUCATIVOS)),
+    // Drop any value the model returns that isn't one of ours instead of
+    // failing the whole extraction over a single unrecognized entry.
+    value: z.array(z.string()).transform((arr) =>
+      arr.filter((v): v is (typeof NIVELES_EDUCATIVOS)[number] =>
+        (NIVELES_EDUCATIVOS as readonly string[]).includes(v)
+      )
+    ),
     confidence,
     evidence: z.string().nullable(),
   }),
-  anios_experiencia: fieldObject(z.number()),
+  anios_experiencia: fieldObject(z.coerce.number()),
   experiencia: z.array(
     z.object({
       puesto: z.string().nullable(),

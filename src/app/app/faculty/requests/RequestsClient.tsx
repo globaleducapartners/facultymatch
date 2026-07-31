@@ -58,14 +58,20 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
   const [followUpMsg, setFollowUpMsg] = useState("");
   const [sending, setSending] = useState(false);
   const [sentOk, setSentOk] = useState(false);
+  const [followUpError, setFollowUpError] = useState<string | null>(null);
 
   const instInitials = (req.institution?.name ?? "IN").substring(0, 2).toUpperCase();
 
   const handleFollowUp = async () => {
     if (!followUpMsg.trim()) return;
     setSending(true);
-    await replyToContact(req.id, followUpMsg.trim());
+    setFollowUpError(null);
+    const result = await replyToContact(req.id, followUpMsg.trim());
     setSending(false);
+    if (result?.error) {
+      setFollowUpError(result.error);
+      return;
+    }
     setSentOk(true);
     setShowFollowUp(false);
     setFollowUpMsg("");
@@ -210,6 +216,9 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
                   className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none text-sm font-medium resize-none"
                   placeholder="Escribe tu respuesta..."
                 />
+                {followUpError && (
+                  <p className="text-xs font-bold text-red-600 bg-red-50 px-3 py-2 rounded-xl">{followUpError}</p>
+                )}
                 <div className="flex gap-2 justify-end">
                   <Button variant="ghost" size="sm" onClick={() => setShowFollowUp(false)} className="rounded-xl font-bold">
                     Cancelar

@@ -54,19 +54,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "file_too_large" }, { status: 413 });
   }
 
-  // (b) Rate limit atado al user_id autenticado, no a IP
-  const today = new Date().toISOString().slice(0, 10);
-  const { data: allowed } = await admin.rpc("increment_cv_extraction_usage", {
-    p_user_id: user.id,
-    p_day: today,
-    p_daily_limit: DAILY_LIMIT,
-  });
-
-  if (!allowed) {
-    if (hasStoragePath) await admin.storage.from(BUCKET).remove([storagePath]);
-    return NextResponse.json({ error: "rate_limited" }, { status: 429 });
-  }
-
   try {
     let text: string;
 
@@ -88,6 +75,13 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "file_too_large" }, { status: 413 });
       }
 
+      // Content-based check (not just the extension in the storage path):
+      // a renamed file can't slip past the client's File.type check.
+      if (!matchesExpectedFileSignature(storagePath, arrayBuffer)) {
+        await admin.storage.from(BUCKET).remove([storagePath]);
+        return NextResponse.json({ error: "invalid_file_type" }, { status: 415 });
+      }
+
       text = await extractText(storagePath, arrayBuffer);
       // Privacidad: el CV se borra en cuanto se ha extraído el texto,
       // no hace falta esperar a que termine la llamada al modelo
@@ -96,6 +90,20 @@ export async function POST(request: Request) {
 
     if (!text || text.trim().length < 20) {
       return NextResponse.json({ error: "empty_document" }, { status: 422 });
+    }
+
+    // Rate limit atado al user_id autenticado, no a IP. Se comprueba aquí,
+    // ya con texto válido en mano, para no gastar intentos en errores de
+    // fichero (vacío, no encontrado, demasiado grande) que nunca llegan
+    // a llamar al modelo.
+    const today = new Date().toISOString().slice(0, 10);
+    const { data: allowed } = await admin.rpc("increment_cv_extraction_usage", {
+      p_user_id: user.id,
+      p_day: today,
+      p_daily_limit: DAILY_LIMIT,
+    });
+    if (!allowed) {
+      return NextResponse.json({ error: "rate_limited" }, { status: 429 });
     }
 
     const result = await extractWithRetry(text);
@@ -115,6 +123,16 @@ export async function POST(request: Request) {
     // Nunca mostrar detalles de parsing/errores del modelo al usuario
     return NextResponse.json({ error: "extraction_failed" }, { status: 500 });
   }
+}
+
+// PDF files start with "%PDF"; DOCX files are ZIP archives ("PK\x03\x04").
+// Checking the real bytes catches a file renamed to spoof its extension —
+// the client's File.type check alone can't.
+function matchesExpectedFileSignature(storagePath: string, buf: ArrayBuffer): boolean {
+  const bytes = new Uint8Array(buf.slice(0, 4));
+  const isPdfSignature = bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46; // %PDF
+  const isZipSignature = bytes[0] === 0x50 && bytes[1] === 0x4b && bytes[2] === 0x03 && bytes[3] === 0x04; // PK..
+  return storagePath.toLowerCase().endsWith(".docx") ? isZipSignature : isPdfSignature;
 }
 
 async function extractText(storagePath: string, arrayBuffer: ArrayBuffer): Promise<string> {
