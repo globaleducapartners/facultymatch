@@ -161,10 +161,11 @@ export function Topbar({ user, profile }: TopbarProps) {
     <header className="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
       <div className="flex items-center gap-4">
         <Link href={dashboardHref} className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#0D2240] flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-xs font-black">FM</span>
-          </div>
-          <span className="text-[17px] font-bold tracking-tight text-[#080F1E]">FacultyMatch</span>
+          <svg width="28" height="28" viewBox="0 0 100 100" className="flex-shrink-0" style={{ filter: "drop-shadow(0 0 6px rgba(255,106,26,0.4))" }}>
+            <circle cx="30" cy="52" r="22" fill="#0D2240" />
+            <circle cx="66" cy="50" r="34" fill="#FF6A1A" />
+          </svg>
+          <span className="text-[17px] font-bold tracking-tight text-[#080F1E]">facultymatch</span>
         </Link>
       </div>
 
