@@ -584,9 +584,9 @@ function SplitInstituciones() {
             {rows.map(([label, val, pct, highlight], i) => (
               <div
                 key={i}
-                className="mb-2.5 flex items-center justify-between gap-2.5 rounded-lg px-3.5 py-2.5 text-xs font-semibold text-white"
+                className="mb-2.5 flex w-full items-center justify-between gap-2.5 rounded-lg px-3.5 py-2.5 text-xs font-semibold text-white md:w-[var(--bar-pct)]"
                 style={{
-                  width: `${pct}%`,
+                  ["--bar-pct" as string]: `${pct}%`,
                   background: highlight ? "linear-gradient(90deg,#FF6A1A,#FF8A45)" : "linear-gradient(90deg,#1B4FD8,#3E6BF0)",
                 }}
               >
