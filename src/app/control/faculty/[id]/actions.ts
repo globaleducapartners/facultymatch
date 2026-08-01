@@ -1,23 +1,23 @@
 "use server";
 
-import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { ensureProfileSlug } from "@/lib/profile-slug";
+import { requireAdmin } from "@/lib/require-admin";
 import { revalidatePath } from "next/cache";
 
 export async function hideFaculty(facultyId: string) {
-  const admin = createAdminClient();
+  const { admin } = await requireAdmin();
   await admin.from("faculty_profiles").update({ visibility: "private" }).eq("user_id", facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
 export async function unhideFaculty(facultyId: string) {
-  const admin = createAdminClient();
+  const { admin } = await requireAdmin();
   await admin.from("faculty_profiles").update({ visibility: "public" }).eq("user_id", facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
 export async function revokeFaculty(facultyId: string) {
-  const admin = createAdminClient();
+  const { admin } = await requireAdmin();
   await admin.from("faculty_profiles").update({
     estado_perfil: "rechazado",
     is_verified: false,
@@ -30,20 +30,7 @@ export async function activateFaculty(
   facultyId: string,
   force = false
 ): Promise<{ ok: true } | { ok: false; reason: "ONBOARDING_INCOMPLETE" }> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
-
-  const admin = createAdminClient();
-
-  const { data: adminProfile } = await admin
-    .from("user_profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-  if (!adminProfile || (adminProfile.role !== "admin" && adminProfile.role !== "super_admin")) {
-    throw new Error("Unauthorized");
-  }
+  const { userId, admin } = await requireAdmin();
 
   if (!force) {
     const { data: fp } = await admin
@@ -65,7 +52,7 @@ export async function activateFaculty(
   await admin.from("faculty_profiles").update({
     estado_perfil: "verificado",
     is_verified: true,
-    verificado_por: user.id,
+    verificado_por: userId,
     verificado_en: new Date().toISOString(),
   }).eq("user_id", facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);
@@ -73,11 +60,7 @@ export async function activateFaculty(
 }
 
 export async function deleteFaculty(facultyId: string) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
-
-  const admin = createAdminClient();
+  const { admin } = await requireAdmin();
   // Delete user (cascade will handle related tables)
   await admin.auth.admin.deleteUser(facultyId);
   revalidatePath("/control/faculty");
@@ -90,11 +73,7 @@ export async function sendNotification(
   body?: string,
   sendEmail?: boolean
 ) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Unauthorized");
-
-  const admin = createAdminClient();
+  const { userId, admin } = await requireAdmin();
 
   let emailLogId: string | null = null;
 
@@ -134,7 +113,7 @@ export async function sendNotification(
           recipient_email: facultyEmail,
           template: type,
           subject,
-          metadata: { admin_id: user.id },
+          metadata: { admin_id: userId },
         })
         .select("id")
         .single();
@@ -149,7 +128,7 @@ export async function sendNotification(
     type,
     subject,
     body: body || subject,
-    admin_id: user.id,
+    admin_id: userId,
     email_log_id: emailLogId,
   });
 

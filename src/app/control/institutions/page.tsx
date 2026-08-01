@@ -6,9 +6,9 @@ import { Badge } from "@/components/ui/badge";
 
 async function toggleInstitutionStatus(formData: FormData) {
   "use server";
-  const { createAdminClient } = await import("@/lib/supabase-server");
+  const { requireAdmin } = await import("@/lib/require-admin");
   const { revalidatePath } = await import("next/cache");
-  const admin = createAdminClient();
+  const { admin } = await requireAdmin();
   const id = formData.get("id") as string;
   const currentStatus = formData.get("currentStatus") as string;
   const newStatus = currentStatus === "blocked" ? "active" : "blocked";
@@ -18,9 +18,9 @@ async function toggleInstitutionStatus(formData: FormData) {
 
 async function deleteInstitution(formData: FormData) {
   "use server";
-  const { createAdminClient } = await import("@/lib/supabase-server");
+  const { requireAdmin } = await import("@/lib/require-admin");
   const { revalidatePath } = await import("next/cache");
-  const admin = createAdminClient();
+  const { admin } = await requireAdmin();
   const id = formData.get("id") as string;
 
   // Look up the institution to get the owner's user_id
