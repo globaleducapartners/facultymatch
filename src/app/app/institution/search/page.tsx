@@ -3,6 +3,7 @@ import { InstitutionSearchPage } from "@/components/dashboard/InstitutionSearchP
 import { InstitutionWelcomeBanner } from "@/components/dashboard/InstitutionWelcomeBanner";
 import { redirect } from "next/navigation";
 import { matchesBlockedDomain } from "@/lib/domain";
+import { escapeOrValue } from "@/lib/postgrest-filter";
 
 // ─── Area → Spanish keywords mapping ──────────────────────────────────────────
 const AREA_KEYWORDS: Record<string, string[]> = {
@@ -75,48 +76,53 @@ export default async function InstitutionSearchRoute({
 
   const { data: institution } = await supabase
     .from("institutions")
-    .select("id, name, type, country, location, website, description, created_at")
+    .select("id, name, type, country, location, website, description, created_at, status")
     .eq("user_id", user.id)
     .maybeSingle();
 
   if (!institution) redirect("/app/institution");
 
-  // Plan check
+  // A suspended institution has no business seeing search results at all —
+  // previously "blocked" only drove a banner on the dashboard home, the
+  // search route itself never checked it.
+  if ((institution as any).status === "blocked") {
+    redirect("/app/institution/home");
+  }
+
+  // Plan check — three real tiers, not a binary isPro. Essential (free): 5
+  // searches/month. Growth: 20/month. Professional: unlimited. Previously
+  // Growth was silently treated as equivalent to Professional here, giving
+  // it unlimited access it isn't sold or billed for (see billing/page.tsx).
   const { data: userProfile } = await supabase
     .from("user_profiles")
     .select("plan, subscription_status")
     .eq("id", user.id)
     .single();
 
-  const isPro = (userProfile?.plan === "institution-pro" || userProfile?.plan === "institution-growth") &&
-    (userProfile?.subscription_status === "active" || userProfile?.subscription_status === "trialing");
+  const subscriptionActive = userProfile?.subscription_status === "active" || userProfile?.subscription_status === "trialing";
+  const isPro = userProfile?.plan === "institution-pro" && subscriptionActive;
+  const isGrowth = userProfile?.plan === "institution-growth" && subscriptionActive;
+  const searchMonthlyLimit = isPro ? null : isGrowth ? 20 : 5;
 
   const hasSearchParams = !!(
     params.query || params.area || params.subarea || params.country ||
     params.language || params.phd || params.modality || params.aneca
   );
 
-  // Search limit enforcement for Essential plan
+  // Search limit enforcement — the RPC itself does the check-and-increment
+  // atomically (FOR UPDATE) and returns whether this search was allowed, so
+  // there's no separate read-then-write race here anymore.
   let searchLimitReached = false;
   const admin = createAdminClient();
   const currentMonth = new Date().toISOString().slice(0, 7);
 
-  if (!isPro && hasSearchParams) {
-    const { data: usageData } = await admin
-      .from("search_usage")
-      .select("search_count")
-      .eq("institution_id", institution.id)
-      .eq("month", currentMonth)
-      .maybeSingle();
-
-    if ((usageData?.search_count ?? 0) >= 5) {
-      searchLimitReached = true;
-    } else {
-      await admin.rpc("increment_search_usage", {
-        p_institution_id: institution.id,
-        p_month: currentMonth,
-      });
-    }
+  if (searchMonthlyLimit !== null && hasSearchParams) {
+    const { data: allowed } = await admin.rpc("increment_search_usage", {
+      p_institution_id: institution.id,
+      p_month: currentMonth,
+      p_monthly_limit: searchMonthlyLimit,
+    });
+    if (!allowed) searchLimitReached = true;
   }
 
   // ── Pre-queries (run in parallel) ────────────────────────────────────────
@@ -141,17 +147,17 @@ export default async function InstitutionSearchRoute({
         // Build OR conditions for each keyword across area + subarea
         const conditions: string[] = [];
         for (const kw of areaKeywords) {
-          conditions.push(`area.ilike.%${kw}%`);
-          conditions.push(`subarea.ilike.%${kw}%`);
+          conditions.push(`area.ilike.%${escapeOrValue(kw)}%`);
+          conditions.push(`subarea.ilike.%${escapeOrValue(kw)}%`);
         }
         // Also include original area text and subarea text for direct match
         if (area) {
-          conditions.push(`area.ilike.%${area}%`);
-          conditions.push(`subarea.ilike.%${area}%`);
+          conditions.push(`area.ilike.%${escapeOrValue(area)}%`);
+          conditions.push(`subarea.ilike.%${escapeOrValue(area)}%`);
         }
         if (subarea) {
-          conditions.push(`area.ilike.%${subarea}%`);
-          conditions.push(`subarea.ilike.%${subarea}%`);
+          conditions.push(`area.ilike.%${escapeOrValue(subarea)}%`);
+          conditions.push(`subarea.ilike.%${escapeOrValue(subarea)}%`);
         }
         return admin.from("faculty_expertise").select("faculty_id").or(conditions.join(","));
       })()
@@ -162,24 +168,24 @@ export default async function InstitutionSearchRoute({
     ? (() => {
         const fpConditions: string[] = [];
         for (const kw of areaKeywords) {
-          fpConditions.push(`headline.ilike.%${kw}%`);
-          fpConditions.push(`bio.ilike.%${kw}%`);
-          fpConditions.push(`degrees.ilike.%${kw}%`);
+          fpConditions.push(`headline.ilike.%${escapeOrValue(kw)}%`);
+          fpConditions.push(`bio.ilike.%${escapeOrValue(kw)}%`);
+          fpConditions.push(`degrees.ilike.%${escapeOrValue(kw)}%`);
           // subjects array — PostgREST @> (contains) with case‑insensitive match
-          fpConditions.push(`subjects.ilike.%${kw}%`);
+          fpConditions.push(`subjects.ilike.%${escapeOrValue(kw)}%`);
         }
         // Also original text
         if (area) {
-          fpConditions.push(`headline.ilike.%${area}%`);
-          fpConditions.push(`bio.ilike.%${area}%`);
-          fpConditions.push(`degrees.ilike.%${area}%`);
-          fpConditions.push(`subjects.ilike.%${area}%`);
+          fpConditions.push(`headline.ilike.%${escapeOrValue(area)}%`);
+          fpConditions.push(`bio.ilike.%${escapeOrValue(area)}%`);
+          fpConditions.push(`degrees.ilike.%${escapeOrValue(area)}%`);
+          fpConditions.push(`subjects.ilike.%${escapeOrValue(area)}%`);
         }
         if (subarea) {
-          fpConditions.push(`headline.ilike.%${subarea}%`);
-          fpConditions.push(`bio.ilike.%${subarea}%`);
-          fpConditions.push(`degrees.ilike.%${subarea}%`);
-          fpConditions.push(`subjects.ilike.%${subarea}%`);
+          fpConditions.push(`headline.ilike.%${escapeOrValue(subarea)}%`);
+          fpConditions.push(`bio.ilike.%${escapeOrValue(subarea)}%`);
+          fpConditions.push(`degrees.ilike.%${escapeOrValue(subarea)}%`);
+          fpConditions.push(`subjects.ilike.%${escapeOrValue(subarea)}%`);
         }
         return admin.from("faculty_profiles").select("id").or(fpConditions.join(","));
       })()
@@ -189,9 +195,6 @@ export default async function InstitutionSearchRoute({
   const namePreQuery = query
     ? admin.from("user_profiles").select("id").ilike("full_name", `%${query}%`)
     : Promise.resolve({ data: null as null | { id: string }[] });
-
-  // Pre-fetch which faculty IDs have expertise entries (for completeness scoring)
-  const allExpertiseQuery = admin.from("faculty_expertise").select("faculty_id");
 
   // Extract the institution's email domain for domain-based blocking
   const userEmailDomain = user.email?.split("@")[1]?.toLowerCase() || null;
@@ -206,7 +209,6 @@ export default async function InstitutionSearchRoute({
     { data: areaMatchData },
     { data: areaProfilesData },
     { data: nameMatchData },
-    { data: allExpertiseData },
   ] = await Promise.all([
     admin.from("favorites").select("faculty_id").eq("institution_id", institution.id),
     supabase.from("contacts").select("*", { count: "exact", head: true }).eq("institution_id", institution.id),
@@ -224,7 +226,6 @@ export default async function InstitutionSearchRoute({
     areaExpertiseQuery,
     areaProfilesQuery,
     namePreQuery,
-    allExpertiseQuery,
   ]);
 
   const favorites = favoritesData?.map((f: any) => f.faculty_id) || [];
@@ -253,7 +254,6 @@ export default async function InstitutionSearchRoute({
     ...(areaProfilesData || []).map((p: any) => p.id),
   ])];
   const nameMatchIds: string[] = (nameMatchData || []).map((m: any) => m.id);
-  const hasExpertiseIds = new Set((allExpertiseData || []).map((e: any) => e.faculty_id));
 
   // ── NOTE: earlyEmpty has been REMOVED ──
   // Instead of returning empty when area filter has zero matches,
@@ -291,11 +291,11 @@ export default async function InstitutionSearchRoute({
   // Broad text search: headline + bio + current_institution + subjects + degrees + full_name (via pre-queried IDs)
   if (query) {
     const orParts = [
-      `headline.ilike.%${query}%`,
-      `bio.ilike.%${query}%`,
-      `current_institution.ilike.%${query}%`,
-      `degrees.ilike.%${query}%`,
-      `subjects.ilike.%${query}%`,
+      `headline.ilike.%${escapeOrValue(query)}%`,
+      `bio.ilike.%${escapeOrValue(query)}%`,
+      `current_institution.ilike.%${escapeOrValue(query)}%`,
+      `degrees.ilike.%${escapeOrValue(query)}%`,
+      `subjects.ilike.%${escapeOrValue(query)}%`,
     ];
     if (nameMatchIds.length > 0) {
       orParts.push(`id.in.(${nameMatchIds.join(",")})`);
@@ -315,22 +315,22 @@ export default async function InstitutionSearchRoute({
     // Fallback: no exact matches from pre-queries, try inline ilike on the main query
     const fpConditions: string[] = [];
     for (const kw of areaKeywords) {
-      fpConditions.push(`headline.ilike.%${kw}%`);
-      fpConditions.push(`bio.ilike.%${kw}%`);
-      fpConditions.push(`degrees.ilike.%${kw}%`);
-      fpConditions.push(`subjects.ilike.%${kw}%`);
+      fpConditions.push(`headline.ilike.%${escapeOrValue(kw)}%`);
+      fpConditions.push(`bio.ilike.%${escapeOrValue(kw)}%`);
+      fpConditions.push(`degrees.ilike.%${escapeOrValue(kw)}%`);
+      fpConditions.push(`subjects.ilike.%${escapeOrValue(kw)}%`);
     }
     if (area) {
-      fpConditions.push(`headline.ilike.%${area}%`);
-      fpConditions.push(`bio.ilike.%${area}%`);
-      fpConditions.push(`degrees.ilike.%${area}%`);
-      fpConditions.push(`subjects.ilike.%${area}%`);
+      fpConditions.push(`headline.ilike.%${escapeOrValue(area)}%`);
+      fpConditions.push(`bio.ilike.%${escapeOrValue(area)}%`);
+      fpConditions.push(`degrees.ilike.%${escapeOrValue(area)}%`);
+      fpConditions.push(`subjects.ilike.%${escapeOrValue(area)}%`);
     }
     if (subarea) {
-      fpConditions.push(`headline.ilike.%${subarea}%`);
-      fpConditions.push(`bio.ilike.%${subarea}%`);
-      fpConditions.push(`degrees.ilike.%${subarea}%`);
-      fpConditions.push(`subjects.ilike.%${subarea}%`);
+      fpConditions.push(`headline.ilike.%${escapeOrValue(subarea)}%`);
+      fpConditions.push(`bio.ilike.%${escapeOrValue(subarea)}%`);
+      fpConditions.push(`degrees.ilike.%${escapeOrValue(subarea)}%`);
+      fpConditions.push(`subjects.ilike.%${escapeOrValue(subarea)}%`);
     }
     educatorQuery = (educatorQuery as any).or(fpConditions.join(","));
   }
@@ -355,18 +355,30 @@ export default async function InstitutionSearchRoute({
     educatorQuery = (educatorQuery as any).contains("modalities", [modality]);
   }
 
-  // First page: 50 results
-  const { data: educators } = await educatorQuery.range(0, 49);
+  // First page: 50 results — skipped entirely once the plan's monthly
+  // search quota is exhausted, so an over-limit institution never actually
+  // receives real results (previously this ran unconditionally and only
+  // the usage counter stopped incrementing — the "limit" was cosmetic).
+  const { data: educators } = searchLimitReached
+    ? { data: [] as any[] }
+    : await educatorQuery.range(0, 49);
 
-  // ── Batch fetch faculty documents for all educators ─────────────────────
+  // ── Batch fetch faculty documents + expertise flags for these educators ──
   const educatorIds = (educators || []).map((ed: any) => ed.id);
   let documentsMap: Record<string, any[]> = {};
+  let hasExpertiseIds = new Set<string>();
   if (educatorIds.length > 0) {
-    const { data: allDocs } = await admin
-      .from("faculty_documents")
-      .select("id, name, file_name, file_path, doc_type, faculty_id, created_at")
-      .in("faculty_id", educatorIds)
-      .order("created_at", { ascending: false });
+    const [{ data: allDocs }, { data: scopedExpertise }] = await Promise.all([
+      admin
+        .from("faculty_documents")
+        .select("id, name, file_name, file_path, doc_type, faculty_id, created_at")
+        .in("faculty_id", educatorIds)
+        .order("created_at", { ascending: false }),
+      admin
+        .from("faculty_expertise")
+        .select("faculty_id")
+        .in("faculty_id", educatorIds),
+    ]);
     if (allDocs) {
       documentsMap = allDocs.reduce((acc: Record<string, any[]>, doc: any) => {
         const fid = doc.faculty_id;
@@ -375,6 +387,7 @@ export default async function InstitutionSearchRoute({
         return acc;
       }, {});
     }
+    hasExpertiseIds = new Set((scopedExpertise || []).map((e: any) => e.faculty_id));
   }
 
   // ── Transform + sort by Pro status + profile completeness ────────────────
@@ -426,6 +439,8 @@ export default async function InstitutionSearchRoute({
       return (a.full_name || "").localeCompare(b.full_name || "");
     });
 
+  const contactMonthlyLimit = isPro ? null : isGrowth ? 20 : 5;
+
   return (
     <>
       {welcomeBanner}
@@ -435,6 +450,9 @@ export default async function InstitutionSearchRoute({
         searchParams={params}
         initialFavorites={favorites}
         isPro={isPro}
+        isGrowth={isGrowth}
+        contactMonthlyLimit={contactMonthlyLimit}
+        searchMonthlyLimit={searchMonthlyLimit ?? 5}
         searchLimitReached={searchLimitReached}
         monthlyContactsUsed={monthlyContactsUsed ?? 0}
       />

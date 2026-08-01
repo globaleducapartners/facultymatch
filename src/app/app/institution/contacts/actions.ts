@@ -26,22 +26,26 @@ export async function sendFollowUp(contactId: string, message: string) {
   const inst = contact.institution as any;
   if (inst?.user_id !== user.id) return { error: "No autorizado" };
 
-  // Update follow_ups array
-  const currentFollowUps = Array.isArray(contact.follow_ups) ? contact.follow_ups : [];
+  // Append follow-up atomically (avoids losing messages sent near-simultaneously)
   const newFollowUp = {
     sender: "institution",
     message: message,
     created_at: new Date().toISOString()
   };
-  const updatedFollowUps = [...currentFollowUps, newFollowUp];
 
-  await admin
-    .from("contacts")
-    .update({
-      follow_ups: updatedFollowUps,
-      status: "sent" // reset status back to sent when a new message is sent
-    })
-    .eq("id", contactId);
+  // "pending" is the status contacts are created with (contactFaculty in
+  // src/app/auth/actions.ts) and is what the UI already treats as "awaiting
+  // reply" (see isSent checks across ContactThread.tsx/home/search). "sent"
+  // is not a value the contacts_status_check constraint accepts — the
+  // previous version of this function passed "sent" here and the write
+  // silently failed every time (the original .update() call never checked
+  // its error either).
+  const { error: appendError } = await admin.rpc("append_contact_follow_up", {
+    p_contact_id: contactId,
+    p_follow_up: newFollowUp,
+    p_status: "pending",
+  });
+  if (appendError) return { error: "No se pudo enviar el mensaje" };
 
   // Get faculty email
   const admin2 = createAdminClient();

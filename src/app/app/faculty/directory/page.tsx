@@ -316,6 +316,7 @@ export default async function FacultyDirectoryPage({
       searchParams={params}
       initialFavorites={[]}
       isPro={false}
+      contactMonthlyLimit={null}
       searchLimitReached={false}
       monthlyContactsUsed={0}
       isReadOnly

@@ -30,8 +30,10 @@ export default async function InstitutionHomePage() {
     .eq("id", user.id)
     .single();
 
-  const isPro = (userProfile?.plan === "institution-pro" || userProfile?.plan === "institution-growth") &&
-    (userProfile?.subscription_status === "active" || userProfile?.subscription_status === "trialing");
+  const subscriptionActive = userProfile?.subscription_status === "active" || userProfile?.subscription_status === "trialing";
+  const isPro = userProfile?.plan === "institution-pro" && subscriptionActive;
+  const isGrowth = userProfile?.plan === "institution-growth" && subscriptionActive;
+  const searchMonthlyLimit = isPro ? null : isGrowth ? 20 : 5;
 
   const currentMonth = new Date().toISOString().slice(0, 7);
   const [year, monthNum] = currentMonth.split("-").map(Number);
@@ -57,7 +59,7 @@ export default async function InstitutionHomePage() {
       .eq("institution_id", institution.id)
       .order("created_at", { ascending: false })
       .limit(4),
-    !isPro
+    searchMonthlyLimit !== null
       ? admin.from("search_usage").select("search_count").eq("institution_id", institution.id).eq("month", currentMonth).maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
@@ -136,13 +138,13 @@ export default async function InstitutionHomePage() {
         {[
           { icon: Mail, label: "Contactos totales", value: totalContacts ?? 0, color: "text-talentia-blue", bg: "bg-blue-50", href: "/app/institution/contacts" },
           { icon: TrendingUp, label: "Contactos este mes", value: monthlyContacts ?? 0, color: "text-green-600", bg: "bg-green-50", href: "/app/institution/contacts" },
-          { icon: Star, label: "Shortlists", value: favoritesCount ?? 0, color: "text-energy-orange", bg: "bg-orange-50", href: "/app/institution/favorites" },
+          { icon: Star, label: "Favoritos", value: favoritesCount ?? 0, color: "text-energy-orange", bg: "bg-orange-50", href: "/app/institution/favorites" },
           {
             icon: Search,
-            label: isPro ? "Búsquedas ilimitadas" : `Búsquedas este mes`,
-            value: isPro ? "∞" : `${searchesUsed}/5`,
-            color: isPro ? "text-purple-600" : (searchesUsed >= 5 ? "text-red-500" : "text-purple-600"),
-            bg: isPro ? "bg-purple-50" : (searchesUsed >= 5 ? "bg-red-50" : "bg-purple-50"),
+            label: searchMonthlyLimit === null ? "Búsquedas ilimitadas" : `Búsquedas este mes`,
+            value: searchMonthlyLimit === null ? "∞" : `${searchesUsed}/${searchMonthlyLimit}`,
+            color: searchMonthlyLimit === null ? "text-purple-600" : (searchesUsed >= searchMonthlyLimit ? "text-red-500" : "text-purple-600"),
+            bg: searchMonthlyLimit === null ? "bg-purple-50" : (searchesUsed >= searchMonthlyLimit ? "bg-red-50" : "bg-purple-50"),
             href: "/app/institution/search",
           },
         ].map((stat) => (
@@ -163,7 +165,7 @@ export default async function InstitutionHomePage() {
       </div>
 
       {/* ── Upgrade banner (mobile only, freemium) ── */}
-      {!isPro && (
+      {!isPro && !isGrowth && (
         <Link
           href="/app/institution/billing"
           className="lg:hidden flex items-center justify-between gap-3 bg-gradient-to-r from-energy-orange to-orange-500 text-white rounded-2xl px-5 py-4 shadow-lg shadow-orange-200 hover:shadow-xl transition-all"
@@ -297,7 +299,7 @@ export default async function InstitutionHomePage() {
           {/* Quick links grid */}
           <div className="grid grid-cols-3 gap-4">
             {[
-              { icon: Star,     label: "Shortlists",  sub: `${favoritesCount ?? 0} guardados`, href: "/app/institution/favorites", color: "text-energy-orange", bg: "bg-orange-50" },
+              { icon: Star,     label: "Favoritos",  sub: `${favoritesCount ?? 0} guardados`, href: "/app/institution/favorites", color: "text-energy-orange", bg: "bg-orange-50" },
               { icon: Mail,     label: "Contactos",   sub: `${totalContacts ?? 0} enviados`,   href: "/app/institution/contacts",  color: "text-talentia-blue", bg: "bg-blue-50" },
               { icon: Building2,label: "Mi perfil",   sub: `${profileCompletion}% completo`,   href: "/app/institution",           color: "text-green-600",     bg: "bg-green-50" },
             ].map((item) => (
@@ -379,6 +381,28 @@ export default async function InstitutionHomePage() {
                 <CheckCircle2 size={13} className="text-green-400" />
                 <span className="text-xs font-bold text-white/80">Activo</span>
               </div>
+            </div>
+          ) : isGrowth ? (
+            <div className="bg-white rounded-3xl border-2 border-dashed border-energy-orange/30 p-5 space-y-3 text-center">
+              <div className="flex items-center justify-center gap-2 text-energy-orange">
+                <Zap size={14} />
+                <span className="text-[10px] font-black uppercase tracking-widest">Plan Growth</span>
+              </div>
+              <p className="text-xs font-medium text-gray-600 leading-relaxed">
+                20 búsquedas y 20 contactos al mes. Pasa a Professional para acceso sin límites.
+              </p>
+              <div className="text-lg font-black text-navy">99€ <span className="text-xs text-gray-400 font-bold">/ mes</span></div>
+              <Link
+                href="/app/institution/billing"
+                className="inline-flex items-center gap-2 w-full justify-center bg-energy-orange hover:bg-orange-600 text-white font-black py-2.5 px-4 rounded-xl text-xs transition-colors"
+              >
+                <Zap size={12} /> Activar Plan Professional
+              </Link>
+              {searchesUsed >= 20 && (
+                <p className="text-[10px] text-red-500 font-bold">
+                  Has alcanzado el límite de búsquedas de este mes.
+                </p>
+              )}
             </div>
           ) : (
             <div className="bg-white rounded-3xl border-2 border-dashed border-energy-orange/30 p-5 space-y-3 text-center">

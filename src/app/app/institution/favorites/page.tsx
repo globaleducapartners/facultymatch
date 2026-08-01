@@ -1,4 +1,5 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { redirect } from "next/navigation";
 import { EducatorCard } from "@/components/dashboard/EducatorCard";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,18 +9,21 @@ export default async function FavoritesPage() {
   const supabase = await createClient();
   const admin = createAdminClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
   const { data: institution } = await admin
     .from("institutions")
     .select("id")
-    .eq("user_id", user!.id)
+    .eq("user_id", user.id)
     .maybeSingle();
+
+  if (!institution) redirect("/app/institution");
 
   // Step 1: get favorite faculty IDs for this institution
   const { data: favoriteRows } = await admin
     .from("favorites")
     .select("faculty_id")
-    .eq("institution_id", institution?.id ?? "");
+    .eq("institution_id", institution.id);
 
   const facultyIds = (favoriteRows || []).map((r: any) => r.faculty_id).filter(Boolean);
 
@@ -63,7 +67,7 @@ export default async function FavoritesPage() {
             <EducatorCard
               key={educator.id}
               educator={educator}
-              institutionId={institution?.id || ""}
+              institutionId={institution.id}
               isFavorite={true}
             />
           ))}

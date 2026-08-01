@@ -38,14 +38,18 @@ import { getDocumentUrl } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-const FREE_CONTACTS_LIMIT = 5;
-
 interface InstitutionSearchPageProps {
   initialEducators: any[];
   institutionId: string;
   searchParams: any;
   initialFavorites: string[];
   isPro: boolean;
+  /** Growth tier: paid, but capped (unlike Pro) — distinct from Essential/free */
+  isGrowth?: boolean;
+  /** Contacts allowed per month for this plan; null = unlimited (Pro) */
+  contactMonthlyLimit: number | null;
+  /** Searches allowed per month for this plan; used only for the limit-reached message */
+  searchMonthlyLimit?: number;
   searchLimitReached: boolean;
   monthlyContactsUsed: number;
   /** When true: faculty browsing mode — contact locked, no plan/limit UI */
@@ -97,6 +101,9 @@ export function InstitutionSearchPage({
   searchParams,
   initialFavorites,
   isPro,
+  isGrowth = false,
+  contactMonthlyLimit,
+  searchMonthlyLimit = 5,
   searchLimitReached,
   monthlyContactsUsed,
   isReadOnly = false,
@@ -117,7 +124,7 @@ export function InstitutionSearchPage({
   // Direct contact from card (bypasses drawer)
   const [directContactEducator, setDirectContactEducator] = useState<any | null>(null);
 
-  const canContact = !isReadOnly && (isPro || usedContacts < FREE_CONTACTS_LIMIT);
+  const canContact = !isReadOnly && (contactMonthlyLimit === null || usedContacts < contactMonthlyLimit);
 
   const selectedEducator = initialEducators.find((e) => e.id === selectedId);
 
@@ -240,9 +247,9 @@ export function InstitutionSearchPage({
           <div className="flex items-center gap-3 flex-wrap">
             <Badge
               variant="outline"
-              className={`font-bold px-4 py-1.5 rounded-full ${isPro ? "bg-blue-50 text-talentia-blue border-blue-100" : "bg-gray-50 text-gray-500 border-gray-200"}`}
+              className={`font-bold px-4 py-1.5 rounded-full ${isPro ? "bg-blue-50 text-talentia-blue border-blue-100" : isGrowth ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}
             >
-              {isPro ? "Plan Professional" : "Plan Essential"}
+              {isPro ? "Plan Professional" : isGrowth ? "Plan Growth" : "Plan Essential"}
             </Badge>
             <Button variant="outline" asChild className="rounded-full border-gray-200 font-bold">
               <Link href="/app/institution/favorites" className="flex items-center gap-2">
@@ -302,7 +309,7 @@ export function InstitutionSearchPage({
               <Lock size={16} className="text-amber-600" />
             </div>
             <div>
-              <p className="font-black text-amber-900 text-sm">Has alcanzado el límite de 5 búsquedas mensuales</p>
+              <p className="font-black text-amber-900 text-sm">Has alcanzado el límite de {searchMonthlyLimit} búsquedas mensuales</p>
               <p className="text-amber-700 text-sm font-medium mt-0.5">
                 Activa el Plan Professional para búsquedas ilimitadas.
               </p>
@@ -668,14 +675,14 @@ export function InstitutionSearchPage({
                         </Button>
                       )}
                     </div>
-                    {!isReadOnly && !isPro && usedContacts < FREE_CONTACTS_LIMIT && (
+                    {!isReadOnly && contactMonthlyLimit !== null && usedContacts < contactMonthlyLimit && (
                       <p className="text-xs text-gray-400 text-center">
-                        {usedContacts} de {FREE_CONTACTS_LIMIT} contactos gratuitos usados este mes
+                        {usedContacts} de {contactMonthlyLimit} contactos usados este mes
                       </p>
                     )}
-                    {!isReadOnly && !isPro && usedContacts >= FREE_CONTACTS_LIMIT && (
+                    {!isReadOnly && contactMonthlyLimit !== null && usedContacts >= contactMonthlyLimit && (
                       <p className="text-xs text-amber-500 text-center font-medium">
-                        Límite mensual alcanzado · <Link href="/app/institution/billing" className="underline">Actualiza a Pro</Link>
+                        Límite mensual alcanzado · <Link href="/app/institution/billing" className="underline">Actualiza tu plan</Link>
                       </p>
                     )}
                   </div>

@@ -18,7 +18,6 @@ export default async function BillingPage() {
 
   const isPro     = profile?.plan === "institution-pro"    && profile?.subscription_status === "active";
   const isGrowth  = profile?.plan === "institution-growth" && profile?.subscription_status === "active";
-  const isEssential = !isPro && !isGrowth;
 
   const periodEnd = profile?.subscription_current_period_end
     ? formatDateTZ(profile.subscription_current_period_end, { day: "numeric", month: "long", year: "numeric" })
@@ -36,7 +35,7 @@ export default async function BillingPage() {
     "20 búsquedas al mes",
     "20 contactos al mes",
     "Filtros avanzados",
-    "Shortlists y favoritos",
+    "Favoritos",
     "1 usuario por cuenta",
     "Soporte por email",
   ];
@@ -45,7 +44,7 @@ export default async function BillingPage() {
     "Búsquedas ilimitadas",
     "Contactos ilimitados",
     "Filtros avanzados completos",
-    "Shortlists y favoritos sin límite",
+    "Favoritos sin límite",
     "Hasta 3 usuarios en la misma cuenta",
     "Soporte prioritario",
   ];

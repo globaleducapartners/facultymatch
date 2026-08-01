@@ -1,4 +1,5 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Mail, ChevronLeft } from "lucide-react";
 import Link from "next/link";
@@ -15,12 +16,15 @@ const SUBJECT_LABELS: Record<string, string> = {
 export default async function ContactsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
   const { data: institution } = await supabase
     .from("institutions")
     .select("id, name")
-    .eq("user_id", user!.id)
-    .single();
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!institution) redirect("/app/institution");
 
   const admin = createAdminClient();
 

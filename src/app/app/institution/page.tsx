@@ -2,10 +2,11 @@ import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Resend } from "resend";
+import { extractDomainFromWebsite, extractDomainFromEmail } from "@/lib/domain";
 import {
   Building2, Globe, MapPin, Phone, Mail, Users, Calendar,
   Link as LinkIcon, Save, ShieldCheck, Download,
-  AlertTriangle, Clock, Search, ArrowRight,
+  AlertTriangle, Search, ArrowRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,12 @@ import { SecuritySettingsSection } from "@/components/settings/SecuritySettingsS
 import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton";
 import { InstitutionSaveButton } from "@/components/dashboard/InstitutionSaveButton";
 
-export default async function InstitutionDashboardPage() {
+export default async function InstitutionDashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error: errorParam } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -41,6 +47,7 @@ export default async function InstitutionDashboardPage() {
     const { data: newInst } = await admin
       .from("institutions")
       .insert({
+        id: user.id,
         user_id: user.id,
         name: meta.institution_name || userProfile?.full_name || "Mi Institución",
         institution_type: meta.institution_type ?? null,
@@ -78,6 +85,23 @@ export default async function InstitutionDashboardPage() {
     const modality = formData.get("modality") as string;
     const cityCountry = [city, country].filter(Boolean).join(", ");
 
+    // Domain validation: if website changed, verify it matches the account email domain
+    if (website && user.email) {
+      const websiteDomain = extractDomainFromWebsite(website);
+      const emailDomain = extractDomainFromEmail(user.email);
+      if (websiteDomain && emailDomain) {
+        const emailDomainLower = emailDomain.toLowerCase();
+        const websiteDomainLower = websiteDomain.toLowerCase();
+        const isValidDomain = emailDomainLower === websiteDomainLower ||
+          emailDomainLower.endsWith("." + websiteDomainLower);
+        if (!isValidDomain) {
+          redirect(`/app/institution?error=domain-mismatch`);
+        }
+      } else if (!websiteDomain) {
+        redirect(`/app/institution?error=invalid-website`);
+      }
+    }
+
     const adminClient = createAdminClient();
     const { data: existing } = await adminClient.from("institutions").select("id").eq("user_id", user.id).maybeSingle();
 
@@ -97,6 +121,7 @@ export default async function InstitutionDashboardPage() {
       }).eq("user_id", user.id);
     } else {
       await adminClient.from("institutions").insert({
+        id: user.id,
         user_id: user.id,
         name, description, country, city,
         location: cityCountry || null,
@@ -154,7 +179,7 @@ export default async function InstitutionDashboardPage() {
     institution?.website,
   ];
   const profileCompletion = Math.round(fields.filter(Boolean).length / fields.length * 100);
-  const isPending = institution?.status === "pending";
+  const isBlocked = (institution as any)?.status === "blocked";
 
   const instTypeLabel: Record<string, string> = {
     university: "Universidad pública", private_university: "Universidad privada",
@@ -198,16 +223,27 @@ export default async function InstitutionDashboardPage() {
         </div>
       </Link>
 
-      {/* Pending banner */}
-      {isPending && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
-          <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-            <Clock size={16} className="text-amber-600" />
+      {errorParam === "domain-mismatch" && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-red-700 font-bold text-sm">
+          ✗ El dominio de la web debe coincidir con el dominio de tu correo electrónico institucional.
+        </div>
+      )}
+      {errorParam === "invalid-website" && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-red-700 font-bold text-sm">
+          ✗ La URL de la web institucional no es válida. Asegúrate de incluir el dominio completo.
+        </div>
+      )}
+
+      {/* Blocked banner */}
+      {isBlocked && (
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
+          <div className="w-8 h-8 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle size={16} className="text-red-600" />
           </div>
           <div>
-            <p className="text-sm font-bold text-amber-800">Cuenta en revisión</p>
-            <p className="text-xs text-amber-600 font-medium mt-0.5">
-              Pendiente de aprobación. Nuestro equipo la revisará en 24-48h hábiles. Puedes completar tu perfil mientras tanto.
+            <p className="text-sm font-bold text-red-800">Cuenta bloqueada</p>
+            <p className="text-xs text-red-600 font-medium mt-0.5">
+              Tu cuenta ha sido bloqueada por nuestro equipo. Contacta con soporte para más información.
             </p>
           </div>
         </div>
@@ -235,14 +271,9 @@ export default async function InstitutionDashboardPage() {
                   />
                 </div>
                 <div className="flex items-center gap-2 pb-1">
-                  {institution?.status === "approved" && (
-                    <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs font-bold px-3 py-1 rounded-full border border-green-100">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" /> Verificada
-                    </span>
-                  )}
-                  {isPending && (
-                    <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-bold px-3 py-1 rounded-full border border-amber-100">
-                      <AlertTriangle size={10} /> En revisión
+                  {isBlocked && (
+                    <span className="inline-flex items-center gap-1 bg-red-50 text-red-700 text-xs font-bold px-3 py-1 rounded-full border border-red-100">
+                      <AlertTriangle size={10} /> Bloqueada
                     </span>
                   )}
                 </div>

@@ -52,7 +52,7 @@ const institutionItems = [
   { label: "Inicio",            href: "/app/institution/home",     icon: Home },
   { label: "Mi institución",    href: "/app/institution",          icon: Building2 },
   { label: "Buscar docentes",   href: "/app/institution/search",   icon: Search },
-  { label: "Shortlists",        href: "/app/institution/favorites",icon: Star },
+  { label: "Favoritos",         href: "/app/institution/favorites",icon: Star },
   { label: "Contactos",         href: "/app/institution/contacts", icon: Mail },
   { label: "Plan & facturación",href: "/app/institution/billing",  icon: CreditCard },
 ];

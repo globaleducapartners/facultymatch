@@ -507,6 +507,51 @@ export async function contactFaculty(formData: FormData) {
   // Use admin client to bypass RLS — institution is authenticated and IDs are validated
   const supabaseAdmin = createAdminClient();
 
+  // Verify the caller actually owns this institution — previously any
+  // authenticated user could pass an arbitrary institutionId in the form
+  // and the contact would be created "from" an institution they don't
+  // control (no ownership check existed at all).
+  const { data: callerInstitution } = await supabaseAdmin
+    .from('institutions')
+    .select('id, status')
+    .eq('id', institutionId)
+    .eq('user_id', user.id)
+    .maybeSingle();
+  if (!callerInstitution) {
+    return { error: 'No autorizado' };
+  }
+  if (callerInstitution.status === 'blocked') {
+    return { error: 'Tu cuenta de institución está suspendida.' };
+  }
+
+  // Enforce the plan's monthly contact limit server-side — the UI's
+  // "usedContacts < limit" check only disabled the button; nothing stopped
+  // a direct call to this action once the limit was reached.
+  const { data: contactPlanProfile } = await supabaseAdmin
+    .from('user_profiles')
+    .select('plan, subscription_status')
+    .eq('id', user.id)
+    .maybeSingle();
+  const contactSubActive = contactPlanProfile?.subscription_status === 'active' || contactPlanProfile?.subscription_status === 'trialing';
+  const isContactPro = contactPlanProfile?.plan === 'institution-pro' && contactSubActive;
+  const isContactGrowth = contactPlanProfile?.plan === 'institution-growth' && contactSubActive;
+  const contactMonthlyLimit = isContactPro ? null : isContactGrowth ? 20 : 5;
+
+  if (contactMonthlyLimit !== null) {
+    const now = new Date();
+    const monthStart = `${now.toISOString().slice(0, 7)}-01`;
+    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString().slice(0, 10);
+    const { count: contactsThisMonth } = await supabaseAdmin
+      .from('contacts')
+      .select('*', { count: 'exact', head: true })
+      .eq('institution_id', institutionId)
+      .gte('created_at', monthStart)
+      .lt('created_at', nextMonth);
+    if ((contactsThisMonth ?? 0) >= contactMonthlyLimit) {
+      return { error: 'Has alcanzado el límite de contactos de tu plan este mes.' };
+    }
+  }
+
   const { error } = await supabaseAdmin.from("contacts").insert({
     faculty_id: facultyId,
     institution_id: institutionId,
@@ -637,22 +682,22 @@ export async function replyToContact(contactId: string, replyMessage: string) {
 
   if (!fp || contact.faculty_id !== fp.id) return { error: 'No autorizado' };
 
-  // Update follow_ups array
-  const currentFollowUps = Array.isArray(contact.follow_ups) ? contact.follow_ups : [];
+  // Append follow-up atomically and mark as replied (avoids losing messages
+  // sent near-simultaneously via a read-modify-write race)
   const newFollowUp = {
     sender: "faculty",
     message: replyMessage,
     created_at: new Date().toISOString()
   };
-  const updatedFollowUps = [...currentFollowUps, newFollowUp];
 
-  // Update status to replied
-  await admin.from('contacts').update({
-    status: 'replied',
-    reply_message: replyMessage,
-    replied_at: new Date().toISOString(),
-    follow_ups: updatedFollowUps
-  }).eq('id', contactId);
+  const { error: appendError } = await admin.rpc('append_contact_follow_up', {
+    p_contact_id: contactId,
+    p_follow_up: newFollowUp,
+    p_status: 'replied',
+    p_reply_message: replyMessage,
+    p_set_replied_at: true,
+  });
+  if (appendError) return { error: 'No se pudo enviar la respuesta' };
 
   // Get faculty name
   const { data: facultyUser } = await admin.from('user_profiles').select('full_name').eq('id', user.id).single();

@@ -46,6 +46,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
   const [followUpMsg, setFollowUpMsg] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [followUpError, setFollowUpError] = useState<string | null>(null);
 
   const isSent = contact.status === "sent" || contact.status === "pending";
   const isReplied = contact.status === "replied";
@@ -56,8 +57,13 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
   const handleFollowUp = async () => {
     if (!followUpMsg.trim()) return;
     setSending(true);
-    await sendFollowUp(contact.id, followUpMsg.trim());
+    setFollowUpError(null);
+    const result = await sendFollowUp(contact.id, followUpMsg.trim());
     setSending(false);
+    if (result?.error) {
+      setFollowUpError(result.error);
+      return;
+    }
     setSent(true);
     setShowFollowUp(false);
     setFollowUpMsg("");
@@ -253,6 +259,9 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
                   className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none text-sm font-medium resize-none"
                   placeholder="Escribe tu mensaje de seguimiento..."
                 />
+                {followUpError && (
+                  <p className="text-xs font-bold text-red-600">{followUpError}</p>
+                )}
                 <div className="flex gap-2 justify-end">
                   <Button variant="ghost" size="sm" onClick={() => setShowFollowUp(false)} className="rounded-xl font-bold">
                     Cancelar

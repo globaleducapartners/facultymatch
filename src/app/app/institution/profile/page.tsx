@@ -41,6 +41,7 @@ export default async function InstitutionProfilePage({
     const { data: newInst } = await supabase
       .from("institutions")
       .insert({
+        id: user.id,
         user_id: user.id,
         name: meta.institution_name || userProfile?.full_name || "Mi Institución",
         institution_type: meta.institution_type ?? null,
@@ -115,6 +116,7 @@ export default async function InstitutionProfilePage({
       }).eq("user_id", user.id);
     } else {
       await supabase.from("institutions").insert({
+        id: user.id,
         user_id: user.id,
         name, description, country, city,
         location: cityCountry || null,
@@ -175,6 +177,20 @@ export default async function InstitutionProfilePage({
     institution?.website,
   ];
   const profileCompletion = Math.round(fields.filter(Boolean).length / fields.length * 100);
+
+  // Map old Spanish text values (stored from signup form) to the select option keys
+  const legacyTypeMap: Record<string, string> = {
+    "Universidad pública": "university",
+    "Universidad privada": "private_university",
+    "Business School": "business_school",
+    "Centro de FP Superior": "polytechnic",
+    "Centro online": "online",
+    "Academia / Instituto": "other",
+    "Empresa con formación interna": "other",
+    "Otro": "other",
+  };
+  const rawInstType = (institution as any)?.institution_type as string | null | undefined;
+  const normalizedInstType = rawInstType ? (legacyTypeMap[rawInstType] ?? rawInstType) : "university";
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -260,7 +276,7 @@ export default async function InstitutionProfilePage({
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-black uppercase tracking-widest text-gray-400">Tipo de institución</label>
-                <select name="institutionType" defaultValue={(institution as any)?.institution_type || "university"}
+                <select name="institutionType" defaultValue={normalizedInstType}
                   className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium appearance-none">
                   <option value="university">Universidad pública</option>
                   <option value="private_university">Universidad privada</option>
