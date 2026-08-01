@@ -170,22 +170,15 @@ export default async function InstitutionSearchRoute({
         for (const kw of areaKeywords) {
           fpConditions.push(`headline.ilike.%${escapeOrValue(kw)}%`);
           fpConditions.push(`bio.ilike.%${escapeOrValue(kw)}%`);
-          fpConditions.push(`degrees.ilike.%${escapeOrValue(kw)}%`);
-          // subjects array — PostgREST @> (contains) with case‑insensitive match
-          fpConditions.push(`subjects.ilike.%${escapeOrValue(kw)}%`);
         }
         // Also original text
         if (area) {
           fpConditions.push(`headline.ilike.%${escapeOrValue(area)}%`);
           fpConditions.push(`bio.ilike.%${escapeOrValue(area)}%`);
-          fpConditions.push(`degrees.ilike.%${escapeOrValue(area)}%`);
-          fpConditions.push(`subjects.ilike.%${escapeOrValue(area)}%`);
         }
         if (subarea) {
           fpConditions.push(`headline.ilike.%${escapeOrValue(subarea)}%`);
           fpConditions.push(`bio.ilike.%${escapeOrValue(subarea)}%`);
-          fpConditions.push(`degrees.ilike.%${escapeOrValue(subarea)}%`);
-          fpConditions.push(`subjects.ilike.%${escapeOrValue(subarea)}%`);
         }
         return admin.from("faculty_profiles").select("id").or(fpConditions.join(","));
       })()
@@ -195,6 +188,14 @@ export default async function InstitutionSearchRoute({
   const namePreQuery = query
     ? admin.from("user_profiles").select("id").ilike("full_name", `%${query}%`)
     : Promise.resolve({ data: null as null | { id: string }[] });
+
+  // degrees (jsonb) / subjects (text[]) can't be searched via PostgREST's ilike
+  // filter — see search_faculty_by_degrees_subjects migration. Fails open: if
+  // that migration hasn't been applied yet, this just returns an error here
+  // and search keeps working without the extra degree-title matches.
+  const degreesTextQuery = query
+    ? admin.rpc("search_faculty_by_degrees_subjects", { p_query: query })
+    : Promise.resolve({ data: null as null | { faculty_id: string }[], error: null as any });
 
   // Extract the institution's email domain for domain-based blocking
   const userEmailDomain = user.email?.split("@")[1]?.toLowerCase() || null;
@@ -209,6 +210,7 @@ export default async function InstitutionSearchRoute({
     { data: areaMatchData },
     { data: areaProfilesData },
     { data: nameMatchData },
+    { data: degreesMatchData, error: degreesMatchError },
   ] = await Promise.all([
     admin.from("favorites").select("faculty_id").eq("institution_id", institution.id),
     supabase.from("contacts").select("*", { count: "exact", head: true }).eq("institution_id", institution.id),
@@ -226,7 +228,12 @@ export default async function InstitutionSearchRoute({
     areaExpertiseQuery,
     areaProfilesQuery,
     namePreQuery,
+    degreesTextQuery,
   ]);
+  if (degreesMatchError && query) {
+    console.error("[institution/search] search_faculty_by_degrees_subjects failed (migration not applied yet?):", degreesMatchError);
+  }
+  const degreesMatchIds: string[] = (degreesMatchData || []).map((d: any) => d.faculty_id);
 
   const favorites = favoritesData?.map((f: any) => f.faculty_id) || [];
 
@@ -288,17 +295,20 @@ export default async function InstitutionSearchRoute({
     educatorQuery = educatorQuery.not("id", "in", `(${[...blockedFacultyIds].join(",")})`);
   }
 
-  // Broad text search: headline + bio + current_institution + subjects + degrees + full_name (via pre-queried IDs)
+  // Broad text search: headline + bio + current_institution + full_name +
+  // degrees/subjects (via pre-queried IDs — see search_faculty_by_degrees_subjects
+  // migration; degrees is jsonb and subjects is text[], neither takes the ilike
+  // operator directly, which previously broke the WHOLE .or() and silently
+  // returned zero results for every text search).
   if (query) {
     const orParts = [
       `headline.ilike.%${escapeOrValue(query)}%`,
       `bio.ilike.%${escapeOrValue(query)}%`,
       `current_institution.ilike.%${escapeOrValue(query)}%`,
-      `degrees.ilike.%${escapeOrValue(query)}%`,
-      `subjects.ilike.%${escapeOrValue(query)}%`,
     ];
-    if (nameMatchIds.length > 0) {
-      orParts.push(`id.in.(${nameMatchIds.join(",")})`);
+    const idMatches = [...new Set([...nameMatchIds, ...degreesMatchIds])];
+    if (idMatches.length > 0) {
+      orParts.push(`id.in.(${idMatches.join(",")})`);
     }
     educatorQuery = educatorQuery.or(orParts.join(","));
   }
@@ -317,20 +327,14 @@ export default async function InstitutionSearchRoute({
     for (const kw of areaKeywords) {
       fpConditions.push(`headline.ilike.%${escapeOrValue(kw)}%`);
       fpConditions.push(`bio.ilike.%${escapeOrValue(kw)}%`);
-      fpConditions.push(`degrees.ilike.%${escapeOrValue(kw)}%`);
-      fpConditions.push(`subjects.ilike.%${escapeOrValue(kw)}%`);
     }
     if (area) {
       fpConditions.push(`headline.ilike.%${escapeOrValue(area)}%`);
       fpConditions.push(`bio.ilike.%${escapeOrValue(area)}%`);
-      fpConditions.push(`degrees.ilike.%${escapeOrValue(area)}%`);
-      fpConditions.push(`subjects.ilike.%${escapeOrValue(area)}%`);
     }
     if (subarea) {
       fpConditions.push(`headline.ilike.%${escapeOrValue(subarea)}%`);
       fpConditions.push(`bio.ilike.%${escapeOrValue(subarea)}%`);
-      fpConditions.push(`degrees.ilike.%${escapeOrValue(subarea)}%`);
-      fpConditions.push(`subjects.ilike.%${escapeOrValue(subarea)}%`);
     }
     educatorQuery = (educatorQuery as any).or(fpConditions.join(","));
   }
@@ -359,9 +363,12 @@ export default async function InstitutionSearchRoute({
   // search quota is exhausted, so an over-limit institution never actually
   // receives real results (previously this ran unconditionally and only
   // the usage counter stopped incrementing — the "limit" was cosmetic).
-  const { data: educators } = searchLimitReached
-    ? { data: [] as any[] }
+  const { data: educators, error: educatorsError } = searchLimitReached
+    ? { data: [] as any[], error: null }
     : await educatorQuery.range(0, 49);
+  if (educatorsError) {
+    console.error("[institution/search] educatorQuery failed:", educatorsError);
+  }
 
   // ── Batch fetch faculty documents + expertise flags for these educators ──
   const educatorIds = (educators || []).map((ed: any) => ed.id);

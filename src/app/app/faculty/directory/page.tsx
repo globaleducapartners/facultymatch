@@ -1,6 +1,7 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { InstitutionSearchPage } from "@/components/dashboard/InstitutionSearchPage";
 import { redirect } from "next/navigation";
+import { escapeOrValue } from "@/lib/postgrest-filter";
 
 // ─── Area → Spanish keywords mapping ──────────────────────────────────────────
 const AREA_KEYWORDS: Record<string, string[]> = {
@@ -96,42 +97,39 @@ export default async function FacultyDirectoryPage({
     ? (() => {
         const conditions: string[] = [];
         for (const kw of areaKeywords) {
-          conditions.push(`area.ilike.%${kw}%`);
-          conditions.push(`subarea.ilike.%${kw}%`);
+          conditions.push(`area.ilike.%${escapeOrValue(kw)}%`);
+          conditions.push(`subarea.ilike.%${escapeOrValue(kw)}%`);
         }
         if (area) {
-          conditions.push(`area.ilike.%${area}%`);
-          conditions.push(`subarea.ilike.%${area}%`);
+          conditions.push(`area.ilike.%${escapeOrValue(area)}%`);
+          conditions.push(`subarea.ilike.%${escapeOrValue(area)}%`);
         }
         if (subarea) {
-          conditions.push(`area.ilike.%${subarea}%`);
-          conditions.push(`subarea.ilike.%${subarea}%`);
+          conditions.push(`area.ilike.%${escapeOrValue(subarea)}%`);
+          conditions.push(`subarea.ilike.%${escapeOrValue(subarea)}%`);
         }
         return admin.from("faculty_expertise").select("faculty_id").or(conditions.join(","));
       })()
     : Promise.resolve({ data: null as null | { faculty_id: string }[] });
 
-  // Query 2: faculty_profiles — match across headline, bio, subjects, degrees
+  // Query 2: faculty_profiles — match across headline, bio.
+  // degrees (jsonb) and subjects (text[]) can't take the ilike operator —
+  // Postgres rejects it outright, which previously broke the WHOLE .or()
+  // and silently returned zero results for every text search.
   const areaProfilesQuery = areaKeywords.length > 0
     ? (() => {
         const fpConditions: string[] = [];
         for (const kw of areaKeywords) {
-          fpConditions.push(`headline.ilike.%${kw}%`);
-          fpConditions.push(`bio.ilike.%${kw}%`);
-          fpConditions.push(`degrees.ilike.%${kw}%`);
-          fpConditions.push(`subjects.ilike.%${kw}%`);
+          fpConditions.push(`headline.ilike.%${escapeOrValue(kw)}%`);
+          fpConditions.push(`bio.ilike.%${escapeOrValue(kw)}%`);
         }
         if (area) {
-          fpConditions.push(`headline.ilike.%${area}%`);
-          fpConditions.push(`bio.ilike.%${area}%`);
-          fpConditions.push(`degrees.ilike.%${area}%`);
-          fpConditions.push(`subjects.ilike.%${area}%`);
+          fpConditions.push(`headline.ilike.%${escapeOrValue(area)}%`);
+          fpConditions.push(`bio.ilike.%${escapeOrValue(area)}%`);
         }
         if (subarea) {
-          fpConditions.push(`headline.ilike.%${subarea}%`);
-          fpConditions.push(`bio.ilike.%${subarea}%`);
-          fpConditions.push(`degrees.ilike.%${subarea}%`);
-          fpConditions.push(`subjects.ilike.%${subarea}%`);
+          fpConditions.push(`headline.ilike.%${escapeOrValue(subarea)}%`);
+          fpConditions.push(`bio.ilike.%${escapeOrValue(subarea)}%`);
         }
         return admin.from("faculty_profiles").select("id").or(fpConditions.join(","));
       })()
@@ -142,6 +140,14 @@ export default async function FacultyDirectoryPage({
     ? admin.from("user_profiles").select("id").ilike("full_name", `%${query}%`)
     : Promise.resolve({ data: null as null | { id: string }[] });
 
+  // degrees (jsonb) / subjects (text[]) can't be searched via PostgREST's ilike
+  // filter — see search_faculty_by_degrees_subjects migration. Fails open: if
+  // that migration hasn't been applied yet, this just returns an error here
+  // and search keeps working without the extra degree-title matches.
+  const degreesTextQuery = query
+    ? admin.rpc("search_faculty_by_degrees_subjects", { p_query: query })
+    : Promise.resolve({ data: null as null | { faculty_id: string }[], error: null as any });
+
   // Pre-fetch which faculty IDs have expertise entries (for completeness scoring)
   const allExpertiseQuery = admin.from("faculty_expertise").select("faculty_id");
 
@@ -150,12 +156,17 @@ export default async function FacultyDirectoryPage({
     { data: areaProfilesData },
     { data: nameMatchData },
     { data: allExpertiseData },
+    { data: degreesMatchData, error: degreesMatchError },
   ] = await Promise.all([
     areaExpertiseQuery,
     areaProfilesQuery,
     namePreQuery,
     allExpertiseQuery,
+    degreesTextQuery,
   ]);
+  if (degreesMatchError && query) {
+    console.error("[faculty/directory] search_faculty_by_degrees_subjects failed (migration not applied yet?):", degreesMatchError);
+  }
 
   // Merge area matches from faculty_expertise AND faculty_profiles headline/bio
   const areaMatchIds: string[] = [...new Set([
@@ -163,6 +174,7 @@ export default async function FacultyDirectoryPage({
     ...(areaProfilesData || []).map((p: any) => p.id),
   ])];
   const nameMatchIds: string[] = (nameMatchData || []).map((m: any) => m.id);
+  const degreesMatchIds: string[] = (degreesMatchData || []).map((d: any) => d.faculty_id);
   const hasExpertiseIds = new Set((allExpertiseData || []).map((e: any) => e.faculty_id));
 
   // ── Main DB query with all filters pushed down ───────────────────────────
@@ -171,17 +183,18 @@ export default async function FacultyDirectoryPage({
     .select(`*, user:user_profiles(full_name, avatar_url, plan, subscription_status), expertise:faculty_expertise(*)`)
     .or("visibility.eq.public,visibility.eq.private,visibility.is.null");
 
-  // Broad text search: headline + bio + current_institution + subjects + degrees + full_name (via pre-queried IDs)
+  // Broad text search: headline + bio + current_institution + full_name +
+  // degrees/subjects (via pre-queried IDs — see search_faculty_by_degrees_subjects
+  // migration and the comment on areaProfilesQuery above).
   if (query) {
     const orParts = [
-      `headline.ilike.%${query}%`,
-      `bio.ilike.%${query}%`,
-      `current_institution.ilike.%${query}%`,
-      `degrees.ilike.%${query}%`,
-      `subjects.ilike.%${query}%`,
+      `headline.ilike.%${escapeOrValue(query)}%`,
+      `bio.ilike.%${escapeOrValue(query)}%`,
+      `current_institution.ilike.%${escapeOrValue(query)}%`,
     ];
-    if (nameMatchIds.length > 0) {
-      orParts.push(`id.in.(${nameMatchIds.join(",")})`);
+    const idMatches = [...new Set([...nameMatchIds, ...degreesMatchIds])];
+    if (idMatches.length > 0) {
+      orParts.push(`id.in.(${idMatches.join(",")})`);
     }
     educatorQuery = educatorQuery.or(orParts.join(","));
   }
@@ -198,22 +211,16 @@ export default async function FacultyDirectoryPage({
     // Fallback: no exact matches from pre-queries, try inline ilike on the main query
     const fpConditions: string[] = [];
     for (const kw of areaKeywords) {
-      fpConditions.push(`headline.ilike.%${kw}%`);
-      fpConditions.push(`bio.ilike.%${kw}%`);
-      fpConditions.push(`degrees.ilike.%${kw}%`);
-      fpConditions.push(`subjects.ilike.%${kw}%`);
+      fpConditions.push(`headline.ilike.%${escapeOrValue(kw)}%`);
+      fpConditions.push(`bio.ilike.%${escapeOrValue(kw)}%`);
     }
     if (area) {
-      fpConditions.push(`headline.ilike.%${area}%`);
-      fpConditions.push(`bio.ilike.%${area}%`);
-      fpConditions.push(`degrees.ilike.%${area}%`);
-      fpConditions.push(`subjects.ilike.%${area}%`);
+      fpConditions.push(`headline.ilike.%${escapeOrValue(area)}%`);
+      fpConditions.push(`bio.ilike.%${escapeOrValue(area)}%`);
     }
     if (subarea) {
-      fpConditions.push(`headline.ilike.%${subarea}%`);
-      fpConditions.push(`bio.ilike.%${subarea}%`);
-      fpConditions.push(`degrees.ilike.%${subarea}%`);
-      fpConditions.push(`subjects.ilike.%${subarea}%`);
+      fpConditions.push(`headline.ilike.%${escapeOrValue(subarea)}%`);
+      fpConditions.push(`bio.ilike.%${escapeOrValue(subarea)}%`);
     }
     educatorQuery = (educatorQuery as any).or(fpConditions.join(","));
   }
@@ -239,7 +246,10 @@ export default async function FacultyDirectoryPage({
   }
 
   // First page: 50 results
-  const { data: educators } = await educatorQuery.range(0, 49);
+  const { data: educators, error: educatorsError } = await educatorQuery.range(0, 49);
+  if (educatorsError) {
+    console.error("[faculty/directory] educatorQuery failed:", educatorsError);
+  }
 
   // ── Batch fetch faculty documents for all educators ─────────────────────
   const educatorIds = (educators || []).map((ed: any) => ed.id);
