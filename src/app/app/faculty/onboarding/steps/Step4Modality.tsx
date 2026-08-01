@@ -147,7 +147,6 @@ export function Step4Modality({ data, updateData }: Props) {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 4,
-                  border: "none",
                   outline: "none",
                   borderRadius: 999,
                   fontWeight: 600,

@@ -217,7 +217,7 @@ export function Step2CareerType({ data, updateData, user, facultyProfile }: Prop
           </div>
 
           {/* Tip for academic users without ORCID */}
-          {data.careerType === "academica" && data.careerType !== "combinado" && (
+          {data.careerType === "academica" && (
             <div style={{
               background: "#F0FDF4", border: "1px solid #BBF7D0",
               borderRadius: 12, padding: "14px 18px",

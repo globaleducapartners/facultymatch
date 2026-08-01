@@ -132,7 +132,7 @@ export async function saveWizardStep(data: WizardData) {
 
   // Build location
   if (data.city !== undefined || data.country !== undefined) {
-    const existing = await admin
+    const { data: existing } = await admin
       .from("faculty_profiles")
       .select("city, country")
       .eq("user_id", user.id)

@@ -95,7 +95,7 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
   // Dentro de la intro: elegir entre las dos tarjetas, o ya dentro del flujo de IA
   const [introMode, setIntroMode] = useState<"choice" | "ai">("choice");
 
-  const [step, setStep] = useState(initialStep);
+  const [step, setStep] = useState<number>(initialStep);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [published, setPublished] = useState(false);
@@ -200,19 +200,21 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
 
   const handleSaveAndExit = useCallback(async () => {
     setSaving(true);
+    setSaveError("");
     try {
       // Save current step state
       await saveWizardStep({ onboarding_step: step, career_type: data.careerType } as any);
       window.location.href = "/app/faculty";
     } catch (e) {
-      console.error("Error saving:", e);
-    } finally {
+      const msg = e instanceof Error ? e.message : "Error al guardar. Inténtalo de nuevo.";
+      setSaveError(msg);
       setSaving(false);
     }
   }, [step, data.careerType]);
 
   const handlePublish = useCallback(async () => {
     setPublishing(true);
+    setSaveError("");
     try {
       // Save final step state first
       await saveWizardStep({
@@ -228,7 +230,8 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
       await publishProfile();
       setPublished(true);
     } catch (e) {
-      console.error("Error publishing:", e);
+      const msg = e instanceof Error ? e.message : "Error al publicar. Inténtalo de nuevo.";
+      setSaveError(msg);
     } finally {
       setPublishing(false);
     }

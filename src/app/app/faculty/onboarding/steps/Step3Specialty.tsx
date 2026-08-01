@@ -81,7 +81,7 @@ export function Step3Specialty({ data, updateData }: Props) {
   };
 
   const handleSubareaChange = (val: string) => {
-    const parent = UNESCO_FIELDS.find((f) => f.subareas.includes(val));
+    const parent = UNESCO_FIELDS.find((f) => (f.subareas as readonly string[]).includes(val));
     updateData({
       unescoSubarea: val,
       unescoArea: parent ? parent.label : data.unescoArea,

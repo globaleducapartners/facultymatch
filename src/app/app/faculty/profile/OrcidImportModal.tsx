@@ -86,7 +86,7 @@ export function OrcidImportModal({ user, facultyProfile, onClose, onSave }: Prop
 
   // Existence checks
   const hasExistingInstitution = !!facultyProfile?.current_institution;
-  const hasExistingDegrees = (facultyProfile?.degrees as any[] | null)?.length > 0;
+  const hasExistingDegrees = ((facultyProfile?.degrees as any[] | null)?.length ?? 0) > 0;
 
   const ORCID_REGEX = /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
 
