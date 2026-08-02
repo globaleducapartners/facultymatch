@@ -68,6 +68,15 @@ function SignupForm() {
     setErrors(e); return !Object.keys(e).length;
   };
 
+  // Institución si llega por cualquiera de los dos parámetros que usan los
+  // distintos CTAs del sitio (?intent=institution en marketing, ?role=institution
+  // en algún enlace interno) — antes esto se calculaba pero nunca se usaba para
+  // decidir el rol real, así que CUALQUIER registro (institución incluida)
+  // creaba siempre una cuenta de docente.
+  const isInstitution =
+    searchParams.get("intent") === "institution" ||
+    searchParams.get("role") === "institution";
+
   // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
     if (!validate()) return;
@@ -75,11 +84,18 @@ function SignupForm() {
     setServerError("");
 
     try {
+      const role = isInstitution ? "institution" : "faculty";
+      const fullName = `${firstName.trim()} ${lastName.trim()}`;
+
       const formData = new FormData();
       formData.append("email", email.trim().toLowerCase());
       formData.append("password", password);
-      formData.append("fullName", `${firstName.trim()} ${lastName.trim()}`);
-      formData.append("role", "faculty");
+      formData.append("fullName", fullName);
+      formData.append("role", role);
+      // Sin un campo dedicado en este formulario, el nombre de la institución
+      // se rellena con el nombre de la persona — se corrige de inmediato desde
+      // /app/institution, que ya lo deja editar.
+      if (role === "institution") formData.append("institutionName", fullName);
       formData.append("terms_accepted", terms ? "on" : "off");
       formData.append("privacy_accepted", terms ? "on" : "off");
       formData.append("marketing_opt_in", "off");
@@ -103,16 +119,16 @@ function SignupForm() {
         submitAcquisitionData(user.id);
       }
 
-      // Redirect directly to onboarding (user is auto-logged in)
-      window.location.href = "/app/faculty/onboarding";
+      // signUp() ya hace redirect() en el servidor según el rol
+      // (faculty → /auth/verificar-email, institution → /app/institution);
+      // esto es solo un respaldo por si esa redirección no se produce.
+      window.location.href = role === "institution" ? "/app/institution" : "/app/faculty/onboarding";
     } catch (err) {
       console.error("[Signup] Unexpected error:", err);
       setServerError("Error de red. Inténtalo de nuevo.");
       setLoading(false);
     }
   };
-
-  const isInstitution = searchParams.get("intent") === "institution";
 
   return (
     <div id="fm-signup-layout" style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "2fr 3fr", fontFamily: SANS }}>
@@ -269,14 +285,23 @@ function SignupForm() {
             <Link href="/login" style={{ color: D.blue, fontWeight: 500 }}>Acceder</Link>
           </p>
 
-          {isInstitution && (
-            <p style={{ fontFamily: SANS, fontSize: 12, color: D.muted, textAlign: "center", marginTop: 12 }}>
-              ¿Eres una institución?{" "}
-              <Link href="/signup/institution" style={{ color: D.blue, fontWeight: 500 }}>
-                Registra tu institución aquí
-              </Link>
-            </p>
-          )}
+          <p style={{ fontFamily: SANS, fontSize: 12, color: D.muted, textAlign: "center", marginTop: 12 }}>
+            {isInstitution ? (
+              <>
+                ¿Eres docente?{" "}
+                <Link href="/signup" style={{ color: D.blue, fontWeight: 500 }}>
+                  Crea tu perfil docente aquí
+                </Link>
+              </>
+            ) : (
+              <>
+                ¿Eres una institución?{" "}
+                <Link href="/signup?intent=institution" style={{ color: D.blue, fontWeight: 500 }}>
+                  Registra tu institución aquí
+                </Link>
+              </>
+            )}
+          </p>
         </div>
       </div>
 

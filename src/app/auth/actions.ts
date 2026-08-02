@@ -30,6 +30,7 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
     const { error: ssoProfileError } = await admin.from("user_profiles").upsert({
       id: user.id,
       role,
+      active_mode: role,
       full_name: fullName || user.user_metadata?.full_name || user.email?.split("@")[0],
     }, { onConflict: "id" });
     if (ssoProfileError) {
@@ -97,6 +98,7 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
     const { error: userProfileError } = await admin.from("user_profiles").upsert({
       id: data.user.id,
       role,
+      active_mode: role,
       full_name: fullName,
       terms_accepted_at: new Date().toISOString(),
       privacy_accepted_at: new Date().toISOString(),

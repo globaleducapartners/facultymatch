@@ -194,6 +194,7 @@ export async function GET(request: Request) {
       await supabaseAdmin.from('user_profiles').upsert({
         id: user.id,
         role: user.user_metadata.role,
+        active_mode: user.user_metadata.role,
         full_name: user.user_metadata.full_name || user.email?.split('@')[0],
         onboarding_completed: user.user_metadata.onboarding_completed === true,
         terms_accepted_at: user.user_metadata.terms_accepted ? new Date().toISOString() : null,
