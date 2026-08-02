@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-server';
 import { Resend } from 'resend';
+import { notifyAdminBillingIssue } from '@/lib/admin-alerts';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || 'FacultyMatch <noreply@facultymatch.app>';
@@ -12,12 +13,28 @@ function buildPriceMap() {
   const map: Record<string, string> = {};
   const fp = process.env.STRIPE_PRICE_FACULTY_PRO;
   const ip = process.env.STRIPE_PRICE_INSTITUTION_PRO;
+  const ig = process.env.STRIPE_PRICE_INSTITUTION_GROWTH;
   if (fp) map[fp] = 'faculty-pro';
   if (ip) map[ip] = 'institution-pro';
+  if (ig) map[ig] = 'institution-growth';
   // Always include known IDs as fallback
   map['price_1TDvExLw5PCavs69t029xaaY'] = 'faculty-pro';
   map['price_1TDvFgLw5PCavs69YGuYE0Z0'] = 'institution-pro';
   return map;
+}
+
+// admin.auth.admin.listUsers() is paginated (50/page by default) — scanning
+// only the first page silently fails to find anyone past it. Paginate
+// through all pages instead of assuming everyone fits on page 1.
+async function findUserByEmail(supabase: ReturnType<typeof createAdminClient>, email: string) {
+  for (let page = 1; page <= 50; page++) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 200 });
+    if (error || !data?.users?.length) break;
+    const found = data.users.find(u => u.email === email);
+    if (found) return found;
+    if (data.users.length < 200) break; // last page
+  }
+  return null;
 }
 
 export async function POST(req: NextRequest) {
@@ -46,6 +63,23 @@ export async function POST(req: NextRequest) {
 
   const supabase = createAdminClient();
 
+  // Idempotency: Stripe retries delivery on anything but a fast 2xx. Without
+  // this, a retry re-runs every write below and re-sends every email a
+  // second time. Insert-first (not insert-after) so two near-simultaneous
+  // deliveries of the same retry can't both slip through before either
+  // finishes processing.
+  const { error: dedupeError } = await supabase
+    .from('stripe_webhook_events')
+    .insert({ event_id: event.id, event_type: event.type });
+  if (dedupeError) {
+    // Unique violation = already processed; anything else, log and process
+    // anyway rather than silently dropping a billing event.
+    if (dedupeError.code === '23505') {
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+    console.error('[stripe webhook] dedupe insert failed:', dedupeError);
+  }
+
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
@@ -59,19 +93,45 @@ export async function POST(req: NextRequest) {
         expand: ['items.data.price'],
       });
       const priceId = subscription.items.data[0]?.price.id;
-      const plan = PRICE_TO_PLAN[priceId] ?? 'faculty-pro';
+      const plan = PRICE_TO_PLAN[priceId];
       const rawPeriodEnd = (subscription as any).current_period_end as number;
       const periodEnd = rawPeriodEnd ? new Date(rawPeriodEnd * 1000).toISOString() : null;
 
-      // Look up user by email
-      const { data: authData } = await supabase.auth.admin.listUsers();
-      const user = authData?.users.find(u => u.email === customerEmail);
-      if (!user) {
-        console.error('[stripe webhook] user not found for email:', customerEmail);
+      if (!plan) {
+        // Never guess — a wrong guess silently gives a paying customer
+        // either the wrong plan or (institution → faculty-pro) no real
+        // access at all. Loud failure the admin can fix beats a silent
+        // wrong one the customer discovers on their own.
+        console.error('[stripe webhook] unrecognized price ID:', priceId);
+        await notifyAdminBillingIssue('Pago recibido pero el plan no se pudo activar', [
+          ['Email', customerEmail || '—'],
+          ['Price ID', priceId || '—'],
+          ['Customer ID', customerId],
+          ['Subscription ID', subscriptionId],
+        ]);
         break;
       }
 
-      await supabase
+      // client_reference_id (set by our own /api/stripe/checkout) is a
+      // direct id lookup — reliable regardless of user count. Falls back to
+      // an email scan for subscriptions created directly in the Stripe
+      // dashboard (e.g. today's manual Growth-plan signups), which have no
+      // client_reference_id.
+      const refId = session.client_reference_id;
+      const user = refId
+        ? (await supabase.auth.admin.getUserById(refId)).data.user
+        : customerEmail ? await findUserByEmail(supabase, customerEmail) : null;
+      if (!user) {
+        console.error('[stripe webhook] user not found for email:', customerEmail);
+        await notifyAdminBillingIssue('Pago recibido pero no se encontró la cuenta', [
+          ['Email', customerEmail || '—'],
+          ['Customer ID', customerId],
+          ['Subscription ID', subscriptionId],
+        ]);
+        break;
+      }
+
+      const { error: updateError } = await supabase
         .from('user_profiles')
         .update({
           plan,
@@ -81,6 +141,15 @@ export async function POST(req: NextRequest) {
           subscription_current_period_end: periodEnd,
         })
         .eq('id', user.id);
+      if (updateError) {
+        console.error('[stripe webhook] user_profiles update failed:', updateError);
+        await notifyAdminBillingIssue('Pago recibido pero falló la activación del plan', [
+          ['Email', customerEmail || '—'],
+          ['User ID', user.id],
+          ['Error', updateError.message],
+        ]);
+        break;
+      }
 
       // Send activation email
       const { data: up } = await supabase.from('user_profiles').select('full_name').eq('id', user.id).single();
@@ -106,13 +175,32 @@ export async function POST(req: NextRequest) {
       const periodEnd = rawEnd ? new Date(rawEnd * 1000).toISOString() : null;
       const effectiveStatus = subscription.cancel_at_period_end ? 'canceling' : status;
 
-      await supabase
+      // Re-derive plan from the subscription's current price so a tier
+      // change made through the Stripe Billing Portal (upgrade/downgrade)
+      // actually takes effect here — previously only status/period_end were
+      // synced, so the DB's plan column could permanently drift from what
+      // the customer is actually being billed for.
+      const priceId = subscription.items.data[0]?.price?.id;
+      const plan = priceId ? PRICE_TO_PLAN[priceId] : undefined;
+      if (priceId && !plan) {
+        console.error('[stripe webhook] subscription.updated: unrecognized price ID:', priceId);
+        await notifyAdminBillingIssue('Cambio de suscripción con price ID desconocido', [
+          ['Customer ID', customerId],
+          ['Price ID', priceId],
+        ]);
+      }
+
+      const { error: subUpdateError } = await supabase
         .from('user_profiles')
         .update({
+          ...(plan ? { plan } : {}),
           subscription_status: effectiveStatus,
           subscription_current_period_end: periodEnd,
         })
         .eq('stripe_customer_id', customerId);
+      if (subUpdateError) {
+        console.error('[stripe webhook] subscription update failed:', subUpdateError);
+      }
 
       console.log(`[stripe webhook] subscription updated for ${customerId}: ${effectiveStatus}`);
       break;
@@ -122,7 +210,7 @@ export async function POST(req: NextRequest) {
       const subscription = event.data.object as Stripe.Subscription;
       const customerId = subscription.customer as string;
 
-      await supabase
+      const { data: cancelingUser, error: deleteError } = await supabase
         .from('user_profiles')
         .update({
           plan: 'free',
@@ -130,9 +218,68 @@ export async function POST(req: NextRequest) {
           subscription_status: 'canceled',
           subscription_current_period_end: null,
         })
-        .eq('stripe_customer_id', customerId);
+        .eq('stripe_customer_id', customerId)
+        .select('full_name')
+        .maybeSingle();
+      if (deleteError) {
+        // Worst spot in the whole file to fail silently: if this write
+        // doesn't go through, a canceled customer keeps Pro/Growth access
+        // indefinitely with nothing anywhere recording that it happened.
+        console.error('[stripe webhook] subscription.deleted update failed:', deleteError);
+        await notifyAdminBillingIssue('Cancelación de Stripe recibida pero no se pudo aplicar', [
+          ['Customer ID', customerId],
+          ['Error', deleteError.message],
+        ]);
+        break;
+      }
+
+      // Cancellation email — previously the only billing lifecycle event
+      // with zero customer communication.
+      try {
+        const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer;
+        if (customer.email) {
+          const firstName = cancelingUser?.full_name?.split(' ')[0] || customer.email.split('@')[0] || 'Hola';
+          resend.emails.send({
+            from: FROM,
+            to: [customer.email],
+            subject: 'Tu suscripción se ha cancelado — FacultyMatch',
+            html: buildCancellationEmail(firstName),
+          }).catch(() => {});
+        }
+      } catch (e) {
+        console.warn('[stripe webhook] could not fetch customer for cancellation email:', e);
+      }
 
       console.log(`[stripe webhook] subscription canceled for ${customerId}`);
+      break;
+    }
+
+    case 'invoice.payment_failed': {
+      const invoice = event.data.object as Stripe.Invoice;
+      const customerId = invoice.customer as string;
+
+      try {
+        const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer;
+        if (customer.email) {
+          const { data: up } = await supabase
+            .from('user_profiles')
+            .select('full_name, plan')
+            .eq('stripe_customer_id', customerId)
+            .maybeSingle();
+          const firstName = up?.full_name?.split(' ')[0] || customer.email.split('@')[0] || 'Hola';
+          const settingsPath = up?.plan?.startsWith('institution') ? '/app/institution/billing' : '/app/faculty/settings';
+          resend.emails.send({
+            from: FROM,
+            to: [customer.email],
+            subject: '⚠️ No hemos podido cobrar tu suscripción — FacultyMatch',
+            html: buildPaymentFailedEmail(firstName, settingsPath),
+          }).catch(() => {});
+        }
+      } catch (e) {
+        console.warn('[stripe webhook] could not send payment-failed email:', e);
+      }
+
+      console.log(`[stripe webhook] payment failed for ${customerId}`);
       break;
     }
 
@@ -168,7 +315,7 @@ export async function POST(req: NextRequest) {
       const renewalDate = up.subscription_current_period_end
         ? new Date(up.subscription_current_period_end).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
         : '';
-      const amount = up.plan === 'faculty-pro' ? '29€' : '99€';
+      const amount = up.plan === 'faculty-pro' ? '29€' : up.plan === 'institution-growth' ? '35€' : '99€';
 
       resend.emails.send({
         from: FROM,
@@ -271,6 +418,51 @@ function buildRenewalEmail(name: string, days: number, date: string, amount: str
     <div style="text-align:center;margin-bottom:16px;">
       <a href="${SITE}/app/faculty" style="display:inline-block;background:#2563EB;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
         Ver mi plan →
+      </a>
+    </div>
+  `);
+}
+
+function buildCancellationEmail(name: string) {
+  return emailWrapper(`
+    <div style="text-align:center;margin-bottom:32px;">
+      <h1 style="margin:0;color:#0B1220;font-size:24px;font-weight:900;">Hola ${name}, tu suscripción se ha cancelado</h1>
+      <p style="color:#64748b;font-size:15px;margin:12px 0 0;line-height:1.6;">
+        Hemos procesado la cancelación de tu Plan Professional. Tu cuenta sigue activa
+        con el plan gratuito — no se ha borrado nada de tu perfil ni de tus datos.
+      </p>
+    </div>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 24px;margin-bottom:24px;">
+      <p style="margin:0;color:#475569;font-size:14px;">
+        Si ha sido un error, o quieres volver a activar tu plan más adelante, puedes
+        hacerlo cuando quieras desde tu panel.
+      </p>
+    </div>
+    <div style="text-align:center;margin-bottom:16px;">
+      <a href="${SITE}/app/faculty" style="display:inline-block;background:#2563EB;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
+        Ir a mi panel →
+      </a>
+    </div>
+  `);
+}
+
+function buildPaymentFailedEmail(name: string, settingsPath: string) {
+  return emailWrapper(`
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="width:64px;height:64px;background:#fef2f2;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
+        <span style="font-size:32px;">⚠️</span>
+      </div>
+      <h1 style="margin:0;color:#0B1220;font-size:24px;font-weight:900;">Hola ${name}, no hemos podido cobrar tu suscripción</h1>
+      <p style="color:#64748b;font-size:15px;margin:12px 0 0;line-height:1.6;">
+        El cobro de tu Plan Professional no se ha completado — puede que la tarjeta
+        haya caducado o el banco lo haya rechazado. Volveremos a intentarlo
+        automáticamente, pero si el problema persiste podrías perder el acceso
+        a las funciones premium.
+      </p>
+    </div>
+    <div style="text-align:center;margin-bottom:16px;">
+      <a href="${SITE}${settingsPath}" style="display:inline-block;background:#2563EB;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
+        Actualizar método de pago →
       </a>
     </div>
   `);

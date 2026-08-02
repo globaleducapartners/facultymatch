@@ -10,7 +10,7 @@ const FROM = process.env.RESEND_FROM_EMAIL || "FacultyMatch <noreply@facultymatc
 // cada sitio.
 export const ADMIN_NOTIFY_EMAIL = "director@globaleducapartners.com";
 
-function wrapEmail(title: string, rows: Array<[string, string]>): string {
+function wrapEmail(title: string, rows: Array<[string, string]>, opts?: { urgent?: boolean }): string {
   const rowsHtml = rows
     .map(
       ([label, value], i) => `
@@ -20,6 +20,7 @@ function wrapEmail(title: string, rows: Array<[string, string]>): string {
       </td></tr>`
     )
     .join("");
+  const headerBg = opts?.urgent ? "#7F1D1D" : "#0B1220";
 
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
@@ -27,7 +28,7 @@ function wrapEmail(title: string, rows: Array<[string, string]>): string {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;max-width:600px;">
-  <tr><td style="background:#0B1220;padding:24px 40px;text-align:center;">
+  <tr><td style="background:${headerBg};padding:24px 40px;text-align:center;">
     <span style="color:#fff;font-size:20px;font-weight:900;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
   </td></tr>
   <tr><td style="padding:36px 40px;">
@@ -42,6 +43,24 @@ function wrapEmail(title: string, rows: Array<[string, string]>): string {
 </table>
 </td></tr></table>
 </body></html>`;
+}
+
+// Aviso urgente para fallos de facturación que necesitan que alguien mire a
+// mano — p.ej. un pago que ha llegado pero cuyo plan no se ha podido activar
+// automáticamente. Antes esto fallaba en completo silencio (console.error
+// perdido en los logs de Vercel, nadie se enteraba salvo que el cliente
+// escribiera a soporte).
+export async function notifyAdminBillingIssue(subject: string, rows: Array<[string, string]>) {
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: [ADMIN_NOTIFY_EMAIL],
+      subject: `🔴 ${subject}`,
+      html: wrapEmail(subject, rows, { urgent: true }),
+    });
+  } catch (e) {
+    console.warn("[notifyAdminBillingIssue] failed:", e);
+  }
 }
 
 export async function notifyAdminNewRegistration(params: {
