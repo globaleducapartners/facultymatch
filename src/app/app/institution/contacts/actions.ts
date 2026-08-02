@@ -52,7 +52,7 @@ export async function sendFollowUp(contactId: string, message: string) {
   const { data: facultyAuth } = await admin2.auth.admin.getUserById(contact.faculty_id);
   const facultyEmail = facultyAuth?.user?.email;
 
-  // Get faculty name
+  // Get faculty name + notification preference
   const { data: fp } = await admin
     .from("user_profiles")
     .select("full_name")
@@ -60,7 +60,14 @@ export async function sendFollowUp(contactId: string, message: string) {
     .single();
   const facultyName = fp?.full_name || "Docente";
 
-  if (facultyEmail) {
+  const { data: facultyProfileForPrefs } = await admin
+    .from("faculty_profiles")
+    .select("notify_messages")
+    .eq("id", contact.faculty_id)
+    .maybeSingle();
+  const notifyMessages = facultyProfileForPrefs?.notify_messages !== false;
+
+  if (facultyEmail && notifyMessages) {
     try {
       await resend.emails.send({
         from: FROM,

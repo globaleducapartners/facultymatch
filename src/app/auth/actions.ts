@@ -6,7 +6,7 @@ import { generateToken, getTokenExpiry } from "@/lib/activation-token";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Resend } from 'resend';
-import { extractDomainFromWebsite, extractDomainFromEmail } from "@/lib/domain";
+import { notifyAdminNewRegistration } from "@/lib/admin-alerts";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || 'FacultyMatch <noreply@facultymatch.app>';
@@ -175,13 +175,13 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
       );
     }
 
-    // Notify support team of new registration
-    resend.emails.send({
-      from: FROM,
-      to: ['support@facultymatch.app'],
-      subject: `🎓 Nuevo ${role === 'faculty' ? 'docente' : 'institución'} registrado: ${fullName}`,
-      html: buildSupportNotification(role, fullName, email, role === 'institution' ? (institutionName || undefined) : undefined),
-    }).catch(e => console.warn("[SignUp] Support notification email failed:", e));
+    // Notify admin of new registration
+    notifyAdminNewRegistration({
+      role,
+      name: fullName,
+      email,
+      institutionName: role === 'institution' ? institutionName : null,
+    }).catch(e => console.warn("[SignUp] Admin notification failed:", e));
   }
 
   // Redirect to the correct page — redirect() in server actions ensures
@@ -192,194 +192,6 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
     redirect("/app/institution");
   }
   redirect("/auth/verificar-email?email=" + encodeURIComponent(email));
-}
-
-// Institution-specific signup: uses admin client to auto-confirm (no Supabase email sent)
-// then auto-logs in and sends our own branded welcome email via Resend
-export async function signUpInstitution(formData: FormData) {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const fullName = formData.get("fullName") as string;
-  const firstName = formData.get("firstName") as string;
-  const lastName = formData.get("lastName") as string;
-  const institutionName = formData.get("institutionName") as string;
-  const institutionType = formData.get("institutionType") as string;
-  const country = formData.get("country") as string;
-  const city = formData.get("city") as string;
-  const website = formData.get("website") as string;
-  const cif = formData.get("cif") as string;
-  const position = formData.get("position") as string;
-  const phone = formData.get("phone") as string;
-  const urgency = formData.get("urgency") as string;
-  const termsAccepted = formData.get("terms_accepted") === "true";
-  const privacyAccepted = formData.get("privacy_accepted") === "true";
-  const marketingOptIn = formData.get("marketing_opt_in") === "true";
-
-  const universityIdStr = formData.get("university_id") as string;
-  const autoVerify = formData.get("auto_verify") === "true";
-  const universityVerifiedName = formData.get("university_verified_name") as string;
-  // university_id is integer in universities_es
-  const universityId = universityIdStr ? parseInt(universityIdStr, 10) : null;
-
-  let knowledge_areas: string[] = [];
-  try { knowledge_areas = JSON.parse((formData.get("knowledge_areas") as string) || "[]"); } catch {}
-
-  if (!email || !password || !fullName || !institutionName) {
-    return { error: "Faltan datos obligatorios." };
-  }
-  if (!website) {
-    return { error: "La web institucional es obligatoria. Debe tener el mismo dominio que tu correo electrónico." };
-  }
-
-  // Domain validation: the institution account email must belong to the institution's domain
-  const websiteDomain = extractDomainFromWebsite(website);
-  const emailDomain = extractDomainFromEmail(email);
-  if (websiteDomain && emailDomain) {
-    // Check if email domain matches the website domain (or is a subdomain of it)
-    const emailDomainLower = emailDomain.toLowerCase();
-    const websiteDomainLower = websiteDomain.toLowerCase();
-    const isValidDomain = emailDomainLower === websiteDomainLower ||
-      emailDomainLower.endsWith("." + websiteDomainLower);
-    if (!isValidDomain) {
-      return {
-        error: `El correo electrónico debe pertenecer al dominio de la institución (${websiteDomain}). Ejemplo: usuario@${websiteDomain}`,
-      };
-    }
-  }
-  if (!websiteDomain) {
-    return { error: "La URL de la web institucional no es válida. Asegúrate de incluir el dominio completo (ej: https://www.universidad.es)." };
-  }
-
-  const admin = createAdminClient();
-
-  // Create user with email pre-confirmed — no Supabase confirmation email sent
-  const { data, error } = await admin.auth.admin.createUser({
-    email: email.toLowerCase(),
-    password,
-    email_confirm: true,
-    user_metadata: {
-      full_name: fullName,
-      first_name: firstName,
-      last_name: lastName,
-      role: "institution",
-      onboarding_completed: true,
-      institution_name: institutionName,
-      institution_type: institutionType,
-      country,
-      city,
-      website: website || null,
-      cif: cif || null,
-      position,
-      phone,
-      knowledge_areas,
-      urgency: urgency || null,
-      terms_accepted: termsAccepted,
-      privacy_accepted: privacyAccepted,
-      marketing_opt_in: marketingOptIn,
-      consent_version: "v1",
-    },
-  });
-
-  if (error) {
-    const msg = error.message.toLowerCase();
-    if (msg.includes("already registered") || msg.includes("already been registered") ||
-        msg.includes("user already") || msg.includes("email address is already") ||
-        msg.includes("email already")) {
-      return { error: "Este correo ya está registrado. Accede con tu cuenta existente." };
-    }
-    return { error: error.message };
-  }
-
-  if (!data.user) return { error: "No se pudo crear la cuenta. Inténtalo de nuevo." };
-
-  // If domain matches a university, use its official name and mark as verified
-  const nameToSave = autoVerify && universityVerifiedName ? universityVerifiedName : institutionName;
-
-  // Create institution record immediately with all signup data
-  const cityCountry = [city, country].filter(Boolean).join(', ');
-  const institutionRecord: Record<string, unknown> = {
-    id: data.user.id,
-    user_id: data.user.id,
-    name: nameToSave,
-    institution_type: institutionType || null,
-    type: institutionType || null,
-    country: country || null,
-    city: city || null,
-    location: cityCountry || null,
-    website: website || null,
-    phone: phone || null,
-    contact_email: email.toLowerCase(),
-    status: autoVerify ? "approved" : "pending",
-  };
-  if (autoVerify) institutionRecord.verified = true;
-  if (universityId != null && !isNaN(universityId)) institutionRecord.university_id = universityId;
-
-  const { error: upsertError } = await admin.from("institutions").upsert(institutionRecord, { onConflict: "id" });
-  if (upsertError) {
-    console.error("[signUpInstitution] institutions upsert failed:", upsertError.message, "| record:", JSON.stringify({ auto_verify: autoVerify, university_id: universityId, verified: institutionRecord.verified }));
-  }
-
-  // Auto-link any faculty who pre-blocked this institution by name
-  const { data: newInst } = await admin
-    .from("institutions")
-    .select("id")
-    .eq("user_id", data.user.id)
-    .maybeSingle();
-  if (newInst) {
-    // Search by both user-typed name and official verified name to maximize matches
-    try {
-      await admin
-        .from("visibility_rules")
-        .update({ institution_id: newInst.id })
-        .ilike("institution_name", nameToSave)
-        .is("institution_id", null)
-        .eq("rule", "block");
-    } catch {
-      // Non-blocking — ignore errors silently
-    }
-  }
-
-  // Auto-login
-  const supabase = await createClient();
-  const { error: signInError } = await supabase.auth.signInWithPassword({
-    email: email.toLowerCase(),
-    password,
-  });
-  if (signInError) {
-    console.error("[signUpInstitution] Auto-login failed:", signInError.message);
-    return { error: "Cuenta creada. Por favor accede con tu email y contraseña." };
-  }
-
-  // Save to institution_applications (non-blocking)
-  admin.from("institution_applications").insert({
-    institution_name: institutionName,
-    institution_type: institutionType,
-    country,
-    city,
-    website: website || null,
-    contact_name: fullName,
-    contact_email: email.toLowerCase(),
-    contact_phone: phone,
-    contact_role: position,
-    knowledge_areas: knowledge_areas,
-    urgency: urgency || null,
-  }).then(({ error }) => {
-    if (error) console.warn('[signUpInstitution] application insert failed:', error.message);
-  });
-
-  // Send branded welcome email via Resend (not Supabase)
-  sendWelcomeEmail(email.toLowerCase(), fullName, "institution", institutionName)
-    .catch(e => console.error("[signUpInstitution] Welcome email failed:", e));
-
-  // Notify support team of new institution registration
-  resend.emails.send({
-    from: FROM,
-    to: ['support@facultymatch.app'],
-    subject: `🏛️ Nueva institución registrada: ${institutionName}`,
-    html: buildSupportNotification("institution", fullName, email.toLowerCase(), institutionName, country, city, institutionType),
-  }).catch(e => console.warn("[signUpInstitution] Support notification email failed:", e));
-
-  redirect("/app/institution");
 }
 
 export async function updateEmail(formData: FormData) {
@@ -571,7 +383,7 @@ export async function contactFaculty(formData: FormData) {
   // facultyId is faculty_profiles.id — need to look up the auth user via user_id
   const { data: facultyProfile } = await supabaseAdmin
     .from('faculty_profiles')
-    .select('user_id')
+    .select('user_id, notify_new_offers')
     .eq('id', facultyId)
     .maybeSingle();
 
@@ -587,8 +399,9 @@ export async function contactFaculty(formData: FormData) {
     .eq('id', institutionId)
     .single();
 
-  // Email al docente notificándole del contacto
-  if (facultyUser && facultyProfile) {
+  // Email al docente notificándole del contacto — respeta su preferencia
+  // de "nuevas ofertas" (activada por defecto)
+  if (facultyUser && facultyProfile && facultyProfile.notify_new_offers !== false) {
     const { data: facultyAuth } = await supabaseAdmin.auth.admin.getUserById(facultyProfile.user_id);
     if (facultyAuth?.user?.email) {
       try {
@@ -789,57 +602,6 @@ export async function toggleFavorite(facultyId: string, institutionId: string) {
     revalidatePath("/app/institution/favorites");
     return { success: true, action: 'added' };
   }
-}
-
-// ─── Internal helper ────────────────────────────────────────────────────────
-
-function buildSupportNotification(
-  role: string,
-  name: string,
-  email: string,
-  institution?: string,
-  country?: string,
-  city?: string,
-  type?: string,
-) {
-  const roleLabel = role === "faculty" ? "Docente" : "Institución";
-  const rows = [
-    ["Tipo", roleLabel],
-    ["Nombre", name],
-    ["Email", email],
-    institution ? ["Institución", institution] : null,
-    type ? ["Tipo de institución", type] : null,
-    (city || country) ? ["Ubicación", [city, country].filter(Boolean).join(", ")] : null,
-    ["Fecha", new Date().toLocaleString("es-ES", { timeZone: "Europe/Madrid" })],
-  ].filter(Boolean) as [string, string][];
-
-  return `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
-<tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;max-width:600px;">
-<tr><td style="background:#0B1220;padding:24px 40px;text-align:center;border-radius:16px 16px 0 0;">
-  <span style="color:#fff;font-size:20px;font-weight:900;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
-  <p style="color:#94a3b8;font-size:12px;margin:4px 0 0;">Notificación interna — Nuevo registro</p>
-</td></tr>
-<tr><td style="padding:40px;">
-  <h2 style="margin:0 0 20px;color:#0B1220;font-size:22px;font-weight:900;">Nuevo ${roleLabel} registrado</h2>
-  <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
-  ${rows.map(([label, value], i) => `
-    <tr style="background:${i % 2 === 0 ? '#f8fafc' : '#fff'};">
-      <td style="padding:12px 16px;font-size:13px;color:#94a3b8;font-weight:700;width:40%;">${label}</td>
-      <td style="padding:12px 16px;font-size:13px;color:#0B1220;font-weight:600;">${value}</td>
-    </tr>`).join("")}
-  </table>
-  <div style="margin-top:24px;">
-    <a href="https://www.facultymatch.app/control" style="display:inline-block;background:#2563EB;color:#fff;padding:12px 24px;border-radius:10px;font-weight:700;text-decoration:none;font-size:14px;">
-      Ir al panel de administración →
-    </a>
-  </div>
-</td></tr>
-<tr><td style="background:#f8fafc;padding:16px 40px;text-align:center;border-top:1px solid #e2e8f0;border-radius:0 0 16px 16px;">
-  <p style="margin:0;font-size:11px;color:#94a3b8;">FacultyMatch · Notificación automática interna</p>
-</td></tr>
-</table></td></tr></table>
-</body></html>`;
 }
 
 export async function switchActiveMode(formData: FormData) {

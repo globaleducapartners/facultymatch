@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { CVUpload } from "@/components/profile/CVUpload";
 import { revalidatePath } from "next/cache";
+import { notifyAdminProfileNeedsReview } from "@/lib/admin-alerts";
 
 export default async function VerificationPage() {
   const supabase = await createClient();
@@ -137,10 +138,13 @@ export default async function VerificationPage() {
     const complete = freshSteps.every(Boolean);
     if (!complete) return;
 
-    await supabase
+    const { error } = await supabase
       .from("faculty_profiles")
       .update({ estado_perfil: "en_revision" })
       .eq("id", user.id);
+    if (error) return;
+
+    notifyAdminProfileNeedsReview(user.id).catch(e => console.error("[requestVerification] admin alert failed:", e));
     revalidatePath("/app/faculty/verification");
   }
 

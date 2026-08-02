@@ -1,16 +1,13 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { Resend } from "resend";
 import { extractDomainFromWebsite, extractDomainFromEmail } from "@/lib/domain";
+import { sendInstitutionProfileUpdatedEmail } from "@/lib/emails/service";
 import { Building2, Globe, MapPin, Phone, Mail, Users, Calendar, Link as LinkIcon, Save } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InstitutionLogoUpload } from "@/components/dashboard/InstitutionLogoUpload";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = process.env.RESEND_FROM_EMAIL || "FacultyMatch <noreply@facultymatch.app>";
 
 export default async function InstitutionProfilePage({
   searchParams,
@@ -135,32 +132,7 @@ export default async function InstitutionProfilePage({
     // Send email notification to user about profile update
     const userEmail = user.email;
     if (userEmail) {
-      resend.emails.send({
-        from: FROM,
-        to: [userEmail],
-        subject: "Perfil institucional actualizado — FacultyMatch",
-        html: `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
-<tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;max-width:600px;">
-<tr><td style="background:#0B1220;padding:24px 40px;text-align:center;border-radius:16px 16px 0 0;">
-  <span style="color:#fff;font-size:20px;font-weight:900;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
-</td></tr>
-<tr><td style="padding:40px;">
-  <h2 style="margin:0 0 12px;color:#0B1220;font-size:22px;font-weight:900;">Perfil actualizado correctamente</h2>
-  <p style="color:#64748b;font-size:15px;line-height:1.7;margin:0 0 24px;">
-    Hemos guardado los cambios en el perfil de <strong style="color:#0B1220;">${name}</strong>.
-    Tu información ya está actualizada en la plataforma.
-  </p>
-  <a href="https://www.facultymatch.app/app/institution/profile" style="display:inline-block;background:#2563EB;color:#fff;padding:14px 28px;border-radius:10px;font-weight:700;text-decoration:none;">
-    Ver mi perfil →
-  </a>
-</td></tr>
-<tr><td style="background:#f8fafc;padding:16px 40px;text-align:center;border-top:1px solid #e2e8f0;border-radius:0 0 16px 16px;">
-  <p style="margin:0;font-size:11px;color:#94a3b8;">FacultyMatch · www.facultymatch.app</p>
-</td></tr>
-</table></td></tr></table>
-</body></html>`,
-      }).catch(e => console.warn("[updateInstitution] email failed:", e));
+      sendInstitutionProfileUpdatedEmail(userEmail, name);
     }
 
     revalidatePath("/app/institution/profile");

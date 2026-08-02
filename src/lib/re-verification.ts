@@ -2,6 +2,7 @@
 
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { SENSITIVE_FIELDS } from "@/lib/profile-sensitivity";
+import { notifyAdminProfileNeedsReview } from "@/lib/admin-alerts";
 
 /**
  * When a verified profile updates a sensitive field, downgrade it back to
@@ -27,7 +28,7 @@ export async function checkReVerification(userId: string, dbColumns: string[]) {
   if (!hasSensitive) return;
 
   const admin = createAdminClient();
-  await admin.from("faculty_profiles").update({
+  const { error } = await admin.from("faculty_profiles").update({
     estado_perfil: "en_revision",
     is_verified: false,
     verificado_por: null,
@@ -35,4 +36,10 @@ export async function checkReVerification(userId: string, dbColumns: string[]) {
     verification_notes: null,
     updated_at: new Date().toISOString(),
   }).eq("id", userId);
+  if (error) {
+    console.error("[checkReVerification]", error);
+    return;
+  }
+
+  notifyAdminProfileNeedsReview(userId).catch(e => console.error("[checkReVerification] admin alert failed:", e));
 }
