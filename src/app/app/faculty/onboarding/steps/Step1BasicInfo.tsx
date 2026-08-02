@@ -75,7 +75,7 @@ export function Step1BasicInfo({ data, updateData, user, avatarUrl }: Props) {
         <AvatarUpload userId={user.id} currentAvatarUrl={avatarUrl} name={data.fullName} />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label style={lbl}>Nombre completo *</label>
           <input
@@ -97,7 +97,7 @@ export function Step1BasicInfo({ data, updateData, user, avatarUrl }: Props) {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label style={lbl}>País</label>
           <select

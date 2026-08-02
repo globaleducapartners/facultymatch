@@ -124,7 +124,7 @@ export function Step2CareerType({ data, updateData, user, facultyProfile }: Prop
       </div>
 
       {/* Career type cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Academic card */}
         <button
           type="button"
@@ -248,7 +248,7 @@ export function Step2CareerType({ data, updateData, user, facultyProfile }: Prop
       {/* Professional section with chips */}
       {isProfessional && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label style={lbl}>Cargo / Rol actual</label>
               <input

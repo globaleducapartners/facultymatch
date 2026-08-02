@@ -191,7 +191,7 @@ export function Step3Specialty({ data, updateData }: Props) {
       </div>
 
       {/* Scholar IDs */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label style={lbl}>Google Scholar ID</label>
           <input
