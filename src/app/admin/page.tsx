@@ -20,5 +20,5 @@ export default async function AdminPage() {
     redirect("/");
   }
 
-  redirect("/app/admin");
+  redirect("/control");
 }

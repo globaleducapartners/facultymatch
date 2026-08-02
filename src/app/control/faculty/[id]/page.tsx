@@ -324,7 +324,7 @@ export default async function FacultyDetailPage({
               <div className="flex flex-wrap gap-2">
                 {fp.languages.map((lang: any, i: number) => (
                   <span key={i} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-purple-50 text-purple-700">
-                    {lang.language || lang.name || lang}
+                    {lang.lang || lang.language || lang.name || (typeof lang === "string" ? lang : "")}
                     {lang.level ? ` · ${lang.level}` : ""}
                   </span>
                 ))}

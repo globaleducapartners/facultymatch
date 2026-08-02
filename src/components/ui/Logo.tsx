@@ -5,9 +5,10 @@ interface LogoProps {
   /** "dark" = logo on light background (dark text). "light" = logo on dark background (white text). */
   variant?: "dark" | "light";
   href?: string;
+  onClick?: () => void;
 }
 
-export function Logo({ className = "", variant = "dark", href = "/" }: LogoProps) {
+export function Logo({ className = "", variant = "dark", href = "/", onClick }: LogoProps) {
   const textColor = variant === "light" ? "#ffffff" : "#0C1018";
   // "Encuentro" mark: two overlapping circles — docente (claro/marino) + institución (naranja).
   const circleA = variant === "light" ? "#EAF0F9" : "#0D2240";
@@ -15,6 +16,7 @@ export function Logo({ className = "", variant = "dark", href = "/" }: LogoProps
   return (
     <Link
       href={href}
+      onClick={onClick}
       style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}
       className={className}
     >

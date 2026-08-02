@@ -63,10 +63,9 @@ export default function AdminLoginPage() {
                   name="email"
                   type="email"
                   required
-                  defaultValue="admin@facultymatch.app"
                   autoComplete="email"
                   className="w-full pl-11 pr-5 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-medium"
-                  placeholder="admin@facultymatch.app"
+                  placeholder="admin@tudominio.com"
                 />
               </div>
             </div>

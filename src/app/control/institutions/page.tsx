@@ -12,7 +12,8 @@ async function toggleInstitutionStatus(formData: FormData) {
   const id = formData.get("id") as string;
   const currentStatus = formData.get("currentStatus") as string;
   const newStatus = currentStatus === "blocked" ? "active" : "blocked";
-  await admin.from("institutions").update({ status: newStatus }).eq("id", id);
+  const { error } = await admin.from("institutions").update({ status: newStatus }).eq("id", id);
+  if (error) throw new Error("No se pudo actualizar el estado: " + error.message);
   revalidatePath("/control/institutions");
 }
 
@@ -31,7 +32,8 @@ async function deleteInstitution(formData: FormData) {
     .single();
 
   // Delete the institution record first
-  await admin.from("institutions").delete().eq("id", id);
+  const { error: deleteError } = await admin.from("institutions").delete().eq("id", id);
+  if (deleteError) throw new Error("No se pudo eliminar la institución: " + deleteError.message);
 
   if (inst?.user_id) {
     // Check if the owner is a dual-mode faculty user or a pure institution user

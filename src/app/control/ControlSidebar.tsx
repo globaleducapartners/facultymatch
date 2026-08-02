@@ -11,9 +11,10 @@ import { useState } from "react";
 interface Props {
   pendingCount: number;
   adminName: string;
+  adminRole: string;
 }
 
-export default function ControlSidebar({ pendingCount, adminName }: Props) {
+export default function ControlSidebar({ pendingCount, adminName, adminRole }: Props) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -34,9 +35,7 @@ export default function ControlSidebar({ pendingCount, adminName }: Props) {
     <>
       {/* Logo */}
       <div className="p-6 border-b border-white/10">
-        <Link href="/control/metrics" onClick={() => setMobileOpen(false)}>
-          <Logo variant="light" />
-        </Link>
+        <Logo variant="light" href="/control/metrics" onClick={() => setMobileOpen(false)} />
         <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-2">
           Panel de Administración
         </p>
@@ -79,7 +78,7 @@ export default function ControlSidebar({ pendingCount, adminName }: Props) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-white truncate">{adminName}</p>
-            <p className="text-[10px] text-white/30 font-medium">Super Admin</p>
+            <p className="text-[10px] text-white/30 font-medium">{adminRole === "super_admin" ? "Super Admin" : "Admin"}</p>
           </div>
         </div>
         <AdminLogoutButton />
@@ -91,9 +90,7 @@ export default function ControlSidebar({ pendingCount, adminName }: Props) {
     <>
       {/* Mobile top bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-navy flex items-center justify-between px-4 h-14 border-b border-white/10">
-        <Link href="/control/metrics">
-          <Logo variant="light" />
-        </Link>
+        <Logo variant="light" href="/control/metrics" />
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
           className="text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/5"

@@ -198,30 +198,35 @@ export default async function MetricsPage() {
     .select("id, name")
     .limit(200);
 
-  const institutionSignals = await Promise.all(
-    (institutions ?? []).map(async (inst: any) => {
-      const { count: contactCount } = await admin
-        .from("contacts")
-        .select("*", { count: "exact", head: true })
-        .eq("institution_id", inst.id);
+  const institutionIds = (institutions ?? []).map((inst: any) => inst.id);
+  const [{ data: allContactRows }, { data: allFavoriteRows }] = await Promise.all([
+    institutionIds.length > 0
+      ? admin.from("contacts").select("institution_id").in("institution_id", institutionIds)
+      : Promise.resolve({ data: [] as { institution_id: string }[] }),
+    institutionIds.length > 0
+      ? admin.from("favorites").select("institution_id").in("institution_id", institutionIds)
+      : Promise.resolve({ data: [] as { institution_id: string }[] }),
+  ]);
+  const contactCounts = new Map<string, number>();
+  (allContactRows ?? []).forEach((r: any) => contactCounts.set(r.institution_id, (contactCounts.get(r.institution_id) ?? 0) + 1));
+  const favoriteCounts = new Map<string, number>();
+  (allFavoriteRows ?? []).forEach((r: any) => favoriteCounts.set(r.institution_id, (favoriteCounts.get(r.institution_id) ?? 0) + 1));
 
-      const { count: favCount } = await admin
-        .from("favorites")
-        .select("*", { count: "exact", head: true })
-        .eq("institution_id", inst.id);
+  const institutionSignals = (institutions ?? []).map((inst: any) => {
+    const contactCount = contactCounts.get(inst.id) ?? 0;
+    const favCount = favoriteCounts.get(inst.id) ?? 0;
 
-      let intention: "Alta" | "Media" | "Baja" = "Baja";
-      if ((contactCount ?? 0) > 0) intention = "Alta";
-      else if ((favCount ?? 0) > 0) intention = "Media";
+    let intention: "Alta" | "Media" | "Baja" = "Baja";
+    if (contactCount > 0) intention = "Alta";
+    else if (favCount > 0) intention = "Media";
 
-      return {
-        name: inst.name || "Sin nombre",
-        contacts: contactCount ?? 0,
-        favorites: favCount ?? 0,
-        intention,
-      };
-    })
-  );
+    return {
+      name: inst.name || "Sin nombre",
+      contacts: contactCount,
+      favorites: favCount,
+      intention,
+    };
+  });
   institutionSignals.sort((a, b) => {
     const order = { Alta: 3, Media: 2, Baja: 1 };
     return (order[b.intention] ?? 0) - (order[a.intention] ?? 0);

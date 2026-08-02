@@ -72,7 +72,7 @@ export function Sidebar() {
   let navItems: { label: string; href: string; icon: any; group?: string }[] = educatorItems;
   if (pathname?.startsWith("/app/institution")) {
     navItems = institutionItems;
-  } else if (pathname?.startsWith("/app/admin") || pathname?.startsWith("/control")) {
+  } else if (pathname?.startsWith("/control")) {
     navItems = adminItems;
   }
 

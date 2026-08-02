@@ -6,23 +6,27 @@ import { revalidatePath } from "next/cache";
 
 export async function hideFaculty(facultyId: string) {
   const { admin } = await requireAdmin();
-  await admin.from("faculty_profiles").update({ visibility: "private" }).eq("user_id", facultyId);
+  const { error } = await admin.from("faculty_profiles").update({ visibility: "private" }).eq("user_id", facultyId);
+  if (error) throw new Error("No se pudo ocultar el perfil: " + error.message);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
 export async function unhideFaculty(facultyId: string) {
   const { admin } = await requireAdmin();
-  await admin.from("faculty_profiles").update({ visibility: "public" }).eq("user_id", facultyId);
+  const { error } = await admin.from("faculty_profiles").update({ visibility: "public" }).eq("user_id", facultyId);
+  if (error) throw new Error("No se pudo mostrar el perfil: " + error.message);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
 export async function revokeFaculty(facultyId: string) {
-  const { admin } = await requireAdmin();
-  await admin.from("faculty_profiles").update({
+  const { userId, admin } = await requireAdmin();
+  const { error } = await admin.from("faculty_profiles").update({
     estado_perfil: "rechazado",
     is_verified: false,
+    verificado_por: userId,
     verificado_en: new Date().toISOString(),
   }).eq("user_id", facultyId);
+  if (error) throw new Error("No se pudo revocar la verificación: " + error.message);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
@@ -49,12 +53,13 @@ export async function activateFaculty(
 
   await ensureProfileSlug(admin, facultyId);
 
-  await admin.from("faculty_profiles").update({
+  const { error } = await admin.from("faculty_profiles").update({
     estado_perfil: "verificado",
     is_verified: true,
     verificado_por: userId,
     verificado_en: new Date().toISOString(),
   }).eq("user_id", facultyId);
+  if (error) throw new Error("No se pudo verificar el perfil: " + error.message);
   revalidatePath(`/control/faculty/${facultyId}`);
   return { ok: true };
 }
@@ -62,7 +67,8 @@ export async function activateFaculty(
 export async function deleteFaculty(facultyId: string) {
   const { admin } = await requireAdmin();
   // Delete user (cascade will handle related tables)
-  await admin.auth.admin.deleteUser(facultyId);
+  const { error } = await admin.auth.admin.deleteUser(facultyId);
+  if (error) throw new Error("No se pudo eliminar la cuenta: " + error.message);
   revalidatePath("/control/faculty");
 }
 
@@ -123,7 +129,7 @@ export async function sendNotification(
   }
 
   // Insert notification
-  await admin.from("admin_notifications").insert({
+  const { error: notifError } = await admin.from("admin_notifications").insert({
     faculty_id: facultyId,
     type,
     subject,
@@ -131,6 +137,7 @@ export async function sendNotification(
     admin_id: userId,
     email_log_id: emailLogId,
   });
+  if (notifError) throw new Error("No se pudo registrar la notificación: " + notifError.message);
 
   revalidatePath(`/control/faculty/${facultyId}`);
 }
