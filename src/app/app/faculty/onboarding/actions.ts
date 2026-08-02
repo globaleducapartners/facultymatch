@@ -178,6 +178,43 @@ export async function publishProfile() {
     throw new Error("Error al publicar: " + error.message);
   }
 
+  // Sync the specialty collected in step 3 of the wizard into
+  // faculty_expertise. Every other part of the app (search matching,
+  // directory, public profile page, PDF export, completeness check) reads
+  // specialties from that table via faculty_id — never from these
+  // unesco_area/unesco_subarea/unesco_topics columns on faculty_profiles —
+  // so without this, whatever the wizard collected here silently never
+  // showed up anywhere else in the product.
+  const { data: fp } = await admin
+    .from("faculty_profiles")
+    .select("id, unesco_area, unesco_subarea, unesco_topics")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (fp?.unesco_area) {
+    const { data: existingExpertise } = await admin
+      .from("faculty_expertise")
+      .select("id")
+      .eq("faculty_id", fp.id)
+      .eq("area", fp.unesco_area)
+      .maybeSingle();
+
+    if (!existingExpertise) {
+      const topics = fp.unesco_topics
+        ? fp.unesco_topics.split(",").map((s: string) => s.trim()).filter(Boolean)
+        : [];
+      const { error: expertiseError } = await admin.from("faculty_expertise").insert({
+        faculty_id: fp.id,
+        area: fp.unesco_area,
+        subarea: fp.unesco_subarea || null,
+        topics,
+      });
+      if (expertiseError) {
+        console.error("[publishProfile] failed to sync faculty_expertise:", expertiseError);
+      }
+    }
+  }
+
   notifyAdminProfileNeedsReview(user.id).catch(e => console.error("[publishProfile] admin alert failed:", e));
 
   revalidatePath("/app/faculty/onboarding");

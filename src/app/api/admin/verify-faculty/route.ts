@@ -106,8 +106,18 @@ export async function POST(request: Request) {
   if (action === "requires_info") {
     const message = infoMessage || "Necesitamos información adicional para verificar tu perfil.";
 
+    // Also clear is_verified/verificado_por/verificado_en — without this,
+    // a profile that reaches "requires_info" after already having been
+    // verified once (an admin sends it back for a re-check post sensitive-
+    // field edit) kept those fields pointing at the earlier approval, so
+    // anything reading them independently of estado_perfil would still
+    // treat it as verified even though estado_perfil correctly moved away
+    // from "verificado".
     await admin.from("faculty_profiles").update({
       estado_perfil: "incompleto",
+      is_verified: false,
+      verificado_por: null,
+      verificado_en: null,
       verification_notes: notes ? `${notes}\n\nInfo solicitada: ${message}` : `Info solicitada: ${message}`,
     }).eq("user_id", facultyId);
 

@@ -178,9 +178,16 @@ export default async function FacultyDirectoryPage({
   const hasExpertiseIds = new Set((allExpertiseData || []).map((e: any) => e.faculty_id));
 
   // ── Main DB query with all filters pushed down ───────────────────────────
+  // estado_perfil = 'verificado' was missing entirely here — this directory
+  // (faculty browsing their peers, read-only) showed every faculty_profiles
+  // row regardless of verification status: pendiente_verificacion,
+  // incompleto, en_revision, rechazado all leaked through. The institution
+  // side of this same shared component (src/app/app/institution/search/
+  // page.tsx) already had this filter; it was just never copied here.
   let educatorQuery = admin
     .from("faculty_profiles")
     .select(`*, user:user_profiles(full_name, avatar_url, plan, subscription_status), expertise:faculty_expertise(*)`)
+    .eq("estado_perfil", "verificado")
     .or("visibility.eq.public,visibility.eq.private,visibility.is.null");
 
   // Broad text search: headline + bio + current_institution + full_name +

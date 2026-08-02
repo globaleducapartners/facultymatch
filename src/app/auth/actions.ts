@@ -187,10 +187,16 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
   }
 
   // Redirect to the correct page — redirect() in server actions ensures
-  // session cookies set by signInWithPassword() are included in the response
+  // session cookies set by signInWithPassword() are included in the response.
+  // revalidatePath forces a fresh render of the destination — right after
+  // auto-login, Next's router cache can otherwise serve a copy of the page
+  // fetched before the session existed, showing blank content until a
+  // manual reload.
   if (role === "faculty") {
+    revalidatePath("/auth/verificar-email");
     redirect("/auth/verificar-email?email=" + encodeURIComponent(email));
   } else if (role === "institution") {
+    revalidatePath("/app/institution");
     redirect("/app/institution");
   }
   redirect("/auth/verificar-email?email=" + encodeURIComponent(email));
