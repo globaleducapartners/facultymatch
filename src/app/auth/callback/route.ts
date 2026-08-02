@@ -3,7 +3,7 @@ import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { notifyAdminNewRegistration } from '@/lib/admin-alerts';
 
-// Admin client to read faculty_leads (bypasses RLS — leads have no SELECT policy)
+// Admin client — bypasses RLS for the profile-recovery/upsert writes below
 const supabaseAdmin = createAdminClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -125,60 +125,6 @@ export async function GET(request: Request) {
     } catch (e) {
       console.warn('[callback] referral code save failed:', e);
     }
-  }
-
-  // Step 4c: Try to pre-populate faculty_profiles from faculty_leads
-  // (only for old /apply magic-link users — skip for new /signup/faculty users
-  //  to avoid overwriting onboarding_completed with false)
-  try {
-    const { data: lead } = await supabaseAdmin
-      .from('faculty_leads')
-      .select('*')
-      .eq('email', user.email)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (lead) {
-      await supabaseAdmin
-  .from('faculty_profiles')
-  .upsert({
-    user_id: user.id,
-    bio: lead.bio ?? undefined,
-    location: lead.city
-      ? [lead.city, lead.country].filter(Boolean).join(', ')
-      : lead.country ?? undefined,
-    city: lead.city ?? undefined,
-    country: lead.country ?? undefined,
-    linkedin_url: lead.linkedin_url ?? undefined,
-    modalities: lead.modalities ?? undefined,
-    // CORREGIDO: primary_fields en leads = faculty_areas en profiles
-    faculty_areas: lead.primary_fields ?? lead.fields ?? lead.faculty_areas ?? undefined,
-    // AÑADIDO: subjects se guarda como datos extra
-    subjects: lead.subjects ?? undefined,
-    languages: lead.languages ?? undefined,
-    availability: lead.availability ?? undefined,
-    years_experience: lead.years_experience ?? undefined,
-    current_institution: lead.current_institution ?? undefined,
-    headline: lead.academic_level
-      ? `Docente · ${lead.academic_level}`
-      : undefined,
-    visibility: 'public',
-    is_active: true,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: 'user_id' });
-
-      // Only update full_name — do NOT set onboarding_completed here
-      // to avoid overwriting what the trigger already set
-      if (lead.full_name) {
-        await supabaseAdmin
-          .from('user_profiles')
-          .update({ full_name: lead.full_name })
-          .eq('id', user.id);
-      }
-    }
-  } catch (e) {
-    console.warn('[callback] lead pre-population failed:', e);
   }
 
   // Step 5: Determine destination

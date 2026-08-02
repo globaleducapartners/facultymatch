@@ -31,10 +31,6 @@ export default function robots(): MetadataRoute.Robots {
           "/update-password",
           "/auth/",
 
-          // Signup confirmation steps — only reachable via the form flow
-          "/signup/faculty/confirm",
-          "/signup/institution/confirm",
-
           // Old / legacy onboarding routes
           "/onboarding/",
           "/apply/",
