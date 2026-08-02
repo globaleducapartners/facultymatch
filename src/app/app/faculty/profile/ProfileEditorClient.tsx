@@ -1035,14 +1035,14 @@ export function ProfileEditorClient({
               <span style={{ fontFamily: SANS, fontSize: 12, color: D.muted }}>
                 {completeness < 60 ? "Empieza a completar tu perfil" : completeness < 80 ? "Casi completo" : "Perfil completo"}
               </span>
-              <span style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: completeness >= 80 ? D.green : D.blue, letterSpacing: "-0.04em" }}>
+              <span style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: D.gold, letterSpacing: "-0.04em" }}>
                 {completeness}%
               </span>
             </div>
             <div style={{ height: 8, background: D.surf, borderRadius: 999, overflow: "hidden" }}>
               <div style={{
                 height: "100%", width: `${completeness}%`,
-                background: completeness >= 80 ? D.green : D.blue,
+                background: D.gold,
                 borderRadius: 999, transition: "width 0.5s ease",
               }} />
             </div>

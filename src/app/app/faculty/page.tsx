@@ -603,11 +603,11 @@ export default async function EducatorDashboard() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-bold text-gray-500">
                 <span>Completado</span>
-                <span className={progress === 100 ? "text-green-600 font-black" : "text-fm-blue font-black"}>{progress}%</span>
+                <span className="text-fm-gold font-black">{progress}%</span>
               </div>
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all ${progress === 100 ? "bg-green-500" : "bg-fm-blue"}`}
+                  className="h-full rounded-full bg-fm-gold transition-all"
                   style={{ width: `${progress}%` }}
                 />
               </div>

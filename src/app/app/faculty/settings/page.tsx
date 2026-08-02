@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
+import { revalidatePath } from "next/cache";
 import { Bell, Trash2, ShieldCheck, Download, AlertTriangle, Sparkles, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,8 +38,10 @@ export default async function SettingsPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    await supabase.from("faculty_profiles")
+    const { error } = await supabase.from("faculty_profiles")
       .upsert({ id: user.id, user_id: user.id, [key]: value }, { onConflict: "id" });
+    if (error) console.error("[updateNotificationPref]", key, error);
+    revalidatePath("/app/faculty/settings");
   }
 
   return (
