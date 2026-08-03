@@ -99,6 +99,8 @@ function SignupForm() {
       formData.append("terms_accepted", terms ? "on" : "off");
       formData.append("privacy_accepted", terms ? "on" : "off");
       formData.append("marketing_opt_in", "off");
+      const referralCode = searchParams.get("ref");
+      if (referralCode) formData.append("referralCode", referralCode);
 
       const result = await signUp(formData);
 

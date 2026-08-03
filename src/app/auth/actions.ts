@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { Resend } from 'resend';
 import { notifyAdminNewRegistration } from "@/lib/admin-alerts";
+import { attributeReferral } from "@/lib/referrals";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || 'FacultyMatch <noreply@facultymatch.app>';
@@ -17,6 +18,7 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
   const fullName = formData.get("fullName") as string;
   const role = formData.get("role") as "faculty" | "institution";
   const institutionName = formData.get("institutionName") as string;
+  const referralCode = (formData.get("referralCode") as string | null)?.trim() || null;
 
   const supabase = await createClient();
 
@@ -122,6 +124,12 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
       }, { onConflict: "id" });
       if (facultyProfileError) {
         console.error("[SignUp] Error upserting faculty_profiles:", facultyProfileError);
+      }
+
+      if (referralCode) {
+        await attributeReferral(admin, data.user.id, referralCode).catch(e =>
+          console.warn("[SignUp] referral attribution failed:", e)
+        );
       }
 
       // Generate activation token and send confirmation email

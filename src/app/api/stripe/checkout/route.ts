@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase-server';
 const PRICE_IDS: Record<string, string | undefined> = {
   'faculty-pro': process.env.STRIPE_PRICE_FACULTY_PRO,
   'institution-pro': process.env.STRIPE_PRICE_INSTITUTION_PRO,
+  'institution-growth': process.env.STRIPE_PRICE_INSTITUTION_GROWTH,
 };
 
 export async function POST(req: NextRequest) {

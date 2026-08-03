@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, Zap, Star, Mail } from "lucide-react";
+import { CheckCircle2, Zap, Star } from "lucide-react";
 import { StripeCancelButton } from "@/components/profile/StripeCancelButton";
 import { formatDateTZ } from "@/lib/utils";
 
@@ -159,13 +159,12 @@ export default async function BillingPage() {
               </div>
             ))}
           </div>
-          <a
-            href="mailto:support@facultymatch.app?subject=Solicitud%20Plan%20Growth%20Instituciones"
-            className="inline-flex items-center justify-center gap-1.5 w-full bg-[#E9A030] hover:bg-amber-400 text-[#0D2240] font-black py-2.5 rounded-xl text-sm transition-colors"
+          <Link
+            href="/checkout?plan=institution-growth"
+            className="inline-flex items-center justify-center w-full bg-[#E9A030] hover:bg-amber-400 text-[#0D2240] font-black py-2.5 rounded-xl text-sm transition-colors"
           >
-            <Mail size={13} /> Solicitar acceso
-          </a>
-          <p className="text-[10px] text-white/30 text-center">Disponible vía email · lanzamiento próximo</p>
+            Activar ahora — 35€/mes
+          </Link>
         </div>
 
         {/* Professional */}

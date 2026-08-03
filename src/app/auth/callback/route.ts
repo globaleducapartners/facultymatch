@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase-server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { notifyAdminNewRegistration } from '@/lib/admin-alerts';
+import { attributeReferral } from '@/lib/referrals';
 
 // Admin client — bypasses RLS for the profile-recovery/upsert writes below
 const supabaseAdmin = createAdminClient(
@@ -88,43 +89,12 @@ export async function GET(request: Request) {
   }
 
   // Step 4b: Save referral code for faculty users who registered via a referral link
+  // (solo aplica al flujo SSO — el registro normal con email/contraseña no pasa
+  // por este callback, ver attributeReferral() en auth/actions.ts signUp())
   if (user.user_metadata?.role === 'faculty' && user.user_metadata?.referral_code) {
-    try {
-      const code: string = user.user_metadata.referral_code;
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-      let referredBy: string | null = null;
-
-      if (uuidRegex.test(code)) {
-        // Personal referral link: the code is the referrer's user_id
-        referredBy = code;
-      } else {
-        // Email invite code (INVITE-XXXXXXXX): look up referrer_id in referrals table
-        const { data: referralRow } = await supabaseAdmin
-          .from('referrals')
-          .select('referrer_id')
-          .eq('code', code)
-          .maybeSingle();
-        referredBy = referralRow?.referrer_id || null;
-
-        // Update referral status to 'registered'
-        if (referralRow) {
-          await supabaseAdmin
-            .from('referrals')
-            .update({ status: 'registered' })
-            .eq('code', code);
-        }
-      }
-
-      // Only set once (don't overwrite if already redeemed)
-      await supabaseAdmin
-        .from('faculty_profiles')
-        .update({ referral_code_redeemed: code, referred_by: referredBy })
-        .eq('user_id', user.id)
-        .is('referral_code_redeemed', null);
-    } catch (e) {
-      console.warn('[callback] referral code save failed:', e);
-    }
+    await attributeReferral(supabaseAdmin, user.id, user.user_metadata.referral_code).catch(e =>
+      console.warn('[callback] referral code save failed:', e)
+    );
   }
 
   // Step 5: Determine destination

@@ -160,6 +160,24 @@ export async function runReverificationReminder(admin: Admin) {
   return { sent, errors };
 }
 
+// ── 4. Revert expired referral-reward premium back to free ──────────────────
+// Solo revierte si plan_source sigue siendo 'referral' — si el docente se
+// convirtió en cliente de pago real de por medio, el webhook de Stripe ya
+// puso plan_source='stripe' y esta consulta no lo alcanza.
+export async function runReferralRewardExpiry(admin: Admin) {
+  const now = new Date().toISOString();
+
+  const { data: expired, error } = await admin
+    .from("user_profiles")
+    .update({ plan: "free", subscription_status: "canceled", plan_source: null })
+    .eq("plan_source", "referral")
+    .lt("subscription_current_period_end", now)
+    .select("id");
+
+  if (error) return { sent: 0, errors: [error.message] };
+  return { sent: expired?.length || 0, errors: [] };
+}
+
 // ── 3. Contacts sitting unanswered ('pending') for 3-4 days ─────────────────
 export async function runUnansweredContactReminder(admin: Admin) {
   const now = new Date();

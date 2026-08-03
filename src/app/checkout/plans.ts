@@ -25,6 +25,21 @@ export const PLANS: Record<string, PlanConfig> = {
     ],
     backHref: "/faculty",
   },
+  "institution-growth": {
+    name: "Plan Growth Institución",
+    badge: "Para Instituciones · Más popular",
+    description: "Búsquedas y contactos ampliados, filtros avanzados y favoritos.",
+    price: "35€",
+    period: "/ mes",
+    features: [
+      "20 búsquedas al mes",
+      "20 contactos al mes",
+      "Filtros avanzados",
+      "Favoritos",
+      "Soporte por email",
+    ],
+    backHref: "/institutions",
+  },
   "institution-pro": {
     name: "Plan Professional Institución",
     badge: "Para Instituciones",

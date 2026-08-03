@@ -135,6 +135,7 @@ export async function POST(req: NextRequest) {
         .from('user_profiles')
         .update({
           plan,
+          plan_source: 'stripe',
           stripe_customer_id: customerId,
           stripe_subscription_id: subscriptionId,
           subscription_status: 'active',
@@ -193,7 +194,7 @@ export async function POST(req: NextRequest) {
       const { error: subUpdateError } = await supabase
         .from('user_profiles')
         .update({
-          ...(plan ? { plan } : {}),
+          ...(plan ? { plan, plan_source: 'stripe' } : {}),
           subscription_status: effectiveStatus,
           subscription_current_period_end: periodEnd,
         })
@@ -214,6 +215,7 @@ export async function POST(req: NextRequest) {
         .from('user_profiles')
         .update({
           plan: 'free',
+          plan_source: null,
           stripe_subscription_id: null,
           subscription_status: 'canceled',
           subscription_current_period_end: null,

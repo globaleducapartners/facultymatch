@@ -42,7 +42,7 @@ interface Props {
 
 export default function ReferralsClient({ userId, referrals, stats }: Props) {
   const router = useRouter();
-  const referralLink = `${SITE}/signup/faculty?ref=${userId}`;
+  const referralLink = `${SITE}/signup?ref=${userId}`;
 
   const [copied, setCopied] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
