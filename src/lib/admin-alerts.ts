@@ -23,7 +23,7 @@ function wrapEmail(title: string, rows: Array<[string, string]>, opts?: { urgent
   const headerBg = opts?.urgent ? "#7F1D1D" : "#0B1220";
 
   return `<!DOCTYPE html>
-<html><head><meta charset="utf-8"></head>
+<html lang="es"><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center">

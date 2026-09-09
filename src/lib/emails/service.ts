@@ -50,7 +50,7 @@ export async function sendConfirmationEmail(email: string, name: string, confirm
 // tenía su propia copia casi idéntica de este email.
 export async function sendInstitutionProfileUpdatedEmail(email: string, institutionName: string) {
   const subject = 'Perfil institucional actualizado — FacultyMatch';
-  const html = `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
+  const html = `<!DOCTYPE html><html lang="es"><body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;max-width:600px;">
 <tr><td style="background:#0B1220;padding:24px 40px;text-align:center;border-radius:16px 16px 0 0;">
@@ -79,7 +79,7 @@ export async function sendInstitutionProfileUpdatedEmail(email: string, institut
 
 export async function sendReferralRewardEmail(email: string, name: string) {
   const subject = '🏆 ¡Has ganado 1 año de acceso Professional! — FacultyMatch';
-  const html = `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
+  const html = `<!DOCTYPE html><html lang="es"><body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;max-width:600px;">
 <tr><td style="background:#0B1220;padding:24px 40px;text-align:center;border-radius:16px 16px 0 0;">
