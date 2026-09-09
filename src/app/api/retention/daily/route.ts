@@ -5,6 +5,7 @@ import {
   runReverificationReminder,
   runUnansweredContactReminder,
   runReferralRewardExpiry,
+  runActivationReminder,
 } from '@/lib/retention-reminders';
 
 // Single cron entry point running all 3 retention checks in sequence —
@@ -19,14 +20,15 @@ export async function GET(req: NextRequest) {
 
   const admin = createAdminClient();
 
-  const [institutionInactivity, reverification, unansweredContact, referralRewardExpiry] = await Promise.all([
+  const [institutionInactivity, reverification, unansweredContact, referralRewardExpiry, activationReminder] = await Promise.all([
     runInstitutionInactivityReminder(admin),
     runReverificationReminder(admin),
     runUnansweredContactReminder(admin),
     runReferralRewardExpiry(admin),
+    runActivationReminder(admin),
   ]);
 
-  const result = { institutionInactivity, reverification, unansweredContact, referralRewardExpiry };
+  const result = { institutionInactivity, reverification, unansweredContact, referralRewardExpiry, activationReminder };
   console.log('[retention/daily]', JSON.stringify(result));
 
   return NextResponse.json(result);

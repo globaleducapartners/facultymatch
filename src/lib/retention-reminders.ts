@@ -178,6 +178,84 @@ export async function runReferralRewardExpiry(admin: Admin) {
   return { sent: expired?.length || 0, errors: [] };
 }
 
+// ── 5. Signed up but never activated the account (token expired unused) ─────
+// Hallazgo del 2026-09-09: un docente puede registrarse y nunca hacer clic
+// en el enlace de activación (válido 24h) — se queda para siempre en
+// estado_perfil='pendiente_verificacion', invisible tanto para él/ella como
+// para el panel de control (que solo muestra 'en_revision'), sin que nadie
+// se lo recuerde. Ventana de 2-3 días: da tiempo de sobra a que el token de
+// 24h haya caducado antes de escribir, y evita que el cron diario repita el
+// aviso más de una vez para el mismo registro.
+export async function runActivationReminder(admin: Admin) {
+  const now = new Date();
+  const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString();
+  const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString();
+
+  const { data: tokens, error } = await admin
+    .from("activation_tokens")
+    .select("user_id, created_at")
+    .eq("used", false)
+    .gte("created_at", threeDaysAgo)
+    .lte("created_at", twoDaysAgo)
+    .limit(100);
+
+  if (error) return { sent: 0, errors: [error.message] };
+  if (!tokens || tokens.length === 0) return { sent: 0, errors: [] };
+
+  let sent = 0;
+  const errors: string[] = [];
+
+  for (const t of tokens) {
+    try {
+      // Doble comprobación defensiva: solo avisar si de verdad nunca activó
+      // (por si esta fila quedó used=false por cualquier otro motivo).
+      const { data: fp } = await admin
+        .from("faculty_profiles")
+        .select("estado_perfil")
+        .eq("user_id", t.user_id)
+        .maybeSingle();
+      if (!fp || fp.estado_perfil !== "pendiente_verificacion") continue;
+
+      const { data: authUser } = await admin.auth.admin.getUserById(t.user_id);
+      const email = authUser?.user?.email;
+      if (!email) continue;
+
+      const firstName =
+        authUser?.user?.user_metadata?.full_name?.split(" ")[0] || email.split("@")[0];
+
+      await resend.emails.send({
+        from: FROM,
+        to: [email],
+        subject: `${firstName}, tu enlace de activación ha caducado`,
+        html: emailWrapper(`
+          <h1 style="margin:0 0 16px;color:#0B1220;font-size:24px;font-weight:900;">
+            ${firstName}, tu cuenta sigue esperando a activarse
+          </h1>
+          <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.7;">
+            Te registraste en FacultyMatch pero el enlace de activación que te enviamos
+            caducó (son válidos 24 horas) antes de que lo usaras. Tu perfil todavía no
+            existe para las instituciones — pide uno nuevo y en un minuto puedes seguir
+            donde lo dejaste.
+          </p>
+          <div style="text-align:center;margin-bottom:24px;">
+            <a href="${SITE}/auth/verificar-email?email=${encodeURIComponent(email)}" style="display:inline-block;background:#F97316;color:#fff;padding:16px 36px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
+              Pedir un enlace nuevo →
+            </a>
+          </div>
+          <p style="margin:0;color:#94a3b8;font-size:12px;text-align:center;line-height:1.6;">
+            Si ya no te interesa, no hace falta que hagas nada — no volveremos a escribirte por esto.
+          </p>
+        `),
+      });
+      sent++;
+    } catch (e: any) {
+      errors.push(e.message);
+    }
+  }
+
+  return { sent, errors };
+}
+
 // ── 3. Contacts sitting unanswered ('pending') for 3-4 days ─────────────────
 export async function runUnansweredContactReminder(admin: Admin) {
   const now = new Date();
