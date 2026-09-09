@@ -94,6 +94,37 @@ export async function notifyAdminNewRegistration(params: {
   }
 }
 
+// Aviso de un error de React no capturado en el navegador de un usuario —
+// p.ej. la pantalla en blanco que requiere refrescar a mano. Antes esto no
+// dejaba ningún rastro: sin límite (error.tsx) en toda la app, un fallo así
+// simplemente desaparecía en blanco sin que nadie se enterara nunca de qué
+// lo causó. Se dispara desde error.tsx/global-error.tsx vía /api/log-client-error.
+export async function notifyAdminClientError(params: {
+  message: string;
+  digest?: string;
+  url?: string;
+  userId?: string;
+}) {
+  const { message, digest, url, userId } = params;
+  const rows: Array<[string, string]> = [
+    ["Mensaje", message.slice(0, 500)],
+  ];
+  if (digest) rows.push(["Digest", digest]);
+  if (url) rows.push(["Página", url]);
+  if (userId) rows.push(["Usuario", userId]);
+
+  try {
+    await resend.emails.send({
+      from: FROM,
+      to: [ADMIN_NOTIFY_EMAIL],
+      subject: `⚠️ Pantalla en blanco / error en la app`,
+      html: wrapEmail("Un usuario ha visto una pantalla de error", rows, { urgent: true }),
+    });
+  } catch (e) {
+    console.warn("[notifyAdminClientError] failed:", e);
+  }
+}
+
 // Aviso al admin de que un perfil docente necesita revisión — antes nadie
 // se enteraba salvo entrando al panel; se dispara desde los 3 sitios que
 // escriben estado_perfil = 'en_revision' por una acción del propio docente
