@@ -27,6 +27,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EducatorCard } from "./EducatorCard";
+import { PendingEducatorCard } from "./PendingEducatorCard";
+import { UNESCO_FIELDS } from "@/lib/unesco-fields";
 import { ContactModal } from "./ContactModal";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import Image from "next/image";
@@ -40,6 +42,10 @@ import { getDocumentUrl } from "@/lib/utils";
 
 interface InstitutionSearchPageProps {
   initialEducators: any[];
+  /** Docentes reales aún no verificados que encajan con los filtros actuales — se
+   *  muestran como tarjetas anónimas y no contactables ("X más completando su
+   *  verificación"). Vacío/omitido = no se muestra la sección. */
+  pendingEducators?: any[];
   institutionId: string;
   searchParams: any;
   initialFavorites: string[];
@@ -97,6 +103,7 @@ function buildUrlWithout(params: Record<string, any>, removeKey: string, removeV
 
 export function InstitutionSearchPage({
   initialEducators,
+  pendingEducators = [],
   institutionId,
   searchParams,
   initialFavorites,
@@ -111,6 +118,11 @@ export function InstitutionSearchPage({
   searchPath,
 }: InstitutionSearchPageProps) {
   const basePath = searchPath ?? (isReadOnly ? "/app/faculty/directory" : "/app/institution/search");
+  // Área elegida — controla qué subáreas se ofrecen debajo (cascada). Arranca
+  // con lo que ya venga en la URL para que un enlace con ?area=X&subarea=Y
+  // muestre las subáreas correctas nada más cargar.
+  const [selectedArea, setSelectedArea] = useState((searchParams.area as string) || "");
+  const selectedAreaSubareas = UNESCO_FIELDS.find((f) => f.label === selectedArea)?.subareas || [];
   // Open drawer from URL param on first render
   const [selectedId, setSelectedId] = useState<string | null>(() => {
     const fid = searchParams.faculty as string | undefined;
@@ -340,22 +352,17 @@ export function InstitutionSearchPage({
               />
             </div>
 
-            {/* Area */}
+            {/* Area — mismas 10 áreas que el docente elige en su perfil (unesco-fields.ts) */}
             <select
               name="area"
-              defaultValue={searchParams.area || ""}
+              value={selectedArea}
+              onChange={(e) => setSelectedArea(e.target.value)}
               className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-52"
             >
               <option value="">Todas las áreas</option>
-              <option value="Business & Management">Business & Management</option>
-              <option value="Economía & Finanzas">Economía & Finanzas</option>
-              <option value="Derecho & Ciencias Políticas">Derecho & CC. Políticas</option>
-              <option value="Ingeniería & Tecnología">Ingeniería & Tecnología</option>
-              <option value="IA & Datos">IA & Datos</option>
-              <option value="Salud & Ciencias">Salud & Ciencias</option>
-              <option value="Comunicación & Marketing">Comunicación & Marketing</option>
-              <option value="Educación">Educación</option>
-              <option value="Otros">Otros</option>
+              {UNESCO_FIELDS.map((f) => (
+                <option key={f.code} value={f.label}>{f.label}</option>
+              ))}
             </select>
 
             {/* Modality */}
@@ -411,12 +418,17 @@ export function InstitutionSearchPage({
                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">
                   Subárea
                 </label>
-                <input
+                <select
                   name="subarea"
                   defaultValue={searchParams.subarea || ""}
-                  className="w-full px-3 py-2 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium"
-                  placeholder="Ej: Finanzas, IA..."
-                />
+                  disabled={!selectedArea}
+                  className="w-full px-3 py-2 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none disabled:text-gray-300 disabled:cursor-not-allowed"
+                >
+                  <option value="">{selectedArea ? "Todas las subáreas" : "Elige un área primero"}</option>
+                  {selectedAreaSubareas.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">
@@ -546,6 +558,22 @@ export function InstitutionSearchPage({
           </div>
           <h3 className="text-xl font-bold text-navy mb-2">No se han encontrado docentes</h3>
           <p className="text-gray-500 max-w-xs mx-auto font-medium">Prueba a ajustar los filtros de búsqueda.</p>
+        </div>
+      )}
+
+      {/* ── Pending teaser cards — docentes reales que aún no están verificados,
+          no contactables. Respeta los mismos filtros que la búsqueda principal. ── */}
+      {pendingEducators.length > 0 && (
+        <div className="space-y-3 pt-2">
+          <p className="text-sm font-bold text-gray-400 flex items-center gap-1.5">
+            <Lock size={13} className="text-gray-300" />
+            +{pendingEducators.length} {pendingEducators.length === 1 ? "docente más" : "docentes más"} completando su verificación
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {pendingEducators.map((p) => (
+              <PendingEducatorCard key={p.id} pending={p} />
+            ))}
+          </div>
         </div>
       )}
 

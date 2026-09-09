@@ -5,56 +5,6 @@ import { redirect } from "next/navigation";
 import { matchesBlockedDomain } from "@/lib/domain";
 import { escapeOrValue } from "@/lib/postgrest-filter";
 
-// ─── Area → Spanish keywords mapping ──────────────────────────────────────────
-const AREA_KEYWORDS: Record<string, string[]> = {
-  "Business & Management": [
-    "negocios", "business", "management", "administración", "administracion",
-    "marketing", "ventas", "emprendimiento", "emprendedurismo",
-    "recursos humanos", "logística", "logistica", "comercio",
-  ],
-  "Economía & Finanzas": [
-    "economía", "economia", "finanzas", "financiero", "contabilidad",
-    "mba", "finance",
-  ],
-  "Derecho & Ciencias Políticas": [
-    "derecho", "jurídico", "juridico", "políticas", "politicas",
-    "ciencias políticas", "civil", "penal", "constitucional",
-    "internacional", "extranjería",
-  ],
-  "Ingeniería & Tecnología": [
-    "ingeniería", "ingenieria", "tecnología", "tecnologia",
-    "informática", "informatica", "sistemas", "técnico", "tecnico",
-  ],
-  "IA & Datos": [
-    "ia", "datos", "inteligencia artificial", "data",
-    "machine learning", "big data",
-  ],
-  "Salud & Ciencias": [
-    "salud", "enfermería", "enfermeria", "farmacia", "nutrición",
-    "nutricion", "medicina", "ciencias", "dietética", "dietetica",
-    "emergencias",
-  ],
-  "Comunicación & Marketing": [
-    "comunicación", "comunicacion", "marketing", "periodismo",
-    "publicidad", "relaciones públicas", "relaciones publicas",
-  ],
-  "Educación": [
-    "educación", "educacion", "docencia", "formación", "formacion",
-    "pedagógica", "pedagogica", "enseñanza", "ensenanza",
-    "orientación", "orientacion", "tutoría", "tutoria",
-    "formación profesional",
-  ],
-  "Otros": [],
-};
-
-function getAreaKeywords(area: string): string[] {
-  // Direct match in the mapping
-  const matched = AREA_KEYWORDS[area];
-  if (matched) return matched;
-  // If not found, use the area string itself as a keyword
-  return [area.toLowerCase()];
-}
-
 export default async function InstitutionSearchRoute({
   searchParams,
 }: {
@@ -131,47 +81,39 @@ export default async function InstitutionSearchRoute({
     ? `${year + 1}-01-01`
     : `${year}-${String(monthNum + 1).padStart(2, "0")}-01`;
 
-  // ── Area / subarea: broad multi-field search ─────────────────────────────
+  // ── Area / subarea: exact match against the REAL taxonomy ────────────────
+  // Antes esto expandía el área elegida a una lista de palabras clave
+  // inventadas a mano (p.ej. "IA & Datos" → "ia", "datos"...) y buscaba esas
+  // palabras sueltas por ilike en area/subarea/headline/bio. El problema: el
+  // desplegable de aquí usaba categorías propias (Business & Management, IA &
+  // Datos...) que NUNCA coinciden con lo que el docente elige realmente en el
+  // asistente (UNESCO_FIELDS — "Negocios, Administración y Derecho",
+  // "Tecnologías de la Información y Comunicación"...), así que solo
+  // "funcionaba" por coincidencias de letras sueltas — p.ej. "ia" (de "IA y
+  // Datos") aparece dentro de "Ciencias Sociales" o "Ingeniería" sin ninguna
+  // relación real, mientras que un área genuina de TIC podía no matchear
+  // nunca. Ahora el desplegable ofrece las mismas 10 áreas (y sus subáreas)
+  // que ve el docente al completar su perfil — ver src/lib/unesco-fields.ts —
+  // y aquí se compara exacto contra faculty_expertise.area/subarea.
   const hasAreaFilter = !!(area || subarea);
 
-  // Resolve area keywords (from mapping or direct)
-  const areaKeywords = area ? getAreaKeywords(area) : [];
-  // Subarea param → use as an additional keyword
-  if (subarea && !areaKeywords.includes(subarea.toLowerCase())) {
-    areaKeywords.push(subarea.toLowerCase());
-  }
-
-  // Query 1: faculty_expertise — match across area, subarea
-  const areaExpertiseQuery = areaKeywords.length > 0
+  // Query 1: faculty_expertise — exact match on area/subarea
+  const areaExpertiseQuery = hasAreaFilter
     ? (() => {
-        // Build OR conditions for each keyword across area + subarea
-        const conditions: string[] = [];
-        for (const kw of areaKeywords) {
-          conditions.push(`area.ilike.%${escapeOrValue(kw)}%`);
-          conditions.push(`subarea.ilike.%${escapeOrValue(kw)}%`);
-        }
-        // Also include original area text and subarea text for direct match
-        if (area) {
-          conditions.push(`area.ilike.%${escapeOrValue(area)}%`);
-          conditions.push(`subarea.ilike.%${escapeOrValue(area)}%`);
-        }
-        if (subarea) {
-          conditions.push(`area.ilike.%${escapeOrValue(subarea)}%`);
-          conditions.push(`subarea.ilike.%${escapeOrValue(subarea)}%`);
-        }
-        return admin.from("faculty_expertise").select("faculty_id").or(conditions.join(","));
+        let q = admin.from("faculty_expertise").select("faculty_id");
+        if (area) q = q.eq("area", area);
+        if (subarea) q = q.eq("subarea", subarea);
+        return q;
       })()
     : Promise.resolve({ data: null as null | { faculty_id: string }[] });
 
-  // Query 2: faculty_profiles — match across headline, bio, subjects, degrees
-  const areaProfilesQuery = areaKeywords.length > 0
+  // Query 2: faculty_profiles headline/bio — secondary fallback for older
+  // profiles with free-text specialties never migrated into faculty_expertise
+  // (ver backfill 20260803000001). Coincidencia literal del nombre del área/
+  // subárea elegida, no de sinónimos inventados.
+  const areaProfilesQuery = hasAreaFilter
     ? (() => {
         const fpConditions: string[] = [];
-        for (const kw of areaKeywords) {
-          fpConditions.push(`headline.ilike.%${escapeOrValue(kw)}%`);
-          fpConditions.push(`bio.ilike.%${escapeOrValue(kw)}%`);
-        }
-        // Also original text
         if (area) {
           fpConditions.push(`headline.ilike.%${escapeOrValue(area)}%`);
           fpConditions.push(`bio.ilike.%${escapeOrValue(area)}%`);
@@ -283,81 +225,81 @@ export default async function InstitutionSearchRoute({
     />
   ) : null;
 
+  // ── Shared filter application — used for both the verified results and the
+  // "pending" teaser cards below, so both respect exactly the same search/
+  // filter criteria (query, area, country, phd, aneca, language, modality).
+  function applySearchFilters(q: any) {
+    let query_ = q.or("visibility.eq.public,visibility.eq.private,visibility.is.null");
+
+    if (blockedFacultyIds.size > 0) {
+      query_ = query_.not("id", "in", `(${[...blockedFacultyIds].join(",")})`);
+    }
+
+    // Broad text search: headline + bio + current_institution + full_name +
+    // degrees/subjects (via pre-queried IDs — see search_faculty_by_degrees_subjects
+    // migration; degrees is jsonb and subjects is text[], neither takes the ilike
+    // operator directly, which previously broke the WHOLE .or() and silently
+    // returned zero results for every text search).
+    if (query) {
+      const orParts = [
+        `headline.ilike.%${escapeOrValue(query)}%`,
+        `bio.ilike.%${escapeOrValue(query)}%`,
+        `current_institution.ilike.%${escapeOrValue(query)}%`,
+      ];
+      const idMatches = [...new Set([...nameMatchIds, ...degreesMatchIds])];
+      if (idMatches.length > 0) {
+        orParts.push(`id.in.(${idMatches.join(",")})`);
+      }
+      query_ = query_.or(orParts.join(","));
+    }
+
+    // Country → location column
+    if (country) {
+      query_ = query_.ilike("location", `%${country}%`);
+    }
+
+    // Area / subarea — areaMatchIds ya combina el match exacto de
+    // faculty_expertise con el fallback de headline/bio (areaProfilesQuery);
+    // si ninguno de los dos encontró nada, no hay nada más que probar.
+    if (hasAreaFilter && areaMatchIds.length > 0) {
+      query_ = query_.in("id", areaMatchIds);
+    } else if (hasAreaFilter && areaMatchIds.length === 0) {
+      // Sin coincidencias reales — forzar cero resultados en vez de devolver
+      // la lista sin filtrar (antes, si el fallback también fallaba, esta
+      // rama simplemente no aplicaba ningún filtro de área en absoluto).
+      query_ = query_.eq("id", "00000000-0000-0000-0000-000000000000");
+    }
+
+    // PhD
+    if (phd === "true") {
+      query_ = query_.eq("is_phd", true);
+    }
+
+    // ANECA accreditation
+    if (aneca) {
+      query_ = query_.ilike("aneca_accreditation", `%${aneca}%`);
+    }
+
+    // Language — JSONB containment: check if languages array contains {lang: "Inglés"}
+    if (language) {
+      query_ = query_.filter("languages", "cs", JSON.stringify([{ lang: language }]));
+    }
+
+    // Modality → modalities array column (stored as ["Online","Presencial","Híbrida"])
+    if (modality) {
+      query_ = query_.contains("modalities", [modality]);
+    }
+
+    return query_;
+  }
+
   // ── Main DB query with all filters pushed down ────────────────────────────
-  let educatorQuery = admin
-    .from("faculty_profiles")
-    .select(`*, user:user_profiles(full_name, avatar_url, plan, subscription_status), expertise:faculty_expertise(*)`)
-    .eq("estado_perfil", "verificado")
-    .or("visibility.eq.public,visibility.eq.private,visibility.is.null");
-
-  // Exclude blocked faculty
-  if (blockedFacultyIds.size > 0) {
-    educatorQuery = educatorQuery.not("id", "in", `(${[...blockedFacultyIds].join(",")})`);
-  }
-
-  // Broad text search: headline + bio + current_institution + full_name +
-  // degrees/subjects (via pre-queried IDs — see search_faculty_by_degrees_subjects
-  // migration; degrees is jsonb and subjects is text[], neither takes the ilike
-  // operator directly, which previously broke the WHOLE .or() and silently
-  // returned zero results for every text search).
-  if (query) {
-    const orParts = [
-      `headline.ilike.%${escapeOrValue(query)}%`,
-      `bio.ilike.%${escapeOrValue(query)}%`,
-      `current_institution.ilike.%${escapeOrValue(query)}%`,
-    ];
-    const idMatches = [...new Set([...nameMatchIds, ...degreesMatchIds])];
-    if (idMatches.length > 0) {
-      orParts.push(`id.in.(${idMatches.join(",")})`);
-    }
-    educatorQuery = educatorQuery.or(orParts.join(","));
-  }
-
-  // Country → location column
-  if (country) {
-    educatorQuery = educatorQuery.ilike("location", `%${country}%`);
-  }
-
-  // Area / subarea (resolved via broad pre-query)
-  if (hasAreaFilter && areaMatchIds.length > 0) {
-    educatorQuery = educatorQuery.in("id", areaMatchIds);
-  } else if (hasAreaFilter && areaKeywords.length > 0 && areaMatchIds.length === 0) {
-    // Fallback: no exact matches from pre-queries, try inline ilike on the main query
-    const fpConditions: string[] = [];
-    for (const kw of areaKeywords) {
-      fpConditions.push(`headline.ilike.%${escapeOrValue(kw)}%`);
-      fpConditions.push(`bio.ilike.%${escapeOrValue(kw)}%`);
-    }
-    if (area) {
-      fpConditions.push(`headline.ilike.%${escapeOrValue(area)}%`);
-      fpConditions.push(`bio.ilike.%${escapeOrValue(area)}%`);
-    }
-    if (subarea) {
-      fpConditions.push(`headline.ilike.%${escapeOrValue(subarea)}%`);
-      fpConditions.push(`bio.ilike.%${escapeOrValue(subarea)}%`);
-    }
-    educatorQuery = (educatorQuery as any).or(fpConditions.join(","));
-  }
-
-  // PhD
-  if (phd === "true") {
-    educatorQuery = educatorQuery.eq("is_phd", true);
-  }
-
-  // ANECA accreditation
-  if (aneca) {
-    educatorQuery = educatorQuery.ilike("aneca_accreditation", `%${aneca}%`);
-  }
-
-  // Language — JSONB containment: check if languages array contains {lang: "Inglés"}
-  if (language) {
-    educatorQuery = (educatorQuery as any).filter("languages", "cs", JSON.stringify([{ lang: language }]));
-  }
-
-  // Modality → modalities array column (stored as ["Online","Presencial","Híbrida"])
-  if (modality) {
-    educatorQuery = (educatorQuery as any).contains("modalities", [modality]);
-  }
+  let educatorQuery = applySearchFilters(
+    admin
+      .from("faculty_profiles")
+      .select(`*, user:user_profiles(full_name, avatar_url, plan, subscription_status), expertise:faculty_expertise(*)`)
+      .eq("estado_perfil", "verificado")
+  );
 
   // First page: 50 results — skipped entirely once the plan's monthly
   // search quota is exhausted, so an over-limit institution never actually
@@ -369,6 +311,35 @@ export default async function InstitutionSearchRoute({
   if (educatorsError) {
     console.error("[institution/search] educatorQuery failed:", educatorsError);
   }
+
+  // ── "Pending" teaser cards — perfiles reales que aún no están verificados ──
+  // Mismos filtros que la búsqueda principal (misma applySearchFilters), pero
+  // sobre estado_perfil NO verificado. 'rechazado' queda fuera a propósito —
+  // un perfil ya rechazado por un admin no es "viene de camino", es un caso
+  // cerrado. Select mínimo: nunca se manda nombre ni bio completa al cliente
+  // — la tarjeta correspondiente (PendingEducatorCard) es deliberadamente
+  // anónima y no clicable, así que no hace falta pedir más.
+  let pendingQuery = applySearchFilters(
+    admin
+      .from("faculty_profiles")
+      .select("id, estado_perfil, country, location, expertise:faculty_expertise(area)")
+      .in("estado_perfil", ["pendiente_verificacion", "incompleto", "en_revision"])
+  );
+  const { data: pendingEducators, error: pendingError } = searchLimitReached
+    ? { data: [] as any[], error: null }
+    : await pendingQuery.range(0, 23);
+  if (pendingError) {
+    console.error("[institution/search] pendingQuery failed:", pendingError);
+  }
+  const transformedPending = (pendingEducators || []).map((p: any) => {
+    const expertise = Array.isArray(p.expertise) ? p.expertise[0] : p.expertise;
+    return {
+      id: p.id,
+      estado_perfil: p.estado_perfil,
+      area: expertise?.area || null,
+      country: p.country || p.location || null,
+    };
+  });
 
   // ── Batch fetch faculty documents + expertise flags for these educators ──
   const educatorIds = (educators || []).map((ed: any) => ed.id);
@@ -453,6 +424,7 @@ export default async function InstitutionSearchRoute({
       {welcomeBanner}
       <InstitutionSearchPage
         initialEducators={transformedEducators}
+        pendingEducators={transformedPending}
         institutionId={institution.id || ""}
         searchParams={params}
         initialFavorites={favorites}

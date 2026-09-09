@@ -3,54 +3,6 @@ import { InstitutionSearchPage } from "@/components/dashboard/InstitutionSearchP
 import { redirect } from "next/navigation";
 import { escapeOrValue } from "@/lib/postgrest-filter";
 
-// ─── Area → Spanish keywords mapping ──────────────────────────────────────────
-const AREA_KEYWORDS: Record<string, string[]> = {
-  "Business & Management": [
-    "negocios", "business", "management", "administración", "administracion",
-    "marketing", "ventas", "emprendimiento", "emprendedurismo",
-    "recursos humanos", "logística", "logistica", "comercio",
-  ],
-  "Economía & Finanzas": [
-    "economía", "economia", "finanzas", "financiero", "contabilidad",
-    "mba", "finance",
-  ],
-  "Derecho & Ciencias Políticas": [
-    "derecho", "jurídico", "juridico", "políticas", "politicas",
-    "ciencias políticas", "civil", "penal", "constitucional",
-    "internacional", "extranjería",
-  ],
-  "Ingeniería & Tecnología": [
-    "ingeniería", "ingenieria", "tecnología", "tecnologia",
-    "informática", "informatica", "sistemas", "técnico", "tecnico",
-  ],
-  "IA & Datos": [
-    "ia", "datos", "inteligencia artificial", "data",
-    "machine learning", "big data",
-  ],
-  "Salud & Ciencias": [
-    "salud", "enfermería", "enfermeria", "farmacia", "nutrición",
-    "nutricion", "medicina", "ciencias", "dietética", "dietetica",
-    "emergencias",
-  ],
-  "Comunicación & Marketing": [
-    "comunicación", "comunicacion", "marketing", "periodismo",
-    "publicidad", "relaciones públicas", "relaciones publicas",
-  ],
-  "Educación": [
-    "educación", "educacion", "docencia", "formación", "formacion",
-    "pedagógica", "pedagogica", "enseñanza", "ensenanza",
-    "orientación", "orientacion", "tutoría", "tutoria",
-    "formación profesional",
-  ],
-  "Otros": [],
-};
-
-function getAreaKeywords(area: string): string[] {
-  const matched = AREA_KEYWORDS[area];
-  if (matched) return matched;
-  return [area.toLowerCase()];
-}
-
 export default async function FacultyDirectoryPage({
   searchParams,
 }: {
@@ -83,46 +35,27 @@ export default async function FacultyDirectoryPage({
   const hasAreaFilter = !!(area || subarea);
   const admin = createAdminClient();
 
-  // ── Area / subarea: broad multi-field search ─────────────────────────────
+  // ── Area / subarea: exact match against the REAL taxonomy ────────────────
+  // Ver el comentario equivalente en institution/search/page.tsx — mismo
+  // arreglo: antes se expandía el área a una lista de palabras clave
+  // inventadas que no correspondían a lo que el docente elige realmente en
+  // el asistente (UNESCO_FIELDS). Ahora coincidencia exacta.
 
-  // Resolve area keywords (from mapping or direct)
-  const areaKeywords = area ? getAreaKeywords(area) : [];
-  // Subarea param → use as an additional keyword
-  if (subarea && !areaKeywords.includes(subarea.toLowerCase())) {
-    areaKeywords.push(subarea.toLowerCase());
-  }
-
-  // Query 1: faculty_expertise — match across area, subarea
-  const areaExpertiseQuery = areaKeywords.length > 0
+  // Query 1: faculty_expertise — exact match on area/subarea
+  const areaExpertiseQuery = hasAreaFilter
     ? (() => {
-        const conditions: string[] = [];
-        for (const kw of areaKeywords) {
-          conditions.push(`area.ilike.%${escapeOrValue(kw)}%`);
-          conditions.push(`subarea.ilike.%${escapeOrValue(kw)}%`);
-        }
-        if (area) {
-          conditions.push(`area.ilike.%${escapeOrValue(area)}%`);
-          conditions.push(`subarea.ilike.%${escapeOrValue(area)}%`);
-        }
-        if (subarea) {
-          conditions.push(`area.ilike.%${escapeOrValue(subarea)}%`);
-          conditions.push(`subarea.ilike.%${escapeOrValue(subarea)}%`);
-        }
-        return admin.from("faculty_expertise").select("faculty_id").or(conditions.join(","));
+        let q = admin.from("faculty_expertise").select("faculty_id");
+        if (area) q = q.eq("area", area);
+        if (subarea) q = q.eq("subarea", subarea);
+        return q;
       })()
     : Promise.resolve({ data: null as null | { faculty_id: string }[] });
 
-  // Query 2: faculty_profiles — match across headline, bio.
-  // degrees (jsonb) and subjects (text[]) can't take the ilike operator —
-  // Postgres rejects it outright, which previously broke the WHOLE .or()
-  // and silently returned zero results for every text search.
-  const areaProfilesQuery = areaKeywords.length > 0
+  // Query 2: faculty_profiles headline/bio — secondary fallback for older
+  // profiles with free-text specialties never migrated into faculty_expertise.
+  const areaProfilesQuery = hasAreaFilter
     ? (() => {
         const fpConditions: string[] = [];
-        for (const kw of areaKeywords) {
-          fpConditions.push(`headline.ilike.%${escapeOrValue(kw)}%`);
-          fpConditions.push(`bio.ilike.%${escapeOrValue(kw)}%`);
-        }
         if (area) {
           fpConditions.push(`headline.ilike.%${escapeOrValue(area)}%`);
           fpConditions.push(`bio.ilike.%${escapeOrValue(area)}%`);
@@ -211,25 +144,12 @@ export default async function FacultyDirectoryPage({
     educatorQuery = educatorQuery.ilike("location", `%${country}%`);
   }
 
-  // Area / subarea (resolved via broad pre-query)
+  // Area / subarea — areaMatchIds ya combina el match exacto de
+  // faculty_expertise con el fallback de headline/bio.
   if (hasAreaFilter && areaMatchIds.length > 0) {
     educatorQuery = educatorQuery.in("id", areaMatchIds);
-  } else if (hasAreaFilter && areaKeywords.length > 0 && areaMatchIds.length === 0) {
-    // Fallback: no exact matches from pre-queries, try inline ilike on the main query
-    const fpConditions: string[] = [];
-    for (const kw of areaKeywords) {
-      fpConditions.push(`headline.ilike.%${escapeOrValue(kw)}%`);
-      fpConditions.push(`bio.ilike.%${escapeOrValue(kw)}%`);
-    }
-    if (area) {
-      fpConditions.push(`headline.ilike.%${escapeOrValue(area)}%`);
-      fpConditions.push(`bio.ilike.%${escapeOrValue(area)}%`);
-    }
-    if (subarea) {
-      fpConditions.push(`headline.ilike.%${escapeOrValue(subarea)}%`);
-      fpConditions.push(`bio.ilike.%${escapeOrValue(subarea)}%`);
-    }
-    educatorQuery = (educatorQuery as any).or(fpConditions.join(","));
+  } else if (hasAreaFilter && areaMatchIds.length === 0) {
+    educatorQuery = educatorQuery.eq("id", "00000000-0000-0000-0000-000000000000");
   }
 
   // PhD
