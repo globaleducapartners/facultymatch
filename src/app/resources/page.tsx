@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
+import { NewsletterForm } from "./NewsletterForm";
 
 export const metadata: Metadata = {
   title: "Recursos para docentes e instituciones | FacultyMatch",
@@ -180,9 +181,9 @@ export default function ResourcesPage() {
               </p>
               <div className="mb-8 flex flex-col gap-4">
                 {[
-                  { label: "Estándar universitario", body: "Alineado con los criterios de las agencias de calidad internacionales." },
-                  { label: "Red de colaboradores",   body: "Artículos escritos por decanos y directores de programa en activo." },
-                  { label: "Actualización continua", body: "El contenido se revisa y actualiza con cada cambio regulatorio relevante." },
+                  { label: "Criterio universitario", body: "Alineado con los estándares de las agencias de calidad y acreditación." },
+                  { label: "Enfoque práctico",       body: "Guías pensadas para decisiones reales de selección de profesorado." },
+                  { label: "Se mantiene al día",     body: "Revisamos el contenido cuando cambia la normativa relevante." },
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3.5">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-fm-blue/20 bg-fm-blue/10">
@@ -195,11 +196,20 @@ export default function ResourcesPage() {
                   </div>
                 ))}
               </div>
-              <Link href="mailto:support@facultymatch.app">
-                <button className="rounded-[7px] border border-fm-border px-6 py-[11px] text-[13px] font-semibold text-fm-navy">
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                <a
+                  href="mailto:support@facultymatch.app"
+                  className="inline-flex rounded-[7px] border border-fm-border px-6 py-[11px] text-[13px] font-semibold text-fm-navy hover:border-fm-blue hover:text-fm-blue transition-colors"
+                >
                   Contactar con el equipo
-                </button>
-              </Link>
+                </a>
+                <span className="text-[13px] text-fm-muted">
+                  o llámanos:{" "}
+                  <a href="tel:+34616684214" className="font-semibold text-fm-navy hover:text-fm-blue">
+                    +34 616 684 214
+                  </a>
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -208,13 +218,12 @@ export default function ResourcesPage() {
       {/* ── CTA NEWSLETTER ── */}
       <section className="relative overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover"
+          className="absolute inset-0"
           style={{
-            backgroundImage: "url(https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1800)",
-            backgroundPosition: "center 55%",
+            background:
+              "radial-gradient(680px 420px at 80% 6%, rgba(255,106,26,0.14), transparent 55%), linear-gradient(160deg, #0B1B33 0%, #071326 72%)",
           }}
         />
-        <div className="absolute inset-0 bg-fm-dark/[0.82]" />
         <div className="relative z-[2] mx-auto max-w-[1100px] px-5 py-14 md:px-10 md:py-18">
           <div className="grid gap-8 md:grid-cols-2 md:gap-14">
             <div>
@@ -242,21 +251,7 @@ export default function ResourcesPage() {
                 ))}
               </div>
             </div>
-            <div className="flex flex-col justify-center gap-3">
-              <div className="flex overflow-hidden rounded-[9px] border border-white/15 bg-white/[0.07]">
-                <input
-                  type="email"
-                  placeholder="Tu correo electrónico"
-                  className="flex-1 bg-transparent px-[18px] py-3.5 text-sm text-white outline-none placeholder:text-white/40"
-                />
-                <button className="shrink-0 bg-fm-blue px-[22px] text-[13px] font-bold tracking-[-0.01em] text-white">
-                  Suscribirme
-                </button>
-              </div>
-              <p className="text-center text-[11px] text-white/25">
-                Una vez al mes. Sin spam. Cancela cuando quieras.
-              </p>
-            </div>
+            <NewsletterForm />
           </div>
         </div>
       </section>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-server';
 
 export async function POST(req: NextRequest) {
-  const { name, email } = await req.json();
+  const { email } = await req.json();
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: 'Email inválido' }, { status: 400 });
@@ -10,14 +10,14 @@ export async function POST(req: NextRequest) {
 
   const supabase = createAdminClient();
 
+  // La tabla newsletter_subscribers solo tiene email + source (no hay columna
+  // 'name' — el insert anterior la incluía y fallaba con 500 en cada envío).
   const { error } = await supabase
     .from('newsletter_subscribers')
-    .upsert(
-      { email: email.trim().toLowerCase(), name: name?.trim() || null, source: 'resources' },
-      { onConflict: 'email', ignoreDuplicates: true }
-    );
+    .insert({ email: email.trim().toLowerCase(), source: 'resources' });
 
-  if (error) {
+  // 23505 = ya está suscrito. No es un error para el usuario.
+  if (error && error.code !== '23505') {
     console.error('[newsletter] insert error:', error);
     return NextResponse.json({ error: 'Error al guardar. Inténtalo de nuevo.' }, { status: 500 });
   }

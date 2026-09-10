@@ -33,6 +33,8 @@ import { formatDateTZ, formatDateTimeTZ } from "@/lib/utils";
 
 // ─── Resource articles ────────────────────────────────────────────────────────
 
+// Estos slugs deben existir en src/app/resources/*/ — antes 3 de los 4
+// apuntaban a artículos que no existían (404) y uno tenía "2025" en el título.
 const RESOURCES = [
   {
     slug: "optimiza-perfil-docente",
@@ -42,24 +44,24 @@ const RESOURCES = [
     color: "blue",
   },
   {
-    slug: "acreditacion-aneca-guia",
-    title: "Guía completa sobre la acreditación ANECA: requisitos y proceso",
-    category: "Carrera",
-    emoji: "🎓",
+    slug: "estandares-verificacion",
+    title: "Estándares de verificación: cómo validamos cada perfil",
+    category: "Verificación",
+    emoji: "🛡️",
     color: "amber",
   },
   {
-    slug: "tendencias-educacion-superior",
-    title: "Las tendencias que transforman la educación superior en 2025",
+    slug: "docencia-online-microcredenciales",
+    title: "El futuro de la docencia online y las microcredenciales",
     category: "Tendencias",
     emoji: "📈",
     color: "green",
   },
   {
-    slug: "como-destacar-directorio",
-    title: "5 elementos clave que miran las instituciones al buscar docentes",
-    category: "Consejos",
-    emoji: "💡",
+    slug: "taxonomia-academica",
+    title: "Cómo clasificamos el conocimiento para que te encuentren",
+    category: "Estructura",
+    emoji: "🗂️",
     color: "purple",
   },
 ];
@@ -449,7 +451,7 @@ export default async function EducatorDashboard() {
                 <p className="text-sm text-gray-400 font-medium">Consejos y guías para impulsar tu carrera académica.</p>
               </div>
               <a
-                href="https://www.facultymatch.app/resources"
+                href="/resources"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs font-black text-fm-blue hover:underline flex items-center gap-1"
@@ -463,7 +465,7 @@ export default async function EducatorDashboard() {
                 return (
                   <a
                     key={r.slug}
-                    href={`https://www.facultymatch.app/resources/${r.slug}`}
+                    href={`/resources/${r.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`group bg-white rounded-2xl border ${c.border} hover:shadow-md transition-all p-5 flex flex-col gap-3`}
