@@ -22,11 +22,15 @@ function Mark({ size = 32, glow = true }: { size?: number; glow?: boolean }) {
   );
 }
 
+// Términos genéricos y de tendencia — lo que la gente escribe de verdad al
+// buscar, con peso en salud, tecnología y negocios. NO son las áreas UNESCO
+// del producto (esas se usan en el buscador de /app, no en marketing).
 const AREAS = [
-  "Medicina", "Derecho", "Inteligencia Artificial", "Liderazgo ejecutivo",
-  "Finanzas corporativas", "Investigación clínica", "Marketing estratégico",
-  "Ingeniería", "Ciencias de la Salud", "Transformación digital",
-  "Comunicación", "Emprendimiento", "Data Science", "Gestión hospitalaria",
+  "Salud y ciencias de la vida", "Inteligencia Artificial", "Ciencia de datos",
+  "Medicina", "Enfermería", "Ciberseguridad", "Marketing digital",
+  "Finanzas y banca", "Liderazgo y management", "Ingeniería",
+  "Sostenibilidad y ESG", "Derecho de los negocios", "Transformación digital",
+  "Educación online",
 ];
 
 function useInView(threshold = 0.15) {
@@ -433,7 +437,7 @@ function ProductTrio() {
             <div className="p-5 pt-4">
               <div className="mb-2 font-mono text-[11px] font-bold text-fm-blue">PASO 2</div>
               <h3 className="mb-2 text-[15.5px] font-bold text-fm-ink">La IA prepara tu borrador</h3>
-              <p className="text-[13px] leading-[1.65] text-[#5B6B85]">Claude Haiku extrae tus datos y marca su confianza en cada campo. Tú revisas antes de publicar — nada se guarda sin tu ok.</p>
+              <p className="text-[13px] leading-[1.65] text-[#5B6B85]">Una IA extrae tus datos y marca su confianza en cada campo. Tú revisas antes de publicar — nada se guarda sin tu ok.</p>
             </div>
           </div>
 
@@ -516,7 +520,7 @@ function SplitDocentes() {
           </p>
           <div className="mb-7 flex flex-col gap-2.5">
             {[
-              "Perfil verificado y estructurado por área UNESCO",
+              "Perfil verificado y estructurado por área de conocimiento",
               "Las instituciones vienen a ti — sin prospectar",
               "Control total de tu visibilidad y privacidad",
             ].map((item, i) => (
@@ -544,11 +548,11 @@ function SplitDocentes() {
 // ─── SPLIT: INSTITUCIONES (embudo de filtrado) ─────────────────────────────
 function SplitInstituciones() {
   const { ref, inView } = useInView(0.1);
-  const rows: [string, string, number, boolean][] = [
-    ["Directorio completo", "1.240", 100, false],
-    ["+ Área: Ciencias de la Salud", "312", 80, false],
-    ["+ Idioma: inglés", "96", 54, false],
-    ["+ Disponibilidad inmediata", "14", 30, true],
+  const rows: [string, number, boolean][] = [
+    ["Todo el directorio", 100, false],
+    ["+ Área: Salud", 80, false],
+    ["+ Idioma de impartición: inglés", 54, false],
+    ["+ Disponibilidad inmediata", 30, true],
   ];
 
   return (
@@ -569,7 +573,7 @@ function SplitInstituciones() {
             FacultyMatch los hace accesibles, verificados y directos.
           </p>
           <div className="mb-7 grid grid-cols-2 gap-2.5">
-            {["Área UNESCO", "Acreditación ANECA", "Idioma de impartición", "Modalidad", "Disponibilidad real", "Tipo de perfil"].map((f, i) => (
+            {["Área de conocimiento", "Acreditación ANECA", "Idioma de impartición", "Modalidad", "Disponibilidad real", "Tipo de perfil"].map((f, i) => (
               <div key={i} className="flex items-center gap-1.5 rounded-lg border border-fm-border bg-fm-surface px-3.5 py-2.5 text-[13px] font-semibold text-fm-navy">
                 <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-fm-gold" />
                 {f}
@@ -588,17 +592,16 @@ function SplitInstituciones() {
             <span className="mb-4 block font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-white/50">
               Cómo filtran las instituciones
             </span>
-            {rows.map(([label, val, pct, highlight], i) => (
+            {rows.map(([label, pct, highlight], i) => (
               <div
                 key={i}
-                className="mb-2.5 flex w-full items-center justify-between gap-2.5 rounded-lg px-3.5 py-2.5 text-xs font-semibold text-white md:w-[var(--bar-pct)]"
+                className="mb-2.5 flex w-full items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-xs font-semibold text-white md:w-[var(--bar-pct)]"
                 style={{
                   ["--bar-pct" as string]: `${pct}%`,
                   background: highlight ? "linear-gradient(90deg,#FF6A1A,#FF8A45)" : "linear-gradient(90deg,#1B4FD8,#3E6BF0)",
                 }}
               >
                 <span>{label}</span>
-                <span className="shrink-0 font-mono font-bold">{val}</span>
               </div>
             ))}
             <div className="mt-4 flex items-center gap-2.5 text-[12.5px] font-semibold leading-[1.4] text-white/90">
@@ -607,7 +610,7 @@ function SplitInstituciones() {
                   <path d="M2 6l3 3 5-5" stroke="#0D2240" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
-              14 perfiles verificados listos para contactar
+              El perfil exacto que necesitas — verificado y en activo.
             </div>
           </div>
         </div>
@@ -629,12 +632,12 @@ function SectorMetrics() {
   return (
     <section className="bg-fm-surface px-6 py-16 md:px-8 md:py-[88px]">
       <div className="mx-auto max-w-[1120px]">
-        <div className="mx-auto mb-12 max-w-[560px] text-center md:mb-16">
+        <div className="mx-auto mb-12 max-w-[600px] text-center md:mb-16">
           <span className="mb-3.5 block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-fm-blue">
-            Sector en España
+            El mercado en España
           </span>
           <h2 className="text-[1.7rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.7rem,3.4vw,2.5rem)]">
-            Un mercado que necesita talento docente.
+            Miles de másteres nuevos cada curso. No hay suficiente claustro con experiencia real.
           </h2>
         </div>
 
@@ -653,6 +656,9 @@ function SectorMetrics() {
             </div>
           ))}
         </div>
+        <p className="mx-auto mt-8 max-w-[440px] text-center text-[12.5px] text-[#8592A8]">
+          Empezamos por España y el mundo de habla hispana.
+        </p>
       </div>
     </section>
   );
