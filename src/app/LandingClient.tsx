@@ -4,7 +4,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Footer } from "@/components/layout/Footer";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 // ─── Mark: "encuentro" — dos círculos que se solapan ──────────────────────
 function Mark({ size = 32, glow = true }: { size?: number; glow?: boolean }) {
@@ -229,9 +228,10 @@ function Hero() {
           <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-fm-border bg-gradient-to-br from-fm-navy to-fm-dark">
             <video
               autoPlay muted loop playsInline preload="auto"
+              poster="/images/faculty-video-poster.jpg"
               className="absolute inset-0 h-full w-full object-cover motion-reduce:hidden"
             >
-              <source src="/hero-campus.mp4" type="video/mp4" />
+              <source src="/faculty-hero.mp4" type="video/mp4" />
             </video>
             <span className="absolute bottom-3 left-3.5 font-mono text-[9px] uppercase tracking-[0.08em] text-white/70">
               Universidades y escuelas de negocio de habla hispana
@@ -472,27 +472,23 @@ function ProductTrio() {
   );
 }
 
-// ─── SPLIT: DOCENTES (vídeo real) ──────────────────────────────────────────
+// ─── SPLIT: DOCENTES ──────────────────────────────────────────────────────
 function SplitDocentes() {
-  const isMob = useIsMobile();
   const { ref, inView } = useInView(0.1);
 
   return (
     <section className="overflow-hidden bg-fm-surface">
       <div ref={ref} className="mx-auto grid max-w-[1120px] md:grid-cols-2 md:min-h-[520px]">
         <div className="relative order-first h-[260px] overflow-hidden rounded-2xl md:order-2 md:h-auto md:rounded-none">
-          {isMob ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src="/images/faculty-video-poster.jpg" alt="Cómo se construye tu perfil en FacultyMatch" className="absolute inset-0 h-full w-full object-cover" />
-          ) : (
-            <video
-              autoPlay muted loop playsInline
-              poster="/images/faculty-video-poster.jpg"
-              className="absolute inset-0 h-full w-full object-cover"
-            >
-              <source src="/faculty-hero.mp4" type="video/mp4" />
-            </video>
-          )}
+          {/* Foto distinta a la del hero (esa es vídeo de otra persona) —
+              faculty-benefits.jpg: profesional presentando, encaja con
+              "lo que sabes hacer tiene demanda en las aulas". */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/faculty-benefits.jpg"
+            alt="Profesional con experiencia impartiendo formación"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-fm-dark/40 to-transparent" />
           <div className="absolute bottom-5 left-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-fm-dark/60 px-3.5 py-2 text-xs font-semibold text-white backdrop-blur-sm">
             <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-fm-gold">
@@ -500,7 +496,7 @@ function SplitDocentes() {
                 <path d="M2 6l3 3 5-5" stroke="#0D2240" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
-            Así se construye tu perfil
+            Docentes con experiencia real
           </div>
         </div>
 
