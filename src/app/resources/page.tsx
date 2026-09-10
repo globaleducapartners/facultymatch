@@ -67,18 +67,14 @@ export default function ResourcesPage() {
       <Navbar />
 
       {/* ── HERO ── */}
+      {/* Sin media externa (antes hotlinkeaba mixkit.co + unsplash.com). */}
       <section className="relative overflow-hidden">
-        <video
-          autoPlay muted loop playsInline
-          poster="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=1800"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: "center 40%" }}
-        >
-          <source src="https://assets.mixkit.co/videos/6532/6532-720.mp4" type="video/mp4" />
-        </video>
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(160deg, rgba(7,19,38,0.55) 0%, rgba(7,19,38,0.75) 60%, rgba(7,19,38,0.94) 100%)" }}
+          style={{
+            background:
+              "radial-gradient(720px 440px at 18% 4%, rgba(27,79,216,0.3), transparent 60%), linear-gradient(160deg, #0B1B33 0%, #071326 72%)",
+          }}
         />
         <div className="relative z-[2] flex min-h-[500px] flex-col items-center justify-center px-5 py-16 text-center md:px-10 md:py-20">
           <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-fm-gold/35 bg-fm-gold/15 px-3.5 py-[5px]">

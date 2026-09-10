@@ -13,13 +13,13 @@ export default function BlogPostClaustro() {
     <div className="min-h-screen bg-[#F8FAFC]">
       <Navbar />
       <main className="max-w-3xl mx-auto px-6 py-16">
-        <Link href="/resources" className="inline-flex items-center gap-2 text-talentia-blue font-bold text-sm mb-8 hover:gap-3 transition-all">
+        <Link href="/resources" className="inline-flex items-center gap-2 text-fm-blue font-bold text-sm mb-8 hover:gap-3 transition-all">
           <ArrowLeft size={16} /> Volver a Recursos
         </Link>
 
         <div className="space-y-4 mb-10">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] font-black uppercase tracking-widest text-tech-cyan bg-blue-50 px-3 py-1 rounded-full">Instituciones</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-fm-blue bg-blue-50 px-3 py-1 rounded-full">Instituciones</span>
             <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400"><Clock size={12} /> 8 min lectura</span>
           </div>
           <h1 className="text-4xl lg:text-5xl font-black text-navy leading-tight">
@@ -48,7 +48,7 @@ export default function BlogPostClaustro() {
               "El nivel docente (Grado, Máster, Doctorado, Executive Education)"
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-2">
-                <CheckCircle2 size={18} className="text-talentia-blue flex-shrink-0 mt-0.5" />
+                <CheckCircle2 size={18} className="text-fm-blue flex-shrink-0 mt-0.5" />
                 <span>{item}</span>
               </li>
             ))}
@@ -89,7 +89,7 @@ export default function BlogPostClaustro() {
               "Flexibilidad en formato y horario de impartición"
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-2">
-                <CheckCircle2 size={18} className="text-talentia-blue flex-shrink-0 mt-0.5" />
+                <CheckCircle2 size={18} className="text-fm-blue flex-shrink-0 mt-0.5" />
                 <span>{item}</span>
               </li>
             ))}
@@ -106,7 +106,7 @@ export default function BlogPostClaustro() {
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mt-10">
             <p className="font-bold text-navy text-lg mb-2">¿Quieres acceder a perfiles docentes verificados?</p>
             <p className="text-gray-600 mb-4">FacultyMatch te ofrece un repositorio estructurado de talento académico internacional, listo para incorporarse a tu institución.</p>
-            <Link href="/signup?role=institution" className="inline-flex items-center gap-2 bg-talentia-blue text-white font-bold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors">
+            <Link href="/signup?intent=institution" className="inline-flex items-center gap-2 bg-fm-blue text-white font-bold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors">
               Registrar mi institución <ArrowLeft size={16} className="rotate-180" />
             </Link>
           </div>

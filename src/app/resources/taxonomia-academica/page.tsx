@@ -13,13 +13,13 @@ export default function BlogPostTaxonomia() {
     <div className="min-h-screen bg-[#F8FAFC]">
       <Navbar />
       <main className="max-w-3xl mx-auto px-6 py-16">
-        <Link href="/resources" className="inline-flex items-center gap-2 text-talentia-blue font-bold text-sm mb-8 hover:gap-3 transition-all">
+        <Link href="/resources" className="inline-flex items-center gap-2 text-fm-blue font-bold text-sm mb-8 hover:gap-3 transition-all">
           <ArrowLeft size={16} /> Volver a Recursos
         </Link>
 
         <div className="space-y-4 mb-10">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] font-black uppercase tracking-widest text-tech-cyan bg-blue-50 px-3 py-1 rounded-full">Estructura</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-fm-blue bg-blue-50 px-3 py-1 rounded-full">Estructura</span>
             <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400"><Clock size={12} /> 10 min lectura</span>
           </div>
           <h1 className="text-4xl lg:text-5xl font-black text-navy leading-tight">
@@ -37,25 +37,25 @@ export default function BlogPostTaxonomia() {
 
           <h2 className="text-2xl font-black text-navy mt-10">Nuestra referencia: la clasificación UNESCO ISCED</h2>
           <p>
-            FacultyMatch utiliza como base la <strong>Clasificación Internacional Normalizada de la Educación (ISCED)</strong> desarrollada por la UNESCO, complementada con las nomenclaturas propias de las principales agencias de calidad universitaria (ANECA en España, ANECA, NCES en EE.UU., QAA en el Reino Unido).
+            FacultyMatch utiliza como base la <strong>Clasificación Internacional Normalizada de la Educación (CINE / ISCED)</strong> desarrollada por la UNESCO, complementada con las acreditaciones propias de las agencias de calidad universitaria (ANECA y las agencias autonómicas en España, y equivalentes en otros países).
           </p>
           <p>
-            Esta clasificación organiza el conocimiento en grandes áreas (nivel 1), sub-áreas (nivel 2) y especialidades (nivel 3), permitiendo una búsqueda tanto amplia como muy específica.
+            Esta clasificación organiza el conocimiento en grandes áreas, sub-áreas y temas, permitiendo una búsqueda tanto amplia como muy específica.
           </p>
 
-          <h2 className="text-2xl font-black text-navy mt-10">Las 10 grandes áreas de FacultyMatch</h2>
+          <h2 className="text-2xl font-black text-navy mt-10">Las 10 grandes áreas</h2>
           <ul className="space-y-3">
             {[
-              { area: "Business & Management", subs: "Dirección Estratégica, Marketing, Finanzas, RRHH, Operaciones, Emprendimiento" },
-              { area: "Ingeniería & Tecnología", subs: "Software, IA, Robótica, Telecomunicaciones, Industrial, Ambiental" },
-              { area: "Ciencias de la Salud", subs: "Medicina, Enfermería, Farmacia, Nutrición, Fisioterapia, Salud Pública" },
-              { area: "Derecho & Ciencias Políticas", subs: "Derecho Civil, Mercantil, Internacional, Tributario, Político" },
-              { area: "Educación", subs: "Pedagogía, Psicopedagogía, Formación del Profesorado, E-Learning" },
-              { area: "Artes & Humanidades", subs: "Filosofía, Historia, Lingüística, Bellas Artes, Literatura" },
-              { area: "Ciencias Sociales", subs: "Sociología, Psicología, Comunicación, Trabajo Social, Antropología" },
-              { area: "Ciencias Naturales", subs: "Física, Química, Biología, Geología, Astronomía" },
-              { area: "Economía", subs: "Macroeconomía, Microeconomía, Economía Internacional, Econometría" },
-              { area: "Matemáticas & Estadística", subs: "Álgebra, Cálculo, Estadística, Investigación Operativa, Matemática Aplicada" }
+              { area: "Educación", subs: "Formación de docentes, Educación superior, Pedagogía y didáctica, Tecnología educativa" },
+              { area: "Artes y Humanidades", subs: "Idiomas y lingüística, Historia, Filosofía y ética, Bellas artes, Literatura" },
+              { area: "Ciencias Sociales, Periodismo e Información", subs: "Psicología, Economía, Ciencias políticas, Sociología, Periodismo y comunicación" },
+              { area: "Negocios, Administración y Derecho", subs: "Dirección de empresas, Marketing y ventas, Finanzas y contabilidad, Recursos humanos, Derecho mercantil e internacional" },
+              { area: "Ciencias Naturales, Matemáticas y Estadística", subs: "Matemáticas, Estadística, Física, Química, Biología" },
+              { area: "Tecnologías de la Información y Comunicación", subs: "Desarrollo de software, Ciencia de datos e IA, Ciberseguridad, Redes y telecomunicaciones" },
+              { area: "Ingeniería, Industria y Construcción", subs: "Ingeniería civil, mecánica y eléctrica, Arquitectura y urbanismo, Energías renovables" },
+              { area: "Agricultura, Veterinaria y Medioambiente", subs: "Agronomía, Veterinaria, Ecología, Gestión ambiental y sostenibilidad, Alimentación" },
+              { area: "Salud y Servicios Sociales", subs: "Medicina, Enfermería, Farmacia, Psicología clínica, Salud pública y epidemiología" },
+              { area: "Servicios", subs: "Turismo y hotelería, Deporte, Seguridad, Transporte y logística" }
             ].map((item, i) => (
               <li key={i} className="flex flex-col gap-1 bg-white rounded-xl p-4 border border-gray-100">
                 <span className="font-bold text-navy">{item.area}</span>
@@ -72,7 +72,7 @@ export default function BlogPostTaxonomia() {
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mt-10">
             <p className="font-bold text-navy text-lg mb-2">¿Quieres que tu perfil aparezca en las búsquedas correctas?</p>
             <p className="text-gray-600 mb-4">Al crear tu perfil en FacultyMatch, te ayudamos a clasificar tu experiencia en nuestra taxonomía para que las instituciones adecuadas te encuentren.</p>
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-talentia-blue text-white font-bold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors">
+            <Link href="/signup" className="inline-flex items-center gap-2 bg-fm-blue text-white font-bold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors">
               Crear mi perfil <ArrowLeft size={16} className="rotate-180" />
             </Link>
           </div>

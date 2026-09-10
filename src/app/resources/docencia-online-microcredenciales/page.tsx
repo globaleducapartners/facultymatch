@@ -13,13 +13,13 @@ export default function BlogPostOnline() {
     <div className="min-h-screen bg-[#F8FAFC]">
       <Navbar />
       <main className="max-w-3xl mx-auto px-6 py-16">
-        <Link href="/resources" className="inline-flex items-center gap-2 text-talentia-blue font-bold text-sm mb-8 hover:gap-3 transition-all">
+        <Link href="/resources" className="inline-flex items-center gap-2 text-fm-blue font-bold text-sm mb-8 hover:gap-3 transition-all">
           <ArrowLeft size={16} /> Volver a Recursos
         </Link>
 
         <div className="space-y-4 mb-10">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] font-black uppercase tracking-widest text-tech-cyan bg-blue-50 px-3 py-1 rounded-full">Tendencias</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-fm-blue bg-blue-50 px-3 py-1 rounded-full">Tendencias</span>
             <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400"><Clock size={12} /> 12 min lectura</span>
           </div>
           <h1 className="text-4xl lg:text-5xl font-black text-navy leading-tight">
@@ -56,7 +56,7 @@ export default function BlogPostOnline() {
               "Actualizar constantemente los contenidos ante la rápida evolución del conocimiento"
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-2">
-                <CheckCircle2 size={18} className="text-talentia-blue flex-shrink-0 mt-0.5" />
+                <CheckCircle2 size={18} className="text-fm-blue flex-shrink-0 mt-0.5" />
                 <span>{item}</span>
               </li>
             ))}
@@ -79,7 +79,7 @@ export default function BlogPostOnline() {
             <strong>Gamificación:</strong> Incorporación de elementos lúdicos (puntos, insignias, rankings) para aumentar el engagement y la persistencia en el aprendizaje.
           </p>
 
-          <h2 className="text-2xl font-black text-navy mt-10">Oportunidades concretas para docentes en 2025-2026</h2>
+          <h2 className="text-2xl font-black text-navy mt-10">Oportunidades concretas para docentes en 2026-2027</h2>
           <p>
             Las áreas con mayor demanda de docentes para programas de microcredenciales actualmente son: Inteligencia Artificial aplicada, Ciberseguridad, Sostenibilidad y ESG, Transformación Digital, Liderazgo y Gestión de Equipos, y Regulación Financiera. Los perfiles que combinan experiencia profesional activa con capacidad pedagógica son especialmente valorados.
           </p>
@@ -87,7 +87,7 @@ export default function BlogPostOnline() {
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mt-10">
             <p className="font-bold text-navy text-lg mb-2">¿Listo para ampliar tu actividad docente al entorno online?</p>
             <p className="text-gray-600 mb-4">FacultyMatch conecta a docentes expertos con instituciones que buscan exactamente tu perfil, en formato presencial, online e híbrido.</p>
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-talentia-blue text-white font-bold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors">
+            <Link href="/signup" className="inline-flex items-center gap-2 bg-fm-blue text-white font-bold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors">
               Crear mi perfil <ArrowLeft size={16} className="rotate-180" />
             </Link>
           </div>

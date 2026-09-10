@@ -13,13 +13,13 @@ export default function BlogPostPerfil() {
     <div className="min-h-screen bg-[#F8FAFC]">
       <Navbar />
       <main className="max-w-3xl mx-auto px-6 py-16">
-        <Link href="/resources" className="inline-flex items-center gap-2 text-talentia-blue font-bold text-sm mb-8 hover:gap-3 transition-all">
+        <Link href="/resources" className="inline-flex items-center gap-2 text-fm-blue font-bold text-sm mb-8 hover:gap-3 transition-all">
           <ArrowLeft size={16} /> Volver a Recursos
         </Link>
 
         <div className="space-y-4 mb-10">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] font-black uppercase tracking-widest text-tech-cyan bg-blue-50 px-3 py-1 rounded-full">Docentes</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-fm-blue bg-blue-50 px-3 py-1 rounded-full">Docentes</span>
             <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400"><Clock size={12} /> 6 min lectura</span>
           </div>
           <h1 className="text-4xl lg:text-5xl font-black text-navy leading-tight">
@@ -46,7 +46,7 @@ export default function BlogPostPerfil() {
               "Especialista en Derecho Tributario Internacional | Acreditado ANECA"
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-2">
-                <CheckCircle2 size={18} className="text-talentia-blue flex-shrink-0 mt-0.5" />
+                <CheckCircle2 size={18} className="text-fm-blue flex-shrink-0 mt-0.5" />
                 <span className="italic">{item}</span>
               </li>
             ))}
@@ -72,13 +72,13 @@ export default function BlogPostPerfil() {
 
           <h2 className="text-2xl font-black text-navy mt-10">5. Disponibilidad e idiomas: facilita la búsqueda</h2>
           <p>
-            Especifica claramente en qué idiomas puedes impartir docencia y en qué modalidades (presencial, online, híbrida). Indica también tu disponibilidad de forma concreta: "Disponible para asignaturas sueltas a partir de septiembre 2025" es mucho más útil que "Disponibilidad flexible".
+            Especifica claramente en qué idiomas puedes impartir docencia y en qué modalidades (presencial, online, híbrida). Indica también tu disponibilidad de forma concreta: "Disponible para asignaturas sueltas a partir de septiembre 2026" es mucho más útil que "Disponibilidad flexible".
           </p>
 
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mt-10">
             <p className="font-bold text-navy text-lg mb-2">¿Aún no tienes tu perfil en FacultyMatch?</p>
             <p className="text-gray-600 mb-4">Regístrate en menos de 5 minutos y empieza a recibir oportunidades de instituciones verificadas.</p>
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-talentia-blue text-white font-bold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors">
+            <Link href="/signup" className="inline-flex items-center gap-2 bg-fm-blue text-white font-bold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors">
               Crear mi perfil ahora <ArrowLeft size={16} className="rotate-180" />
             </Link>
           </div>
