@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { OrcidImportModal } from "./OrcidImportModal";
 import { saveOrcidImport } from "./actions";
+import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 
 function useIsMobile() {
   const [mob, setMob] = useState(false);
@@ -73,25 +74,14 @@ const AVAIL_LABELS: Record<string, { label: string; color: string; bg: string }>
 };
 
 // ─── Completeness ──────────────────────────────────────────────────────────────
-function calcCompleteness(fp: any, p: any, meta: any): number {
-  const fields = [
-    fp?.headline, fp?.bio, fp?.country, fp?.city,
-    fp?.current_institution, fp?.years_experience,
-    fp?.availability, fp?.academic_level,
-    fp?.degrees?.length, fp?.languages?.length,
-    fp?.linkedin_url || fp?.website,
-    p?.avatar_url || fp?.avatar_url,
-    p?.full_name || meta?.full_name,
-  ];
-  return Math.round((fields.filter(Boolean).length / fields.length) * 100);
-}
-
 // ─── Types ─────────────────────────────────────────────────────────────────────
 interface Props {
   user: { id: string; email?: string | null };
   userMeta: Record<string, any>;
   profile: any;
   facultyProfile: any;
+  /** ¿tiene fila en faculty_expertise? (para el cálculo de completitud) */
+  hasExpertise?: boolean;
   documents: any[];
   viewCount: number;
   saved: boolean;
@@ -200,7 +190,7 @@ function SaveButton({ label = "Guardar cambios" }: { label?: string }) {
 
 // ─── Main component ────────────────────────────────────────────────────────────
 export function ProfileEditorClient({
-  user, userMeta, profile, facultyProfile, documents, viewCount, saved, error, tab,
+  user, userMeta, profile, facultyProfile, hasExpertise = false, documents, viewCount, saved, error, tab,
   saveBasicInfo, saveExperience, saveFormacion, saveLanguages,
   saveResearch, saveLinks, updateContactPreferences,
 }: Props) {
@@ -216,7 +206,9 @@ export function ProfileEditorClient({
 
   const avatarUrl = profile?.avatar_url || facultyProfile?.avatar_url;
   const bannerUrl = (facultyProfile as any)?.banner_url || null;
-  const completeness = calcCompleteness(facultyProfile, profile, userMeta);
+  const completeness = calcFacultyCompleteness(
+    completenessInputFromRows(facultyProfile, profile, hasExpertise)
+  ).score;
 
   const fullName    = profile?.full_name || userMeta?.full_name || "";
   const headline    = facultyProfile?.headline || "";

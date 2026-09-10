@@ -1,4 +1,5 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 import {
   CheckCircle2,
   ShieldCheck,
@@ -144,19 +145,21 @@ export default async function EducatorDashboard() {
   const hasExpertise = (expertiseData?.length ?? 0) > 0;
   const hasAreas = hasExpertise || (facultyProfile?.faculty_areas || []).length > 0;
 
-  // Checklist
-  const checklist = [
-    { id: "info",     label: "Titular y ubicación",  href: "/app/faculty/profile",    completed: !!facultyProfile?.headline && !!facultyProfile?.location },
-    { id: "areas",    label: "Especialidades",        href: "/app/faculty/specialties", completed: hasAreas },
-    { id: "langs",    label: "Idiomas",               href: "/app/faculty/profile",    completed: (facultyProfile?.languages || []).length > 0 },
-    { id: "history",  label: "Historial docente",     href: "/app/faculty/profile",    completed: (facultyProfile?.institutions_taught || []).length > 0 },
-    { id: "bio",      label: "Biografía profesional", href: "/app/faculty/profile",    completed: !!facultyProfile?.bio },
-    { id: "avail",    label: "Disponibilidad",        href: "/app/faculty/profile",    completed: !!facultyProfile?.availability },
-  ];
-
-  const completedCount = checklist.filter((i) => i.completed).length;
-  const progress = Math.round((completedCount / checklist.length) * 100);
-  const pendingItems = checklist.filter((i) => !i.completed);
+  // Completitud — cálculo unificado (src/lib/faculty-completeness.ts), el
+  // mismo número que ve el docente en el editor y el admin en /control.
+  const { score: progress, missing } = calcFacultyCompleteness(
+    completenessInputFromRows(facultyProfile, profile, hasAreas)
+  );
+  // `pendingItems` conserva la forma { label, href } que espera la UI de
+  // "secciones que faltan"; el href lleva a la pantalla donde se rellena.
+  const MISSING_HREF: Record<string, string> = {
+    "Área de especialidad": "/app/faculty/specialties",
+    "Foto de perfil": "/app/faculty/profile",
+  };
+  const pendingItems = missing.map((label) => ({
+    label,
+    href: MISSING_HREF[label] || "/app/faculty/profile",
+  }));
 
   const isPro = profile?.plan === "faculty-pro" && profile?.subscription_status === "active";
 
@@ -397,7 +400,7 @@ export default async function EducatorDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-black text-navy">Completa tu perfil</h2>
-                  <p className="text-sm text-gray-400 font-medium">{completedCount} de {checklist.length} secciones listas</p>
+                  <p className="text-sm text-gray-400 font-medium">Te falta{pendingItems.length !== 1 ? "n" : ""} {pendingItems.length} {pendingItems.length === 1 ? "sección" : "secciones"}</p>
                 </div>
                 <Badge className="bg-blue-50 text-fm-blue border-none font-black text-xs px-3 py-1">
                   {progress}%
@@ -406,7 +409,7 @@ export default async function EducatorDashboard() {
               <div className="space-y-2">
                 {pendingItems.map((item) => (
                   <Link
-                    key={item.id}
+                    key={item.label}
                     href={item.href}
                     className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-gray-200 hover:border-fm-blue hover:bg-blue-50/50 transition-all group"
                   >

@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase-server";
 import { escapeOrValue } from "@/lib/postgrest-filter";
+import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 
 // Lógica de búsqueda/filtrado compartida entre las dos entradas al mismo
 // directorio de docentes: la búsqueda de instituciones
@@ -279,24 +280,12 @@ export async function searchFacultyProfiles(
       const userObj = Array.isArray(userJoin) ? userJoin[0] : userJoin;
       const isFacultyPro = userObj?.plan === "faculty-pro" && userObj?.subscription_status === "active";
 
-      const hasAvatar = !!userObj?.avatar_url;
-      const hasBio = !!ed.bio;
-      const hasHeadline = !!ed.headline;
-      const hasDegrees = Array.isArray(ed.degrees) && ed.degrees.length > 0;
-      const docCount = documentsMap[ed.id]?.length || 0;
-      const hasExpertise = hasExpertiseIds.has(ed.id);
-      const hasLanguages = Array.isArray(ed.languages) && ed.languages.length > 0;
-      const hasAneca = !!ed.aneca_accreditation;
-
-      const completenessScore =
-        (hasAvatar ? 25 : 0) +
-        (hasBio ? 20 : 0) +
-        (hasHeadline ? 10 : 0) +
-        (hasDegrees ? 15 : 0) +
-        (docCount > 0 ? 10 : 0) +
-        (hasExpertise ? 10 : 0) +
-        (hasLanguages ? 5 : 0) +
-        (hasAneca ? 5 : 0);
+      // Completitud — mismo cálculo unificado que ve el docente y el admin
+      // (src/lib/faculty-completeness.ts); aquí solo se usa para ordenar los
+      // resultados (los más completos primero).
+      const completenessScore = calcFacultyCompleteness(
+        completenessInputFromRows(ed, userObj, hasExpertiseIds.has(ed.id))
+      ).score;
 
       return {
         ...ed,

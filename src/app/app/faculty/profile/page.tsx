@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { ensureProfileSlug } from "@/lib/profile-slug";
 import { ProfileEditorClient } from "./ProfileEditorClient";
 import { checkReVerification } from "@/lib/re-verification";
+import { refreshFacultyCompleteness } from "@/lib/faculty-completeness";
 
 export default async function ProfilePage({
   searchParams,
@@ -37,6 +38,16 @@ export default async function ProfilePage({
     .select("*")
     .eq("faculty_id", user.id)
     .order("created_at", { ascending: false });
+
+  // Las especialidades viven en faculty_expertise (otra tabla); el cálculo
+  // de completitud las necesita para no marcar "falta área" en un perfil
+  // que sí la tiene.
+  const { data: expertiseRows } = await supabase
+    .from("faculty_expertise")
+    .select("id")
+    .eq("faculty_id", user.id)
+    .limit(1);
+  const hasExpertise = (expertiseRows?.length ?? 0) > 0;
 
   // ─── Server Actions (one per tab) ────────────────────────────────────────
 
@@ -75,6 +86,7 @@ export default async function ProfilePage({
     // Re-verification: full_name is a sensitive field
     await checkReVerification(user.id, ["full_name"]);
 
+    await refreshFacultyCompleteness(admin, user.id);
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
     redirect("/app/faculty/profile?saved=1&tab=basic");
@@ -115,6 +127,7 @@ export default async function ProfilePage({
       "current_institution", "is_phd", "academic_level", "institutions_taught",
     ]);
 
+    await refreshFacultyCompleteness(createAdminClient(), user.id);
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
     redirect("/app/faculty/profile?saved=1&tab=experience");
@@ -140,6 +153,7 @@ export default async function ProfilePage({
     // Re-verification: degrees is a sensitive field
     await checkReVerification(user.id, ["degrees"]);
 
+    await refreshFacultyCompleteness(createAdminClient(), user.id);
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
     redirect("/app/faculty/profile?saved=1&tab=formacion");
@@ -162,6 +176,7 @@ export default async function ProfilePage({
       redirect("/app/faculty/profile?error=1&tab=idiomas");
     }
 
+    await refreshFacultyCompleteness(createAdminClient(), user.id);
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");
     redirect("/app/faculty/profile?saved=1&tab=idiomas");
@@ -285,6 +300,7 @@ export default async function ProfilePage({
       userMeta={userMeta}
       profile={profile}
       facultyProfile={facultyProfile}
+      hasExpertise={hasExpertise}
       documents={documents || []}
       viewCount={viewCount}
       saved={saved === "1"}

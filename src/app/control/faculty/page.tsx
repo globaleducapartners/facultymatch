@@ -4,25 +4,9 @@ import {
   CheckCircle2, XCircle, Clock, EyeOff, Eye,
   GraduationCap, Award, MessageSquare, AlertCircle,
 } from "lucide-react";
+import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 
-// ── Profile Completeness Calculator ───────────────────────────────────────
 
-function calculateCompleteness(fp: any, user?: any): number {
-  const fields = [
-    fp.headline,
-    fp.bio,
-    fp.country,
-    fp.linkedin_url,
-    fp.is_phd,
-    fp.aneca_accreditation,
-    fp.faculty_areas && Array.isArray(fp.faculty_areas) && fp.faculty_areas.length > 0,
-    fp.levels && Array.isArray(fp.levels) && fp.levels.length > 0,
-    fp.languages && Array.isArray(fp.languages) && fp.languages.length > 0,
-    user?.avatar_url,                   // avatar en user_profiles, no en faculty_profiles
-  ];
-  const filled = fields.filter(Boolean).length;
-  return Math.round((filled / fields.length) * 100);
-}
 
 // ── ───────────────────────────────────────────────────────────────────────
 
@@ -49,16 +33,11 @@ export default async function FacultyListPage({
   // Fetch faculty_profiles ordered by view_count DESC (primary sort)
   let profileQuery = admin
     .from("faculty_profiles")
-    .select("user_id, view_count, visibility, headline, country, profile_completeness, is_phd, aneca_accreditation, bio, linkedin_url, faculty_areas, levels, languages, estado_perfil")
+    .select("user_id, view_count, visibility, headline, country, city, location, bio, availability, academic_level, degrees, institutions_taught, faculty_areas, languages, aneca_accreditation, is_phd, estado_perfil")
     .order("view_count", { ascending: false })
     .limit(200);
 
   const { data: allProfiles } = await profileQuery;
-
-  // Check if any profile has stored non-zero completeness
-  const hasStoredCompleteness = (allProfiles ?? []).some(
-    (fp: any) => fp.profile_completeness !== null && fp.profile_completeness !== 0
-  );
 
   // Build resolved profile data
   const profileIds = (allProfiles ?? []).map((fp: any) => fp.user_id);
@@ -77,14 +56,26 @@ export default async function FacultyListPage({
     }
   }
 
-  // Build combined faculty list sorted by view_count DESC
+  // ¿Qué docentes tienen especialidad? (faculty_expertise vive en otra tabla)
+  const expertiseSet = new Set<string>();
+  if (profileIds.length > 0) {
+    const { data: expRows } = await admin
+      .from("faculty_expertise")
+      .select("faculty_id")
+      .in("faculty_id", profileIds);
+    (expRows ?? []).forEach((r: any) => expertiseSet.add(r.faculty_id));
+  }
+
+  // Build combined faculty list sorted by view_count DESC — completitud con el
+  // cálculo unificado (src/lib/faculty-completeness.ts), en vivo, el mismo
+  // número que ve el docente en su perfil.
   const facultyList = (allProfiles ?? [])
     .filter((fp: any) => userMap[fp.user_id])
     .map((fp: any) => {
       const user = userMap[fp.user_id];
-      const completeness = hasStoredCompleteness
-        ? (fp.profile_completeness ?? 0)
-        : calculateCompleteness(fp, user);
+      const completeness = calcFacultyCompleteness(
+        completenessInputFromRows(fp, user, expertiseSet.has(fp.user_id))
+      ).score;
       return { ...user, _profile: { ...fp, _completeness: completeness } };
     });
 

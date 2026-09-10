@@ -3,6 +3,7 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { revalidatePath } from "next/cache";
 import { notifyAdminProfileNeedsReview } from "@/lib/admin-alerts";
+import { refreshFacultyCompleteness } from "@/lib/faculty-completeness";
 
 interface WizardData {
   onboarding_step: number;
@@ -216,6 +217,8 @@ export async function publishProfile() {
   }
 
   notifyAdminProfileNeedsReview(user.id).catch(e => console.error("[publishProfile] admin alert failed:", e));
+
+  await refreshFacultyCompleteness(admin, user.id);
 
   revalidatePath("/app/faculty/onboarding");
   revalidatePath("/app/faculty/profile");

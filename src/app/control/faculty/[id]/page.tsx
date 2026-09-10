@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase-server";
 import { notFound } from "next/navigation";
+import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 import {
   Mail, Eye, GraduationCap, Globe, MapPin, Award, BookOpen, FileText,
   Languages, Phone, Link as LinkIcon, Calendar, Clock, ChevronRight,
@@ -143,10 +144,13 @@ export default async function FacultyDetailPage({
   const isHidden = visibility === "private";
   const isVerified = fp.estado_perfil === "verificado";
 
-  // Calculate profile completeness
-  const fields = [fp.headline, fp.bio, fp.location, fp.country, fp.website, fp.contact_email, fp.avatar_url, fp.banner_url];
-  const filledFields = fields.filter(Boolean).length;
-  const completeness = Math.round((filledFields / fields.length) * 100);
+  // Completitud — cálculo unificado (src/lib/faculty-completeness.ts). Antes
+  // aquí se comprobaban 8 campos, 2 de ellos (contact_email, avatar_url)
+  // columnas que NO existen en faculty_profiles, así que todo perfil perdía
+  // un 25% fijo y uno completo salía al ~63%.
+  const { score: completeness } = calcFacultyCompleteness(
+    completenessInputFromRows(fp, userProfile, (expertise?.length ?? 0) > 0)
+  );
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">

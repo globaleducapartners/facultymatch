@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase-server";
 import Stripe from "stripe";
+import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 import {
   AlertTriangle, DollarSign, Users, Eye, TrendingUp,
   GraduationCap, Award, Linkedin,
@@ -32,23 +33,6 @@ async function getMRR(): Promise<{ mrr: number; activeSubscriptions: number }> {
 
 // ── Profile Completeness Calculator ───────────────────────────────────────
 
-function calculateCompleteness(fp: any, avatarUrl?: string | null): number {
-  const fields = [
-    fp.headline,
-    fp.bio,
-    fp.country,
-    fp.linkedin_url,
-    fp.is_phd,
-    fp.aneca_accreditation,
-    fp.faculty_areas && Array.isArray(fp.faculty_areas) && fp.faculty_areas.length > 0,
-    fp.levels && Array.isArray(fp.levels) && fp.levels.length > 0,
-    fp.languages && Array.isArray(fp.languages) && fp.languages.length > 0,
-    avatarUrl,                          // avatar en user_profiles, no en faculty_profiles
-  ];
-  const filled = fields.filter(Boolean).length;
-  return Math.round((filled / fields.length) * 100);
-}
-
 // ── ───────────────────────────────────────────────────────────────────────
 
 export default async function MetricsPage() {
@@ -76,44 +60,40 @@ export default async function MetricsPage() {
     }
   }
 
-  // Faculty profiles for completeness check
+  // Faculty profiles — completitud con el cálculo unificado, en vivo
+  // (src/lib/faculty-completeness.ts). Antes esto leía la columna
+  // profile_completeness (que nada rellenaba → siempre 0) con un cálculo de
+  // reserva propio y distinto de los demás.
   const { data: allFacultyProfiles } = await admin
     .from("faculty_profiles")
-    .select("user_id, profile_completeness, headline, bio, country, linkedin_url, is_phd, aneca_accreditation, faculty_areas, levels, languages")
+    .select("user_id, headline, bio, country, city, location, availability, academic_level, degrees, institutions_taught, faculty_areas, languages")
     .limit(500);
 
-  // Fetch user_profiles.avatar_url for completeness calculation
-  let avatarMap: Record<string, string | null> = {};
   const fpUserIds = (allFacultyProfiles ?? []).map((fp: any) => fp.user_id).filter(Boolean);
+
+  let avatarMap: Record<string, string | null> = {};
+  const metricsExpertiseSet = new Set<string>();
   if (fpUserIds.length > 0) {
-    const { data: avatarProfiles } = await admin
-      .from("user_profiles")
-      .select("id, avatar_url")
-      .in("id", fpUserIds);
-    if (avatarProfiles) {
-      avatarProfiles.forEach((u: any) => { avatarMap[u.id] = u.avatar_url; });
-    }
+    const [{ data: avatarProfiles }, { data: expRows }] = await Promise.all([
+      admin.from("user_profiles").select("id, avatar_url").in("id", fpUserIds),
+      admin.from("faculty_expertise").select("faculty_id").in("faculty_id", fpUserIds),
+    ]);
+    (avatarProfiles ?? []).forEach((u: any) => { avatarMap[u.id] = u.avatar_url; });
+    (expRows ?? []).forEach((r: any) => metricsExpertiseSet.add(r.faculty_id));
   }
 
-  let completenessZeroCount = 0;
-  if (allFacultyProfiles && allFacultyProfiles.length > 0) {
-    const hasStoredCompleteness = allFacultyProfiles.some(
-      (fp: any) => fp.profile_completeness !== null && fp.profile_completeness !== 0
-    );
-    if (!hasStoredCompleteness) {
-      completenessZeroCount = allFacultyProfiles.filter(
-        (fp: any) => calculateCompleteness(fp, avatarMap[fp.user_id]) === 0
-      ).length;
-    } else {
-      completenessZeroCount = allFacultyProfiles.filter(
-        (fp: any) => fp.profile_completeness === null || fp.profile_completeness === 0
-      ).length;
-    }
-  }
+  const completenessScores = (allFacultyProfiles ?? []).map((fp: any) =>
+    calcFacultyCompleteness(
+      completenessInputFromRows(fp, { avatar_url: avatarMap[fp.user_id] }, metricsExpertiseSet.has(fp.user_id))
+    ).score
+  );
+  const completenessZeroCount = completenessScores.filter((s) => s === 0).length;
   const completenessPct =
-    allFacultyProfiles?.length
-      ? (completenessZeroCount / allFacultyProfiles.length) * 100
+    completenessScores.length
+      ? (completenessZeroCount / completenessScores.length) * 100
       : 0;
+  const funnelProfileOver50 = completenessScores.filter((s) => s > 50).length;
+  const profileOver80 = completenessScores.filter((s) => s > 80).length;
 
   const { mrr, activeSubscriptions } = await getMRR();
 
@@ -130,9 +110,9 @@ export default async function MetricsPage() {
       type: "danger",
     });
   }
-  if (completenessPct > 80) {
+  if (completenessPct > 50) {
     alerts.push({
-      message: "Completeness no calculado — ejecutar actualización SQL",
+      message: `${Math.round(completenessPct)}% de los perfiles docentes están vacíos (0% de completitud) — mayormente cuentas abandonadas`,
       type: "info",
     });
   }
@@ -167,11 +147,6 @@ export default async function MetricsPage() {
   );
 
   // ── Section 3: Funnel ──────────────────────────────────────────────────
-
-  const { count: funnelProfileOver50 } = await admin
-    .from("faculty_profiles")
-    .select("*", { count: "exact", head: true })
-    .gt("profile_completeness", 50);
 
   const { count: funnelVisited } = await admin
     .from("faculty_profiles")
@@ -277,11 +252,6 @@ export default async function MetricsPage() {
     .select("*", { count: "exact", head: true })
     .not("linkedin_url", "is", null)
     .neq("linkedin_url", "");
-
-  const { count: profileOver80 } = await admin
-    .from("faculty_profiles")
-    .select("*", { count: "exact", head: true })
-    .gt("profile_completeness", 80);
 
   // ── ────────────────────────────────────────────────────────────────────
 

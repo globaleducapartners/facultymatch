@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-server';
 import { Resend } from 'resend';
+import { calcFacultyCompleteness, completenessInputFromRows } from '@/lib/faculty-completeness';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || 'FacultyMatch <noreply@facultymatch.app>';
@@ -18,11 +19,13 @@ export async function GET(req: NextRequest) {
   const twoDaysAgo = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString();
   const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Faculty profiles created 2-3 days ago with completeness < 80
+  // Perfiles docentes tocados hace 2-3 días. La completitud se calcula en
+  // vivo con el módulo unificado (antes esto filtraba por la columna
+  // profile_completeness, que nada rellenaba, así que "< 80" era siempre
+  // cierto y el único filtro real era la ventana de fechas).
   const { data: profiles, error } = await admin
     .from('faculty_profiles')
-    .select('user_id, profile_completeness')
-    .lt('profile_completeness', 80)
+    .select('user_id, headline, bio, country, city, location, availability, academic_level, degrees, institutions_taught, faculty_areas, languages')
     .gte('updated_at', threeDaysAgo)
     .lte('updated_at', twoDaysAgo)
     .limit(50);
@@ -34,6 +37,18 @@ export async function GET(req: NextRequest) {
 
   if (!profiles || profiles.length === 0) {
     return NextResponse.json({ sent: 0, message: 'No profiles to remind' });
+  }
+
+  const reminderUserIds = profiles.map((p: any) => p.user_id).filter(Boolean);
+  const avatarById: Record<string, string | null> = {};
+  const expertiseIds = new Set<string>();
+  if (reminderUserIds.length > 0) {
+    const [{ data: avs }, { data: exps }] = await Promise.all([
+      admin.from('user_profiles').select('id, avatar_url').in('id', reminderUserIds),
+      admin.from('faculty_expertise').select('faculty_id').in('faculty_id', reminderUserIds),
+    ]);
+    (avs ?? []).forEach((u: any) => { avatarById[u.id] = u.avatar_url; });
+    (exps ?? []).forEach((r: any) => expertiseIds.add(r.faculty_id));
   }
 
   let sent = 0;
@@ -51,8 +66,12 @@ export async function GET(req: NextRequest) {
       if (!up?.email) continue;
       if (up.plan === 'faculty-pro' && up.subscription_status === 'active') continue;
 
+      const { score: completeness } = calcFacultyCompleteness(
+        completenessInputFromRows(fp, { avatar_url: avatarById[fp.user_id] }, expertiseIds.has(fp.user_id))
+      );
+      if (completeness >= 80) continue; // ya está suficientemente completo
+
       const firstName = up.full_name?.split(' ')[0] || up.email.split('@')[0];
-      const completeness = fp.profile_completeness ?? 0;
 
       await resend.emails.send({
         from: FROM,
