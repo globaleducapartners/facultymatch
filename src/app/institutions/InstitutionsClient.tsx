@@ -4,7 +4,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -32,47 +31,45 @@ const AVATAR_COLORS: string[] = [
   "#1B4FD8", "#0D2240", "#059669", "#7C3AED", "#DC2626", "#0891B2",
 ];
 
+// Muestra ANÓNIMA — sin nombres ni "Ex-Google/Ex-Amazon" inventados (solo
+// Miguel, Rocío y Javier tienen consentimiento para aparecer con nombre).
+// Se enseñan los atributos que de verdad se pueden filtrar: rol, área,
+// idiomas, disponibilidad, experiencia.
 const SAMPLE_PROFILES = [
   {
-    init: "MR", name: "Dr. Miguel Rodríguez", role: "Economía · Política fiscal",
-    org: "Universidad Autónoma · Madrid", kind: "Académica" as const,
-    avail: true, lang: "ES · EN", area: "Economía", years: "12 años exp.",
-    color: AVATAR_COLORS[0],
+    role: "Economía · Política fiscal", org: "Docente universitario",
+    kind: "Académica" as const, avail: true, lang: "ES · EN",
+    area: "Economía", years: "12 años exp.", color: AVATAR_COLORS[0],
   },
   {
-    init: "JL", name: "Javier Llamas", role: "Director de Operaciones",
-    org: "Ex-Amazon · Ex-Inditex", kind: "Experto" as const,
-    avail: true, lang: "ES · EN · FR", area: "Operaciones", years: "18 años exp.",
-    color: AVATAR_COLORS[1],
+    role: "Dirección de Operaciones", org: "Directivo en activo",
+    kind: "Experto" as const, avail: true, lang: "ES · EN · FR",
+    area: "Operaciones", years: "18 años exp.", color: AVATAR_COLORS[1],
   },
   {
-    init: "CR", name: "Dra. Carmen Ramos", role: "Derecho Mercantil · Compliance",
-    org: "UCM · Abogada en activo", kind: "Académica" as const,
-    avail: false, lang: "ES · FR", area: "Derecho", years: "9 años exp.",
-    color: AVATAR_COLORS[2],
+    role: "Derecho mercantil · Compliance", org: "Abogada en activo",
+    kind: "Académica" as const, avail: false, lang: "ES · FR",
+    area: "Derecho", years: "9 años exp.", color: AVATAR_COLORS[2],
   },
   {
-    init: "PV", name: "Pablo Velasco", role: "Marketing Digital · Growth",
-    org: "Ex-Google · Ex-Cabify", kind: "Profesional" as const,
-    avail: true, lang: "ES · EN", area: "Marketing", years: "14 años exp.",
-    color: AVATAR_COLORS[3],
+    role: "Marketing digital · Growth", org: "Profesional del sector",
+    kind: "Profesional" as const, avail: true, lang: "ES · EN",
+    area: "Marketing", years: "14 años exp.", color: AVATAR_COLORS[3],
   },
   {
-    init: "BM", name: "Dra. Beatriz Morales", role: "Inteligencia Artificial · ML",
-    org: "UPM · Investigadora senior", kind: "Académica" as const,
-    avail: true, lang: "ES · EN", area: "IA & Datos", years: "8 años exp.",
-    color: AVATAR_COLORS[4],
+    role: "Inteligencia Artificial · ML", org: "Investigadora senior",
+    kind: "Académica" as const, avail: true, lang: "ES · EN",
+    area: "Inteligencia Artificial", years: "8 años exp.", color: AVATAR_COLORS[4],
   },
   {
-    init: "AS", name: "Ana Sánchez", role: "Liderazgo · Gestión de personas",
-    org: "Directora RRHH · Multinacional", kind: "Experto" as const,
-    avail: true, lang: "ES · EN", area: "Liderazgo", years: "16 años exp.",
-    color: AVATAR_COLORS[5],
+    role: "Liderazgo · Gestión de personas", org: "Dirección de RR. HH.",
+    kind: "Experto" as const, avail: true, lang: "ES · EN",
+    area: "Liderazgo", years: "16 años exp.", color: AVATAR_COLORS[5],
   },
 ];
 
 const FILTERS = [
-  { label: "Área UNESCO",      desc: "Desde Economía hasta Ciencias de la Salud" },
+  { label: "Área de conocimiento", desc: "De Salud y Tecnología a Negocios y Derecho" },
   { label: "Acreditación",     desc: "ANECA, ORCID, titulación doctoral" },
   { label: "Idioma",           desc: "Español, inglés, francés y más" },
   { label: "Modalidad",        desc: "Presencial, online o híbrida" },
@@ -104,7 +101,7 @@ const HOW = [
   {
     n: "III",
     title: "Contacta directamente",
-    body: "Envía una solicitud al docente. Él decide si responde. Sin intermediarios ni comisiones por contratación. Tú negociais directamente.",
+    body: "Envía una solicitud al docente. Él decide si responde. Sin intermediarios ni comisiones por contratación. Negociáis directamente.",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B4FD8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -117,27 +114,26 @@ const COMPARISON = [
   {
     feature: "Disponibilidad docente",
     fm: "Filtro real: inmediata, próximo semestre, solo online",
-    li: "No existe. Hay que contactar y preguntar uno a uno",
+    li: "Hay que contactar y preguntar a cada persona",
   },
   {
     feature: "Perfiles verificados",
-    fm: "Revisados manualmente antes de publicarse",
+    fm: "Revisados a mano antes de publicarse",
     li: "Cualquiera puede escribir que da clases en su perfil",
   },
   {
-    feature: "Tiempo hasta el primer contacto",
-    fm: "Media de 3 días hábiles",
-    li: "+2 semanas de media (mensajes frecuentemente ignorados)",
+    feature: "Primer contacto",
+    fm: "Solicitud directa al docente; responde o declina",
+    li: "Correos en frío que a menudo se quedan sin respuesta",
   },
   {
     feature: "Comisión por contratación",
     fm: "0 € — nunca",
-    li: "No aplica, pero el proceso manual tiene un coste oculto alto",
+    li: "El proceso manual tiene un coste oculto en horas",
   },
 ];
 
 export default function InstitutionsClient() {
-  const isMob = useIsMobile();
   const { ref: directoryRef, inView: directoryVisible } = useInView(0.1);
   const { ref: howRef, inView: howVisible } = useInView(0.1);
 
@@ -146,28 +142,16 @@ export default function InstitutionsClient() {
       <Navbar />
 
       {/* ── HERO ── */}
+      {/* Sin media externa: antes cargaba un vídeo de mixkit.co y una foto de
+          unsplash.com por hotlink (dependencia frágil, sin control de
+          licencia). Degradado marino sólido. */}
       <section className="relative flex items-center overflow-hidden min-h-[90svh] md:min-h-[580px]">
-        {isMob ? (
-          <div
-            className="absolute inset-0 bg-cover"
-            style={{
-              backgroundImage: "url(https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=85&w=1200)",
-              backgroundPosition: "center 30%",
-            }}
-          />
-        ) : (
-          <video
-            autoPlay muted loop playsInline
-            poster="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=85&w=1800"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "center 30%" }}
-          >
-            <source src="https://assets.mixkit.co/videos/48165/48165-720.mp4" type="video/mp4" />
-          </video>
-        )}
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(160deg, rgba(7,19,38,0.78) 0%, rgba(7,19,38,0.88) 60%, rgba(7,19,38,0.96) 100%)" }}
+          style={{
+            background:
+              "radial-gradient(700px 420px at 85% 0%, rgba(255,106,26,0.16), transparent 55%), radial-gradient(760px 460px at 12% 8%, rgba(27,79,216,0.3), transparent 60%), linear-gradient(160deg, #0B1B33 0%, #071326 70%)",
+          }}
         />
         <div className="relative z-[2] mx-auto flex w-full max-w-[1120px] flex-col items-center px-6 py-20 text-center md:px-8 md:py-0">
           <div className="fm-animate-up mb-7 inline-flex items-center gap-2 rounded-full border border-fm-blue/40 bg-fm-blue/20 px-3.5 py-[5px]">
@@ -183,8 +167,9 @@ export default function InstitutionsClient() {
 
           <p className="fm-animate-up fm-animate-up-delay-2 mb-10 max-w-[540px] text-[15px] leading-[1.75] text-white/60 md:text-[17px]">
             Médicos en activo, investigadores, directivos y especialistas
-            que nunca publican su CV en LinkedIn. Aquí están disponibles,
-            verificados, con contacto directo y sin comisiones de contratación.
+            que nunca publican su CV en portales de empleo. Aquí están
+            disponibles, verificados, con contacto directo y sin comisiones
+            de contratación.
           </p>
 
           <div className="fm-animate-up fm-animate-up-delay-3 flex flex-wrap justify-center gap-3">
@@ -236,14 +221,17 @@ export default function InstitutionsClient() {
                 >
                   <div className="flex items-start gap-3">
                     <div
-                      className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl text-sm font-extrabold tracking-[-0.02em] text-white"
+                      className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl text-white"
                       style={{ background: p.color }}
                     >
-                      {p.init}
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="8" r="4" fill="#fff" fillOpacity="0.9" />
+                        <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="#fff" fillOpacity="0.9" />
+                      </svg>
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="mb-0.5 flex items-center justify-between gap-1.5">
-                        <span className="text-sm font-bold tracking-[-0.02em] text-fm-ink">{p.name}</span>
+                        <span className="text-sm font-bold tracking-[-0.02em] text-fm-ink">{p.org}</span>
                         <div className={`flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 ${p.avail ? "bg-emerald-50" : "bg-gray-100"}`}>
                           <span className={`h-[5px] w-[5px] rounded-full ${p.avail ? "bg-emerald-600" : "bg-[#8896B0]"}`} />
                           <span className={`text-[9px] font-bold uppercase tracking-[0.06em] ${p.avail ? "text-emerald-600" : "text-[#8896B0]"}`}>
@@ -252,7 +240,6 @@ export default function InstitutionsClient() {
                         </div>
                       </div>
                       <div className="text-xs leading-tight text-fm-muted">{p.role}</div>
-                      <div className="mt-0.5 text-[11px] text-[#8896B0]">{p.org}</div>
                     </div>
                   </div>
 
@@ -289,40 +276,28 @@ export default function InstitutionsClient() {
 
       {/* ── FILTROS ── */}
       <section className="bg-white px-6 py-16 md:px-8 md:py-[88px]">
-        <div className="mx-auto max-w-[1120px]">
-          <div className="grid items-center gap-0 md:grid-cols-2 md:gap-[72px]">
-            <div>
-              <div className="mb-4 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
-                Búsqueda estructurada
+        <div className="mx-auto max-w-[760px]">
+          <div className="mb-4 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
+            Búsqueda estructurada
+          </div>
+          <h2 className="mb-[18px] text-2xl font-extrabold leading-[1.1] tracking-[-0.04em] text-fm-ink md:text-[clamp(26px,2.8vw,36px)]">
+            Búsqueda pensada para quien contrata, no para quien busca trabajo.
+          </h2>
+          <p className="mb-8 text-[15px] leading-[1.8] text-fm-muted">
+            No hay keywords que interpretar ni CVs confusos. El directorio
+            está estructurado exactamente con los criterios que usan los
+            directores de programa al seleccionar profesorado.
+          </p>
+          <div className="grid gap-2.5 sm:grid-cols-2">
+            {FILTERS.map((f, i) => (
+              <div key={i} className="rounded-[10px] border border-fm-border bg-fm-surface px-4 py-3">
+                <div className="mb-1 flex items-center gap-[7px]">
+                  <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-fm-gold" />
+                  <span className="text-[13px] font-semibold text-fm-ink">{f.label}</span>
+                </div>
+                <p className="text-xs leading-[1.5] text-[#8896B0]">{f.desc}</p>
               </div>
-              <h2 className="mb-[18px] text-2xl font-extrabold leading-[1.1] tracking-[-0.04em] text-fm-ink md:text-[clamp(26px,2.8vw,36px)]">
-                Búsqueda pensada para<br />quien contrata, no para<br />quien busca trabajo.
-              </h2>
-              <p className="mb-8 text-[15px] leading-[1.8] text-fm-muted">
-                No hay keywords que interpretar ni CVs confusos. El directorio
-                está estructurado exactamente con los criterios que usan los
-                directores de programa al seleccionar profesorado.
-              </p>
-              <div className="grid grid-cols-2 gap-2.5">
-                {FILTERS.map((f, i) => (
-                  <div key={i} className="rounded-[10px] border border-fm-border bg-fm-surface px-4 py-3">
-                    <div className="mb-1 flex items-center gap-[7px]">
-                      <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-fm-gold" />
-                      <span className="text-[13px] font-semibold text-fm-ink">{f.label}</span>
-                    </div>
-                    <p className="text-xs leading-[1.5] text-[#8896B0]">{f.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            {!isMob && (
-              <div className="h-[480px] overflow-hidden rounded-[20px]">
-                <div
-                  className="h-full w-full bg-cover bg-center"
-                  style={{ backgroundImage: "url(https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800)" }}
-                />
-              </div>
-            )}
+            ))}
           </div>
         </div>
       </section>
@@ -364,15 +339,15 @@ export default function InstitutionsClient() {
         </div>
       </section>
 
-      {/* ── POR QUÉ NO LINKEDIN ── */}
+      {/* ── POR QUÉ UN DIRECTORIO DEDICADO ── */}
       <section className="bg-white px-6 py-16 md:px-8 md:py-[88px]">
         <div className="mx-auto max-w-[1120px]">
           <div className="mb-12 text-center">
             <div className="mb-3.5 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
-              Por qué no LinkedIn
+              Por qué un directorio dedicado
             </div>
             <h2 className="mb-4 text-[26px] font-extrabold tracking-[-0.04em] text-fm-ink md:text-[clamp(28px,3vw,40px)]">
-              LinkedIn tiene 50 millones de perfiles.<br />Nosotros tenemos los que enseñan.
+              Una red generalista tiene millones de perfiles.<br />Aquí están los que enseñan.
             </h2>
             <p className="mx-auto max-w-[520px] text-[15px] text-fm-muted">
               No todos los profesionales quieren dar clases — ni saben que pueden.
@@ -405,7 +380,7 @@ export default function InstitutionsClient() {
                       </svg>
                     </div>
                     <div>
-                      <span className="text-[9px] font-extrabold uppercase tracking-[0.08em] text-[#8896B0]">LinkedIn </span>
+                      <span className="text-[9px] font-extrabold uppercase tracking-[0.08em] text-[#8896B0]">Buscarlo por tu cuenta </span>
                       <p className="mt-0.5 text-[13px] leading-[1.5] text-fm-muted">{row.li}</p>
                     </div>
                   </div>
@@ -469,7 +444,7 @@ export default function InstitutionsClient() {
               <div className="mb-1 text-[44px] font-black leading-none tracking-[-0.05em] text-white">35 €</div>
               <div className="mb-7 text-[13px] text-white/40">al mes · sin permanencia</div>
               <div className="mb-7 flex flex-1 flex-col gap-[11px]">
-                {["20 búsquedas al mes", "20 contactos al mes", "Filtros avanzados", "Shortlists y favoritos", "1 usuario", "Soporte por email"].map((f, i) => (
+                {["20 búsquedas al mes", "20 contactos al mes", "Filtros avanzados", "Favoritos", "1 usuario", "Soporte por email"].map((f, i) => (
                   <div key={i} className="flex items-center gap-2.5">
                     <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-fm-gold/20">
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
@@ -480,14 +455,11 @@ export default function InstitutionsClient() {
                   </div>
                 ))}
               </div>
-              <a href="mailto:support@facultymatch.app?subject=Solicitud%20Plan%20Growth">
+              <Link href="/checkout?plan=institution-growth">
                 <button className="w-full rounded-[10px] bg-fm-gold py-3 text-sm font-bold text-fm-ink">
-                  Solicitar acceso
+                  Activar ahora — 35 €/mes
                 </button>
-              </a>
-              <p className="mt-2.5 text-center text-[11px] text-white/35">
-                Disponible por email · lanzamiento próximo
-              </p>
+              </Link>
             </div>
 
             {/* Professional */}
@@ -498,7 +470,7 @@ export default function InstitutionsClient() {
               <div className="mb-1 text-[44px] font-black leading-none tracking-[-0.05em] text-white">99 €</div>
               <div className="mb-7 text-[13px] text-white/40">al mes · sin permanencia</div>
               <div className="mb-7 flex flex-1 flex-col gap-[11px]">
-                {["Búsquedas ilimitadas", "Contactos ilimitados", "Filtros avanzados completos", "Shortlists y favoritos sin límite", "Hasta 3 usuarios", "Soporte prioritario"].map((f, i) => (
+                {["Búsquedas ilimitadas", "Contactos ilimitados", "Filtros avanzados completos", "Favoritos sin límite", "Hasta 3 usuarios", "Soporte prioritario"].map((f, i) => (
                   <div key={i} className="flex items-center gap-2.5">
                     <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-fm-gold/15">
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none">

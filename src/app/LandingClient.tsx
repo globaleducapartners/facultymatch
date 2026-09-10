@@ -238,7 +238,7 @@ function Hero() {
             </span>
           </div>
 
-          <div className="relative -ml-4 mt-[-52px] rounded-2xl border border-[#E1E7F5] bg-white p-3.5 shadow-[0_30px_55px_-24px_rgba(13,34,64,0.4)] md:-ml-7">
+          <div className="relative mt-[-52px] rounded-2xl border border-[#E1E7F5] bg-white p-3.5 shadow-[0_30px_55px_-24px_rgba(13,34,64,0.4)] md:-ml-7">
             <div className="mb-2.5 flex gap-2">
               <div className="flex h-8 flex-1 items-center gap-1.5 rounded-lg border border-[#E1E7F5] bg-[#F7F9FD] px-2.5 text-[11px] text-[#8592A8]">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" strokeLinecap="round" /></svg>

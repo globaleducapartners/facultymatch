@@ -92,28 +92,17 @@ export default function FacultyClient() {
       <Navbar />
 
       {/* ── HERO ── */}
+      {/* Sin vídeo: el de la home ya usa /faculty-hero.mp4 y se repetía. El
+          overlay tapaba el 75-96% del vídeo de todas formas — queda un
+          degradado marino sólido. Un vídeo propio de aula puede volver aquí
+          cuando haya un asset distinto. */}
       <section className="relative flex items-center overflow-hidden min-h-[90svh] md:min-h-[580px]">
-        {isMob ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src="/images/faculty-video-poster.jpg"
-            alt="Docente experto en FacultyMatch"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "center 30%" }}
-          />
-        ) : (
-          <video
-            autoPlay muted loop playsInline
-            poster="/images/faculty-video-poster.jpg"
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ objectPosition: "center 30%" }}
-          >
-            <source src="/faculty-hero.mp4" type="video/mp4" />
-          </video>
-        )}
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(160deg, rgba(7,19,38,0.75) 0%, rgba(7,19,38,0.88) 60%, rgba(7,19,38,0.96) 100%)" }}
+          style={{
+            background:
+              "radial-gradient(700px 420px at 15% 0%, rgba(27,79,216,0.28), transparent 60%), linear-gradient(160deg, #0B1B33 0%, #071326 70%)",
+          }}
         />
         <div className="relative z-[2] mx-auto flex w-full max-w-[1120px] flex-col items-center px-6 py-20 text-center md:px-8 md:py-0">
           <div className="fm-animate-up mb-7 inline-flex items-center gap-2 rounded-full border border-fm-blue/40 bg-fm-blue/20 px-3.5 py-[5px]">
