@@ -90,12 +90,22 @@ export default async function PrivacyPage({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const admin = createAdminClient();
+    // visibility_source='faculty' + fecha → deja constancia de que esto fue
+    // una decisión del docente, no el valor por defecto del sistema. Lo lee
+    // /control para distinguir "eligió privado" de "privado por defecto".
+    const base = {
+      id: user.id,
+      user_id: user.id,
+      visibility: mode,
+      visibility_source: "faculty",
+      visibility_updated_at: new Date().toISOString(),
+    };
     // Try with name_visibility first; if column doesn't exist fall back without it
     let { error } = await admin.from("faculty_profiles")
-      .upsert({ id: user.id, user_id: user.id, visibility: mode, name_visibility: nameVis }, { onConflict: "id" });
+      .upsert({ ...base, name_visibility: nameVis }, { onConflict: "id" });
     if (error?.message?.includes("name_visibility")) {
       ({ error } = await admin.from("faculty_profiles")
-        .upsert({ id: user.id, user_id: user.id, visibility: mode }, { onConflict: "id" }));
+        .upsert(base, { onConflict: "id" }));
     }
     if (error) {
       console.error("[updateVisibility]", error);

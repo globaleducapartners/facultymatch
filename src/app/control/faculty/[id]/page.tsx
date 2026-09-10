@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase-server";
 import { notFound } from "next/navigation";
 import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
+import { describeVisibility } from "@/lib/visibility";
 import {
   Mail, Eye, GraduationCap, Globe, MapPin, Award, BookOpen, FileText,
   Languages, Phone, Link as LinkIcon, Calendar, Clock, ChevronRight,
@@ -139,9 +140,9 @@ export default async function FacultyDetailPage({
     .limit(20);
 
   const fp = facultyProfile || {};
-  const visibility = fp.visibility || "public";
   const viewCount = fp.view_count ?? 0;
-  const isHidden = visibility === "private";
+  const vis = describeVisibility(fp);
+  const isHidden = vis.hidden;
   const isVerified = fp.estado_perfil === "verificado";
 
   // Completitud — cálculo unificado (src/lib/faculty-completeness.ts). Antes
@@ -172,8 +173,15 @@ export default async function FacultyDetailPage({
             <div className="flex items-center gap-2 mt-2">
               <StatusBadge status={fp.estado_perfil} />
               {isHidden && (
-                <span className="text-xs font-black px-2.5 py-1 rounded-full bg-gray-200 text-gray-700 flex items-center gap-1.5">
-                  <EyeOff size={12} /> Oculto
+                <span
+                  title={vis.detail || undefined}
+                  className={`text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1.5 ${
+                    vis.kind === "faculty" ? "bg-blue-100 text-blue-700"
+                    : vis.kind === "admin" ? "bg-red-100 text-red-700"
+                    : "bg-gray-200 text-gray-700"
+                  }`}
+                >
+                  <EyeOff size={12} /> {vis.label}
                 </span>
               )}
             </div>
@@ -372,14 +380,20 @@ export default async function FacultyDetailPage({
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <SectionTitle icon={EyeOff} title="Visibilidad" />
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <span className="text-sm text-navy font-semibold">Estado</span>
-                <span className={`text-xs font-black px-2 py-0.5 rounded-full ${
-                  isHidden ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
+                <span className={`text-xs font-black px-2 py-0.5 rounded-full text-right ${
+                  !isHidden ? "bg-green-100 text-green-700"
+                  : vis.kind === "faculty" ? "bg-blue-100 text-blue-700"
+                  : vis.kind === "admin" ? "bg-red-100 text-red-700"
+                  : "bg-gray-200 text-gray-700"
                 }`}>
-                  {isHidden ? "Oculto" : "Visible"}
+                  {isHidden ? vis.label : "Visible"}
                 </span>
               </div>
+              {isHidden && vis.detail && (
+                <p className="text-xs text-gray-500 font-medium leading-snug -mt-1">{vis.detail}</p>
+              )}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-navy font-semibold">Nombre visible</span>
                 <span className="text-xs text-gray-500 font-bold">{fp.name_visibility || "public"}</span>

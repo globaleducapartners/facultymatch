@@ -6,14 +6,22 @@ import { revalidatePath } from "next/cache";
 
 export async function hideFaculty(facultyId: string) {
   const { admin } = await requireAdmin();
-  const { error } = await admin.from("faculty_profiles").update({ visibility: "private" }).eq("user_id", facultyId);
+  const { error } = await admin.from("faculty_profiles").update({
+    visibility: "private",
+    visibility_source: "admin",
+    visibility_updated_at: new Date().toISOString(),
+  }).eq("user_id", facultyId);
   if (error) throw new Error("No se pudo ocultar el perfil: " + error.message);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
 export async function unhideFaculty(facultyId: string) {
   const { admin } = await requireAdmin();
-  const { error } = await admin.from("faculty_profiles").update({ visibility: "public" }).eq("user_id", facultyId);
+  const { error } = await admin.from("faculty_profiles").update({
+    visibility: "public",
+    visibility_source: "admin",
+    visibility_updated_at: new Date().toISOString(),
+  }).eq("user_id", facultyId);
   if (error) throw new Error("No se pudo mostrar el perfil: " + error.message);
   revalidatePath(`/control/faculty/${facultyId}`);
 }

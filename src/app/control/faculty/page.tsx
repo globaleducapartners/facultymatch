@@ -5,14 +5,21 @@ import {
   GraduationCap, Award, MessageSquare, AlertCircle,
 } from "lucide-react";
 import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
+import { describeVisibility } from "@/lib/visibility";
 
 
 
 // ── ───────────────────────────────────────────────────────────────────────
 
-function StatusBadge({ status, visibility }: { status?: string | null; visibility?: string | null }) {
-  if (visibility === "private") {
-    return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-gray-200 text-gray-700 flex items-center gap-1"><EyeOff size={10} /> Oculto</span>;
+function StatusBadge({ status, profile }: { status?: string | null; profile?: any }) {
+  const vis = describeVisibility(profile || {});
+  if (vis.hidden) {
+    const cls =
+      vis.kind === "faculty" ? "bg-blue-100 text-blue-700"
+      : vis.kind === "admin" ? "bg-red-100 text-red-700"
+      : "bg-gray-200 text-gray-700";
+    const short = vis.kind === "faculty" ? "Privado" : "Oculto";
+    return <span title={vis.detail || undefined} className={`text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 ${cls}`}><EyeOff size={10} /> {short}</span>;
   }
   if (status === "verificado") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-green-100 text-green-700 flex items-center gap-1"><CheckCircle2 size={10} /> Verificado</span>;
   if (status === "rechazado") return <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-red-100 text-red-700 flex items-center gap-1"><XCircle size={10} /> Rechazado</span>;
@@ -33,7 +40,7 @@ export default async function FacultyListPage({
   // Fetch faculty_profiles ordered by view_count DESC (primary sort)
   let profileQuery = admin
     .from("faculty_profiles")
-    .select("user_id, view_count, visibility, headline, country, city, location, bio, availability, academic_level, degrees, institutions_taught, faculty_areas, languages, aneca_accreditation, is_phd, estado_perfil")
+    .select("user_id, view_count, visibility, visibility_source, visibility_updated_at, headline, country, city, location, bio, availability, academic_level, degrees, institutions_taught, faculty_areas, languages, aneca_accreditation, is_phd, estado_perfil")
     .order("view_count", { ascending: false })
     .limit(200);
 
@@ -271,7 +278,7 @@ export default async function FacultyListPage({
                         )}
                       </td>
                       <td className="px-5 py-3 text-center">
-                        <StatusBadge status={fp.estado_perfil} visibility={fp.visibility} />
+                        <StatusBadge status={fp.estado_perfil} profile={fp} />
                       </td>
 
                       {/* Recommended action */}
