@@ -76,10 +76,7 @@ function Nav() {
         <div className="mx-auto flex h-full max-w-[1120px] items-center justify-between gap-5 px-6 md:px-8">
           <Link href="/" className="flex shrink-0 items-center gap-2.5 no-underline">
             <Mark size={34} />
-            <span
-              className="text-lg font-extrabold tracking-tight transition-colors duration-300"
-              style={{ color: scrolled ? "#080F1E" : "#fff" }}
-            >
+            <span className="text-lg font-extrabold tracking-tight text-[#080F1E]">
               facultymatch
             </span>
           </Link>
@@ -89,8 +86,7 @@ function Nav() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="whitespace-nowrap text-sm font-medium transition-colors"
-                style={{ color: scrolled ? "#4B5A7A" : "rgba(255,255,255,0.8)" }}
+                className="whitespace-nowrap text-sm font-medium text-[#4B5A7A] transition-colors hover:text-fm-ink"
               >
                 {l.label}
               </Link>
@@ -99,13 +95,7 @@ function Nav() {
 
           <div className="flex shrink-0 items-center gap-2">
             <Link href="/login" className="hidden min-[560px]:block">
-              <button
-                className="rounded-[10px] border px-5 py-[7px] text-[13px] font-medium transition-colors"
-                style={{
-                  borderColor: scrolled ? "#D8E2EF" : "rgba(255,255,255,0.35)",
-                  color: scrolled ? "#080F1E" : "#fff",
-                }}
-              >
+              <button className="rounded-[10px] border border-fm-border px-5 py-[7px] text-[13px] font-medium text-[#080F1E]">
                 Acceder
               </button>
             </Link>
@@ -119,13 +109,12 @@ function Nav() {
               type="button"
               aria-label="Abrir menú"
               onClick={() => setMenuOpen((v) => !v)}
-              className="flex h-[38px] w-[38px] items-center justify-center rounded-lg border min-[900px]:hidden"
-              style={{ borderColor: scrolled ? "#D8E2EF" : "rgba(255,255,255,0.3)" }}
+              className="flex h-[38px] w-[38px] items-center justify-center rounded-lg border border-fm-border min-[900px]:hidden"
             >
               <div className="flex flex-col gap-1">
-                <span className="block h-[1.5px] w-4" style={{ background: scrolled ? "#080F1E" : "#fff" }} />
-                <span className="block h-[1.5px] w-4" style={{ background: scrolled ? "#080F1E" : "#fff" }} />
-                <span className="block h-[1.5px] w-4" style={{ background: scrolled ? "#080F1E" : "#fff" }} />
+                <span className="block h-[1.5px] w-4 bg-[#080F1E]" />
+                <span className="block h-[1.5px] w-4 bg-[#080F1E]" />
+                <span className="block h-[1.5px] w-4 bg-[#080F1E]" />
               </div>
             </button>
           </div>
@@ -156,91 +145,136 @@ function Nav() {
 }
 
 // ─── HERO ──────────────────────────────────────────────────────────────────
+// Verified-teacher card for the floating panel. Solo se muestran con nombre
+// los 3 perfiles con consentimiento (Miguel, Rocío, Javier); el 4º es una
+// tarjeta anónima "en revisión", igual que en el producto real.
+const HERO_CARDS: Array<
+  | { name: string; role: string; initials: string; from: string; bar: number }
+  | { pending: true }
+> = [
+  { name: "Miguel A. Martí", role: "Estrategia empresarial · Murcia", initials: "MA", from: "#1B4FD8", bar: 88 },
+  { name: "Rocío Guijarro", role: "Marketing y Publicidad · Valencia", initials: "RG", from: "#FF6A1A", bar: 71 },
+  { name: "Javier Plitt Stevens", role: "Derecho mercantil · Madrid", initials: "JP", from: "#0D2240", bar: 94 },
+  { pending: true },
+];
+
 function Hero() {
   return (
-    <div
-      className="px-6 pb-16 pt-[120px] md:px-8 md:pb-20 md:pt-[140px]"
-      style={{
-        background:
-          "radial-gradient(900px 480px at 18% -10%, rgba(27,79,216,0.32), transparent 60%), radial-gradient(640px 460px at 92% 6%, rgba(255,106,26,0.14), transparent 55%), #071326",
-      }}
-    >
-      <div className="mx-auto max-w-[760px] text-center">
-        <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[rgba(62,107,240,0.45)] bg-[rgba(27,79,216,0.22)] py-[6px] pl-2 pr-3.5">
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-fm-gold">
-            <svg viewBox="0 0 12 12" fill="none" className="h-[11px] w-[11px]">
-              <path d="M2 6l3 3 5-5" stroke="#0D2240" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+    <section className="bg-white px-6 pb-14 pt-[104px] md:px-8 md:pb-20 md:pt-[128px]">
+      <div className="mx-auto grid max-w-[1180px] items-center gap-10 md:grid-cols-[0.9fr_1.1fr] md:gap-12">
+
+        {/* ── Left: copy ── */}
+        <div>
+          <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#EEF3FE] px-3 py-[6px] font-mono text-[10px] font-bold uppercase tracking-[0.09em] text-fm-blue">
+            Directorio académico verificado
           </span>
-          <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-white/85">
-            Cada perfil, verificado a mano
-          </span>
+          <h1 className="mb-4 text-[2rem] font-black leading-[1.08] tracking-[-0.035em] text-fm-ink md:text-[clamp(2.1rem,3.4vw,2.9rem)]">
+            En la era de la IA, la experiencia <span className="text-fm-blue">real</span> marca la diferencia.
+          </h1>
+          <p className="mb-7 max-w-[480px] text-[15px] leading-[1.7] text-[#5B6B85]">
+            La red profesional —el «LinkedIn»— de los docentes que forman en universidades y escuelas de
+            negocio. Perfiles verificados, sin intermediarios.
+          </p>
+
+          <div className="mb-4 flex flex-wrap gap-3">
+            <Link href="/signup">
+              <button className="rounded-[10px] bg-fm-blue px-7 py-[13px] text-[14px] font-bold text-white shadow-[0_10px_24px_-8px_rgba(27,79,216,0.5)]">
+                Publicar mi perfil →
+              </button>
+            </Link>
+            <Link href="/signup?intent=institution">
+              <button className="rounded-[10px] border-[1.5px] border-fm-border px-6 py-[13px] text-[14px] font-semibold text-fm-navy">
+                Buscar docentes
+              </button>
+            </Link>
+          </div>
+
+          {/* Facts para el CTA — cualitativos y comprobables, sin cifras infladas */}
+          <p className="mb-6 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[11px] text-[#8592A8]">
+            <span>Gratis para docentes</span><span className="text-fm-border">·</span>
+            <span>Cada perfil, verificado a mano</span><span className="text-fm-border">·</span>
+            <span>Sin intermediarios</span>
+          </p>
+
+          <div className="flex items-center gap-3">
+            <div className="flex">
+              {[
+                { t: "MA", bg: "#1B4FD8" }, { t: "RG", bg: "#FF6A1A" }, { t: "JP", bg: "#0D2240" },
+              ].map((a) => (
+                <span
+                  key={a.t}
+                  className="-ml-2 flex h-[30px] w-[30px] items-center justify-center rounded-full border-2 border-white text-[10px] font-extrabold text-white first:ml-0"
+                  style={{ background: a.bg }}
+                >
+                  {a.t}
+                </span>
+              ))}
+              <span className="-ml-2 flex h-[30px] w-[30px] items-center justify-center rounded-full border-2 border-white bg-[#4B5A7A]">
+                <svg viewBox="0 0 24 24" fill="none" className="h-[14px] w-[14px]">
+                  <circle cx="12" cy="8" r="4" fill="#fff" fillOpacity="0.9" />
+                  <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="#fff" fillOpacity="0.9" />
+                </svg>
+              </span>
+            </div>
+            <span className="font-mono text-[11px] text-[#8592A8]">+200 perfiles verificados</span>
+          </div>
         </div>
 
-        <h1 className="mb-5 text-[2.2rem] font-black leading-[1.08] tracking-[-0.04em] text-white md:text-[clamp(2.4rem,5vw,3.6rem)]">
-          En la era de la IA, lo más valioso
-          <br />
-          no es tu contenido, <span className="text-fm-gold">es tu experiencia.</span>
-        </h1>
-
-        <p className="mx-auto mb-9 max-w-[540px] text-[15px] leading-[1.75] text-white/60 md:text-[17px]">
-          FacultyMatch conecta directivos, médicos, investigadores y expertos en activo
-          con universidades y escuelas de negocio. Sin intermediarios. Sin currículums sin comprobar.
-        </p>
-
-        <div className="mb-4 flex flex-wrap justify-center gap-3">
-          <Link href="/signup">
-            <button className="rounded-[10px] bg-white px-8 py-[14px] text-[15px] font-bold text-fm-ink shadow-[0_2px_20px_rgba(255,255,255,0.15)]">
-              Publicar mi perfil →
-            </button>
-          </Link>
-          <Link href="/signup?intent=institution">
-            <button className="rounded-[10px] border border-white/30 px-8 py-[14px] text-[15px] font-medium text-white/85">
-              Buscar docentes
-            </button>
-          </Link>
-        </div>
-        <p className="font-mono text-xs text-white/40">
-          100% PERFILES REVISADOS POR PERSONAS · CERO BOTS
-        </p>
-      </div>
-
-      <div className="mx-auto mt-14 max-w-[940px] md:mt-16">
-        <div className="relative overflow-hidden rounded-[18px] bg-[#12161d] shadow-[0_24px_60px_-20px_rgba(7,19,38,0.6)] ring-1 ring-white/[0.06]">
-          <div className="flex items-center gap-2 bg-[#1B1F27] px-[18px] py-[13px]">
-            <span className="h-[11px] w-[11px] rounded-full bg-[#FF5F57]" />
-            <span className="h-[11px] w-[11px] rounded-full bg-[#FFBD2E]" />
-            <span className="h-[11px] w-[11px] rounded-full bg-[#28C840]" />
-          </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/panel-docente-mockup.png"
-            alt="Panel de docente en FacultyMatch"
-            className="block w-full"
-          />
-          <div
-            className="absolute h-5 w-5 rounded-full [animation:fm-cursor-travel_7s_ease-in-out_infinite] motion-reduce:hidden"
-            style={{ filter: "drop-shadow(0 3px 8px rgba(0,0,0,0.45))" }}
-          >
-            <div className="absolute -left-[7px] -top-[7px] h-[34px] w-[34px] rounded-full border-2 border-fm-signal [animation:fm-ripple-pulse_7s_ease-in-out_infinite]" />
-            <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-              <path d="M4 2l14 6-6 2-2 6-6-14z" fill="#fff" stroke="#0D2240" strokeWidth="1.2" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <div className="absolute bottom-[26px] right-[26px] flex items-center gap-[9px] rounded-xl bg-white px-3.5 py-2.5 shadow-[0_12px_30px_rgba(0,0,0,0.25)] [animation:fm-badge-pulse_7s_ease-in-out_infinite]">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-fm-gold">
-              <svg viewBox="0 0 12 12" fill="none" className="h-[11px] w-[11px]">
-                <path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-            <span className="text-xs font-bold leading-tight text-fm-navy">
-              Perfil verificado
-              <small className="block font-mono font-normal text-[#8592A8]">por el equipo FacultyMatch</small>
+        {/* ── Right: video + floating search panel ── */}
+        <div className="relative">
+          <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-fm-border bg-gradient-to-br from-fm-navy to-fm-dark">
+            <video
+              autoPlay muted loop playsInline preload="auto"
+              className="absolute inset-0 h-full w-full object-cover motion-reduce:hidden"
+            >
+              <source src="/hero-campus.mp4" type="video/mp4" />
+            </video>
+            <span className="absolute bottom-3 left-3.5 font-mono text-[9px] uppercase tracking-[0.08em] text-white/70">
+              Universidades y escuelas de negocio de habla hispana
             </span>
           </div>
+
+          <div className="relative -ml-4 mt-[-52px] rounded-2xl border border-[#E1E7F5] bg-white p-3.5 shadow-[0_30px_55px_-24px_rgba(13,34,64,0.4)] md:-ml-7">
+            <div className="mb-2.5 flex gap-2">
+              <div className="flex h-8 flex-1 items-center gap-1.5 rounded-lg border border-[#E1E7F5] bg-[#F7F9FD] px-2.5 text-[11px] text-[#8592A8]">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" strokeLinecap="round" /></svg>
+                Marketing estratégico, MBA…
+              </div>
+              <div className="flex h-8 w-16 items-center justify-center rounded-lg border border-[#E1E7F5] bg-[#F7F9FD] text-[10px] font-semibold text-[#4B5A7A]">Área ▾</div>
+              <div className="hidden h-8 w-16 items-center justify-center rounded-lg border border-[#E1E7F5] bg-[#F7F9FD] text-[10px] font-semibold text-[#4B5A7A] min-[420px]:flex">País ▾</div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {HERO_CARDS.map((c, i) =>
+                "pending" in c ? (
+                  <div key={i} className="relative rounded-[10px] border border-[#E1E7F5] bg-[#FBFCFE] p-2.5">
+                    <span className="absolute right-2.5 top-2.5 rounded-[5px] bg-fm-gold/15 px-1.5 py-0.5 font-mono text-[7.5px] font-bold uppercase tracking-[0.03em] text-[#B77A1B]">En revisión</span>
+                    <div className="mb-1.5 flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#DCE2EE]">
+                      <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5"><circle cx="12" cy="8" r="4" fill="#fff" /><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="#fff" /></svg>
+                    </div>
+                    <div className="mb-1 h-1.5 w-[70%] rounded bg-[#E4E9F3]" />
+                    <div className="mb-2 h-1.5 w-[48%] rounded bg-[#E4E9F3]" />
+                    <div className="h-1 overflow-hidden rounded-full bg-[#EEF1F8]"><i className="block h-full w-[22%] rounded-full bg-[#C7CEDD]" /></div>
+                  </div>
+                ) : (
+                  <div key={i} className="relative rounded-[10px] border border-[#E1E7F5] bg-white p-2.5">
+                    <span className="absolute right-2.5 top-2.5 rounded-[5px] bg-fm-gold/15 px-1.5 py-0.5 font-mono text-[7.5px] font-bold uppercase tracking-[0.03em] text-[#B77A1B]">Verificado</span>
+                    <div
+                      className="mb-1.5 flex h-[26px] w-[26px] items-center justify-center rounded-full text-[9px] font-extrabold text-white"
+                      style={{ background: `linear-gradient(140deg, ${c.from}, #0D2240)` }}
+                    >
+                      {c.initials}
+                    </div>
+                    <div className="text-[10px] font-bold text-fm-navy">{c.name}</div>
+                    <div className="mb-2 text-[8px] leading-tight text-[#8592A8]">{c.role}</div>
+                    <div className="h-1 overflow-hidden rounded-full bg-[#EEF1F8]"><i className="block h-full rounded-full bg-fm-blue" style={{ width: `${c.bar}%` }} /></div>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -256,33 +290,6 @@ function Ticker() {
           >
             {a}
           </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── STATS ─────────────────────────────────────────────────────────────────
-function StatsStrip() {
-  const stats = [
-    { display: "+91", label: "universidades en España" },
-    { display: "1,76M", label: "estudiantes universitarios" },
-    { display: "200k", label: "alumnos internacionales / curso" },
-    { display: "4k", label: "titulaciones de máster" },
-  ];
-  return (
-    <div className="bg-fm-dark py-12">
-      <div className="mx-auto grid max-w-[1120px] grid-cols-2 gap-y-9 px-6 md:grid-cols-4 md:gap-y-0 md:px-8">
-        {stats.map((s, i) => (
-          <div
-            key={i}
-            className="px-2 text-center md:border-r md:border-white/10 md:px-6 md:last:border-r-0"
-          >
-            <div className="font-mono text-4xl font-bold tracking-[-0.02em] text-white [font-variant-numeric:tabular-nums] md:text-[clamp(2rem,3.6vw,2.7rem)]">
-              {s.display}
-            </div>
-            <div className="mt-1.5 text-[12.5px] text-white/45">{s.label}</div>
-          </div>
         ))}
       </div>
     </div>
@@ -501,7 +508,7 @@ function SplitDocentes() {
             Para docentes y expertos
           </span>
           <h2 className="mb-[18px] text-[1.6rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.6rem,2.8vw,2.2rem)]">
-            Tu experiencia es el <b className="font-extrabold text-fm-blue">valor diferencial.</b>
+            Lo que sabes hacer <b className="font-extrabold text-fm-blue">tiene demanda en las aulas.</b>
           </h2>
           <p className="mb-6 text-[14.5px] leading-[1.8] text-[#5B6B85]">
             Años en medicina, consultoría, investigación o dirección tienen demanda real en másteres
@@ -555,7 +562,7 @@ function SplitInstituciones() {
             Para instituciones educativas
           </span>
           <h2 className="mb-[18px] text-[1.6rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.6rem,2.8vw,2.2rem)]">
-            El docente que buscas <b className="font-extrabold text-fm-blue">no está en LinkedIn.</b>
+            El docente que buscas <b className="font-extrabold text-fm-blue">está dando clase, no buscando trabajo.</b>
           </h2>
           <p className="mb-6 text-[14.5px] leading-[1.8] text-[#5B6B85]">
             Los mejores perfiles están en activo: dirigiendo hospitales, liderando equipos, investigando.
@@ -737,6 +744,11 @@ function CtaFinal() {
             </button>
           </Link>
         </div>
+        <p className="mt-7 flex flex-wrap justify-center gap-x-2.5 gap-y-1 font-mono text-[11px] text-white/45">
+          <span>Verificación humana de cada perfil</span><span>·</span>
+          <span>Sin permanencia</span><span>·</span>
+          <span>Sin comisiones por contratación</span>
+        </p>
       </div>
     </section>
   );
@@ -749,7 +761,6 @@ export default function LandingClient() {
       <Nav />
       <Hero />
       <Ticker />
-      <StatsStrip />
       <HowItWorks />
       <ProductTrio />
       <SplitDocentes />
