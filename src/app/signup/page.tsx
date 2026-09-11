@@ -7,6 +7,7 @@ import { signUp } from "@/app/auth/actions";
 import { submitAcquisitionData } from "@/lib/acquisition";
 import { Logo } from "@/components/ui/Logo";
 import { GoogleButton } from "@/components/auth/GoogleButton";
+import { MicrosoftButton } from "@/components/auth/MicrosoftButton";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
@@ -206,10 +207,16 @@ function SignupForm() {
           </div>
 
           {/* SSO */}
-          <GoogleButton
-            intent={isInstitution ? "institution" : "faculty"}
-            referralCode={searchParams.get("ref") || undefined}
-          />
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <GoogleButton
+              intent={isInstitution ? "institution" : "faculty"}
+              referralCode={searchParams.get("ref") || undefined}
+            />
+            <MicrosoftButton
+              intent={isInstitution ? "institution" : "faculty"}
+              referralCode={searchParams.get("ref") || undefined}
+            />
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
             <div style={{ flex: 1, borderTop: `1px solid ${D.border}` }} />
             <span style={{ fontFamily: SANS, fontSize: 12, color: D.faint }}>o con tu email</span>
