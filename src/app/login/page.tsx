@@ -7,7 +7,9 @@ import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
 import { GoogleButton } from "@/components/auth/GoogleButton";
-import { MicrosoftButton } from "@/components/auth/MicrosoftButton";
+// MicrosoftButton: retirado temporalmente hasta activar el proveedor Azure
+// en Supabase — ver src/components/auth/MicrosoftButton.tsx, listo para
+// volver a importarlo cuando esté activo.
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
@@ -232,7 +234,6 @@ function LoginContent() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <GoogleButton next={next || undefined} />
-            <MicrosoftButton next={next || undefined} />
           </div>
 
           <div style={{ margin: "24px 0", borderTop: `1px solid ${D.border}` }} />

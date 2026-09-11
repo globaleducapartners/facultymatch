@@ -215,6 +215,29 @@ export default function ResourcesPage() {
         </div>
       </section>
 
+      {/* ── PRENSA ── */}
+      {/* Sello de "hablan de nosotros" — solo el nombre del medio enlazado, sin
+          reproducir cifras del artículo (es de mediados de 2026 y ya no
+          coincide con los datos reales del directorio). */}
+      <section className="border-y border-fm-border bg-white px-6 py-10 md:px-8">
+        <div className="mx-auto flex max-w-[900px] flex-col items-center gap-4 text-center">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#9CA3AF]">
+            Han hablado de nosotros
+          </span>
+          <a
+            href="https://alicanteplaza.es/alicanteplaza/empresas/asi-es-facultymatch-el-linkedin-de-docentes-impulsada-por-un-noveldense-para-universidades-y-escuelas-de-negocio"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-lg font-black tracking-[-0.02em] text-fm-ink transition-colors hover:text-fm-blue"
+          >
+            Alicante Plaza
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-50">
+              <path d="M7 17L17 7M17 7H8M17 7V16" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+        </div>
+      </section>
+
       {/* ── CTA NEWSLETTER ── */}
       <section className="relative overflow-hidden">
         <div

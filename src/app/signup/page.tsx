@@ -7,7 +7,8 @@ import { signUp } from "@/app/auth/actions";
 import { submitAcquisitionData } from "@/lib/acquisition";
 import { Logo } from "@/components/ui/Logo";
 import { GoogleButton } from "@/components/auth/GoogleButton";
-import { MicrosoftButton } from "@/components/auth/MicrosoftButton";
+// MicrosoftButton: retirado temporalmente hasta activar el proveedor Azure
+// en Supabase — ver src/components/auth/MicrosoftButton.tsx.
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
@@ -137,9 +138,14 @@ function SignupForm() {
   return (
     <div id="fm-signup-layout" style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "2fr 3fr", fontFamily: SANS }}>
 
-      {/* ── Panel izquierdo — dark ── */}
+      {/* ── Panel izquierdo — foto real + overlay ── */}
+      {/* Antes era un degradado plano sin imagen — pobre para quien llega
+          desde un anuncio. Reutiliza faculty-benefits.jpg, ya aprobada y en
+          uso público en la home y /faculty. */}
       <div id="fm-signup-left" style={{
-        background: `linear-gradient(160deg, ${D.dark} 0%, ${D.navy} 100%)`,
+        background: `linear-gradient(180deg, rgba(7,19,38,0.55) 0%, rgba(7,19,38,0.75) 55%, rgba(7,19,38,0.94) 100%), url(/images/faculty-benefits.jpg)`,
+        backgroundSize: "cover",
+        backgroundPosition: "center 20%",
         padding: "48px 44px",
         display: "flex", flexDirection: "column", justifyContent: "space-between",
       }}>
@@ -148,22 +154,22 @@ function SignupForm() {
         <div>
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 6,
-            background: "rgba(233,160,48,0.15)", border: "1px solid rgba(233,160,48,0.3)",
+            background: "rgba(255,106,26,0.16)", border: "1px solid rgba(255,106,26,0.35)",
             borderRadius: 20, padding: "4px 12px", marginBottom: 20,
           }}>
-            <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.gold }}>
-              Directorio académico global
+            <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#FF6A1A" }}>
+              Para docentes y expertos
             </span>
           </div>
-          <h2 style={{ fontFamily: SANS, fontSize: 26, fontWeight: 900, color: "#fff", lineHeight: 1.2, margin: "0 0 24px", letterSpacing: "-0.04em" }}>
-            Un perfil para todo lo que sabes hacer.
+          <h2 style={{ fontFamily: SANS, fontSize: 30, fontWeight: 900, color: "#fff", lineHeight: 1.18, margin: "0 0 24px", letterSpacing: "-0.04em" }}>
+            Las instituciones pagan por tu experiencia.
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[
-              "Apareces en búsquedas de instituciones educativas",
-              "Tú decides si respondes y en qué condiciones",
-              "Puedes también registrar tu institución",
-              "Gratuito siempre para docentes y expertos",
+              "Universidades y escuelas de negocio te buscan por tu conocimiento",
+              "Publica tu perfil y que tu experiencia hable por ti",
+              "Tú decides qué instituciones pueden contactarte",
+              "Gratuito siempre — sin comisiones",
             ].map((t, i) => (
               <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                 <div style={{
@@ -191,9 +197,21 @@ function SignupForm() {
       <div id="fm-signup-right" style={{ background: D.surf, padding: "48px 56px", overflowY: "auto" }}>
         <div style={{ maxWidth: 480, margin: "0 auto" }}>
 
-          {/* Logo visible only on mobile */}
-          <div id="fm-signup-mobile-logo" style={{ display: "none", marginBottom: 24 }}>
-            <Logo />
+          {/* Cabecera visual solo en móvil — antes el panel izquierdo (con la
+              foto) desaparecía entero en móvil y solo quedaba un logo suelto;
+              la mayoría del tráfico de un anuncio llega desde el móvil. */}
+          <div id="fm-signup-mobile-hero" style={{
+            display: "none",
+            margin: "-36px -24px 24px",
+            padding: "20px 24px 22px",
+            background: `linear-gradient(180deg, rgba(7,19,38,0.5) 0%, rgba(7,19,38,0.88) 100%), url(/images/faculty-benefits.jpg)`,
+            backgroundSize: "cover",
+            backgroundPosition: "center 15%",
+          }}>
+            <Logo variant="light" />
+            <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff", margin: "14px 0 0", letterSpacing: "-0.01em" }}>
+              Las instituciones pagan por tu experiencia.
+            </p>
           </div>
 
           {/* Header */}
@@ -213,17 +231,12 @@ function SignupForm() {
             display: "flex", flexWrap: "wrap", gap: "4px 8px",
           }}>
             <span>Verificación humana de cada perfil</span><span>·</span>
-            <span>Mencionados en Alicante Plaza</span><span>·</span>
             <span>{isInstitution ? "Sin permanencia" : "Gratis para docentes"}</span>
           </p>
 
           {/* SSO */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <GoogleButton
-              intent={isInstitution ? "institution" : "faculty"}
-              referralCode={searchParams.get("ref") || undefined}
-            />
-            <MicrosoftButton
               intent={isInstitution ? "institution" : "faculty"}
               referralCode={searchParams.get("ref") || undefined}
             />
@@ -342,7 +355,7 @@ function SignupForm() {
           #fm-signup-layout { display: flex !important; flex-direction: column !important; }
           #fm-signup-left   { display: none !important; }
           #fm-signup-right  { padding: 36px 24px !important; }
-          #fm-signup-mobile-logo { display: block !important; }
+          #fm-signup-mobile-hero { display: block !important; }
         }
       `}</style>
     </div>
