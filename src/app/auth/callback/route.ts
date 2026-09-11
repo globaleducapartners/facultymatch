@@ -54,6 +54,21 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL('/login?error=Could not authenticate user', origin).toString());
   }
 
+  // Step 3b: Google/Azure sign-in that hasn't picked a role yet — Google no
+  // manda si es docente o institución, así que a la primera vez (y solo la
+  // primera) lo mandamos a elegirlo. El alta por email siempre trae
+  // user_metadata.role ya puesto desde signUp(), así que esto nunca la
+  // afecta (provider === 'email' la salta directamente).
+  const provider = user.app_metadata?.provider;
+  if (provider && provider !== 'email' && !user.user_metadata?.sso_role_confirmed) {
+    const completeUrl = new URL('/auth/completar-registro', origin);
+    const ref = searchParams.get('ref');
+    const intent = searchParams.get('intent');
+    if (ref) completeUrl.searchParams.set('ref', ref);
+    if (intent) completeUrl.searchParams.set('intent', intent);
+    return NextResponse.redirect(completeUrl.toString());
+  }
+
   // Step 4: For institution users — ensure institutions record exists (from signup metadata)
   if (user.user_metadata?.role === 'institution') {
     try {

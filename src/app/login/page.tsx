@@ -6,6 +6,7 @@ import { signIn } from "@/app/auth/actions";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
+import { GoogleButton } from "@/components/auth/GoogleButton";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
@@ -221,6 +222,14 @@ function LoginContent() {
               }
             </button>
           </form>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "22px 0" }}>
+            <div style={{ flex: 1, borderTop: `1px solid ${D.border}` }} />
+            <span style={{ fontFamily: SANS, fontSize: 12, color: D.faint }}>o</span>
+            <div style={{ flex: 1, borderTop: `1px solid ${D.border}` }} />
+          </div>
+
+          <GoogleButton next={next || undefined} />
 
           <div style={{ margin: "24px 0", borderTop: `1px solid ${D.border}` }} />
 

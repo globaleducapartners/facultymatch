@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signUp } from "@/app/auth/actions";
 import { submitAcquisitionData } from "@/lib/acquisition";
 import { Logo } from "@/components/ui/Logo";
+import { GoogleButton } from "@/components/auth/GoogleButton";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const SANS = `var(--font-sans, system-ui, -apple-system, sans-serif)`;
@@ -202,6 +203,17 @@ function SignupForm() {
             <p style={{ fontFamily: SANS, fontSize: 14, color: D.muted, margin: "6px 0 0" }}>
               Solo lo esencial para empezar. Completarás tu perfil después.
             </p>
+          </div>
+
+          {/* SSO */}
+          <GoogleButton
+            intent={isInstitution ? "institution" : "faculty"}
+            referralCode={searchParams.get("ref") || undefined}
+          />
+          <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "20px 0" }}>
+            <div style={{ flex: 1, borderTop: `1px solid ${D.border}` }} />
+            <span style={{ fontFamily: SANS, fontSize: 12, color: D.faint }}>o con tu email</span>
+            <div style={{ flex: 1, borderTop: `1px solid ${D.border}` }} />
           </div>
 
           {/* Server error */}

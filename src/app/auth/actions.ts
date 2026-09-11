@@ -23,33 +23,103 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
   const supabase = await createClient();
 
   if (isSSO) {
-    // SSO: user already exists, just update their profile metadata
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return { error: "No se encontró sesión de SSO activa." };
+    // SSO: la sesión ya existe (viene de Google/Azure vía /auth/callback);
+    // esto es la pantalla "elige tu rol" que Google no puede rellenar por
+    // nosotros. Aquí sí exigimos los mismos consentimientos que en el alta
+    // por email — antes esta rama no los guardaba en absoluto.
+    const termsAccepted = formData.get("terms_accepted") === "on";
+    const privacyAccepted = formData.get("privacy_accepted") === "on";
+    const marketingOptIn = formData.get("marketing_opt_in") === "on";
 
-    // Update user_profiles with role and name
+    if (!termsAccepted || !privacyAccepted) {
+      return { error: "Debes aceptar los términos y la política de privacidad." };
+    }
+    if (role !== "faculty" && role !== "institution") {
+      return { error: "Indica si eres docente o institución." };
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "No se encontró sesión de Google activa. Vuelve a intentarlo." };
+
+    const resolvedFullName =
+      fullName?.trim() ||
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      user.email?.split("@")[0] ||
+      "Usuario";
+    const referralCodeSSO = (formData.get("referralCode") as string | null)?.trim() || null;
+
     const admin = createAdminClient();
     const { error: ssoProfileError } = await admin.from("user_profiles").upsert({
       id: user.id,
       role,
       active_mode: role,
-      full_name: fullName || user.user_metadata?.full_name || user.email?.split("@")[0],
+      full_name: resolvedFullName,
+      terms_accepted_at: new Date().toISOString(),
+      privacy_accepted_at: new Date().toISOString(),
+      marketing_opt_in: marketingOptIn,
+      consent_version: "v1",
     }, { onConflict: "id" });
     if (ssoProfileError) {
       console.error("[SignUp][SSO] Error upserting user_profiles:", ssoProfileError);
     }
 
     if (role === "institution") {
+      // El trigger de alta (handle_new_user) siempre crea antes un
+      // faculty_profiles por defecto, porque hasta este momento no sabíamos
+      // que el usuario iba a elegir institución. Se retira: si se deja, es
+      // un perfil docente vacío y huérfano que nadie va a completar nunca.
+      await admin.from("faculty_profiles").delete().eq("id", user.id);
+
+      const resolvedInstitutionName = institutionName?.trim() || resolvedFullName;
       const { error: ssoInstitutionError } = await admin.from("institutions").upsert({
         id: user.id,
         user_id: user.id,
-        name: institutionName || user.email?.split("@")[0] || "Mi Institución",
+        name: resolvedInstitutionName,
         updated_at: new Date().toISOString(),
       }, { onConflict: "id" });
       if (ssoInstitutionError) {
         console.error("[SignUp][SSO] Error upserting institutions:", ssoInstitutionError);
       }
+
+      sendWelcomeEmail(user.email!, resolvedFullName, "institution", resolvedInstitutionName).catch(e =>
+        console.error("[SignUp][SSO] Welcome email failed:", e)
+      );
+    } else {
+      // Google ya verificó el email — no hace falta el paso de activación
+      // por token que sí usa el alta con contraseña. Sin este UPDATE, el
+      // perfil se queda en 'pendiente_verificacion' (el valor por defecto
+      // que puso el trigger) y el usuario, en cuanto termine el wizard,
+      // choca con la puerta de /app/faculty que pide activar por email.
+      const { error: ssoFacultyError } = await admin
+        .from("faculty_profiles")
+        .update({ estado_perfil: "incompleto" })
+        .eq("id", user.id);
+      if (ssoFacultyError) {
+        console.error("[SignUp][SSO] Error updating faculty_profiles:", ssoFacultyError);
+      }
+
+      if (referralCodeSSO) {
+        await attributeReferral(admin, user.id, referralCodeSSO).catch(e =>
+          console.warn("[SignUp][SSO] referral attribution failed:", e)
+        );
+      }
     }
+
+    // Marca que ya eligió rol — así /auth/callback no lo vuelve a mandar
+    // aquí en el próximo login con Google.
+    await supabase.auth.updateUser({ data: { sso_role_confirmed: true } });
+
+    notifyAdminNewRegistration({
+      role,
+      name: resolvedFullName,
+      email: user.email ?? "—",
+      institutionName: role === "institution" ? (institutionName?.trim() || resolvedFullName) : null,
+    }).catch(e => console.warn("[SignUp][SSO] Admin notification failed:", e));
+
+    const ssoDestination = role === "institution" ? "/app/institution" : "/app/faculty/onboarding";
+    revalidatePath(ssoDestination);
+    redirect(ssoDestination);
   } else {
     const termsAccepted = formData.get("terms_accepted") === "on";
     const privacyAccepted = formData.get("privacy_accepted") === "on";
@@ -238,17 +308,27 @@ export const signOut = async () => {
   return redirect("/");
 };
 
-export async function signInWithSSO(provider: 'google' | 'azure', next?: string) {
+export async function signInWithSSO(
+  provider: 'google' | 'azure',
+  next?: string,
+  extra?: { ref?: string; intent?: string }
+) {
   const supabase = await createClient();
-  
+
   // Always use the canonical production URL to avoid vercel.app redirect mismatches
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '')
     || 'https://www.facultymatch.app';
   const redirectTo = new URL(`${siteUrl}/auth/callback`);
-  
+
   if (next) {
     redirectTo.searchParams.set("next", next);
   }
+  // El código de referido y la intención (docente/institución) del CTA de
+  // origen no viajan en user_metadata como en el alta por email — Google no
+  // los conoce. Van en la URL de vuelta para que /auth/callback los recoja
+  // y se los pase a /auth/completar-registro.
+  if (extra?.ref) redirectTo.searchParams.set("ref", extra.ref);
+  if (extra?.intent) redirectTo.searchParams.set("intent", extra.intent);
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
