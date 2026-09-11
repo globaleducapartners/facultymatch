@@ -230,7 +230,7 @@ function SignupForm() {
             fontFamily: SANS, fontSize: 11, color: D.faint, margin: "0 0 22px",
             display: "flex", flexWrap: "wrap", gap: "4px 8px",
           }}>
-            <span>Verificación humana de cada perfil</span><span>·</span>
+            <span>Revisión manual de cada perfil</span><span>·</span>
             <span>{isInstitution ? "Sin permanencia" : "Gratis para docentes"}</span>
           </p>
 

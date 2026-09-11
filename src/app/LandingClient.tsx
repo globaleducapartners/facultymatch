@@ -310,7 +310,7 @@ function HowItWorks() {
         </svg>
       ),
       title: "Publica en 10 minutos",
-      body: "Sube tu CV o rellénalo tú mismo. Un especialista humano revisa y aprueba cada perfil antes de publicarlo.",
+      body: "Sube tu CV o rellénalo tú mismo. Un experto de nuestro equipo revisa y aprueba cada perfil antes de publicarlo.",
     },
     {
       icon: (
@@ -456,13 +456,13 @@ function ProductTrio() {
                   </svg>
                 </div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-fm-gold/90">
-                  Verificado · equipo humano
+                  Verificado · revisado a mano
                 </div>
               </div>
             </div>
             <div className="p-5 pt-4">
               <div className="mb-2 font-mono text-[11px] font-bold text-fm-blue">PASO 3</div>
-              <h3 className="mb-2 text-[15.5px] font-bold text-fm-ink">Verificación humana</h3>
+              <h3 className="mb-2 text-[15.5px] font-bold text-fm-ink">Revisión de nuestro equipo</h3>
               <p className="text-[13px] leading-[1.65] text-[#5B6B85]">Un revisor de nuestro equipo confirma cada perfil a mano antes de publicarlo. La IA propone, las personas deciden.</p>
             </div>
           </div>
@@ -747,7 +747,7 @@ function CtaFinal() {
           </Link>
         </div>
         <p className="mt-7 flex flex-wrap justify-center gap-x-2.5 gap-y-1 font-mono text-[11px] text-white/45">
-          <span>Verificación humana de cada perfil</span><span>·</span>
+          <span>Revisión manual de cada perfil</span><span>·</span>
           <span>Sin permanencia</span><span>·</span>
           <span>Sin comisiones por contratación</span>
         </p>
