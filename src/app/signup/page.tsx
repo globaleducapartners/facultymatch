@@ -145,7 +145,7 @@ function SignupForm() {
       <div id="fm-signup-left" style={{
         background: `linear-gradient(180deg, rgba(7,19,38,0.55) 0%, rgba(7,19,38,0.75) 55%, rgba(7,19,38,0.94) 100%), url(/images/faculty-benefits.jpg)`,
         backgroundSize: "cover",
-        backgroundPosition: "center 20%",
+        backgroundPosition: "90% 20%",
         padding: "48px 44px",
         display: "flex", flexDirection: "column", justifyContent: "space-between",
       }}>
