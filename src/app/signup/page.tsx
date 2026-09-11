@@ -206,6 +206,17 @@ function SignupForm() {
             </p>
           </div>
 
+          {/* Confianza — pensado para quien llega desde un anuncio y no ha
+              visto el resto de la web todavía. Sin cifras inventadas. */}
+          <p style={{
+            fontFamily: SANS, fontSize: 11, color: D.faint, margin: "0 0 22px",
+            display: "flex", flexWrap: "wrap", gap: "4px 8px",
+          }}>
+            <span>Verificación humana de cada perfil</span><span>·</span>
+            <span>Mencionados en Alicante Plaza</span><span>·</span>
+            <span>{isInstitution ? "Sin permanencia" : "Gratis para docentes"}</span>
+          </p>
+
           {/* SSO */}
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <GoogleButton
