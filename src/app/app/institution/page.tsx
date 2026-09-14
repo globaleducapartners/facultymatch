@@ -16,13 +16,14 @@ import { InstitutionLogoUpload } from "@/components/dashboard/InstitutionLogoUpl
 import { SecuritySettingsSection } from "@/components/settings/SecuritySettingsSection";
 import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton";
 import { InstitutionSaveButton } from "@/components/dashboard/InstitutionSaveButton";
+import { SignupConversionPixel } from "@/components/SignupConversionPixel";
 
 export default async function InstitutionDashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; fm_signup?: string }>;
 }) {
-  const { error: errorParam } = await searchParams;
+  const { error: errorParam, fm_signup: signupRole } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -178,6 +179,7 @@ export default async function InstitutionDashboardPage({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      <SignupConversionPixel role={signupRole} />
 
       {/* Search CTA hero */}
       <Link href="/app/institution/search" className="block group">

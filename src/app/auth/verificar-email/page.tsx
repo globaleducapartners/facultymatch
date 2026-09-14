@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Mail, RefreshCw, CheckCircle2, AlertTriangle, ArrowLeft } from "lucide-react";
+import { SignupConversionPixel } from "@/components/SignupConversionPixel";
 
 const SANS = `'Inter', system-ui, -apple-system, sans-serif`;
 const D = {
@@ -40,7 +41,7 @@ const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
 };
 
 interface Props {
-  searchParams: Promise<{ email?: string; error?: string }>;
+  searchParams: Promise<{ email?: string; error?: string; fm_signup?: string }>;
 }
 
 export default function VerificarEmailPage({ searchParams }: Props) {
@@ -49,6 +50,7 @@ export default function VerificarEmailPage({ searchParams }: Props) {
   const [sending, setSending] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const [resendMessage, setResendMessage] = useState("");
+  const [signupRole, setSignupRole] = useState<string | null>(null);
 
   // Read searchParams
   useEffect(() => {
@@ -57,6 +59,7 @@ export default function VerificarEmailPage({ searchParams }: Props) {
       if (params.error && ERROR_MESSAGES[params.error]) {
         setError(params.error);
       }
+      if (params.fm_signup) setSignupRole(params.fm_signup);
     });
   }, [searchParams]);
 
@@ -104,6 +107,7 @@ export default function VerificarEmailPage({ searchParams }: Props) {
 
   return (
     <div style={{ fontFamily: SANS, minHeight: "100vh", background: "#F2F6FC", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <SignupConversionPixel role={signupRole} />
       <div style={{ maxWidth: 480, width: "100%" }}>
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>

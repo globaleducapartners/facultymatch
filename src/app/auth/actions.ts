@@ -117,7 +117,9 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
       institutionName: role === "institution" ? (institutionName?.trim() || resolvedFullName) : null,
     }).catch(e => console.warn("[SignUp][SSO] Admin notification failed:", e));
 
-    const ssoDestination = role === "institution" ? "/app/institution" : "/app/faculty/onboarding";
+    const ssoDestination =
+      (role === "institution" ? "/app/institution" : "/app/faculty/onboarding") +
+      "?fm_signup=" + role;
     revalidatePath(ssoDestination);
     redirect(ssoDestination);
   } else {
@@ -272,12 +274,12 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
   // manual reload.
   if (role === "faculty") {
     revalidatePath("/auth/verificar-email");
-    redirect("/auth/verificar-email?email=" + encodeURIComponent(email));
+    redirect("/auth/verificar-email?email=" + encodeURIComponent(email) + "&fm_signup=faculty");
   } else if (role === "institution") {
     revalidatePath("/app/institution");
-    redirect("/app/institution");
+    redirect("/app/institution?fm_signup=institution");
   }
-  redirect("/auth/verificar-email?email=" + encodeURIComponent(email));
+  redirect("/auth/verificar-email?email=" + encodeURIComponent(email) + "&fm_signup=faculty");
 }
 
 export async function updateEmail(formData: FormData) {

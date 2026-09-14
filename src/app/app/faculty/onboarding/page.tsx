@@ -1,8 +1,14 @@
 import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { ProfileWizardClient } from "./ProfileWizardClient";
+import { SignupConversionPixel } from "@/components/SignupConversionPixel";
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ fm_signup?: string }>;
+}) {
+  const { fm_signup: signupRole } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -26,11 +32,14 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <ProfileWizardClient
-      user={{ id: user.id, email: user.email }}
-      userMeta={user.user_metadata || {}}
-      profile={profile}
-      facultyProfile={facultyProfile}
-    />
+    <>
+      <SignupConversionPixel role={signupRole} />
+      <ProfileWizardClient
+        user={{ id: user.id, email: user.email }}
+        userMeta={user.user_metadata || {}}
+        profile={profile}
+        facultyProfile={facultyProfile}
+      />
+    </>
   );
 }
