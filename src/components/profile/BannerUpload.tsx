@@ -28,9 +28,11 @@ interface BannerUploadProps {
   userId: string;
   currentBannerUrl?: string | null;
   onClose: () => void;
+  /** "faculty" (por defecto) actualiza faculty_profiles.banner_url; "institution" actualiza institutions.banner_url. */
+  target?: "faculty" | "institution";
 }
 
-export function BannerUpload({ userId, currentBannerUrl, onClose }: BannerUploadProps) {
+export function BannerUpload({ userId, currentBannerUrl, onClose, target = "faculty" }: BannerUploadProps) {
   const [tab, setTab] = useState<"presets" | "upload">("presets");
   const UNSET = "__unset__";
   const [selected, setSelected] = useState<string>(currentBannerUrl ?? UNSET);
@@ -40,14 +42,19 @@ export function BannerUpload({ userId, currentBannerUrl, onClose }: BannerUpload
   const supabase = createClient();
   const router = useRouter();
 
+  // Mismo bucket para ambos, pero con un prefijo de fichero distinto: una
+  // cuenta dual (docente + institución) comparte el mismo userId, y si
+  // usáramos el mismo nombre de archivo el banner de uno pisaría el del otro.
+  const filePrefix = target === "institution" ? "institution-banner" : "banner";
+
   const saveBanner = async (url: string) => {
     setUploading(true);
     setError(null);
     try {
-      const { error: dbErr } = await supabase
-        .from("faculty_profiles")
-        .update({ banner_url: url })
-        .eq("id", userId);
+      const { error: dbErr } =
+        target === "institution"
+          ? await supabase.from("institutions").update({ banner_url: url }).eq("user_id", userId)
+          : await supabase.from("faculty_profiles").update({ banner_url: url }).eq("id", userId);
       if (dbErr) throw dbErr;
       onClose();
       window.location.reload();
@@ -73,7 +80,7 @@ export function BannerUpload({ userId, currentBannerUrl, onClose }: BannerUpload
     setError(null);
     try {
       const ext = file.name.split(".").pop() || "jpg";
-      const filePath = `${userId}/banner.${ext}`;
+      const filePath = `${userId}/${filePrefix}.${ext}`;
       const { error: uploadErr } = await supabase.storage
         .from("banners")
         .upload(filePath, file, { upsert: true });

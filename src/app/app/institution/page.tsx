@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { InstitutionLogoUpload } from "@/components/dashboard/InstitutionLogoUpload";
+import { InstitutionBannerEditor } from "@/components/dashboard/InstitutionBannerEditor";
 import { SecuritySettingsSection } from "@/components/settings/SecuritySettingsSection";
 import { DeleteAccountButton } from "@/components/settings/DeleteAccountButton";
 import { InstitutionSaveButton } from "@/components/dashboard/InstitutionSaveButton";
@@ -161,6 +162,7 @@ export default async function InstitutionDashboardPage({
   ];
   const profileCompletion = Math.round(fields.filter(Boolean).length / fields.length * 100);
   const isBlocked = (institution as any)?.status === "blocked";
+  const isVerified = ["active", "approved"].includes((institution as any)?.status);
 
   const instTypeLabel: Record<string, string> = {
     university: "Universidad pública", private_university: "Universidad privada",
@@ -240,9 +242,10 @@ export default async function InstitutionDashboardPage({
           {/* Profile card (cover + logo + name) */}
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             {/* Cover band */}
-            <div className="h-36 bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#4F7FE8] relative">
-              <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
-            </div>
+            <InstitutionBannerEditor
+              institutionId={institution?.id ?? ""}
+              currentBannerUrl={(institution as any)?.banner_url ?? null}
+            />
             <CardContent className="pt-0 pb-5 px-6">
               {/* Logo overlapping cover */}
               <div className="flex items-end justify-between" style={{ marginTop: -44 }}>
@@ -262,7 +265,14 @@ export default async function InstitutionDashboardPage({
               </div>
               {/* Name + meta */}
               <div className="mt-3">
-                <h1 className="text-2xl font-black text-[#0C1018] leading-tight">{institution?.name || "Mi Institución"}</h1>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h1 className="text-2xl font-black text-[#0C1018] leading-tight">{institution?.name || "Mi Institución"}</h1>
+                  {isVerified && (
+                    <span className="inline-flex items-center gap-1.5 bg-[#F7E8C8] border border-[#E9C77A] text-[#B4791E] text-[10px] font-bold px-2.5 py-1 rounded-full">
+                      <ShieldCheck size={11} /> Institución verificada
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-gray-500 font-medium mt-0.5">
                   {typeLabel || "Institución"}{[institution?.city, institution?.country].filter(Boolean).length > 0 && " · "}
                   {[institution?.city, institution?.country].filter(Boolean).join(", ")}

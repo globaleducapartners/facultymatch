@@ -16,7 +16,7 @@ export default async function RequestsPage() {
 
   const { data: requests } = await supabase
     .from("contacts")
-    .select("*, institution:institutions(name, country)")
+    .select("*, institution:institutions(name, country, logo_url, status)")
     .eq("faculty_id", facultyProfile?.id ?? user.id)
     .order("created_at", { ascending: false });
 

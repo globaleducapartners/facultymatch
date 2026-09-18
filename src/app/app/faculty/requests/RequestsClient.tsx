@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Archive, Clock, CheckCircle2, Mail, ChevronDown, ChevronUp, Send, Loader2 } from "lucide-react";
+import { Archive, Clock, CheckCircle2, Mail, ChevronDown, ChevronUp, Send, Loader2, ShieldCheck } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDateTZ, formatDateTimeTZ } from "@/lib/utils";
@@ -41,7 +42,7 @@ interface ContactRequest {
   created_at: string;
   replied_at: string | null;
   reply_message: string | null;
-  institution: { name: string; country: string };
+  institution: { name: string; country: string; logo_url: string | null; status: string };
 }
 
 interface Props {
@@ -61,6 +62,8 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
   const [followUpError, setFollowUpError] = useState<string | null>(null);
 
   const instInitials = (req.institution?.name ?? "IN").substring(0, 2).toUpperCase();
+  const instLogo = req.institution?.logo_url;
+  const instVerified = ["active", "approved"].includes(req.institution?.status);
 
   const handleFollowUp = async () => {
     if (!followUpMsg.trim()) return;
@@ -82,12 +85,21 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
     <div className={`bg-white rounded-2xl border shadow-sm transition-all ${isPending ? "border-blue-100 hover:border-blue-200" : "border-green-100"}`}>
       {/* Header */}
       <div className="flex items-center gap-4 p-5 cursor-pointer" onClick={() => setExpanded(!expanded)}>
-        <div className="w-10 h-10 bg-navy/10 text-navy rounded-xl flex items-center justify-center font-black text-xs flex-shrink-0">
-          {instInitials}
+        <div className="relative w-10 h-10 bg-navy/10 text-navy rounded-xl flex items-center justify-center font-black text-xs flex-shrink-0 overflow-hidden">
+          {instLogo ? (
+            <Image src={instLogo} alt={req.institution?.name ?? ""} fill sizes="40px" className="object-cover" />
+          ) : (
+            instInitials
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="text-base font-bold text-navy truncate">{req.institution?.name}</h4>
+            {instVerified && (
+              <span className="inline-flex items-center gap-1 bg-[#F7E8C8] text-[#B4791E] text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#E9C77A]">
+                <ShieldCheck size={9} /> Verificada
+              </span>
+            )}
             {req.subject && (
               <Badge variant="secondary" className="bg-blue-50 text-fm-blue font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 border-blue-100">
                 {SUBJECT_LABELS[req.subject] ?? req.subject}

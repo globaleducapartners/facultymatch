@@ -39,7 +39,7 @@ export function InstitutionWelcomeBanner({
       icon: UserCircle2,
       title: "Completa tu perfil",
       done: hasDescription,
-      href: "/app/institution/profile",
+      href: "/app/institution",
     },
     {
       icon: Search,

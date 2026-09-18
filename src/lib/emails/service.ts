@@ -45,7 +45,7 @@ export async function sendConfirmationEmail(email: string, name: string, confirm
   }
 }
 
-// Compartido por src/app/app/institution/page.tsx y .../institution/profile/page.tsx
+// Usado por src/app/app/institution/page.tsx
 // (las dos pantallas de edición de perfil institucional) — antes cada una
 // tenía su propia copia casi idéntica de este email.
 export async function sendInstitutionProfileUpdatedEmail(email: string, institutionName: string) {
