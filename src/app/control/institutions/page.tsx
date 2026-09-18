@@ -313,6 +313,12 @@ export default async function ControlInstitutionsPage() {
                         {intentionBadge}
                       </div>
 
+                      {inst.status === "rejected" && inst.rejection_reason && (
+                        <p className="text-xs text-gray-400 font-medium mt-0.5">
+                          Motivo: <span className="text-gray-500">{inst.rejection_reason}</span>
+                        </p>
+                      )}
+
                       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
                         {(inst.country || inst.city) && (
                           <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">

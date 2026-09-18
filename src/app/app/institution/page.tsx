@@ -104,9 +104,13 @@ export default async function InstitutionDashboardPage({
     }
 
     const adminClient = createAdminClient();
-    const { data: existing } = await adminClient.from("institutions").select("id").eq("user_id", user.id).maybeSingle();
+    const { data: existing } = await adminClient.from("institutions").select("id, status").eq("user_id", user.id).maybeSingle();
 
     if (existing) {
+      // Si el admin la había rechazado, al guardar cambios vuelve a la cola
+      // de revisión — si no, el correo de rechazo prometería una segunda
+      // revisión que nunca llega a pasar.
+      const wasRejected = existing.status === "rejected";
       await adminClient.from("institutions").update({
         name, description, country, city,
         location: cityCountry || null,
@@ -119,6 +123,7 @@ export default async function InstitutionDashboardPage({
         linkedin_url: linkedinUrl,
         modality: modality || null,
         updated_at: new Date().toISOString(),
+        ...(wasRejected ? { status: "pending", rejection_reason: null, rejected_at: null } : {}),
       }).eq("user_id", user.id);
     } else {
       await adminClient.from("institutions").insert({

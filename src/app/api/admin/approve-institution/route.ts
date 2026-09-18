@@ -16,23 +16,34 @@ export async function POST(request: Request) {
   if (!adminProfile || (adminProfile.role !== "admin" && adminProfile.role !== "super_admin"))
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { institutionId, action } = await request.json();
+  const { institutionId, action, reason } = await request.json();
   if (!institutionId || !action) return NextResponse.json({ error: "Missing data" }, { status: 400 });
+
+  const trimmedReason = typeof reason === "string" ? reason.trim() : "";
+  if (action === "reject" && !trimmedReason) {
+    return NextResponse.json({ error: "Indica un motivo de rechazo." }, { status: 400 });
+  }
 
   // "active" on approve so the institution appears correctly in all stats/badges
   const newStatus = action === "approve" ? "active" : "rejected";
   const { error } = await admin.from("institutions")
-    .update({ status: newStatus, verified: action === "approve" ? true : false, verified_at: action === "approve" ? new Date().toISOString() : null })
+    .update({
+      status: newStatus,
+      verified: action === "approve" ? true : false,
+      verified_at: action === "approve" ? new Date().toISOString() : null,
+      rejection_reason: action === "reject" ? trimmedReason : null,
+      rejected_at: action === "reject" ? new Date().toISOString() : null,
+    })
     .eq("id", institutionId);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  if (action === "approve") {
-    const { data: inst } = await admin.from("institutions").select("name, contact_email, user_id").eq("id", institutionId).single();
-    const { data: authUser } = inst?.user_id ? await admin.auth.admin.getUserById(inst.user_id) : { data: null };
-    const email = inst?.contact_email || authUser?.user?.email;
-    const name = inst?.name || "vuestra institución";
+  const { data: inst } = await admin.from("institutions").select("name, contact_email, user_id").eq("id", institutionId).single();
+  const { data: authUser } = inst?.user_id ? await admin.auth.admin.getUserById(inst.user_id) : { data: null };
+  const email = inst?.contact_email || authUser?.user?.email;
+  const name = inst?.name || "vuestra institución";
 
+  if (action === "approve") {
     if (email) {
       resend.emails.send({
         from: FROM,
@@ -46,6 +57,21 @@ export async function POST(request: Request) {
       to: ["support@facultymatch.app"],
       subject: `✅ Institución aprobada: ${name}`,
       html: `<p><strong>${name}</strong> aprobada. ID: ${institutionId}. Email: ${email || "—"}</p>`,
+    }).catch(() => {});
+  } else {
+    if (email) {
+      resend.emails.send({
+        from: FROM,
+        to: [email],
+        subject: `Sobre tu solicitud de alta en FacultyMatch`,
+        html: buildRejectionEmail(name, trimmedReason),
+      }).catch(() => {});
+    }
+    resend.emails.send({
+      from: FROM,
+      to: ["support@facultymatch.app"],
+      subject: `✗ Institución rechazada: ${name}`,
+      html: `<p><strong>${name}</strong> rechazada. ID: ${institutionId}. Email: ${email || "—"}.</p><p>Motivo: ${trimmedReason}</p>`,
     }).catch(() => {});
   }
 
@@ -109,5 +135,33 @@ function buildApprovalEmail(name: string) {
       </div>`).join("")}
     </div>
     <p style="text-align:center;color:#94a3b8;font-size:13px;margin-top:24px;">¿Tienes dudas? Escríbenos a <a href="mailto:support@facultymatch.app" style="color:#2563EB;">support@facultymatch.app</a></p>
+  `);
+}
+
+function buildRejectionEmail(name: string, reason: string) {
+  return emailWrapper(`
+    <p style="margin:0 0 16px;color:#0B1220;font-size:16px;line-height:1.7;">Hola,</p>
+    <p style="margin:0 0 20px;color:#0B1220;font-size:16px;line-height:1.7;">
+      Gracias por registrar <strong>${name}</strong> en FacultyMatch. Hemos revisado la solicitud y, de momento, no podemos aprobarla.
+    </p>
+    <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:20px 24px;margin-bottom:24px;">
+      <p style="margin:0 0 6px;font-weight:900;color:#9a3412;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Motivo</p>
+      <p style="margin:0;color:#7c2d12;font-size:14px;line-height:1.7;">${reason}</p>
+    </div>
+    <p style="margin:0 0 12px;color:#0B1220;font-size:14px;font-weight:900;">Para completarlo:</p>
+    <ul style="margin:0 0 24px;padding:0 0 0 20px;color:#475569;font-size:14px;line-height:2;">
+      <li>Vuelve a iniciar sesión en FacultyMatch con la cuenta que usaste al registrarte.</li>
+      <li>Revisa y completa los datos de tu institución en el panel.</li>
+      <li>En cuanto guardes los cambios, vuelve automáticamente a nuestra cola de revisión.</li>
+    </ul>
+    <p style="margin:0 0 28px;color:#475569;font-size:14px;line-height:1.7;">
+      Si el registro fue un error, o buscabas otra cosa, respóndenos a este correo y te orientamos sin compromiso.
+    </p>
+    <div style="text-align:center;margin-bottom:8px;">
+      <a href="${SITE}/login" style="display:inline-block;background:#1B4FD8;color:#fff;padding:14px 32px;border-radius:10px;font-weight:900;font-size:14px;text-decoration:none;">
+        Completar mi institución →
+      </a>
+    </div>
+    <p style="text-align:center;color:#94a3b8;font-size:13px;margin-top:28px;">¿Tienes dudas? Escríbenos a <a href="mailto:support@facultymatch.app" style="color:#2563EB;">support@facultymatch.app</a> o por WhatsApp al <a href="https://wa.me/34616684214" style="color:#2563EB;">+34 616 684 214</a></p>
   `);
 }
