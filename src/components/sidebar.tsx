@@ -65,19 +65,30 @@ const adminItems = [
   { label: "Ajustes",                   href: "/control/settings",     icon: Settings },
 ];
 
-export function Sidebar() {
+export function Sidebar({ activeMode }: { activeMode?: string | null } = {}) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
+  // Antes esto se decidía solo por la URL: una institución viendo el perfil
+  // de un docente concreto (/app/faculty/[id], una excepción que el
+  // middleware sí permite) se encontraba con el menú lateral de un docente
+  // —Mi perfil, Especialidades...— aunque su cuenta seguía en modo
+  // institución (el topbar, que sí mira active_mode, lo confirmaba). Con
+  // activeMode disponible manda sobre la URL; sin él (p.ej. /control), cae
+  // al comportamiento anterior.
   let navItems: { label: string; href: string; icon: any; group?: string }[] = educatorItems;
-  if (pathname?.startsWith("/app/institution")) {
+  if (activeMode === "institution") {
+    navItems = institutionItems;
+  } else if (activeMode === "faculty") {
+    navItems = educatorItems;
+  } else if (pathname?.startsWith("/app/institution")) {
     navItems = institutionItems;
   } else if (pathname?.startsWith("/control")) {
     navItems = adminItems;
   }
 
-  const isFaculty     = pathname?.startsWith("/app/faculty");
-  const isInstitution = pathname?.startsWith("/app/institution");
+  const isFaculty     = activeMode ? activeMode === "faculty" : pathname?.startsWith("/app/faculty");
+  const isInstitution = activeMode ? activeMode === "institution" : pathname?.startsWith("/app/institution");
 
   return (
     <>

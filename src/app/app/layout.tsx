@@ -34,7 +34,7 @@ export default async function DashboardLayout({
     <div className="min-h-screen bg-[#F2F6FC] flex flex-col">
       <Topbar user={{ id: user.id, email: user.email }} profile={displayProfile} />
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
+        <Sidebar activeMode={displayProfile.active_mode ?? displayProfile.role} />
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-7xl mx-auto space-y-6">
             {children}

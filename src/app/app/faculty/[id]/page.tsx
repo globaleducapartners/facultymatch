@@ -65,9 +65,32 @@ export default async function FacultyProfilePage({
     supabase.from("user_profiles").select("plan, subscription_status, can_switch_role, active_mode").eq("id", user.id).single(),
   ]);
 
-  const isPro =
-    (viewerProfile?.plan === "institution-pro" || viewerProfile?.plan === "institution-growth") &&
-    (viewerProfile?.subscription_status === "active" || viewerProfile?.subscription_status === "trialing");
+  // Antes esto conflaba Growth con Pro (ambos "isPro") y a Essential la
+  // bloqueaba del todo sin mirar su cuota — la misma institución con el
+  // mismo plan podía contactar sin problema desde /app/institution/search
+  // (que sí respeta la cuota de 5/20 al mes) pero se encontraba bloqueada
+  // aquí, en la ficha completa. Mismo modelo de 3 niveles que ya usa la
+  // búsqueda: Pro ve el contacto directo sin límite; Growth y Essential
+  // contactan a través del formulario mientras les quede cuota del mes.
+  const subActive = viewerProfile?.subscription_status === "active" || viewerProfile?.subscription_status === "trialing";
+  const isPro = viewerProfile?.plan === "institution-pro" && subActive;
+  const isGrowth = viewerProfile?.plan === "institution-growth" && subActive;
+  const contactMonthlyLimit = isPro ? null : isGrowth ? 20 : 5;
+
+  let usedContacts = 0;
+  if (institution && contactMonthlyLimit !== null) {
+    const now = new Date();
+    const monthStart = `${now.toISOString().slice(0, 7)}-01`;
+    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString().slice(0, 10);
+    const { count } = await admin
+      .from("contacts")
+      .select("*", { count: "exact", head: true })
+      .eq("institution_id", institution.id)
+      .gte("created_at", monthStart)
+      .lt("created_at", nextMonth);
+    usedContacts = count ?? 0;
+  }
+  const canContact = contactMonthlyLimit === null || usedContacts < contactMonthlyLimit;
 
   const canSwitchRole = viewerProfile?.can_switch_role === true;
   const activeMode = viewerProfile?.active_mode;
@@ -690,22 +713,41 @@ export default async function FacultyProfilePage({
               </div>
             </div>
 
-          ) : institution && !isPro ? (
+          ) : institution && !isPro && canContact ? (
+            <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-sm p-6 sm:p-8 space-y-5">
+              <div>
+                <h3 className="text-lg font-bold text-[#0D2240] mb-1 tracking-tight">¿Interesado?</h3>
+                <p className="text-sm text-slate-500 font-medium">Envía una propuesta a este docente para explorar una colaboración.</p>
+              </div>
+              <ContactModalWrapper
+                facultyId={facultyId}
+                facultyName={facultyName}
+                institutionId={institution.id}
+              />
+              {contactMonthlyLimit !== null && (
+                <p className="text-xs text-gray-400 text-center">
+                  {usedContacts} de {contactMonthlyLimit} contactos usados este mes
+                </p>
+              )}
+              <FavoriteButton facultyId={facultyId} institutionId={institution.id} initialIsFavorite={isFavorite} />
+            </div>
+
+          ) : institution && !isPro && !canContact ? (
             <div className="bg-white rounded-3xl border-2 border-gray-100 shadow-sm p-6 space-y-5 text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto">
                 <Lock size={22} className="text-gray-400" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-[#0D2240] mb-1">Contacto bloqueado</h3>
+                <h3 className="text-base font-bold text-[#0D2240] mb-1">Límite mensual alcanzado</h3>
                 <p className="text-sm text-slate-500 font-medium leading-relaxed">
-                  Activa el Plan Professional para acceder a los datos de contacto.
+                  Has usado tus {contactMonthlyLimit} contactos de este mes. Actualiza tu plan para seguir contactando docentes.
                 </p>
               </div>
               <Link
                 href="/app/institution/billing"
                 className="flex items-center justify-center gap-2 w-full bg-[#1B4FD8] hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-colors shadow-sm"
               >
-                <Zap size={14} /> Activar Plan Professional
+                <Zap size={14} /> Actualizar plan
               </Link>
               <FavoriteButton facultyId={facultyId} institutionId={institution.id} initialIsFavorite={isFavorite} />
             </div>

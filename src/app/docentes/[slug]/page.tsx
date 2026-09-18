@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import { Logo } from "@/components/ui/Logo";
 
 const BASE = "https://www.facultymatch.app";
 
@@ -151,12 +152,7 @@ export default async function PublicFacultyProfilePage({
         {/* ── Navbar ── */}
         <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
           <div className="max-w-5xl mx-auto flex items-center justify-between px-6 h-16">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-[#0D2240] rounded-lg flex items-center justify-center">
-                <span className="text-white text-xs font-black">FM</span>
-              </div>
-              <span className="font-black text-[#0D2240] text-sm">FacultyMatch</span>
-            </Link>
+            <Logo />
             <div className="flex items-center gap-3">
               <Link
                 href="/login"
@@ -165,7 +161,7 @@ export default async function PublicFacultyProfilePage({
                 Acceder
               </Link>
               <Link
-                href="/signup?role=institution"
+                href="/signup?intent=institution"
                 className="flex items-center gap-1.5 bg-[#1B4FD8] hover:bg-blue-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors"
               >
                 <UserPlus size={14} /> Registrarse
@@ -676,10 +672,10 @@ export default async function PublicFacultyProfilePage({
 
         {/* ── Footer ── */}
         <footer className="border-t border-slate-200 bg-white">
-          <div className="max-w-5xl mx-auto px-6 py-10 text-center">
+          <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col items-center gap-4">
+            <Logo />
             <p className="text-sm text-slate-400 font-medium">
-              <span className="font-black text-[#0D2240]">FACULTY<span className="text-[#1B4FD8]">MATCH</span></span>
-              {" · "}La plataforma académica de referencia{" · "}
+              Directorio académico verificado{" · "}
               <a href="https://www.facultymatch.app" className="hover:underline text-[#1B4FD8]">
                 www.facultymatch.app
               </a>
