@@ -669,19 +669,6 @@ export default async function PublicFacultyProfilePage({
             </aside>
           </div>
         </div>
-
-        {/* ── Footer ── */}
-        <footer className="border-t border-slate-200 bg-white">
-          <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col items-center gap-4">
-            <Logo />
-            <p className="text-sm text-slate-400 font-medium">
-              Directorio académico verificado{" · "}
-              <a href="https://www.facultymatch.app" className="hover:underline text-[#1B4FD8]">
-                www.facultymatch.app
-              </a>
-            </p>
-          </div>
-        </footer>
       </div>
     </>
   );

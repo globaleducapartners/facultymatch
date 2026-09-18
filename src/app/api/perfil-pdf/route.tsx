@@ -13,7 +13,7 @@ export async function GET() {
 
     const admin = createAdminClient();
 
-    const [{ data: profile }, { data: facultyProfile }, { data: expertise }] =
+    const [{ data: profile }, { data: facultyProfile }] =
       await Promise.all([
         supabase
           .from("user_profiles")
@@ -25,10 +25,6 @@ export async function GET() {
           .select("*")
           .eq("user_id", user.id)
           .maybeSingle(),
-        supabase
-          .from("faculty_expertise")
-          .select("area, subarea, topics")
-          .eq("faculty_id", user.id),
       ]);
 
     if (!facultyProfile) {
@@ -50,36 +46,28 @@ export async function GET() {
       );
     }
 
-    const areas = [
-      ...(facultyProfile.faculty_areas || []),
-      ...(expertise || []).map((e: any) => e.area),
-    ].filter(Boolean);
+    // El certificado necesita una fecha de verificación real y estable
+    // (ver src/lib/verification.ts) — sin ella el código de verificación
+    // no tendría nada fijo que representar.
+    if (!facultyProfile.verificado_en) {
+      return NextResponse.json(
+        { error: "Falta la fecha de verificación del perfil" },
+        { status: 500 }
+      );
+    }
 
     const pdfBuffer = await renderToBuffer(
       <VerifiedProfilePdf
         fullName={profile?.full_name || user.email?.split("@")[0] || "Docente"}
         headline={facultyProfile.headline}
-        location={facultyProfile.location}
-        bio={facultyProfile.bio}
-        languages={facultyProfile.languages || []}
-        degrees={facultyProfile.degrees || []}
-        institutionsTaught={facultyProfile.institutions_taught || []}
-        yearsExperience={facultyProfile.years_experience}
         currentInstitution={facultyProfile.current_institution}
-        availability={facultyProfile.availability}
-        modalities={facultyProfile.modalities || []}
+        academicLevel={facultyProfile.academic_level}
+        yearsExperience={facultyProfile.years_experience}
         isPhd={facultyProfile.is_phd}
         anecaAccreditation={facultyProfile.aneca_accreditation}
-        researchPublications={facultyProfile.research_publications}
         orcidId={facultyProfile.orcid_id}
-        orcidImportData={facultyProfile.orcid_import_data}
-        facultyAreas={areas}
         profileSlug={facultyProfile.profile_slug}
-        userEmail={user.email!}
-        phone={facultyProfile.phone}
-        linkedinUrl={facultyProfile.linkedin_url}
-        website={facultyProfile.website}
-        academicLevel={facultyProfile.academic_level}
+        verifiedAt={facultyProfile.verificado_en}
       />
     );
 
