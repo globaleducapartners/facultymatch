@@ -54,9 +54,13 @@ export function Topbar({ user, profile }: TopbarProps) {
   const [notifLoaded, setNotifLoaded] = useState(false);
   const bellRef = useRef<HTMLDivElement>(null);
 
+  // active_mode manda sobre role, igual que en el enlace de Configuración
+  // más abajo — una cuenta con doble rol (docente/institución) sigue
+  // teniendo role="faculty" como base aunque esté en modo institución.
+  const effectiveMode = profile?.active_mode ?? profile?.role;
   const dashboardHref =
-    profile?.role === "faculty"      ? "/app/faculty" :
-    profile?.role === "institution"  ? "/app/institution/home" :
+    effectiveMode === "faculty"      ? "/app/faculty" :
+    effectiveMode === "institution"  ? "/app/institution/home" :
     profile?.role === "admin" || profile?.role === "super_admin" ? "/control" :
     "/app/faculty";
 
@@ -361,11 +365,7 @@ export function Topbar({ user, profile }: TopbarProps) {
               <DropdownMenuItem className="rounded-lg p-2.5">
                 <Link
                   href={`/app/${
-                    profile?.role === "faculty"
-                      ? "faculty"
-                      : profile?.role === "institution"
-                      ? "institution"
-                      : "admin"
+                    effectiveMode === "institution" ? "institution" : effectiveMode === "faculty" ? "faculty" : "admin"
                   }/settings`}
                   className="flex items-center gap-2 w-full"
                 >
