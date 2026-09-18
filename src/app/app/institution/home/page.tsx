@@ -297,7 +297,7 @@ export default async function InstitutionHomePage() {
           </div>
 
           {/* Quick links grid */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 min-[480px]:grid-cols-3 gap-4">
             {[
               { icon: Star,     label: "Favoritos",  sub: `${favoritesCount ?? 0} guardados`, href: "/app/institution/favorites", color: "text-energy-orange", bg: "bg-orange-50" },
               { icon: Mail,     label: "Contactos",   sub: `${totalContacts ?? 0} enviados`,   href: "/app/institution/contacts",  color: "text-talentia-blue", bg: "bg-blue-50" },

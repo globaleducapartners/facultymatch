@@ -501,7 +501,7 @@ function SplitDocentes() {
         </div>
 
         <div
-          className="order-2 flex flex-col justify-center px-0 pt-9 transition-transform duration-700 md:order-1 md:px-8 md:py-16 md:pl-8"
+          className="order-2 flex flex-col justify-center px-6 pt-9 transition-transform duration-700 md:order-1 md:px-8 md:py-16 md:pl-8"
           style={{ transform: inView ? "translateX(0)" : "translateX(-10px)" }}
         >
           <span className="mb-4 block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#B4791E]">
@@ -555,7 +555,7 @@ function SplitInstituciones() {
     <section className="overflow-hidden bg-white">
       <div ref={ref} className="mx-auto grid max-w-[1120px] md:grid-cols-2 md:min-h-[520px]">
         <div
-          className="order-2 flex flex-col justify-center px-0 pb-9 pt-0 transition-transform duration-700 md:order-1 md:py-16 md:pl-16 md:pr-8"
+          className="order-2 flex flex-col justify-center px-6 pb-9 pt-0 transition-transform duration-700 md:order-1 md:py-16 md:pl-16 md:pr-8"
           style={{ transform: inView ? "translateX(0)" : "translateX(-10px)" }}
         >
           <span className="mb-4 block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#B4791E]">

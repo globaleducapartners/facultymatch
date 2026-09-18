@@ -151,20 +151,20 @@ export default async function PublicFacultyProfilePage({
       <div className="min-h-screen bg-[#F8FAFC]">
         {/* ── Navbar ── */}
         <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
-          <div className="max-w-5xl mx-auto flex items-center justify-between px-6 h-16">
-            <Logo />
-            <div className="flex items-center gap-3">
+          <div className="max-w-5xl mx-auto flex items-center justify-between gap-2 px-4 sm:px-6 h-16">
+            <Logo className="shrink-0" />
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               <Link
                 href="/login"
-                className="text-sm font-bold text-[#0D2240] hover:text-[#1B4FD8] transition-colors"
+                className="whitespace-nowrap text-xs sm:text-sm font-bold text-[#0D2240] hover:text-[#1B4FD8] transition-colors px-1"
               >
                 Acceder
               </Link>
               <Link
                 href="/signup?intent=institution"
-                className="flex items-center gap-1.5 bg-[#1B4FD8] hover:bg-blue-700 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors"
+                className="flex items-center gap-1.5 whitespace-nowrap bg-[#1B4FD8] hover:bg-blue-700 text-white text-xs sm:text-sm font-bold px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl transition-colors"
               >
-                <UserPlus size={14} /> Registrarse
+                <UserPlus size={14} className="hidden sm:block" /> Registrarse
               </Link>
             </div>
           </div>
@@ -205,6 +205,7 @@ export default async function PublicFacultyProfilePage({
                       alt={fullName}
                       fill
                       sizes="112px"
+                      priority
                       className="object-cover"
                     />
                   ) : (

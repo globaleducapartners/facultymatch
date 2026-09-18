@@ -427,7 +427,7 @@ export default async function EducatorDashboard() {
           )}
 
           {/* Personal stats */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 min-[480px]:grid-cols-3 gap-4">
             {[
               { icon: Star, label: "En favoritos", value: (favoritesCount ?? 0).toString(), color: "text-fm-gold", bg: "bg-orange-50" },
               { icon: Mail, label: "Solicitudes recibidas", value: (contactsCount ?? 0).toString(), color: "text-fm-blue", bg: "bg-blue-50" },
