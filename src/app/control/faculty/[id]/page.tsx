@@ -217,7 +217,14 @@ export default async function FacultyDetailPage({
               {fp.verificado_en && (
                 <InfoRow icon={CheckCircle2} label="Verificado el" value={fmtDate(fp.verificado_en)} />
               )}
-              <InfoRow icon={User} label="Rol" value={userProfile.role} />
+              <InfoRow
+                icon={User}
+                label="Rol"
+                value={
+                  ({ faculty: "Docente", institution: "Institución", admin: "Admin", super_admin: "Super admin" } as Record<string, string>)[userProfile.role] ??
+                  userProfile.role
+                }
+              />
               <InfoRow icon={CheckCircle2} label="Onboarding completado" value={userProfile.onboarding_completed ? "Sí" : "No"} />
             </div>
           </div>
@@ -396,7 +403,9 @@ export default async function FacultyDetailPage({
               )}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-navy font-semibold">Nombre visible</span>
-                <span className="text-xs text-gray-500 font-bold">{fp.name_visibility || "public"}</span>
+                <span className="text-xs text-gray-500 font-bold">
+                  {fp.name_visibility === "institutions" ? "Solo instituciones" : "Nombre completo"}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-navy font-semibold">Notificaciones</span>
