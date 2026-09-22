@@ -22,6 +22,7 @@ export interface FacultySearchFilters {
   modality: string;
   phd: string;
   aneca: string;
+  availability: string;
 }
 
 export function parseFacultySearchParams(
@@ -36,6 +37,7 @@ export function parseFacultySearchParams(
     modality: Array.isArray(params.modality) ? params.modality[0] : (params.modality as string) || "",
     phd: (params.phd as string) || "",
     aneca: (params.aneca as string) || "",
+    availability: (params.availability as string) || "",
   };
 }
 
@@ -58,7 +60,7 @@ export async function searchFacultyProfiles(
   filters: FacultySearchFilters,
   opts: FacultySearchOptions = {}
 ): Promise<FacultySearchResult> {
-  const { query, area, subarea, country, language, modality, phd, aneca } = filters;
+  const { query, area, subarea, country, language, modality, phd, aneca, availability } = filters;
   const blockedFacultyIds = opts.blockedFacultyIds ?? new Set<string>();
   const logPrefix = opts.logPrefix ?? "[faculty-search]";
 
@@ -196,6 +198,12 @@ export async function searchFacultyProfiles(
     // Modality → modalities array column (stored as ["Online","Presencial","Híbrida"])
     if (modality) {
       query_ = query_.contains("modalities", [modality]);
+    }
+
+    // Availability — mismos códigos que AVAIL_LABELS en EducatorCard/docentes/[slug]
+    // ("open", "next_semester", "occasional"...), columna de texto simple.
+    if (availability) {
+      query_ = query_.eq("availability", availability);
     }
 
     return query_;

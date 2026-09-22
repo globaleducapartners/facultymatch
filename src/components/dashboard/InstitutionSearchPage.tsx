@@ -68,7 +68,7 @@ interface InstitutionSearchPageProps {
 
 // ─── Filter chip helpers ──────────────────────────────────────────────────────
 
-const FILTER_KEYS = ["query", "area", "subarea", "language", "country", "aneca", "phd", "modality"] as const;
+const FILTER_KEYS = ["query", "area", "subarea", "language", "country", "aneca", "phd", "modality", "availability"] as const;
 
 const FILTER_LABELS: Record<string, string> = {
   query: "Búsqueda",
@@ -79,10 +79,27 @@ const FILTER_LABELS: Record<string, string> = {
   aneca: "ANECA",
   phd: "Solo PhD",
   modality: "Modalidad",
+  availability: "Disponibilidad",
 };
+
+// Mismos códigos y textos que AVAIL_LABELS en EducatorCard.tsx / docentes/[slug] —
+// es lo que un docente elige en su perfil como disponibilidad real.
+const AVAILABILITY_OPTIONS: { value: string; label: string }[] = [
+  { value: "open", label: "Disponible ahora" },
+  { value: "next_semester", label: "Próximo semestre" },
+  { value: "occasional", label: "Asignaturas puntuales" },
+  { value: "weekends", label: "Fines de semana" },
+  { value: "online_only", label: "Solo online" },
+  { value: "limited", label: "En 6 meses" },
+  { value: "invite_only", label: "Por invitación" },
+];
 
 function getChipLabel(key: string, value: string): string {
   if (key === "phd") return "Solo PhD";
+  if (key === "availability") {
+    const opt = AVAILABILITY_OPTIONS.find((o) => o.value === value);
+    return `Disponibilidad: ${opt?.label ?? value}`;
+  }
   return `${FILTER_LABELS[key] ?? key}: ${value}`;
 }
 
@@ -379,6 +396,22 @@ export function InstitutionSearchPage({
               <option value="Online">Online</option>
               <option value="Presencial">Presencial</option>
               <option value="Híbrida">Híbrida</option>
+            </select>
+
+            {/* Availability — cuándo puede empezar, no cómo imparte (eso es Modalidad) */}
+            <select
+              name="availability"
+              defaultValue={
+                Array.isArray(searchParams.availability)
+                  ? searchParams.availability[0]
+                  : searchParams.availability || ""
+              }
+              className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-48"
+            >
+              <option value="">Disponibilidad</option>
+              {AVAILABILITY_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
             </select>
 
             {/* More filters toggle */}
