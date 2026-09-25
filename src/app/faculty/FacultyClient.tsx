@@ -106,8 +106,7 @@ export default function FacultyClient() {
           }}
         />
         <div className="relative z-[2] mx-auto flex w-full max-w-[1120px] flex-col items-center px-6 py-20 text-center md:px-8 md:py-0">
-          <div className="fm-animate-up mb-7 inline-flex items-center gap-2 rounded-full border border-fm-blue/40 bg-fm-blue/20 px-3.5 py-[5px]">
-            <span className="h-1.5 w-1.5 rounded-full bg-fm-gold" />
+          <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
             <span className="font-sans text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
               Para docentes y expertos profesionales
             </span>

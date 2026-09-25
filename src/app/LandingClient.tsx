@@ -168,7 +168,7 @@ function Hero() {
 
         {/* ── Left: copy ── */}
         <div>
-          <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#EEF3FE] px-3 py-[6px] font-mono text-[10px] font-bold uppercase tracking-[0.09em] text-fm-blue">
+          <span className="mb-4 inline-flex items-center border-l-2 border-[#FF6A1A] py-0.5 pl-3 font-mono text-[10px] font-bold uppercase tracking-[0.09em] text-fm-blue">
             Directorio académico verificado
           </span>
           <h1 className="mb-4 text-[2rem] font-black leading-[1.08] tracking-[-0.035em] text-fm-ink md:text-[clamp(2.1rem,3.4vw,2.9rem)]">
