@@ -165,7 +165,11 @@ export function Topbar({ user, profile }: TopbarProps) {
   return (
     <header className="h-16 bg-white border-b border-[#E2E8F0] flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
       <div className="flex items-center gap-4">
-        <Logo href={dashboardHref} variant="dark" />
+        {/* En lg+ el sidebar ya muestra el logo; aquí solo hace falta cuando
+            el sidebar está plegado (móvil/tablet). */}
+        <div className="lg:hidden">
+          <Logo href={dashboardHref} variant="dark" />
+        </div>
       </div>
 
       {/* ── Role switcher (dual-role) — desktop ── */}

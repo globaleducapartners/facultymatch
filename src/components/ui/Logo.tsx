@@ -20,9 +20,9 @@ export function Logo({ className = "", variant = "dark", href = "/", onClick }: 
       style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10 }}
       className={className}
     >
-      <svg width="30" height="30" viewBox="0 0 100 100" style={{ flexShrink: 0, filter: "drop-shadow(0 0 8px rgba(255,106,26,0.45))" }}>
-        <path d="M51.1 44.7 L48.9 44.7 L8.9 31.1 L6.7 30.0 L4.7 27.6 L4.0 25.8 L4.0 22.9 L5.1 20.3 L7.1 18.3 L9.3 17.2 L22.1 13.2 L23.2 12.4 L48.2 4.0 L52.2 4.0 L54.4 5.1 L91.8 17.6 L94.0 19.0 L95.3 20.7 L96.0 22.5 L96.0 25.8 L94.9 28.4 L93.3 30.0 L91.1 31.1 L90.0 31.1 L87.0 29.3 L83.0 28.2 L78.6 28.2 L74.6 29.3 L71.3 31.1 L67.4 35.0 L65.6 37.9 L65.0 39.9 Z" fill={capColor} />
-        <circle cx="80.8" cy="44.8" r="10.2" fill="#FF6A1A" />
+      <svg width="30" height="30" viewBox="0 0 100 100" style={{ flexShrink: 0 }}>
+        <path d="M51.1 65.2 L48.9 65.2 L8.9 51.6 L6.7 50.5 L4.7 48.1 L4.0 46.3 L4.0 43.4 L5.1 40.8 L7.1 38.8 L9.3 37.7 L22.1 33.7 L23.2 32.9 L48.2 24.5 L52.2 24.5 L54.4 25.6 L91.8 38.1 L94.0 39.5 L95.3 41.2 L96.0 43.0 L96.0 46.3 L94.9 48.9 L93.3 50.5 L91.1 51.6 L90.0 51.6 L87.0 49.8 L83.0 48.7 L78.6 48.7 L74.6 49.8 L71.3 51.6 L67.4 55.5 L65.6 58.4 L65.0 60.4 Z" fill={capColor} />
+        <circle cx="80.8" cy="65.3" r="10.2" fill="#FF6A1A" />
       </svg>
 
       {/* Wordmark */}
