@@ -98,12 +98,12 @@ function Nav() {
 
           <div className="flex shrink-0 items-center gap-2">
             <Link href="/login" className="hidden min-[560px]:block">
-              <button className="rounded-[10px] border border-fm-border px-5 py-[7px] text-[13px] font-medium text-[#080F1E]">
+              <button className="rounded-[10px] border border-fm-border px-5 py-[7px] text-[13px] font-medium text-[#080F1E] transition-transform duration-150 ease-out active:scale-[0.97]">
                 Acceder
               </button>
             </Link>
             <Link href="/signup">
-              <button className="rounded-[10px] bg-fm-blue px-[22px] py-[7px] text-[13px] font-bold text-white">
+              <button className="rounded-[10px] bg-fm-blue px-[22px] py-[7px] text-[13px] font-bold text-white transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                 <span className="hidden min-[560px]:inline">Publicar perfil</span>
                 <span className="min-[560px]:hidden">Empezar</span>
               </button>
@@ -125,7 +125,7 @@ function Nav() {
       </nav>
 
       {menuOpen && (
-        <div className="fixed inset-x-0 top-16 z-[199] flex flex-col gap-1 border-b border-fm-border bg-white px-6 pb-7 pt-5 min-[900px]:hidden">
+        <div className="fixed inset-x-0 top-16 z-[199] flex flex-col gap-1 border-b border-fm-border bg-white px-6 pb-7 pt-5 min-[900px]:hidden [animation:fm-menu-in_220ms_cubic-bezier(0.22,1,0.36,1)] motion-reduce:animate-none">
           {links.map((l) => (
             <Link
               key={l.href}
@@ -181,12 +181,12 @@ function Hero() {
 
           <div className="flex flex-wrap gap-3">
             <Link href="/signup">
-              <button className="rounded-[10px] bg-fm-blue px-7 py-[13px] text-[14px] font-bold text-white shadow-[0_10px_24px_-8px_rgba(27,79,216,0.5)]">
+              <button className="rounded-[10px] bg-fm-blue px-7 py-[13px] text-[14px] font-bold text-white shadow-[0_10px_24px_-8px_rgba(27,79,216,0.5)] transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                 Publicar mi perfil →
               </button>
             </Link>
             <Link href="/signup?intent=institution">
-              <button className="rounded-[10px] border-[1.5px] border-fm-border px-6 py-[13px] text-[14px] font-semibold text-fm-navy">
+              <button className="rounded-[10px] border-[1.5px] border-fm-border px-6 py-[13px] text-[14px] font-semibold text-fm-navy transition-transform duration-150 ease-out active:scale-[0.97]">
                 Buscar docentes
               </button>
             </Link>
@@ -534,7 +534,7 @@ function SplitDocentes() {
             ))}
           </div>
           <Link href="/faculty" className="self-start">
-            <button className="rounded-[10px] bg-fm-navy px-7 py-[13px] text-sm font-bold text-white">
+            <button className="rounded-[10px] bg-fm-navy px-7 py-[13px] text-sm font-bold text-white transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
               Ver cómo funciona para docentes →
             </button>
           </Link>
@@ -580,7 +580,7 @@ function SplitInstituciones() {
             ))}
           </div>
           <Link href="/institutions" className="self-start">
-            <button className="rounded-[10px] bg-fm-blue px-7 py-[13px] text-sm font-bold text-white">
+            <button className="rounded-[10px] bg-fm-blue px-7 py-[13px] text-sm font-bold text-white transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
               Acceder al directorio →
             </button>
           </Link>
@@ -707,7 +707,7 @@ function Privacy() {
             Tu perfil es visible únicamente para quien tú decidas.
           </p>
           <Link href="/signup" className="self-start">
-            <button className="rounded-[10px] border-[1.5px] border-fm-navy px-6 py-3 text-sm font-semibold text-fm-navy">
+            <button className="rounded-[10px] border-[1.5px] border-fm-navy px-6 py-3 text-sm font-semibold text-fm-navy transition-transform duration-150 ease-out active:scale-[0.97]">
               Gestionar mi privacidad
             </button>
           </Link>
@@ -733,12 +733,12 @@ function CtaFinal() {
         </p>
         <div className="flex flex-wrap justify-center gap-3.5">
           <Link href="/signup">
-            <button className="rounded-[10px] bg-white px-9 py-[15px] text-[15px] font-bold text-fm-navy shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
+            <button className="rounded-[10px] bg-white px-9 py-[15px] text-[15px] font-bold text-fm-navy shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
               Soy docente o experto →
             </button>
           </Link>
           <Link href="/signup?intent=institution">
-            <button className="rounded-[10px] border-[1.5px] border-white/35 px-9 py-[15px] text-[15px] font-semibold text-white/85">
+            <button className="rounded-[10px] border-[1.5px] border-white/35 px-9 py-[15px] text-[15px] font-semibold text-white/85 transition-transform duration-150 ease-out active:scale-[0.97]">
               Soy institución
             </button>
           </Link>
