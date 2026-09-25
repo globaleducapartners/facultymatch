@@ -86,6 +86,7 @@ export default function FacultyClient() {
   const isMob = useIsMobile();
   const { ref: benefitsRef, inView: benefitsVisible } = useInView(0.1);
   const { ref: profilesRef, inView: profilesVisible } = useInView(0.1);
+  const { ref: pricingRef, inView: pricingVisible } = useInView(0.1);
 
   return (
     <div className="bg-white font-sans">
@@ -125,12 +126,12 @@ export default function FacultyClient() {
 
           <div className="fm-animate-up fm-animate-up-delay-3 flex flex-wrap justify-center gap-3">
             <Link href="/signup">
-              <button className="rounded-[10px] bg-white px-8 py-3.5 text-[15px] font-bold text-fm-ink">
+              <button className="rounded-[10px] bg-white px-8 py-3.5 text-[15px] font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                 Publicar mi perfil
               </button>
             </Link>
             <Link href="/login">
-              <button className="rounded-[10px] border border-white/30 px-8 py-3.5 text-[15px] text-white/80">
+              <button className="rounded-[10px] border border-white/30 px-8 py-3.5 text-[15px] text-white/80 transition-transform duration-150 ease-out active:scale-[0.97]">
                 Ya tengo cuenta
               </button>
             </Link>
@@ -142,9 +143,6 @@ export default function FacultyClient() {
       <section className="bg-white px-6 py-16 md:px-8 md:py-[88px]">
         <div className="mx-auto max-w-[1120px]">
           <div className="mb-11 text-center md:mb-15">
-            <div className="mb-3.5 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
-              Quién puede publicar su perfil
-            </div>
             <h2 className="mb-3.5 text-[26px] font-extrabold leading-[1.1] tracking-[-0.04em] text-fm-ink md:text-[clamp(28px,3vw,40px)]">
               No hace falta ser catedrático.
             </h2>
@@ -161,7 +159,9 @@ export default function FacultyClient() {
                 style={{
                   borderTop: `3px solid ${p.dot.includes("blue") ? "#1B4FD8" : p.dot.includes("gold") ? "#E9A030" : "#059669"}`,
                   transitionDelay: `${i * 0.12}s`,
-                  transform: profilesVisible ? "translateY(0)" : "translateY(10px)",
+                  // El paso central queda un poco más elevado en reposo —
+                  // rompe a propósito la simetría de "3 tarjetas iguales".
+                  transform: profilesVisible ? `translateY(${i === 1 ? -10 : 0}px)` : "translateY(10px)",
                 }}
               >
                 <div className="mb-3.5 flex items-center gap-2.5">
@@ -195,9 +195,6 @@ export default function FacultyClient() {
               </svg>
             </div>
             <div className="flex-1">
-              <div className="mb-2 font-sans text-[10px] font-extrabold uppercase tracking-[0.16em] text-fm-gold">
-                Tu empresa no lo sabrá
-              </div>
               <h3 className="mb-2.5 text-xl font-extrabold leading-tight tracking-[-0.03em] text-white md:text-2xl">
                 Tu institución actual no verá tu perfil,<br />a menos que tú quieras.
               </h3>
@@ -207,7 +204,7 @@ export default function FacultyClient() {
               </p>
             </div>
             <Link href="/signup" className="shrink-0">
-              <button className="whitespace-nowrap rounded-[10px] bg-fm-gold px-7 py-3.5 text-sm font-bold text-fm-ink">
+              <button className="whitespace-nowrap rounded-[10px] bg-fm-gold px-7 py-3.5 text-sm font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                 Publicar con privacidad →
               </button>
             </Link>
@@ -228,9 +225,6 @@ export default function FacultyClient() {
               </div>
             )}
             <div ref={benefitsRef}>
-              <div className="mb-4 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
-                Cómo funciona para ti
-              </div>
               <h2 className="mb-8 text-[26px] font-extrabold leading-[1.1] tracking-[-0.04em] text-fm-ink md:text-[clamp(26px,2.8vw,36px)]">
                 Lo que hace diferente<br />estar en FacultyMatch.
               </h2>
@@ -268,9 +262,12 @@ export default function FacultyClient() {
             </h2>
           </div>
 
-          <div className="mx-auto grid max-w-[780px] gap-5 md:grid-cols-2">
+          <div ref={pricingRef} className="mx-auto grid max-w-[780px] gap-5 md:grid-cols-2">
             {/* Basic */}
-            <div className="rounded-[20px] border border-fm-border bg-fm-surface p-8">
+            <div
+              className="rounded-[20px] border border-fm-border bg-fm-surface p-8 transition-transform duration-500"
+              style={{ transform: pricingVisible ? "translateY(0)" : "translateY(10px)" }}
+            >
               <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#8896B0]">
                 Plan Basic
               </div>
@@ -295,14 +292,17 @@ export default function FacultyClient() {
                 ))}
               </div>
               <Link href="/signup">
-                <button className="w-full rounded-[10px] border-[1.5px] border-fm-navy py-3.5 text-sm font-semibold text-fm-navy">
+                <button className="w-full rounded-[10px] border-[1.5px] border-fm-navy py-3.5 text-sm font-semibold text-fm-navy transition-transform duration-150 ease-out active:scale-[0.97]">
                   Empezar gratis
                 </button>
               </Link>
             </div>
 
             {/* Pro */}
-            <div className="relative overflow-hidden rounded-[20px] bg-fm-navy p-8">
+            <div
+              className="relative overflow-hidden rounded-[20px] bg-fm-navy p-8 transition-transform duration-500"
+              style={{ transitionDelay: "0.1s", transform: pricingVisible ? "translateY(0)" : "translateY(10px)" }}
+            >
               <div className="absolute right-5 top-5 rounded-full bg-fm-gold px-2.5 py-1 font-sans text-[10px] font-extrabold uppercase tracking-[0.08em] text-fm-ink">
                 Popular
               </div>
@@ -330,7 +330,7 @@ export default function FacultyClient() {
                 ))}
               </div>
               <Link href="/checkout?plan=faculty-pro">
-                <button className="w-full rounded-[10px] bg-fm-gold py-3.5 text-sm font-bold text-fm-ink">
+                <button className="w-full rounded-[10px] bg-fm-gold py-3.5 text-sm font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                   Activar Professional
                 </button>
               </Link>
@@ -343,9 +343,6 @@ export default function FacultyClient() {
       <section className="relative overflow-hidden bg-gradient-to-br from-fm-navy to-fm-blue">
         <div className="mx-auto flex max-w-[1120px] flex-col items-start justify-between gap-8 px-6 py-16 md:flex-row md:items-center md:px-8 md:py-18">
           <div>
-            <div className="mb-3 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
-              Empieza hoy
-            </div>
             <h2 className="text-2xl font-extrabold leading-[1.1] tracking-[-0.04em] text-white md:text-[clamp(24px,2.8vw,36px)]">
               Publica hoy. Recibe tu primera
               <br />solicitud esta semana.
@@ -356,12 +353,12 @@ export default function FacultyClient() {
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
             <Link href="/signup">
-              <button className="rounded-[10px] bg-white px-[30px] py-3.5 text-sm font-bold text-fm-ink">
+              <button className="rounded-[10px] bg-white px-[30px] py-3.5 text-sm font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                 Publicar mi perfil
               </button>
             </Link>
             <Link href="/signup?intent=institution">
-              <button className="rounded-[10px] border-[1.5px] border-white/25 px-[30px] py-3.5 text-sm text-white/75">
+              <button className="rounded-[10px] border-[1.5px] border-white/25 px-[30px] py-3.5 text-sm text-white/75 transition-transform duration-150 ease-out active:scale-[0.97]">
                 Soy institución
               </button>
             </Link>

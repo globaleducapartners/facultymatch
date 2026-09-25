@@ -116,7 +116,7 @@ export function Navbar() {
           {/* Desktop auth */}
           <div className="fm-nav-desktop" style={{ display: "flex", gap: 8, alignItems: "center" }}>
             {user ? (
-              <Link href={dashboardHref} style={{
+              <Link href={dashboardHref} className="transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]" style={{
                 fontFamily: SANS, fontSize: 13, fontWeight: 700,
                 background: D.blue, border: "none",
                 color: "#fff", padding: "8px 22px", borderRadius: 8,
@@ -126,7 +126,7 @@ export function Navbar() {
               </Link>
             ) : (
               <>
-                <Link href="/login" style={{
+                <Link href="/login" className="transition-transform duration-150 ease-out active:scale-[0.97]" style={{
                   fontFamily: SANS, fontSize: 13, fontWeight: 500,
                   background: "transparent",
                   border: `1px solid ${D.border}`,
@@ -135,7 +135,7 @@ export function Navbar() {
                 }}>
                   Acceder
                 </Link>
-                <Link href="/signup" style={{
+                <Link href="/signup" className="transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]" style={{
                   fontFamily: SANS, fontSize: 13, fontWeight: 700,
                   background: D.blue, border: "none",
                   color: "#fff", padding: "7px 22px", borderRadius: 8,
@@ -149,7 +149,7 @@ export function Navbar() {
 
           {/* Hamburger */}
           <button
-            className="fm-hamburger"
+            className="fm-hamburger transition-transform duration-150 ease-out active:scale-90"
             onClick={() => setMenuOpen(!menuOpen)}
             style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}
           >
@@ -160,13 +160,15 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div style={{
-          position: "fixed", top: 64, left: 0, right: 0, zIndex: 99,
-          background: D.white, borderBottom: `1px solid ${D.border}`,
-          padding: "20px 24px 28px",
-          display: "flex", flexDirection: "column", gap: 4,
-          boxShadow: "0 8px 24px rgba(7,19,38,0.1)",
-        }}>
+        <div
+          className="[animation:fm-menu-in_220ms_cubic-bezier(0.22,1,0.36,1)] motion-reduce:animate-none"
+          style={{
+            position: "fixed", top: 64, left: 0, right: 0, zIndex: 99,
+            background: D.white, borderBottom: `1px solid ${D.border}`,
+            padding: "20px 24px 28px",
+            display: "flex", flexDirection: "column", gap: 4,
+            boxShadow: "0 8px 24px rgba(7,19,38,0.1)",
+          }}>
           {NAV_LINKS.map((l) => (
             <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)} style={{
               fontFamily: SANS, fontSize: 16, color: D.ink, fontWeight: 500,
@@ -178,7 +180,7 @@ export function Navbar() {
           ))}
           <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 8 }}>
             {user ? (
-              <Link href={dashboardHref} onClick={() => setMenuOpen(false)} style={{
+              <Link href={dashboardHref} onClick={() => setMenuOpen(false)} className="transition-transform duration-150 ease-out active:scale-[0.97]" style={{
                 fontFamily: SANS, background: D.blue, color: "#fff",
                 border: "none", padding: "13px", borderRadius: 8,
                 fontSize: 14, fontWeight: 700, cursor: "pointer",
@@ -188,7 +190,7 @@ export function Navbar() {
               </Link>
             ) : (
               <>
-                <Link href="/login" onClick={() => setMenuOpen(false)} style={{
+                <Link href="/login" onClick={() => setMenuOpen(false)} className="transition-transform duration-150 ease-out active:scale-[0.97]" style={{
                   fontFamily: SANS, background: D.blue, color: "#fff",
                   border: "none", padding: "12px", borderRadius: 8,
                   fontSize: 14, fontWeight: 700, cursor: "pointer",
@@ -196,7 +198,7 @@ export function Navbar() {
                 }}>
                   Acceder
                 </Link>
-                <Link href="/signup" onClick={() => setMenuOpen(false)} style={{
+                <Link href="/signup" onClick={() => setMenuOpen(false)} className="transition-transform duration-150 ease-out active:scale-[0.97]" style={{
                   fontFamily: SANS, background: D.white, color: D.ink,
                   border: `1.5px solid ${D.border}`, padding: "12px", borderRadius: 8,
                   fontSize: 14, fontWeight: 600, cursor: "pointer",
