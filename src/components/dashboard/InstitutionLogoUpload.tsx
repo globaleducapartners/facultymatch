@@ -90,7 +90,7 @@ export function InstitutionLogoUpload({ institutionId, currentLogoUrl, onUpdate 
 
   return (
     <div className="relative group">
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-navy to-talentia-blue flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden">
+      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-navy to-fm-blue flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden">
         {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={logoUrl} alt="Logo institucional" className="w-full h-full object-cover" />

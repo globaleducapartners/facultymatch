@@ -108,16 +108,16 @@ export default async function FacultyLayout({
       )}
 
       {showInstitutionBanner && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-[#EEF3FE] border border-fm-blue/20 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-              <Building2 size={18} className="text-[#1B4FD8]" />
+            <div className="w-10 h-10 rounded-xl bg-fm-blue/10 flex items-center justify-center flex-shrink-0">
+              <Building2 size={18} className="text-fm-blue" />
             </div>
             <div>
-              <p className="font-bold text-[#0D2240] text-sm">
+              <p className="font-bold text-fm-navy text-sm">
                 Tienes acceso como institución
               </p>
-              <p className="text-slate-600 text-sm font-medium mt-0.5">
+              <p className="text-fm-muted text-sm font-medium mt-0.5">
                 Cambia al modo institución para gestionar contactos, favoritos y buscar docentes con todas las funcionalidades.
               </p>
             </div>
@@ -126,7 +126,7 @@ export default async function FacultyLayout({
             <input type="hidden" name="mode" value="institution" />
             <button
               type="submit"
-              className="inline-flex items-center gap-2 bg-[#1B4FD8] hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
+              className="inline-flex items-center gap-2 bg-fm-blue hover:opacity-90 active:scale-[0.97] text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all whitespace-nowrap flex-shrink-0"
             >
               <Building2 size={14} /> Ir a modo institución <ArrowRight size={14} />
             </button>

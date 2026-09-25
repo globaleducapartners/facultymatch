@@ -136,7 +136,7 @@ export default async function InstitutionHomePage() {
       {/* ── Stats row ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { icon: Mail, label: "Contactos totales", value: totalContacts ?? 0, color: "text-talentia-blue", bg: "bg-blue-50", href: "/app/institution/contacts" },
+          { icon: Mail, label: "Contactos totales", value: totalContacts ?? 0, color: "text-fm-blue", bg: "bg-blue-50", href: "/app/institution/contacts" },
           { icon: TrendingUp, label: "Contactos este mes", value: monthlyContacts ?? 0, color: "text-green-600", bg: "bg-green-50", href: "/app/institution/contacts" },
           { icon: Star, label: "Favoritos", value: favoritesCount ?? 0, color: "text-energy-orange", bg: "bg-orange-50", href: "/app/institution/favorites" },
           {
@@ -158,7 +158,7 @@ export default async function InstitutionHomePage() {
             </div>
             <div>
               <p className="text-2xl font-black text-navy">{stat.value}</p>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-tight mt-0.5">{stat.label}</p>
+              <p className="text-[10px] font-bold text-fm-faint uppercase tracking-widest leading-tight mt-0.5">{stat.label}</p>
             </div>
           </Link>
         ))}
@@ -193,7 +193,7 @@ export default async function InstitutionHomePage() {
 
           {/* Search CTA */}
           <Link href="/app/institution/search" className="group block">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-navy to-[#1B4FD8] p-5 flex items-center justify-between gap-4 hover:shadow-lg hover:shadow-blue-200 transition-all">
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-navy to-[#1B4FD8] p-5 flex items-center justify-between gap-4 hover:shadow-lg hover:shadow-blue-200 active:scale-[0.99] transition-all">
               <div className="absolute right-0 top-0 w-48 h-full opacity-10 pointer-events-none" style={{ background: "radial-gradient(circle at 80% 50%, #fff 0%, transparent 70%)" }} />
               <div className="relative flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-colors">
@@ -214,7 +214,7 @@ export default async function InstitutionHomePage() {
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-black text-navy">Contactos recientes</h2>
-              <Link href="/app/institution/contacts" className="text-xs font-black text-talentia-blue hover:underline flex items-center gap-1">
+              <Link href="/app/institution/contacts" className="text-xs font-black text-fm-blue hover:underline flex items-center gap-1">
                 Ver todos <ArrowRight size={11} />
               </Link>
             </div>
@@ -251,7 +251,7 @@ export default async function InstitutionHomePage() {
                       {userObj?.avatar_url ? (
                         <img src={userObj.avatar_url} alt={name} className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
                       ) : (
-                        <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-talentia-blue font-black text-sm flex-shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-fm-blue font-black text-sm flex-shrink-0">
                           {initials}
                         </div>
                       )}
@@ -260,17 +260,17 @@ export default async function InstitutionHomePage() {
                           <p className="font-black text-navy text-sm truncate">{name}</p>
                           <Badge className={`border-none text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 ${
                             isReplied ? "bg-green-50 text-green-600" :
-                            isSent ? "bg-blue-50 text-talentia-blue" :
+                            isSent ? "bg-blue-50 text-fm-blue" :
                             "bg-gray-100 text-gray-500"
                           }`}>
                             {isReplied ? "Respondida" : isSent ? "Enviada" : "Archivada"}
                           </Badge>
                         </div>
                         <p className="text-xs text-gray-500 font-medium truncate mt-0.5">
-                          <strong className="font-bold text-gray-600">{lastMsgSender}:</strong> {lastMsgText}
+                          <strong className="font-bold text-fm-muted">{lastMsgSender}:</strong> {lastMsgText}
                         </p>
                       </div>
-                      <span className="text-[10px] text-gray-400 font-bold whitespace-nowrap self-start mt-1">
+                      <span className="text-[10px] text-fm-faint font-bold whitespace-nowrap self-start mt-1">
                         {formatDateTZ(lastMsgDate)}
                       </span>
                     </div>
@@ -280,15 +280,15 @@ export default async function InstitutionHomePage() {
             ) : (
               <div className="text-center py-10 border border-dashed border-gray-200 rounded-2xl">
                 <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Mail size={20} className="text-talentia-blue" />
+                  <Mail size={20} className="text-fm-blue" />
                 </div>
                 <p className="font-bold text-navy text-sm">Aún no has contactado docentes</p>
-                <p className="text-gray-400 text-xs mt-1 max-w-xs mx-auto">
+                <p className="text-fm-faint text-xs mt-1 max-w-xs mx-auto">
                   Busca en el directorio y envía propuestas a los profesores que encajen con tus programas.
                 </p>
                 <Link
                   href="/app/institution/search"
-                  className="inline-flex items-center gap-2 bg-talentia-blue text-white font-black px-5 py-2.5 rounded-xl text-xs mt-4 hover:bg-navy transition-colors"
+                  className="inline-flex items-center gap-2 bg-fm-blue text-white font-black px-5 py-2.5 rounded-xl text-xs mt-4 hover:bg-navy transition-colors"
                 >
                   <Search size={13} /> Explorar directorio
                 </Link>
@@ -300,7 +300,7 @@ export default async function InstitutionHomePage() {
           <div className="grid grid-cols-1 min-[480px]:grid-cols-3 gap-4">
             {[
               { icon: Star,     label: "Favoritos",  sub: `${favoritesCount ?? 0} guardados`, href: "/app/institution/favorites", color: "text-energy-orange", bg: "bg-orange-50" },
-              { icon: Mail,     label: "Contactos",   sub: `${totalContacts ?? 0} enviados`,   href: "/app/institution/contacts",  color: "text-talentia-blue", bg: "bg-blue-50" },
+              { icon: Mail,     label: "Contactos",   sub: `${totalContacts ?? 0} enviados`,   href: "/app/institution/contacts",  color: "text-fm-blue", bg: "bg-blue-50" },
               { icon: Building2,label: "Mi perfil",   sub: `${profileCompletion}% completo`,   href: "/app/institution",           color: "text-green-600",     bg: "bg-green-50" },
             ].map((item) => (
               <Link
@@ -311,8 +311,8 @@ export default async function InstitutionHomePage() {
                 <div className={`w-9 h-9 ${item.bg} rounded-xl flex items-center justify-center`}>
                   <item.icon size={16} className={item.color} />
                 </div>
-                <p className="font-black text-navy text-sm group-hover:text-talentia-blue transition-colors">{item.label}</p>
-                <p className="text-[10px] text-gray-400 font-bold">{item.sub}</p>
+                <p className="font-black text-navy text-sm group-hover:text-fm-blue transition-colors">{item.label}</p>
+                <p className="text-[10px] text-fm-faint font-bold">{item.sub}</p>
               </Link>
             ))}
           </div>
@@ -332,12 +332,12 @@ export default async function InstitutionHomePage() {
             <div className="space-y-1.5">
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all ${profileCompletion >= 80 ? "bg-green-500" : "bg-talentia-blue"}`}
+                  className={`h-full rounded-full transition-all ${profileCompletion >= 80 ? "bg-green-500" : "bg-fm-blue"}`}
                   style={{ width: `${profileCompletion}%` }}
                 />
               </div>
               {profileCompletion < 100 && (
-                <p className="text-xs text-gray-400 font-medium">
+                <p className="text-xs text-fm-faint font-medium">
                   Completa tu perfil para mejorar tu visibilidad.
                 </p>
               )}
@@ -351,7 +351,7 @@ export default async function InstitutionHomePage() {
                 { label: "Descripción", done: !!institution.description },
                 { label: "Web oficial", done: !!institution.website },
               ].map((item) => (
-                <div key={item.label} className={`flex items-center gap-2.5 text-xs font-bold ${item.done ? "text-gray-600" : "text-gray-300"}`}>
+                <div key={item.label} className={`flex items-center gap-2.5 text-xs font-bold ${item.done ? "text-fm-muted" : "text-gray-300"}`}>
                   {item.done
                     ? <CheckCircle2 size={13} className="text-green-500 flex-shrink-0" />
                     : <div className="w-3.5 h-3.5 rounded-full border-2 border-dashed border-gray-200 flex-shrink-0" />}
@@ -388,10 +388,10 @@ export default async function InstitutionHomePage() {
                 <Zap size={14} />
                 <span className="text-[10px] font-black uppercase tracking-widest">Plan Growth</span>
               </div>
-              <p className="text-xs font-medium text-gray-600 leading-relaxed">
+              <p className="text-xs font-medium text-fm-muted leading-relaxed">
                 20 búsquedas y 20 contactos al mes. Pasa a Professional para acceso sin límites.
               </p>
-              <div className="text-lg font-black text-navy">99€ <span className="text-xs text-gray-400 font-bold">/ mes</span></div>
+              <div className="text-lg font-black text-navy">99€ <span className="text-xs text-fm-faint font-bold">/ mes</span></div>
               <Link
                 href="/app/institution/billing"
                 className="inline-flex items-center gap-2 w-full justify-center bg-energy-orange hover:bg-orange-600 text-white font-black py-2.5 px-4 rounded-xl text-xs transition-colors"
@@ -410,10 +410,10 @@ export default async function InstitutionHomePage() {
                 <Zap size={14} />
                 <span className="text-[10px] font-black uppercase tracking-widest">Plan Professional</span>
               </div>
-              <p className="text-xs font-medium text-gray-600 leading-relaxed">
+              <p className="text-xs font-medium text-fm-muted leading-relaxed">
                 Búsquedas y contactos ilimitados. Encuentra el profesorado ideal para todos tus programas.
               </p>
-              <div className="text-lg font-black text-navy">99€ <span className="text-xs text-gray-400 font-bold">/ mes</span></div>
+              <div className="text-lg font-black text-navy">99€ <span className="text-xs text-fm-faint font-bold">/ mes</span></div>
               <Link
                 href="/app/institution/billing"
                 className="inline-flex items-center gap-2 w-full justify-center bg-energy-orange hover:bg-orange-600 text-white font-black py-2.5 px-4 rounded-xl text-xs transition-colors"

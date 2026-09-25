@@ -280,7 +280,7 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
           {educator.avatar_url ? (
             <Image src={educator.avatar_url} alt={educator.full_name} fill sizes="96px" className="object-cover" />
           ) : (
-            <div className="bg-talentia-blue/10 text-talentia-blue w-full h-full flex items-center justify-center">
+            <div className="bg-fm-blue/10 text-fm-blue w-full h-full flex items-center justify-center">
               <span className="text-2xl font-black">{initials}</span>
             </div>
           )}
@@ -290,11 +290,11 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h3 className="text-xl font-bold text-navy group-hover:text-talentia-blue transition-colors">
+                <h3 className="text-xl font-bold text-navy group-hover:text-fm-blue transition-colors">
                   {educator.full_name}
                 </h3>
                 {isVerified && (
-                  <Badge className="bg-blue-50 text-talentia-blue border-none text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
+                  <Badge className="bg-blue-50 text-fm-blue border-none text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
                     <CheckCircle2 size={10} /> Verificado
                   </Badge>
                 )}
@@ -365,7 +365,7 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
       </div>
 
       <div className="mt-6 pt-6 border-t border-gray-50 flex items-center justify-end">
-        <Button variant="link" asChild className="text-talentia-blue font-bold text-sm hover:no-underline group/btn">
+        <Button variant="link" asChild className="text-fm-blue font-bold text-sm hover:no-underline group/btn">
           <Link href={`/app/faculty/${educator.id}`} className="flex items-center gap-2">
             Ver perfil completo
             <ChevronRight size={18} className="group-hover/btn:translate-x-1 transition-all" />

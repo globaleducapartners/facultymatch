@@ -78,7 +78,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
         onClick={() => setExpanded(!expanded)}
       >
         {/* Avatar */}
-        <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-talentia-blue/10 text-talentia-blue flex items-center justify-center flex-shrink-0">
+        <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-fm-blue/10 text-fm-blue flex items-center justify-center flex-shrink-0">
           {faculty.avatar_url ? (
             <Image src={faculty.avatar_url} alt={faculty.full_name} fill sizes="48px" className="object-cover" />
           ) : (
@@ -91,7 +91,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="text-base font-bold text-navy truncate">{faculty.full_name}</h3>
             {subjectLabel && (
-              <Badge variant="secondary" className="bg-blue-50 text-talentia-blue border-blue-100 text-[9px] font-black uppercase tracking-wider px-2 py-0.5">
+              <Badge variant="secondary" className="bg-blue-50 text-fm-blue border-blue-100 text-[9px] font-black uppercase tracking-wider px-2 py-0.5">
                 {subjectLabel}
               </Badge>
             )}
@@ -104,7 +104,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
           <div className="hidden sm:block text-right">
             <Badge className={`border-none text-[10px] font-black uppercase tracking-wider ${
               isReplied ? "bg-green-50 text-green-600" :
-              isSent ? "bg-blue-50 text-talentia-blue" :
+              isSent ? "bg-blue-50 text-fm-blue" :
               "bg-gray-100 text-gray-500"
             }`}>
               {isReplied ? <><CheckCircle2 size={10} className="inline mr-1" />Respondida</> :
@@ -171,7 +171,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
                     <span>·</span>
                     <span>{formatDateTimeTZ(msg.created_at)}</span>
                   </div>
-                  <div className={`max-w-[80%] p-4 rounded-2xl ${isInst ? "bg-talentia-blue text-white rounded-tr-sm" : "bg-gray-100 text-navy rounded-tl-sm"}`}>
+                  <div className={`max-w-[80%] p-4 rounded-2xl ${isInst ? "bg-fm-blue text-white rounded-tr-sm" : "bg-gray-100 text-navy rounded-tl-sm"}`}>
                     {/* Meta tags only for first institution message */}
                     {isInst && index === 0 && (contact.subject || contact.modality || contact.dates) && (
                       <div className="flex flex-wrap gap-2 mb-3 opacity-80">
@@ -200,7 +200,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
 
             {/* Pending status message when not yet replied */}
             {isSent && !sent && (
-              <div className="flex items-center gap-2 py-2 px-4 bg-blue-50 rounded-xl text-xs font-medium text-talentia-blue">
+              <div className="flex items-center gap-2 py-2 px-4 bg-blue-50 rounded-xl text-xs font-medium text-fm-blue">
                 <Clock size={13} />
                 Esperando respuesta del docente...
               </div>
@@ -221,7 +221,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
                   href={`/faculty/${contact.faculty_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs font-bold text-talentia-blue hover:underline"
+                  className="flex items-center gap-1.5 text-xs font-bold text-fm-blue hover:underline"
                 >
                   <ExternalLink size={12} /> Ver perfil completo
                 </Link>
@@ -256,7 +256,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
                   value={followUpMsg}
                   onChange={e => setFollowUpMsg(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none text-sm font-medium resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none text-sm font-medium resize-none"
                   placeholder="Escribe tu mensaje de seguimiento..."
                 />
                 {followUpError && (
@@ -270,7 +270,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
                     size="sm"
                     disabled={sending || !followUpMsg.trim()}
                     onClick={handleFollowUp}
-                    className="bg-talentia-blue hover:bg-blue-700 text-white font-bold rounded-xl"
+                    className="bg-fm-blue hover:bg-blue-700 text-white font-bold rounded-xl"
                   >
                     {sending ? <Loader2 size={14} className="animate-spin" /> : <><Send size={12} className="mr-1.5" />Enviar</>}
                   </Button>

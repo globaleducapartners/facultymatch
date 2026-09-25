@@ -85,12 +85,12 @@ export default async function ContactsPage() {
         </div>
       ) : (
         <div className="bg-white p-20 rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center text-center">
-          <div className="bg-blue-50 p-6 rounded-full text-talentia-blue mb-6"><Mail size={48} /></div>
+          <div className="bg-blue-50 p-6 rounded-full text-fm-blue mb-6"><Mail size={48} /></div>
           <h3 className="text-xl font-bold text-navy mb-2">No has iniciado conversaciones aún</h3>
           <p className="text-gray-500 max-w-xs mx-auto font-medium">
             Cuando encuentres un docente que encaje con tu programa, podrás contactarle directamente desde el directorio.
           </p>
-          <Button asChild className="mt-8 bg-talentia-blue hover:bg-blue-700 text-white font-bold h-12 rounded-xl px-8">
+          <Button asChild className="mt-8 bg-fm-blue hover:bg-blue-700 text-white font-bold h-12 rounded-xl px-8">
             <Link href="/app/institution/search">Buscar docentes</Link>
           </Button>
         </div>

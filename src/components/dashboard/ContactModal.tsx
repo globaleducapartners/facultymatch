@@ -94,7 +94,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
                     <select
                       name="reason"
                       required
-                      className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium text-sm appearance-none"
+                      className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all font-medium text-sm appearance-none"
                     >
                       <option value="">Seleccionar...</option>
                       <option value="profesor_adjunto">Profesor Adjunto / Invitado</option>
@@ -108,7 +108,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
                     <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Tipo de contrato</label>
                     <select
                       name="contract_type"
-                      className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium text-sm appearance-none"
+                      className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all font-medium text-sm appearance-none"
                     >
                       <option value="">A definir</option>
                       <option value="docencia_plena">Docencia plena</option>
@@ -127,7 +127,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
                     <select
                       name="modality"
                       required
-                      className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium text-sm appearance-none"
+                      className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all font-medium text-sm appearance-none"
                     >
                       <option value="online">Online</option>
                       <option value="presencial">Presencial</option>
@@ -142,7 +142,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
                       name="dates"
                       type="text"
                       required
-                      className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium text-sm"
+                      className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all font-medium text-sm"
                       placeholder="Ej: Q3 2026 o Oct-Dic"
                     />
                   </div>
@@ -154,7 +154,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
                     name="message"
                     required
                     rows={4}
-                    className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all font-medium text-sm resize-none"
+                    className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all font-medium text-sm resize-none"
                     placeholder="Describe brevemente el programa y por qué crees que este docente encaja..."
                   ></textarea>
                 </div>
@@ -178,7 +178,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-talentia-blue hover:bg-blue-700 text-white font-bold py-6 rounded-xl shadow-lg shadow-blue-100"
+                  className="flex-1 bg-fm-blue hover:bg-blue-700 text-white font-bold py-6 rounded-xl shadow-lg shadow-blue-100"
                 >
                   {loading ? <Loader2 className="animate-spin" size={20} /> : "Enviar propuesta"}
                 </Button>

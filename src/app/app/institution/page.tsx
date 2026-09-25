@@ -273,7 +273,7 @@ export default async function InstitutionDashboardPage({
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-500 font-medium mt-0.5">
+                <p className="text-sm text-fm-muted font-medium mt-0.5">
                   {typeLabel || "Institución"}{[institution?.city, institution?.country].filter(Boolean).length > 0 && " · "}
                   {[institution?.city, institution?.country].filter(Boolean).join(", ")}
                   {(institution as any)?.modality && ` · ${(institution as any).modality}`}
@@ -294,22 +294,22 @@ export default async function InstitutionDashboardPage({
         <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-              <Building2 size={18} className="text-talentia-blue" /> Identidad institucional
+              <Building2 size={18} className="text-fm-blue" /> Identidad institucional
             </CardTitle>
             <CardDescription>Información principal de tu institución.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid md:grid-cols-2 gap-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400">Nombre de la institución <span className="text-red-500">*</span></label>
+                <label className="text-xs font-black uppercase tracking-widest text-fm-faint">Nombre de la institución <span className="text-red-500">*</span></label>
                 <input name="name" defaultValue={institution?.name ?? ''} required
-                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium"
                   placeholder="Universidad / Escuela de Negocios / Centro..." />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400">Tipo de institución</label>
+                <label className="text-xs font-black uppercase tracking-widest text-fm-faint">Tipo de institución</label>
                 <select name="institutionType" defaultValue={normalizedInstType}
-                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium appearance-none">
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium appearance-none">
                   <option value="university">Universidad pública</option>
                   <option value="private_university">Universidad privada</option>
                   <option value="business_school">Business School / MBA</option>
@@ -320,9 +320,9 @@ export default async function InstitutionDashboardPage({
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400">Modalidad de estudios</label>
+                <label className="text-xs font-black uppercase tracking-widest text-fm-faint">Modalidad de estudios</label>
                 <select name="modality" defaultValue={(institution as any)?.modality || ""}
-                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium appearance-none">
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium appearance-none">
                   <option value="">Sin especificar</option>
                   <option value="Presencial">Presencial</option>
                   <option value="Online">Online</option>
@@ -332,9 +332,9 @@ export default async function InstitutionDashboardPage({
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-widest text-gray-400">Descripción de la institución</label>
+              <label className="text-xs font-black uppercase tracking-widest text-fm-faint">Descripción de la institución</label>
               <textarea name="description" defaultValue={(institution as any)?.description ?? ''} rows={4}
-                className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium resize-none"
+                className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium resize-none"
                 placeholder="Describe brevemente tu institución, misión y programas principales..." />
             </div>
           </CardContent>
@@ -344,21 +344,21 @@ export default async function InstitutionDashboardPage({
         <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-              <MapPin size={18} className="text-talentia-blue" /> Ubicación
+              <MapPin size={18} className="text-fm-blue" /> Ubicación
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid md:grid-cols-2 gap-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-1"><Globe size={11} /> País</label>
+                <label className="text-xs font-black uppercase tracking-widest text-fm-faint flex items-center gap-1"><Globe size={11} /> País</label>
                 <input name="country" defaultValue={institution?.country ?? ''}
-                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium"
                   placeholder="España" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-1"><MapPin size={11} /> Ciudad</label>
+                <label className="text-xs font-black uppercase tracking-widest text-fm-faint flex items-center gap-1"><MapPin size={11} /> Ciudad</label>
                 <input name="city" defaultValue={(institution as any)?.city ?? ''}
-                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium"
                   placeholder="Madrid" />
               </div>
             </div>
@@ -369,33 +369,33 @@ export default async function InstitutionDashboardPage({
         <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-              <Phone size={18} className="text-talentia-blue" /> Contacto y presencia digital
+              <Phone size={18} className="text-fm-blue" /> Contacto y presencia digital
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid md:grid-cols-2 gap-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-1"><Mail size={11} /> Email de contacto</label>
+                <label className="text-xs font-black uppercase tracking-widest text-fm-faint flex items-center gap-1"><Mail size={11} /> Email de contacto</label>
                 <input name="contactEmail" type="email" defaultValue={(institution as any)?.contact_email || user.email}
-                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium"
                   placeholder="rrhh@universidad.edu" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-1"><Phone size={11} /> Teléfono</label>
+                <label className="text-xs font-black uppercase tracking-widest text-fm-faint flex items-center gap-1"><Phone size={11} /> Teléfono</label>
                 <input name="phone" defaultValue={(institution as any)?.phone ?? ''}
-                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium"
                   placeholder="+34 91 000 0000" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-1"><Globe size={11} /> Web oficial</label>
+                <label className="text-xs font-black uppercase tracking-widest text-fm-faint flex items-center gap-1"><Globe size={11} /> Web oficial</label>
                 <input name="website" defaultValue={institution?.website ?? ''}
-                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium"
                   placeholder="https://www.universidad.edu" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-1"><LinkIcon size={11} /> LinkedIn</label>
+                <label className="text-xs font-black uppercase tracking-widest text-fm-faint flex items-center gap-1"><LinkIcon size={11} /> LinkedIn</label>
                 <input name="linkedinUrl" defaultValue={(institution as any)?.linkedin_url ?? ''}
-                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium"
                   placeholder="https://linkedin.com/school/..." />
               </div>
             </div>
@@ -406,21 +406,21 @@ export default async function InstitutionDashboardPage({
         <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-              <Users size={18} className="text-talentia-blue" /> Datos adicionales
+              <Users size={18} className="text-fm-blue" /> Datos adicionales
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid md:grid-cols-2 gap-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-1"><Calendar size={11} /> Año de fundación</label>
+                <label className="text-xs font-black uppercase tracking-widest text-fm-faint flex items-center gap-1"><Calendar size={11} /> Año de fundación</label>
                 <input name="foundedYear" type="number" defaultValue={(institution as any)?.founded_year ?? ''}
-                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium"
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium"
                   placeholder="1960" min="1800" max="2030" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400 flex items-center gap-1"><Users size={11} /> Número de estudiantes</label>
+                <label className="text-xs font-black uppercase tracking-widest text-fm-faint flex items-center gap-1"><Users size={11} /> Número de estudiantes</label>
                 <select name="numStudents" defaultValue={(institution as any)?.num_students || ""}
-                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none transition-all font-medium appearance-none">
+                  className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none transition-all font-medium appearance-none">
                   <option value="">Seleccionar...</option>
                   <option value="<500">Menos de 500</option>
                   <option value="500-2000">500 – 2.000</option>
@@ -448,7 +448,7 @@ export default async function InstitutionDashboardPage({
             <CardContent className="pt-5 pb-5">
               <p className="text-sm font-black text-[#0C1018] mb-3">Progreso del perfil</p>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-fm-faint">
                   {profileCompletion < 60 ? "Empieza a completar tu perfil" : profileCompletion < 80 ? "Casi completo" : "Perfil completo"}
                 </span>
                 <span className="text-xl font-black" style={{ color: profileCompletion >= 80 ? "#059669" : "#1B4FD8" }}>
@@ -469,15 +469,15 @@ export default async function InstitutionDashboardPage({
               <div className="space-y-2">
                 <Link href="/app/institution/search" className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-[#F2F6FC] transition-colors group">
                   <Search size={15} className="text-[#1B4FD8] flex-shrink-0" />
-                  <span className="text-sm font-semibold text-gray-700 group-hover:text-[#0D2240]">Buscar docentes</span>
+                  <span className="text-sm font-semibold text-fm-ink group-hover:text-[#0D2240]">Buscar docentes</span>
                 </Link>
                 <Link href="/app/institution/favorites" className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-[#F2F6FC] transition-colors group">
                   <span className="text-[#E9A030] text-sm">★</span>
-                  <span className="text-sm font-semibold text-gray-700 group-hover:text-[#0D2240]">Mis favoritos</span>
+                  <span className="text-sm font-semibold text-fm-ink group-hover:text-[#0D2240]">Mis favoritos</span>
                 </Link>
                 <Link href="/app/institution/contacts" className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-[#F2F6FC] transition-colors group">
                   <Mail size={15} className="text-[#1B4FD8] flex-shrink-0" />
-                  <span className="text-sm font-semibold text-gray-700 group-hover:text-[#0D2240]">Contactos enviados</span>
+                  <span className="text-sm font-semibold text-fm-ink group-hover:text-[#0D2240]">Contactos enviados</span>
                 </Link>
               </div>
             </CardContent>
@@ -505,13 +505,13 @@ export default async function InstitutionDashboardPage({
       {/* Settings section */}
       <div className="pt-4 border-t border-gray-100">
         <h2 className="text-2xl font-bold text-navy mb-1">Configuración de cuenta</h2>
-        <p className="text-gray-500 font-medium mb-6">Gestiona la seguridad y tus datos.</p>
+        <p className="text-fm-muted font-medium mb-6">Gestiona la seguridad y tus datos.</p>
 
         {/* Security */}
         <Card className="border-none shadow-sm rounded-2xl overflow-hidden mb-6">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-              <ShieldCheck size={18} className="text-talentia-blue" /> Seguridad & Acceso
+              <ShieldCheck size={18} className="text-fm-blue" /> Seguridad & Acceso
             </CardTitle>
             <CardDescription className="font-medium">Gestiona cómo accedes a tu cuenta.</CardDescription>
           </CardHeader>
@@ -524,7 +524,7 @@ export default async function InstitutionDashboardPage({
         <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-              <Download size={18} className="text-talentia-blue" /> Tus datos (GDPR)
+              <Download size={18} className="text-fm-blue" /> Tus datos (GDPR)
             </CardTitle>
             <CardDescription className="font-medium">
               Tienes derecho a exportar o eliminar tus datos en cualquier momento.
@@ -560,7 +560,7 @@ function Tip({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-2">
       <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
-      <span className="text-xs text-gray-500 font-medium">{text}</span>
+      <span className="text-xs text-fm-muted font-medium">{text}</span>
     </div>
   );
 }

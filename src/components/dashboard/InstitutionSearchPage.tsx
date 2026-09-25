@@ -276,7 +276,7 @@ export function InstitutionSearchPage({
           <div className="flex items-center gap-3 flex-wrap">
             <Badge
               variant="outline"
-              className={`font-bold px-4 py-1.5 rounded-full ${isPro ? "bg-blue-50 text-talentia-blue border-blue-100" : isGrowth ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}
+              className={`font-bold px-4 py-1.5 rounded-full ${isPro ? "bg-blue-50 text-fm-blue border-blue-100" : isGrowth ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}
             >
               {isPro ? "Plan Professional" : isGrowth ? "Plan Growth" : "Plan Essential"}
             </Badge>
@@ -301,7 +301,7 @@ export function InstitutionSearchPage({
               <Search size={16} className="text-blue-600" />
             </div>
             <div>
-              <p className="font-black text-blue-900 text-sm">Modo exploración — solo lectura</p>
+              <p className="font-black text-blue-900 text-sm">Modo exploración · solo lectura</p>
               <p className="text-blue-700 text-sm font-medium mt-0.5">
                 {isAlreadyInstitution
                   ? "Tienes un perfil de institución. Cambia al modo institución para contactar docentes."
@@ -360,11 +360,11 @@ export function InstitutionSearchPage({
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Keyword */}
             <div className="relative flex-1 min-w-0">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-fm-faint pointer-events-none" size={16} />
               <input
                 name="query"
                 defaultValue={searchParams.query || ""}
-                className="w-full pl-9 pr-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium"
+                className="w-full pl-9 pr-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all text-sm font-medium"
                 placeholder="Nombre, especialidad, bio..."
               />
             </div>
@@ -374,7 +374,7 @@ export function InstitutionSearchPage({
               name="area"
               value={selectedArea}
               onChange={(e) => setSelectedArea(e.target.value)}
-              className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-52"
+              className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-52"
             >
               <option value="">Todas las áreas</option>
               {UNESCO_FIELDS.map((f) => (
@@ -390,7 +390,7 @@ export function InstitutionSearchPage({
                   ? searchParams.modality[0]
                   : searchParams.modality || ""
               }
-              className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-44"
+              className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-44"
             >
               <option value="">Modalidad</option>
               <option value="Online">Online</option>
@@ -406,7 +406,7 @@ export function InstitutionSearchPage({
                   ? searchParams.availability[0]
                   : searchParams.availability || ""
               }
-              className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-48"
+              className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-48"
             >
               <option value="">Disponibilidad</option>
               {AVAILABILITY_OPTIONS.map((o) => (
@@ -420,7 +420,7 @@ export function InstitutionSearchPage({
               onClick={() => setShowMoreFilters((v) => !v)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all whitespace-nowrap ${
                 hasActiveMoreFilters
-                  ? "bg-blue-50 text-talentia-blue border-blue-100"
+                  ? "bg-blue-50 text-fm-blue border-blue-100"
                   : showMoreFilters
                   ? "bg-gray-100 text-navy border-gray-200"
                   : "bg-gray-50 text-gray-500 border-gray-100 hover:bg-gray-100 hover:text-navy"
@@ -428,7 +428,7 @@ export function InstitutionSearchPage({
             >
               <Filter size={14} />
               Más filtros
-              {hasActiveMoreFilters && <span className="w-1.5 h-1.5 rounded-full bg-talentia-blue flex-shrink-0" />}
+              {hasActiveMoreFilters && <span className="w-1.5 h-1.5 rounded-full bg-fm-blue flex-shrink-0" />}
               <ChevronDown
                 size={14}
                 className={`transition-transform duration-200 ${showMoreFilters ? "rotate-180" : ""}`}
@@ -438,7 +438,7 @@ export function InstitutionSearchPage({
             {/* Submit */}
             <Button
               type="submit"
-              className="bg-talentia-blue hover:bg-blue-700 text-white font-bold h-10 px-6 rounded-xl shadow-sm shadow-blue-100 whitespace-nowrap"
+              className="bg-fm-blue hover:bg-blue-700 text-white font-bold h-10 px-6 rounded-xl shadow-sm shadow-blue-100 whitespace-nowrap"
             >
               Buscar
             </Button>
@@ -448,14 +448,14 @@ export function InstitutionSearchPage({
           {showMoreFilters && (
             <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 animate-in slide-in-from-top-2 duration-200">
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-fm-faint block mb-1.5">
                   Subárea
                 </label>
                 <select
                   name="subarea"
                   defaultValue={searchParams.subarea || ""}
                   disabled={!selectedArea}
-                  className="w-full px-3 py-2 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none disabled:text-gray-300 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none disabled:text-gray-300 disabled:cursor-not-allowed"
                 >
                   <option value="">{selectedArea ? "Todas las subáreas" : "Elige un área primero"}</option>
                   {selectedAreaSubareas.map((s) => (
@@ -464,13 +464,13 @@ export function InstitutionSearchPage({
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-fm-faint block mb-1.5">
                   Idioma
                 </label>
                 <select
                   name="language"
                   defaultValue={searchParams.language || ""}
-                  className="w-full px-3 py-2 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none"
+                  className="w-full px-3 py-2 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none"
                 >
                   <option value="">Cualquier idioma</option>
                   <option value="Español">Español</option>
@@ -481,13 +481,13 @@ export function InstitutionSearchPage({
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-fm-faint block mb-1.5">
                   País
                 </label>
                 <select
                   name="country"
                   defaultValue={searchParams.country || ""}
-                  className="w-full px-3 py-2 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none"
+                  className="w-full px-3 py-2 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none"
                 >
                   <option value="">Cualquier país</option>
                   <option value="España">España</option>
@@ -499,13 +499,13 @@ export function InstitutionSearchPage({
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mb-1.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-fm-faint block mb-1.5">
                   ANECA
                 </label>
                 <select
                   name="aneca"
                   defaultValue={searchParams.aneca || ""}
-                  className="w-full px-3 py-2 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none"
+                  className="w-full px-3 py-2 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none"
                 >
                   <option value="">Cualquier acreditación</option>
                   <option value="Ayudante Doctor">Ayudante Doctor</option>
@@ -521,9 +521,9 @@ export function InstitutionSearchPage({
                     name="phd"
                     value="true"
                     defaultChecked={searchParams.phd === "true"}
-                    className="rounded border-gray-300 text-talentia-blue focus:ring-talentia-blue w-4 h-4"
+                    className="rounded border-gray-300 text-fm-blue focus:ring-fm-blue w-4 h-4"
                   />
-                  <span className="text-sm font-bold text-gray-600 group-hover:text-navy transition-colors">
+                  <span className="text-sm font-bold text-fm-muted group-hover:text-navy transition-colors">
                     Solo PhD / Doctores
                   </span>
                 </label>
@@ -539,7 +539,7 @@ export function InstitutionSearchPage({
               <Link
                 key={`${key}-${value}`}
                 href={buildUrlWithout(searchParams, key, value, basePath)}
-                className="inline-flex items-center gap-1.5 bg-blue-50 text-talentia-blue text-xs font-bold px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors"
+                className="inline-flex items-center gap-1.5 bg-blue-50 text-fm-blue text-xs font-bold px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors"
               >
                 {label}
                 <X size={11} />
@@ -556,7 +556,7 @@ export function InstitutionSearchPage({
       </div>
 
       {/* ── Results count ── */}
-      <p className="text-sm font-bold text-gray-400">
+      <p className="text-sm font-bold text-fm-faint">
         {initialEducators.length}{" "}
         {initialEducators.length === 1 ? "docente encontrado" : "docentes encontrados"}
       </p>
@@ -598,7 +598,7 @@ export function InstitutionSearchPage({
           no contactables. Respeta los mismos filtros que la búsqueda principal. ── */}
       {pendingEducators.length > 0 && (
         <div className="space-y-3 pt-2">
-          <p className="text-sm font-bold text-gray-400 flex items-center gap-1.5">
+          <p className="text-sm font-bold text-fm-faint flex items-center gap-1.5">
             <Lock size={13} className="text-gray-300" />
             +{pendingEducators.length} {pendingEducators.length === 1 ? "docente más" : "docentes más"} completando su verificación
           </p>
@@ -629,8 +629,8 @@ export function InstitutionSearchPage({
                       className="object-cover w-full h-full"
                     />
                   ) : (
-                    <div className="w-full h-full bg-talentia-blue/10 flex items-center justify-center">
-                      <span className="text-xl font-black text-talentia-blue">
+                    <div className="w-full h-full bg-fm-blue/10 flex items-center justify-center">
+                      <span className="text-xl font-black text-fm-blue">
                         {selectedEducator.full_name?.substring(0, 2).toUpperCase()}
                       </span>
                     </div>
@@ -640,7 +640,7 @@ export function InstitutionSearchPage({
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="text-lg font-bold text-navy leading-tight">{selectedEducator.full_name}</h3>
                     {selectedEducator.verified && selectedEducator.verified !== "none" && (
-                      <Badge className="bg-blue-50 text-talentia-blue border-none text-[10px] font-black uppercase tracking-widest flex items-center gap-1 flex-shrink-0">
+                      <Badge className="bg-blue-50 text-fm-blue border-none text-[10px] font-black uppercase tracking-widest flex items-center gap-1 flex-shrink-0">
                         <CheckCircle2 size={10} /> Verificado
                       </Badge>
                     )}
@@ -656,7 +656,7 @@ export function InstitutionSearchPage({
                 /* ── Restricted preview for faculty browsing ── */
                 <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
                   <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
-                    <Lock size={36} className="text-gray-400" />
+                    <Lock size={36} className="text-fm-faint" />
                   </div>
                   <h3 className="text-lg font-black text-navy mb-2">
                     Perfiles bloqueados
@@ -671,9 +671,9 @@ export function InstitutionSearchPage({
                     <Building2 size={16} />
                     Registrarme como institución
                   </Link>
-                  <p className="text-xs text-gray-400 mt-4">
+                  <p className="text-xs text-fm-faint mt-4">
                     ¿Ya tienes cuenta?{" "}
-                    <Link href="/login" className="text-talentia-blue font-bold hover:underline">
+                    <Link href="/login" className="text-fm-blue font-bold hover:underline">
                       Inicia sesión
                     </Link>
                   </p>
@@ -713,7 +713,7 @@ export function InstitutionSearchPage({
                       ) : (
                         <Link
                           href="/app/institution/billing"
-                          className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold h-11 rounded-xl transition-colors text-sm"
+                          className="flex-1 inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-fm-muted font-bold h-11 rounded-xl transition-colors text-sm"
                         >
                           <Lock size={15} /> Actualiza a Pro para más contactos
                         </Link>
@@ -726,7 +726,7 @@ export function InstitutionSearchPage({
                           className={`h-11 w-11 rounded-xl flex-shrink-0 transition-all ${
                             favorites.includes(selectedEducator.id)
                               ? "text-energy-orange bg-orange-50 border-orange-100"
-                              : "text-gray-400 border-gray-200 hover:text-energy-orange hover:bg-orange-50"
+                              : "text-fm-faint border-gray-200 hover:text-energy-orange hover:bg-orange-50"
                           }`}
                         >
                           <Star
@@ -737,7 +737,7 @@ export function InstitutionSearchPage({
                       )}
                     </div>
                     {!isReadOnly && contactMonthlyLimit !== null && usedContacts < contactMonthlyLimit && (
-                      <p className="text-xs text-gray-400 text-center">
+                      <p className="text-xs text-fm-faint text-center">
                         {usedContacts} de {contactMonthlyLimit} contactos usados este mes
                       </p>
                     )}
@@ -750,18 +750,18 @@ export function InstitutionSearchPage({
 
                   {/* Basic info */}
                   <div className="space-y-3">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">
                       Información básica
                     </h4>
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="flex items-center gap-2 text-sm font-bold text-gray-600">
-                        <MapPin size={15} className="text-talentia-blue flex-shrink-0" />
+                      <div className="flex items-center gap-2 text-sm font-bold text-fm-muted">
+                        <MapPin size={15} className="text-fm-blue flex-shrink-0" />
                         <span className="truncate">
                           {selectedEducator.country || selectedEducator.location || "España"}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm font-bold text-gray-600">
-                        <Globe size={15} className="text-talentia-blue flex-shrink-0" />
+                      <div className="flex items-center gap-2 text-sm font-bold text-fm-muted">
+                        <Globe size={15} className="text-fm-blue flex-shrink-0" />
                         <span className="truncate">
                           {(Array.isArray(selectedEducator.languages) ? selectedEducator.languages : [])
                             .map((l: any) => (typeof l === "string" ? l : l.lang ?? l.language ?? ""))
@@ -770,20 +770,20 @@ export function InstitutionSearchPage({
                         </span>
                       </div>
                       {selectedEducator.aneca_accreditation && (
-                        <div className="flex items-center gap-2 text-sm font-bold text-gray-600">
-                          <Award size={15} className="text-talentia-blue flex-shrink-0" />
+                        <div className="flex items-center gap-2 text-sm font-bold text-fm-muted">
+                          <Award size={15} className="text-fm-blue flex-shrink-0" />
                           <span className="truncate">{selectedEducator.aneca_accreditation}</span>
                         </div>
                       )}
                       {selectedEducator.experience_years > 0 && (
-                        <div className="flex items-center gap-2 text-sm font-bold text-gray-600">
-                          <Briefcase size={15} className="text-talentia-blue flex-shrink-0" />
+                        <div className="flex items-center gap-2 text-sm font-bold text-fm-muted">
+                          <Briefcase size={15} className="text-fm-blue flex-shrink-0" />
                           {selectedEducator.experience_years}+ años exp.
                         </div>
                       )}
                       {selectedEducator.current_institution && (
-                        <div className="flex items-center gap-2 text-sm font-bold text-gray-600">
-                          <Building2 size={15} className="text-talentia-blue flex-shrink-0" />
+                        <div className="flex items-center gap-2 text-sm font-bold text-fm-muted">
+                          <Building2 size={15} className="text-fm-blue flex-shrink-0" />
                           <span className="truncate">{selectedEducator.current_institution}</span>
                         </div>
                       )}
@@ -793,8 +793,8 @@ export function InstitutionSearchPage({
                   {/* Bio */}
                   {selectedEducator.bio && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Biografía</h4>
-                      <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">Biografía</h4>
+                      <p className="text-sm text-fm-muted leading-relaxed whitespace-pre-line">
                         {selectedEducator.bio}
                       </p>
                     </div>
@@ -803,7 +803,7 @@ export function InstitutionSearchPage({
                   {/* Specialties */}
                   {(selectedEducator.expertise?.length > 0 || selectedEducator.faculty_areas?.length > 0) && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">
                         Especialidades
                       </h4>
                       <div className="flex flex-wrap gap-2">
@@ -818,7 +818,7 @@ export function InstitutionSearchPage({
                               return label ? (
                                 <Badge
                                   key={exp.id ?? label}
-                                  className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold"
+                                  className="bg-gray-50 text-fm-muted border-none px-3 py-1.5 rounded-xl text-xs font-bold"
                                 >
                                   {label}
                                 </Badge>
@@ -830,7 +830,7 @@ export function InstitutionSearchPage({
                               return label ? (
                                 <Badge
                                   key={label}
-                                  className="bg-gray-50 text-gray-600 border-none px-3 py-1.5 rounded-xl text-xs font-bold"
+                                  className="bg-gray-50 text-fm-muted border-none px-3 py-1.5 rounded-xl text-xs font-bold"
                                 >
                                   {label}
                                 </Badge>
@@ -843,7 +843,7 @@ export function InstitutionSearchPage({
                   {/* Degrees (up to 3) */}
                   {Array.isArray(selectedEducator.degrees) && selectedEducator.degrees.length > 0 && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Formación</h4>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">Formación</h4>
                       <div className="space-y-2">
                         {selectedEducator.degrees.slice(0, 3).map((deg: any, i: number) => (
                           <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
@@ -855,16 +855,16 @@ export function InstitutionSearchPage({
                                 {deg.type || deg.title || deg.degree || "Titulación"}
                               </p>
                               {deg.field && (
-                                <p className="text-[11px] font-medium text-talentia-blue truncate">{deg.field}</p>
+                                <p className="text-[11px] font-medium text-fm-blue truncate">{deg.field}</p>
                               )}
                               {deg.university && (
-                                <p className="text-[10px] text-gray-400 truncate">{deg.university}</p>
+                                <p className="text-[10px] text-fm-faint truncate">{deg.university}</p>
                               )}
                             </div>
                           </div>
                         ))}
                         {selectedEducator.degrees.length > 3 && (
-                          <p className="text-xs text-gray-400 font-medium text-center">
+                          <p className="text-xs text-fm-faint font-medium text-center">
                             +{selectedEducator.degrees.length - 3} más
                           </p>
                         )}
@@ -875,13 +875,13 @@ export function InstitutionSearchPage({
                   {/* Website/LinkedIn */}
                   {(selectedEducator.website || selectedEducator.linkedin_url) && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Enlaces</h4>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">Enlaces</h4>
                       <div className="flex flex-wrap gap-2">
                         {selectedEducator.website && (
                           <a
                             href={selectedEducator.website}
                             target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-xs font-bold text-talentia-blue bg-blue-50 px-3 py-1.5 rounded-xl hover:bg-blue-100 transition-colors"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-fm-blue bg-blue-50 px-3 py-1.5 rounded-xl hover:bg-blue-100 transition-colors"
                           >
                             <Globe size={12} />
                             Web
@@ -905,11 +905,11 @@ export function InstitutionSearchPage({
                   {/* ── Documents ── */}
                   {(loadingDocs || facultyDocs.length > 0) && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Documentos</h4>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">Documentos</h4>
                       {loadingDocs ? (
                         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                          <div className="w-5 h-5 rounded-full border-2 border-talentia-blue border-t-transparent animate-spin" />
-                          <span className="text-xs text-gray-400 font-medium">Cargando...</span>
+                          <div className="w-5 h-5 rounded-full border-2 border-fm-blue border-t-transparent animate-spin" />
+                          <span className="text-xs text-fm-faint font-medium">Cargando...</span>
                         </div>
                       ) : (
                         <div className="space-y-2">
@@ -920,14 +920,14 @@ export function InstitutionSearchPage({
                               target="_blank" rel="noopener noreferrer"
                               className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50/50 hover:border-blue-200 transition-all group border border-transparent"
                             >
-                              <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-talentia-blue">
+                              <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-fm-blue">
                                 <FileText size={14} />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-bold text-navy truncate">{doc.name || doc.file_name || "Documento"}</p>
                                 <p className="text-[10px] font-semibold text-slate-400 uppercase">{doc.doc_type || "PDF"}</p>
                               </div>
-                              <ExternalLink size={12} className="text-slate-300 group-hover:text-talentia-blue" />
+                              <ExternalLink size={12} className="text-slate-300 group-hover:text-fm-blue" />
                             </a>
                           ))}
                         </div>
@@ -938,11 +938,11 @@ export function InstitutionSearchPage({
                   {/* ── Contact info (Pro only) ── */}
                   {isPro && (selectedEducator.contact_email || selectedEducator.contact_whatsapp || selectedEducator.phone || selectedEducator.contact_linkedin) && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Contacto directo</h4>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">Contacto directo</h4>
                       <div className="space-y-2">
                         {selectedEducator.contact_email && (
                           <a href={`mailto:${selectedEducator.contact_email}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50/50 transition-all group">
-                            <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-talentia-blue">
+                            <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-fm-blue">
                               <AtSign size={14} />
                             </div>
                             <span className="text-xs font-semibold text-navy truncate flex-1">{selectedEducator.contact_email}</span>
@@ -958,7 +958,7 @@ export function InstitutionSearchPage({
                         )}
                         {selectedEducator.phone && (
                           <a href={`tel:${selectedEducator.phone}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50/50 transition-all group">
-                            <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-talentia-blue">
+                            <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-fm-blue">
                               <Phone size={14} />
                             </div>
                             <span className="text-xs font-semibold text-navy truncate flex-1">{selectedEducator.phone}</span>
@@ -978,7 +978,7 @@ export function InstitutionSearchPage({
 
                   {/* View count — engagement signal */}
                   <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl">
-                    <Eye size={15} className="text-gray-400" />
+                    <Eye size={15} className="text-fm-faint" />
                     <span className="text-xs font-bold text-gray-500">
                       {selectedEducator.view_count ?? 0} {(selectedEducator.view_count ?? 0) === 1 ? "visita" : "visitas"} al perfil
                     </span>
@@ -992,7 +992,7 @@ export function InstitutionSearchPage({
               <div className="p-5 border-t border-gray-100 flex-shrink-0 bg-gray-50/50 flex items-center justify-between">
                 <Link
                   href={`/app/faculty/${selectedEducator.id}`}
-                  className="inline-flex items-center gap-2 text-sm font-bold text-talentia-blue hover:text-navy transition-colors"
+                  className="inline-flex items-center gap-2 text-sm font-bold text-fm-blue hover:text-navy transition-colors"
                   onClick={closeDrawer}
                 >
                   <ExternalLink size={14} />

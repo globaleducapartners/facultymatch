@@ -81,7 +81,7 @@ export default async function FavoritesPage() {
           <p className="text-gray-500 max-w-xs mx-auto font-medium">
             Explora el directorio y guarda los perfiles que mejor encajen con tu institución.
           </p>
-          <Button asChild className="mt-8 bg-talentia-blue hover:bg-blue-700 text-white font-bold h-12 rounded-xl px-8">
+          <Button asChild className="mt-8 bg-fm-blue hover:bg-blue-700 text-white font-bold h-12 rounded-xl px-8">
             <Link href="/app/institution/search">Explorar docentes</Link>
           </Button>
         </div>
