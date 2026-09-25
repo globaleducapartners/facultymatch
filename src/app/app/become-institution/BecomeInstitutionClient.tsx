@@ -466,7 +466,7 @@ export function BecomeInstitutionClient({
               borderRadius: 10, padding: "14px 16px",
             }}>
               <p style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: D.blue, margin: "0 0 6px" }}>
-                Plan Esencial — Gratis
+                Plan Esencial · Gratis
               </p>
               <ul style={{ margin: 0, padding: "0 0 0 16px" }}>
                 {[

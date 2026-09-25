@@ -770,7 +770,7 @@ export function ProfileEditorClient({
                       defaultChecked={!!(facultyProfile?.aneca_accreditation?.includes("ANECA"))} />
                     <div>
                       <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: D.ink }}>
-                        Acreditación ANECA — Titular de Universidad
+                        Acreditación ANECA · Titular de Universidad
                       </div>
                       <div style={{ fontFamily: SANS, fontSize: 12, color: D.muted, marginTop: 2 }}>
                         Para Titular de Universidad o Catedrático

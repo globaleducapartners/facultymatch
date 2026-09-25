@@ -258,7 +258,7 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
             Crea tu perfil
           </h1>
           <p style={{ fontSize: 14, color: D.muted, margin: "8px 0 0" }}>
-            Elige cómo quieres empezar — puedes cambiar de opción en cualquier momento.
+            Elige cómo quieres empezar, puedes cambiar de opción en cualquier momento.
           </p>
         </div>
 
@@ -419,7 +419,7 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
             Crear tu perfil
           </h1>
           <p style={{ fontSize: 13, color: D.muted, margin: "4px 0 0" }}>
-            Paso {Math.min(step + 1, 5)} de 5 — {STEP_LABELS[Math.min(step, 4)]}
+            Paso {Math.min(step + 1, 5)} de 5 · {STEP_LABELS[Math.min(step, 4)]}
           </p>
         </div>
         <button

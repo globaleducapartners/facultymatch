@@ -221,7 +221,7 @@ export function PrintProfileClient({
             <div style={{ width: 18, height: 18, borderRadius: 4, background: "#0D2240", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ fontSize: 8, fontWeight: 900, color: "#fff" }}>FM</span>
             </div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#6B7280" }}>FacultyMatch — facultymatch.app</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#6B7280" }}>FacultyMatch · facultymatch.app</span>
           </div>
           <span style={{ fontSize: 10, color: "#9CA3AF" }}>Generado el {today}</span>
         </div>

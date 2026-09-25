@@ -142,7 +142,7 @@ export function Step5Review({ data }: Props) {
         } />
         {data.careerType === "combinado" && (
           <div style={{ marginBottom: 8, padding: 8, background: "#EFF6FF", borderRadius: 8, fontSize: 12, color: D.blue, fontWeight: 600 }}>
-            Perfil combinado — incluye ambas trayectorias
+            Perfil combinado, incluye ambas trayectorias
           </div>
         )}
         {(data.careerType === "profesional" || data.careerType === "combinado") && (

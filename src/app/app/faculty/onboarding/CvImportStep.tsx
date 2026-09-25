@@ -141,7 +141,7 @@ export function CvImportStep({ userId, onConfirm, onBack }: Props) {
               Esto es lo que hemos leído de tu CV
             </h2>
             <p style={{ fontFamily: SANS, fontSize: 12, color: D.muted, margin: "2px 0 0" }}>
-              Revísalo — podrás editar cada campo en el formulario. Nada se guarda todavía.
+              Revísalo. Podrás editar cada campo en el formulario. Nada se guarda todavía.
             </p>
           </div>
         </div>
@@ -324,7 +324,7 @@ export function CvImportStep({ userId, onConfirm, onBack }: Props) {
             ¿Tienes un CV a mano? Súbelo y te ahorramos el formulario
           </p>
           <p style={{ fontFamily: SANS, fontSize: 12, color: D.muted, margin: 0 }}>
-            PDF o DOCX, máximo 10MB — también vale el export de LinkedIn en PDF
+            PDF o DOCX, máximo 10MB. También vale el export de LinkedIn en PDF
           </p>
         </div>
       </label>

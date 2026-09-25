@@ -32,9 +32,9 @@ const lbl: React.CSSProperties = {
 };
 
 const ACCREDITATION_CHIPS = [
-  { value: "aneca_titular", label: "ANECA — Titular de Universidad" },
-  { value: "aneca_catedratico", label: "ANECA — Catedrático" },
-  { value: "aneca_ayudante", label: "ANECA — Ayudante Doctor" },
+  { value: "aneca_titular", label: "ANECA · Titular de Universidad" },
+  { value: "aneca_catedratico", label: "ANECA · Catedrático" },
+  { value: "aneca_ayudante", label: "ANECA · Ayudante Doctor" },
   { value: "aqu", label: "AQU" },
   { value: "acsucyl", label: "ACSUCYL" },
   { value: "deva", label: "DEVA" },

@@ -85,7 +85,7 @@ export function SpecialtyForm({ action }: Props) {
           style={inp}
         />
         <p style={{ fontFamily: SANS, fontSize: 11, color: D.faint, margin: "6px 0 0" }}>
-          Opcional — ayudan a las instituciones a encontrarte con búsquedas más específicas
+          Opcional: ayudan a las instituciones a encontrarte con búsquedas más específicas
         </p>
       </div>
 

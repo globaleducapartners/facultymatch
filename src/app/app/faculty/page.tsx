@@ -231,7 +231,7 @@ export default async function EducatorDashboard() {
           <div className="flex-1">
             <p className="font-black text-blue-800 text-sm">¡Tráete tu perfil de ORCID!</p>
             <p className="text-sm text-blue-600 font-medium">
-              Impórtalo y rellena tu perfil en segundos. Afiliaciones, publicaciones, citas y más — todo desde tu ORCID.
+              Impórtalo y rellena tu perfil en segundos. Afiliaciones, publicaciones, citas y más, todo desde tu ORCID.
             </p>
             <Link href="/app/faculty/profile?tab=research" className="text-sm font-black text-blue-700 hover:underline mt-1 inline-block">
               Ir a importar →

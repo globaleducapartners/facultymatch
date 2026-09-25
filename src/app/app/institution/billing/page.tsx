@@ -89,7 +89,7 @@ export default async function BillingPage() {
                 href="/checkout?plan=institution-pro"
                 className="inline-flex items-center justify-center w-full bg-[#1d4ed8] hover:bg-blue-700 text-white font-black py-3 rounded-xl text-sm transition-colors"
               >
-                Mejorar a Professional — 99€/mes
+                Mejorar a Professional · 99€/mes
               </Link>
             )}
             <div className="pt-2">
@@ -163,7 +163,7 @@ export default async function BillingPage() {
             href="/checkout?plan=institution-growth"
             className="inline-flex items-center justify-center w-full bg-[#E9A030] hover:bg-amber-400 text-[#0D2240] font-black py-2.5 rounded-xl text-sm transition-colors"
           >
-            Activar ahora — 35€/mes
+            Activar ahora · 35€/mes
           </Link>
         </div>
 
@@ -191,7 +191,7 @@ export default async function BillingPage() {
             href="/checkout?plan=institution-pro"
             className="inline-flex items-center justify-center w-full bg-[#1d4ed8] hover:bg-blue-700 text-white font-black py-2.5 rounded-xl text-sm transition-colors"
           >
-            Activar ahora — 99€/mes
+            Activar ahora · 99€/mes
           </Link>
           <p className="text-[10px] text-gray-400 text-center">
             o{" "}
@@ -201,7 +201,7 @@ export default async function BillingPage() {
             >
               14 días de prueba gratuita
             </a>
-            {" "}— sin tarjeta
+            , sin tarjeta
           </p>
         </div>
       </div>

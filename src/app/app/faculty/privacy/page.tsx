@@ -601,7 +601,7 @@ export default async function PrivacyPage({
                         facultymatch.app/docentes/{facultyProfile.profile_slug}
                       </p>
                       <p className="text-[10px] text-blue-600 font-medium">
-                        Enlace público — visible para cualquier persona
+                        Enlace público, visible para cualquier persona
                       </p>
                     </div>
                     <CopyButton url={`${siteUrl}/docentes/${facultyProfile.profile_slug}`} />

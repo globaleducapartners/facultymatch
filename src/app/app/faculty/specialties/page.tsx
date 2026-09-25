@@ -263,7 +263,7 @@ export default async function SpecialtiesPage() {
                   <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <div style={{ width: 6, height: 6, borderRadius: "50%", background: D.blue, flexShrink: 0 }} />
                     <span style={{ fontFamily: SANS, fontSize: 13, color: D.ink, fontWeight: 600 }}>
-                      {item.area}{item.subarea ? ` — ${item.subarea}` : ""}
+                      {item.area}{item.subarea ? ` · ${item.subarea}` : ""}
                     </span>
                   </div>
                 ))}
