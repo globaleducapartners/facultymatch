@@ -354,10 +354,18 @@ function HowItWorks() {
           <p className="text-[15.5px] text-[#5B6B85]">Sin intermediarios. Sin comisiones por contratación.</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="relative grid gap-10 md:grid-cols-3 md:gap-6">
+          {/* Hilo que conecta los 3 pasos — solo desktop, donde están en fila */}
+          <div
+            aria-hidden="true"
+            className="absolute left-[calc(16.6%+48px)] right-[calc(16.6%+48px)] top-12 hidden h-px bg-gradient-to-r from-fm-border via-fm-blue/40 to-fm-border md:block"
+          />
           {steps.map((step, i) => (
-            <div key={i} className="text-center">
-              <div className="mx-auto mb-[22px] flex h-24 w-24 items-center justify-center rounded-full border border-fm-border bg-fm-surface shadow-[0_4px_24px_rgba(7,19,38,0.06)]">
+            <div
+              key={i}
+              className={`relative text-center ${i === 1 ? "md:-translate-y-3" : ""}`}
+            >
+              <div className="relative z-10 mx-auto mb-[22px] flex h-24 w-24 items-center justify-center rounded-full border border-fm-border bg-white shadow-[0_4px_24px_rgba(7,19,38,0.06)]">
                 {step.icon}
               </div>
               <h3 className="mb-[9px] text-[16.5px] font-bold tracking-[-0.02em] text-fm-ink">{step.title}</h3>
@@ -663,54 +671,55 @@ function SectorMetrics() {
 // ─── PRIVACY ───────────────────────────────────────────────────────────────
 function Privacy() {
   return (
-    <section className="overflow-hidden bg-white">
-      <div className="mx-auto grid max-w-[1120px] md:min-h-[380px] md:grid-cols-2">
-        <div className="flex items-center justify-center bg-gradient-to-br from-fm-navy to-fm-dark px-8 py-10">
-          <div className="w-full max-w-[320px] rounded-2xl border border-white/10 bg-white/[0.045] p-6">
-            <div className="mb-[22px] flex items-center justify-between text-[13px] font-semibold text-white">
-              <span>Visible en el directorio</span>
-              <span className="relative h-[22px] w-[38px] shrink-0 rounded-full bg-fm-blue">
-                <span className="absolute left-[18px] top-0.5 h-[18px] w-[18px] rounded-full bg-white" />
+    <section className="overflow-hidden bg-white px-6 py-16 md:px-8 md:py-[88px]">
+      <div className="mx-auto flex max-w-[620px] flex-col items-center text-center">
+        <div className="mb-5 flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-fm-blue/[0.08]">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B4FD8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </div>
+        <h2 className="mb-[18px] text-[1.5rem] font-extrabold leading-[1.1] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.5rem,2.6vw,2.1rem)]">
+          Tú controlas quién ve tu perfil.
+        </h2>
+        <p className="mb-7 text-sm leading-[1.8] text-[#5B6B85]">
+          Puedes bloquear instituciones específicas por nombre, incluido tu empleador actual.
+          Tu perfil es visible únicamente para quien tú decidas.
+        </p>
+        <Link href="/signup">
+          <button className="rounded-[10px] border-[1.5px] border-fm-navy px-6 py-3 text-sm font-semibold text-fm-navy transition-transform duration-150 ease-out active:scale-[0.97]">
+            Gestionar mi privacidad
+          </button>
+        </Link>
+      </div>
+
+      {/* Tarjeta flotante y descentrada — a propósito distinta de la columna
+          50/50 que ya usan las dos secciones "Para docentes/instituciones"
+          de más arriba, para no repetir un tercer split idéntico. */}
+      <div className="mx-auto mt-12 max-w-[1120px] md:mt-[-8px]">
+        <div className="w-full max-w-[320px] rounded-2xl border border-white/10 bg-gradient-to-br from-fm-navy to-fm-dark p-6 shadow-[0_30px_60px_-24px_rgba(13,34,64,0.35)] md:ml-auto md:mr-[6%] md:-rotate-2">
+          <div className="mb-[22px] flex items-center justify-between text-[13px] font-semibold text-white">
+            <span>Visible en el directorio</span>
+            <span className="relative h-[22px] w-[38px] shrink-0 rounded-full bg-fm-blue">
+              <span className="absolute left-[18px] top-0.5 h-[18px] w-[18px] rounded-full bg-white" />
+            </span>
+          </div>
+          <div className="mb-3 font-mono text-[10.5px] uppercase tracking-[0.08em] text-white/40">
+            Instituciones bloqueadas
+          </div>
+          {[68, 52].map((w, i) => (
+            <div key={i} className="mb-2 flex items-center justify-between gap-2.5 rounded-lg bg-white/5 px-3 py-2.5">
+              <div className="h-[9px] rounded-md bg-white/15" style={{ width: `${w}%` }} />
+              <span className="shrink-0 rounded-full bg-fm-signal/15 px-2 font-mono text-[9.5px] font-bold text-[#FF9B8A]">
+                Bloqueada
               </span>
             </div>
-            <div className="mb-3 font-mono text-[10.5px] uppercase tracking-[0.08em] text-white/40">
-              Instituciones bloqueadas
-            </div>
-            {[68, 52].map((w, i) => (
-              <div key={i} className="mb-2 flex items-center justify-between gap-2.5 rounded-lg bg-white/5 px-3 py-2.5">
-                <div className="h-[9px] rounded-md bg-white/15" style={{ width: `${w}%` }} />
-                <span className="shrink-0 rounded-full bg-fm-signal/15 px-2 font-mono text-[9.5px] font-bold text-[#FF9B8A]">
-                  Bloqueada
-                </span>
-              </div>
-            ))}
-            <button
-              type="button"
-              className="mt-2 w-full rounded-lg border border-dashed border-white/25 py-2 text-[11.5px] text-white/50"
-            >
-              + Bloquear otra institución
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-col justify-center px-6 py-9 md:px-16 md:py-14">
-          <div className="mb-5 flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-fm-blue/[0.08]">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B4FD8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
-          </div>
-          <h2 className="mb-[18px] text-[1.5rem] font-extrabold leading-[1.1] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.5rem,2.6vw,2.1rem)]">
-            Tú controlas quién ve tu perfil.
-          </h2>
-          <p className="mb-7 text-sm leading-[1.8] text-[#5B6B85]">
-            Puedes bloquear instituciones específicas por nombre, incluido tu empleador actual.
-            Tu perfil es visible únicamente para quien tú decidas.
-          </p>
-          <Link href="/signup" className="self-start">
-            <button className="rounded-[10px] border-[1.5px] border-fm-navy px-6 py-3 text-sm font-semibold text-fm-navy transition-transform duration-150 ease-out active:scale-[0.97]">
-              Gestionar mi privacidad
-            </button>
-          </Link>
+          ))}
+          <button
+            type="button"
+            className="mt-2 w-full rounded-lg border border-dashed border-white/25 py-2 text-[11.5px] text-white/50"
+          >
+            + Bloquear otra institución
+          </button>
         </div>
       </div>
     </section>
