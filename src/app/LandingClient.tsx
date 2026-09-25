@@ -175,11 +175,11 @@ function Hero() {
             En la era de la IA, la experiencia <span className="text-fm-blue">real</span> marca la diferencia.
           </h1>
           <p className="mb-7 max-w-[480px] text-[15px] leading-[1.7] text-[#5B6B85]">
-            La red profesional —el «LinkedIn»— de los docentes que forman en universidades y escuelas de
-            negocio. Perfiles verificados, sin intermediarios.
+            El «LinkedIn» de los docentes que forman en universidades y escuelas de negocio.
+            Perfiles verificados, sin intermediarios.
           </p>
 
-          <div className="mb-4 flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3">
             <Link href="/signup">
               <button className="rounded-[10px] bg-fm-blue px-7 py-[13px] text-[14px] font-bold text-white shadow-[0_10px_24px_-8px_rgba(27,79,216,0.5)]">
                 Publicar mi perfil →
@@ -190,36 +190,6 @@ function Hero() {
                 Buscar docentes
               </button>
             </Link>
-          </div>
-
-          {/* Facts para el CTA — cualitativos y comprobables, sin cifras infladas */}
-          <p className="mb-6 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[11px] text-[#8592A8]">
-            <span>Gratis para docentes</span><span className="text-fm-border">·</span>
-            <span>Cada perfil, verificado a mano</span><span className="text-fm-border">·</span>
-            <span>Sin intermediarios</span>
-          </p>
-
-          <div className="flex items-center gap-3">
-            <div className="flex">
-              {[
-                { t: "MA", bg: "#1B4FD8" }, { t: "RG", bg: "#FF6A1A" }, { t: "JP", bg: "#0D2240" },
-              ].map((a) => (
-                <span
-                  key={a.t}
-                  className="-ml-2 flex h-[30px] w-[30px] items-center justify-center rounded-full border-2 border-white text-[10px] font-extrabold text-white first:ml-0"
-                  style={{ background: a.bg }}
-                >
-                  {a.t}
-                </span>
-              ))}
-              <span className="-ml-2 flex h-[30px] w-[30px] items-center justify-center rounded-full border-2 border-white bg-[#4B5A7A]">
-                <svg viewBox="0 0 24 24" fill="none" className="h-[14px] w-[14px]">
-                  <circle cx="12" cy="8" r="4" fill="#fff" fillOpacity="0.9" />
-                  <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="#fff" fillOpacity="0.9" />
-                </svg>
-              </span>
-            </div>
-            <span className="font-mono text-[11px] text-[#8592A8]">+200 perfiles verificados</span>
           </div>
         </div>
 
@@ -282,6 +252,48 @@ function Hero() {
   );
 }
 
+// ─── TRUST STRIP ───────────────────────────────────────────────────────────
+// Vive fuera del hero a propósito (ver skill design-taste-frontend, regla de
+// densidad del hero): la línea de confianza y los avatares eran un quinto y
+// sexto elemento dentro del hero, algo que la propia guía marca como "trust
+// micro-strip" a evitar ahí. Aquí, como franja propia, cumple el mismo papel
+// sin sobrecargar el bloque principal.
+function TrustStrip() {
+  return (
+    <div className="border-y border-fm-border bg-fm-surface px-6 py-4 md:px-8">
+      <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-3">
+        <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[11px] text-[#8592A8]">
+          <span>Gratis para docentes</span><span className="text-fm-border">·</span>
+          <span>Cada perfil, verificado a mano</span><span className="text-fm-border">·</span>
+          <span>Sin intermediarios</span>
+        </p>
+        <div className="flex items-center gap-3">
+          <div className="flex">
+            {[
+              { t: "MA", bg: "#1B4FD8" }, { t: "RG", bg: "#FF6A1A" }, { t: "JP", bg: "#0D2240" },
+            ].map((a) => (
+              <span
+                key={a.t}
+                className="-ml-2 flex h-[30px] w-[30px] items-center justify-center rounded-full border-2 border-white text-[10px] font-extrabold text-white first:ml-0"
+                style={{ background: a.bg }}
+              >
+                {a.t}
+              </span>
+            ))}
+            <span className="-ml-2 flex h-[30px] w-[30px] items-center justify-center rounded-full border-2 border-white bg-[#4B5A7A]">
+              <svg viewBox="0 0 24 24" fill="none" className="h-[14px] w-[14px]">
+                <circle cx="12" cy="8" r="4" fill="#fff" fillOpacity="0.9" />
+                <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" fill="#fff" fillOpacity="0.9" />
+              </svg>
+            </span>
+          </div>
+          <span className="font-mono text-[11px] text-[#8592A8]">+200 perfiles verificados</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── TICKER ────────────────────────────────────────────────────────────────
 function Ticker() {
   return (
@@ -336,9 +348,6 @@ function HowItWorks() {
     <section className="bg-white px-6 py-16 md:px-8 md:py-[88px]">
       <div className="mx-auto max-w-[1120px]">
         <div className="mx-auto mb-12 max-w-[560px] text-center md:mb-16">
-          <span className="mb-3.5 block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#B4791E]">
-            Cómo funciona
-          </span>
           <h2 className="mb-3.5 text-[1.7rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.7rem,3.4vw,2.5rem)]">
             De la experiencia al aula.
           </h2>
@@ -367,13 +376,10 @@ function ProductTrio() {
     <section className="bg-fm-surface px-6 py-16 md:px-8 md:py-[88px]">
       <div className="mx-auto max-w-[1120px]">
         <div className="mx-auto mb-12 max-w-[560px] text-center md:mb-16">
-          <span className="mb-3.5 block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-fm-blue">
-            La herramienta, por dentro
-          </span>
           <h2 className="mb-3.5 text-[1.7rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.7rem,3.4vw,2.5rem)]">
             De tu CV a un perfil verificado.
           </h2>
-          <p className="text-[15.5px] text-[#5B6B85]">Así es el camino real dentro de FacultyMatch — sin datos sensibles a la vista.</p>
+          <p className="text-[15.5px] text-[#5B6B85]">Así es el camino real dentro de FacultyMatch, sin datos sensibles a la vista.</p>
         </div>
 
         <div className="grid gap-5 md:grid-cols-3">
@@ -437,7 +443,7 @@ function ProductTrio() {
             <div className="p-5 pt-4">
               <div className="mb-2 font-mono text-[11px] font-bold text-fm-blue">PASO 2</div>
               <h3 className="mb-2 text-[15.5px] font-bold text-fm-ink">La IA prepara tu borrador</h3>
-              <p className="text-[13px] leading-[1.65] text-[#5B6B85]">Una IA extrae tus datos y marca su confianza en cada campo. Tú revisas antes de publicar — nada se guarda sin tu ok.</p>
+              <p className="text-[13px] leading-[1.65] text-[#5B6B85]">Una IA extrae tus datos y marca su confianza en cada campo. Tú revisas antes de publicar: nada se guarda sin tu ok.</p>
             </div>
           </div>
 
@@ -504,9 +510,6 @@ function SplitDocentes() {
           className="order-2 flex flex-col justify-center px-6 pt-9 transition-transform duration-700 md:order-1 md:px-8 md:py-16 md:pl-8"
           style={{ transform: inView ? "translateX(0)" : "translateX(-10px)" }}
         >
-          <span className="mb-4 block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#B4791E]">
-            Para docentes y expertos
-          </span>
           <h2 className="mb-[18px] text-[1.6rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.6rem,2.8vw,2.2rem)]">
             Lo que sabes hacer <b className="font-extrabold text-fm-blue">tiene demanda en las aulas.</b>
           </h2>
@@ -517,7 +520,7 @@ function SplitDocentes() {
           <div className="mb-7 flex flex-col gap-2.5">
             {[
               "Perfil verificado y estructurado por área de conocimiento",
-              "Las instituciones vienen a ti — sin prospectar",
+              "Las instituciones vienen a ti, sin prospectar",
               "Control total de tu visibilidad y privacidad",
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2.5">
@@ -606,7 +609,7 @@ function SplitInstituciones() {
                   <path d="M2 6l3 3 5-5" stroke="#0D2240" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
-              El perfil exacto que necesitas — verificado y en activo.
+              El perfil exacto que necesitas, verificado y en activo.
             </div>
           </div>
         </div>
@@ -629,9 +632,6 @@ function SectorMetrics() {
     <section className="bg-fm-surface px-6 py-16 md:px-8 md:py-[88px]">
       <div className="mx-auto max-w-[1120px]">
         <div className="mx-auto mb-12 max-w-[600px] text-center md:mb-16">
-          <span className="mb-3.5 block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-fm-blue">
-            El mercado en España
-          </span>
           <h2 className="text-[1.7rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.7rem,3.4vw,2.5rem)]">
             Miles de másteres nuevos cada curso. No hay suficiente claustro con experiencia real.
           </h2>
@@ -699,9 +699,6 @@ function Privacy() {
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
           </div>
-          <span className="mb-3.5 block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#B4791E]">
-            Privacidad
-          </span>
           <h2 className="mb-[18px] text-[1.5rem] font-extrabold leading-[1.1] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.5rem,2.6vw,2.1rem)]">
             Tú controlas quién ve tu perfil.
           </h2>
@@ -762,6 +759,7 @@ export default function LandingClient() {
     <div className="bg-fm-surface font-sans">
       <Nav />
       <Hero />
+      <TrustStrip />
       <Ticker />
       <HowItWorks />
       <ProductTrio />
