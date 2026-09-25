@@ -81,10 +81,20 @@ export default async function PublicFacultyProfilePage({
   const { slug } = await params;
   const admin = createAdminClient();
 
-  // Fetch faculty profile — security-critical: filter in query, not just UI
+  // Fetch faculty profile — security-critical: filter in query, not just UI.
+  // Columna a columna (no select(*)): esta página es pública y usa el
+  // cliente admin, así que una fila entera incluiría teléfono, email de
+  // contacto y notas internas de verificación aunque hoy no se rendericen.
   const { data: faculty } = await admin
     .from("faculty_profiles")
-    .select(`*, expertise:faculty_expertise(*)`)
+    .select(`
+      id, headline, current_institution, bio, banner_url,
+      faculty_areas, aneca_accreditation, academic_level, institutions_taught,
+      languages, availability, city, country, location, degrees,
+      google_scholar_id, orcid_id, linkedin_url, website, is_phd,
+      years_experience, modalities, research_publications,
+      expertise:faculty_expertise(id, area, subarea, topics)
+    `)
     .eq("profile_slug", slug)
     .eq("visibility", "public")
     .eq("is_active", true)
