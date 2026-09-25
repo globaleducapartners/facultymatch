@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, StyleSheet, Svg, Circle } from "@react-pdf/renderer";
+import { Document, Page, View, Text, StyleSheet, Svg, Circle, Path } from "@react-pdf/renderer";
 import { buildCredentialId, generateVerificationHash, shortenHash } from "@/lib/verification";
 
 // ─── Colores — misma identidad de marca del resto de la web ──────────────────
@@ -161,8 +161,8 @@ export function VerifiedProfilePdf({
             <View style={styles.head}>
               <View style={styles.brandRow}>
                 <Svg width={20} height={20} viewBox="0 0 100 100">
-                  <Circle cx={30} cy={52} r={22} fill={NAVY} />
-                  <Circle cx={66} cy={50} r={34} fill={SIGNAL} />
+                  <Path d="M51.1 44.7 L48.9 44.7 L8.9 31.1 L6.7 30.0 L4.7 27.6 L4.0 25.8 L4.0 22.9 L5.1 20.3 L7.1 18.3 L9.3 17.2 L22.1 13.2 L23.2 12.4 L48.2 4.0 L52.2 4.0 L54.4 5.1 L91.8 17.6 L94.0 19.0 L95.3 20.7 L96.0 22.5 L96.0 25.8 L94.9 28.4 L93.3 30.0 L91.1 31.1 L90.0 31.1 L87.0 29.3 L83.0 28.2 L78.6 28.2 L74.6 29.3 L71.3 31.1 L67.4 35.0 L65.6 37.9 L65.0 39.9 Z" fill={NAVY} />
+                  <Circle cx={80.8} cy={44.8} r={10.2} fill={SIGNAL} />
                 </Svg>
                 <Text style={styles.brandWord}>facultymatch</Text>
               </View>
