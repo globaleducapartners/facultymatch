@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -93,11 +94,7 @@ export default function FacultyClient() {
       <Navbar />
 
       {/* ── HERO ── */}
-      {/* Sin vídeo: el de la home ya usa /faculty-hero.mp4 y se repetía. El
-          overlay tapaba el 75-96% del vídeo de todas formas — queda un
-          degradado marino sólido. Un vídeo propio de aula puede volver aquí
-          cuando haya un asset distinto. */}
-      <section className="relative flex items-center overflow-hidden min-h-[90svh] md:min-h-[580px]">
+      <section className="relative overflow-hidden py-20 md:py-0 md:min-h-[580px] md:flex md:items-center">
         <div
           className="absolute inset-0"
           style={{
@@ -105,35 +102,49 @@ export default function FacultyClient() {
               "radial-gradient(700px 420px at 15% 0%, rgba(27,79,216,0.28), transparent 60%), linear-gradient(160deg, #0B1B33 0%, #071326 70%)",
           }}
         />
-        <div className="relative z-[2] mx-auto flex w-full max-w-[1120px] flex-col items-center px-6 py-20 text-center md:px-8 md:py-0">
-          <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
-            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
-              Para docentes y expertos profesionales
-            </span>
+        <div className="relative z-[2] mx-auto grid w-full max-w-[1120px] items-center gap-10 px-6 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-8">
+          <div className="text-center md:text-left">
+            <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
+              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+                Para docentes y expertos profesionales
+              </span>
+            </div>
+
+            <h1 className="fm-animate-up fm-animate-up-delay-1 mb-5 text-[34px] font-black leading-[1.1] tracking-[-0.04em] text-white md:text-[clamp(32px,3.4vw,44px)]">
+              Lo que la IA no puede sustituir es tu experiencia.
+            </h1>
+
+            <p className="fm-animate-up fm-animate-up-delay-2 mb-10 max-w-[480px] text-[15px] leading-[1.75] text-white/60 md:text-[17px] mx-auto md:mx-0">
+              Médicos, investigadores, directivos, abogados, comunicadores.
+              FacultyMatch los conecta con universidades y escuelas de negocio
+              que buscan exactamente lo que ellos saben.
+            </p>
+
+            <div className="fm-animate-up fm-animate-up-delay-3 flex flex-wrap justify-center gap-3 md:justify-start">
+              <Link href="/signup">
+                <button className="rounded-[10px] bg-white px-8 py-3.5 text-[15px] font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
+                  Publicar mi perfil
+                </button>
+              </Link>
+              <Link href="/login">
+                <button className="rounded-[10px] border border-white/30 px-8 py-3.5 text-[15px] text-white/80 transition-transform duration-150 ease-out active:scale-[0.97]">
+                  Ya tengo cuenta
+                </button>
+              </Link>
+            </div>
           </div>
 
-          <h1 className="fm-animate-up fm-animate-up-delay-1 mb-5 max-w-[740px] text-[34px] font-black leading-[1.06] tracking-[-0.04em] text-white md:text-[clamp(38px,5vw,60px)]">
-            Lo que la IA no puede sustituir
-            <br />es tu experiencia.
-          </h1>
-
-          <p className="fm-animate-up fm-animate-up-delay-2 mb-10 max-w-[520px] text-[15px] leading-[1.75] text-white/60 md:text-[17px]">
-            Médicos, investigadores, directivos, abogados, comunicadores.
-            FacultyMatch los conecta con universidades y escuelas de negocio
-            que buscan exactamente lo que ellos saben.
-          </p>
-
-          <div className="fm-animate-up fm-animate-up-delay-3 flex flex-wrap justify-center gap-3">
-            <Link href="/signup">
-              <button className="rounded-[10px] bg-white px-8 py-3.5 text-[15px] font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
-                Publicar mi perfil
-              </button>
-            </Link>
-            <Link href="/login">
-              <button className="rounded-[10px] border border-white/30 px-8 py-3.5 text-[15px] text-white/80 transition-transform duration-150 ease-out active:scale-[0.97]">
-                Ya tengo cuenta
-              </button>
-            </Link>
+          <div className="fm-animate-up fm-animate-up-delay-2 relative mx-auto w-full max-w-[440px] md:mx-0 md:max-w-none">
+            <div className="relative aspect-[3/2] overflow-hidden rounded-2xl border border-white/10">
+              <Image
+                src="/images/faculty-hero-photo.jpg"
+                alt="Docente experta explicando en una pizarra"
+                fill
+                sizes="(min-width: 768px) 45vw, 90vw"
+                className="object-cover"
+                priority
+              />
+            </div>
           </div>
         </div>
       </section>

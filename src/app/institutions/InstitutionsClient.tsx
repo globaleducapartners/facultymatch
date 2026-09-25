@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 
 function useInView(threshold = 0.15) {
@@ -145,10 +146,7 @@ export default function InstitutionsClient() {
       <Navbar />
 
       {/* ── HERO ── */}
-      {/* Sin media externa: antes cargaba un vídeo de mixkit.co y una foto de
-          unsplash.com por hotlink (dependencia frágil, sin control de
-          licencia). Degradado marino sólido. */}
-      <section className="relative flex items-center overflow-hidden min-h-[90svh] md:min-h-[580px]">
+      <section className="relative overflow-hidden py-20 md:py-0 md:min-h-[580px] md:flex md:items-center">
         <div
           className="absolute inset-0"
           style={{
@@ -156,34 +154,49 @@ export default function InstitutionsClient() {
               "radial-gradient(700px 420px at 85% 0%, rgba(255,106,26,0.16), transparent 55%), radial-gradient(760px 460px at 12% 8%, rgba(27,79,216,0.3), transparent 60%), linear-gradient(160deg, #0B1B33 0%, #071326 70%)",
           }}
         />
-        <div className="relative z-[2] mx-auto flex w-full max-w-[1120px] flex-col items-center px-6 py-20 text-center md:px-8 md:py-0">
-          <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
-              Para universidades y escuelas de negocio
-            </span>
+        <div className="relative z-[2] mx-auto grid w-full max-w-[1120px] items-center gap-10 px-6 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-8">
+          <div className="text-center md:text-left">
+            <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
+              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+                Para universidades y escuelas de negocio
+              </span>
+            </div>
+
+            <h1 className="fm-animate-up fm-animate-up-delay-1 mb-5 text-[32px] font-black leading-[1.1] tracking-[-0.04em] text-white md:text-[clamp(30px,3.4vw,42px)]">
+              El directorio que ningún portal de empleo puede tener.
+            </h1>
+
+            <p className="fm-animate-up fm-animate-up-delay-2 mb-10 max-w-[480px] text-[15px] leading-[1.75] text-white/60 md:text-[17px] mx-auto md:mx-0">
+              Médicos, investigadores y directivos que nunca publican su CV
+              en portales de empleo. Aquí están disponibles, verificados y
+              con contacto directo.
+            </p>
+
+            <div className="fm-animate-up fm-animate-up-delay-3 flex flex-wrap justify-center gap-3 md:justify-start">
+              <Link href="/signup?intent=institution">
+                <button className="rounded-[10px] bg-white px-8 py-3.5 text-[15px] font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
+                  Acceder al directorio
+                </button>
+              </Link>
+              <Link href="/login">
+                <button className="rounded-[10px] border border-white/30 px-8 py-3.5 text-[15px] text-white/80 transition-transform duration-150 ease-out active:scale-[0.97]">
+                  Ya tengo cuenta
+                </button>
+              </Link>
+            </div>
           </div>
 
-          <h1 className="fm-animate-up fm-animate-up-delay-1 mb-5 max-w-[760px] text-[32px] font-black leading-[1.06] tracking-[-0.04em] text-white md:text-[clamp(36px,4.8vw,58px)]">
-            El directorio que ningún<br />portal de empleo puede tener.
-          </h1>
-
-          <p className="fm-animate-up fm-animate-up-delay-2 mb-10 max-w-[540px] text-[15px] leading-[1.75] text-white/60 md:text-[17px]">
-            Médicos, investigadores y directivos que nunca publican su CV
-            en portales de empleo. Aquí están disponibles, verificados y
-            con contacto directo.
-          </p>
-
-          <div className="fm-animate-up fm-animate-up-delay-3 flex flex-wrap justify-center gap-3">
-            <Link href="/signup?intent=institution">
-              <button className="rounded-[10px] bg-white px-8 py-3.5 text-[15px] font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
-                Acceder al directorio
-              </button>
-            </Link>
-            <Link href="/login">
-              <button className="rounded-[10px] border border-white/30 px-8 py-3.5 text-[15px] text-white/80 transition-transform duration-150 ease-out active:scale-[0.97]">
-                Ya tengo cuenta
-              </button>
-            </Link>
+          <div className="fm-animate-up fm-animate-up-delay-2 relative mx-auto w-full max-w-[440px] md:mx-0 md:max-w-none">
+            <div className="relative aspect-[3/2] overflow-hidden rounded-2xl border border-white/10">
+              <Image
+                src="/images/institutions-hero-photo.jpg"
+                alt="Campus universitario"
+                fill
+                sizes="(min-width: 768px) 45vw, 90vw"
+                className="object-cover"
+                priority
+              />
+            </div>
           </div>
         </div>
       </section>
