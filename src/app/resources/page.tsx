@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { NewsletterForm } from "./NewsletterForm";
 
@@ -78,7 +79,7 @@ export default function ResourcesPage() {
           }}
         />
         <div className="relative z-[2] flex min-h-[500px] flex-col items-center justify-center px-5 py-16 text-center md:px-10 md:py-20">
-          <div className="mb-6 inline-flex items-center gap-1.5 rounded-full border border-fm-gold/35 bg-fm-gold/15 px-3.5 py-[5px]">
+          <div className="mb-6 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
             <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-gold">
               Centro de conocimiento
             </span>
@@ -112,7 +113,7 @@ export default function ResourcesPage() {
       <section className="bg-white">
         <div className="mx-auto max-w-[1100px] px-5 py-12 md:px-10 md:py-20">
           <div className="mb-14 text-center">
-            <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-fm-blue/20 bg-fm-blue/[0.08] px-3.5 py-1">
+            <div className="mb-4 inline-flex items-center border-l-2 border-fm-blue py-0.5 pl-3">
               <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-blue">
                 Guías y análisis
               </span>
@@ -159,15 +160,18 @@ export default function ResourcesPage() {
       <section className="bg-fm-surface">
         <div className="mx-auto max-w-[1100px] px-5 py-12 md:px-10 md:py-20">
           <div className="grid items-center gap-0 md:grid-cols-2 md:gap-[60px]">
-            <div className="hidden h-[420px] overflow-hidden rounded-2xl md:block">
-              <div
-                className="h-full w-full bg-cover bg-top"
-                style={{ backgroundImage: "url(https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&q=80&w=900)" }}
+            <div className="relative hidden h-[420px] overflow-hidden rounded-2xl md:block">
+              <Image
+                src="/images/resources-event-photo.jpg"
+                alt="Profesionales asistiendo a una jornada de formación"
+                fill
+                sizes="(min-width: 768px) 45vw, 0px"
+                className="object-cover"
               />
             </div>
 
             <div>
-              <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-fm-gold/25 bg-fm-gold/[0.12] px-3.5 py-1">
+              <div className="mb-5 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
                 <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-gold">
                   Por qué publicamos esto
                 </span>
@@ -250,7 +254,7 @@ export default function ResourcesPage() {
         <div className="relative z-[2] mx-auto max-w-[1100px] px-5 py-14 md:px-10 md:py-18">
           <div className="grid gap-8 md:grid-cols-2 md:gap-14">
             <div>
-              <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-fm-gold/30 bg-fm-gold/15 px-3.5 py-1">
+              <div className="mb-5 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
                 <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-gold">
                   FacultyMatch Monthly
                 </span>

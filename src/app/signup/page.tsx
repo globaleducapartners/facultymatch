@@ -153,9 +153,9 @@ function SignupForm() {
 
         <div>
           <div style={{
-            display: "inline-flex", alignItems: "center", gap: 6,
-            background: "rgba(255,106,26,0.16)", border: "1px solid rgba(255,106,26,0.35)",
-            borderRadius: 20, padding: "4px 12px", marginBottom: 20,
+            display: "inline-flex", alignItems: "center",
+            borderLeft: "2px solid #FF6A1A", paddingLeft: 12, paddingTop: 2, paddingBottom: 2,
+            marginBottom: 20,
           }}>
             <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#FF6A1A" }}>
               Para docentes y expertos
@@ -169,7 +169,7 @@ function SignupForm() {
               "Universidades y escuelas de negocio te buscan por tu conocimiento",
               "Publica tu perfil y que tu experiencia hable por ti",
               "Tú decides qué instituciones pueden contactarte",
-              "Gratuito siempre — sin comisiones",
+              "Gratuito siempre, sin comisiones",
             ].map((t, i) => (
               <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                 <div style={{

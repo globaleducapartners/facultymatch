@@ -76,9 +76,9 @@ function LoginContent() {
         {/* Cuerpo */}
         <div>
           <div style={{
-            display: "inline-flex", alignItems: "center", gap: 6,
-            background: "rgba(233,160,48,0.15)", border: "1px solid rgba(233,160,48,0.3)",
-            borderRadius: 20, padding: "4px 12px", marginBottom: 20,
+            display: "inline-flex", alignItems: "center",
+            borderLeft: `2px solid ${D.gold}`, paddingLeft: 12, paddingTop: 2, paddingBottom: 2,
+            marginBottom: 20,
           }}>
             <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.gold }}>
               Tu red académica
