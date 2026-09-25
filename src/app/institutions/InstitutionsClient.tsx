@@ -128,7 +128,7 @@ const COMPARISON = [
   },
   {
     feature: "Comisión por contratación",
-    fm: "0 € — nunca",
+    fm: "0 €, nunca",
     li: "El proceso manual tiene un coste oculto en horas",
   },
 ];
@@ -136,6 +136,9 @@ const COMPARISON = [
 export default function InstitutionsClient() {
   const { ref: directoryRef, inView: directoryVisible } = useInView(0.1);
   const { ref: howRef, inView: howVisible } = useInView(0.1);
+  const { ref: filtersRef, inView: filtersVisible } = useInView(0.1);
+  const { ref: comparisonRef, inView: comparisonVisible } = useInView(0.1);
+  const { ref: pricingRef, inView: pricingVisible } = useInView(0.1);
 
   return (
     <div className="bg-white font-sans">
@@ -166,20 +169,19 @@ export default function InstitutionsClient() {
           </h1>
 
           <p className="fm-animate-up fm-animate-up-delay-2 mb-10 max-w-[540px] text-[15px] leading-[1.75] text-white/60 md:text-[17px]">
-            Médicos en activo, investigadores, directivos y especialistas
-            que nunca publican su CV en portales de empleo. Aquí están
-            disponibles, verificados, con contacto directo y sin comisiones
-            de contratación.
+            Médicos, investigadores y directivos que nunca publican su CV
+            en portales de empleo. Aquí están disponibles, verificados y
+            con contacto directo.
           </p>
 
           <div className="fm-animate-up fm-animate-up-delay-3 flex flex-wrap justify-center gap-3">
             <Link href="/signup?intent=institution">
-              <button className="rounded-[10px] bg-white px-8 py-3.5 text-[15px] font-bold text-fm-ink">
+              <button className="rounded-[10px] bg-white px-8 py-3.5 text-[15px] font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                 Acceder al directorio
               </button>
             </Link>
             <Link href="/login">
-              <button className="rounded-[10px] border border-white/30 px-8 py-3.5 text-[15px] text-white/80">
+              <button className="rounded-[10px] border border-white/30 px-8 py-3.5 text-[15px] text-white/80 transition-transform duration-150 ease-out active:scale-[0.97]">
                 Ya tengo cuenta
               </button>
             </Link>
@@ -192,15 +194,12 @@ export default function InstitutionsClient() {
         <div className="mx-auto max-w-[1120px]">
           <div className="mb-10 flex flex-wrap items-end justify-between gap-5">
             <div>
-              <div className="mb-3 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
-                Muestra del directorio
-              </div>
               <h2 className="text-2xl font-extrabold leading-[1.1] tracking-[-0.04em] text-fm-ink md:text-[clamp(26px,2.8vw,36px)]">
                 Una muestra real de los perfiles disponibles.
               </h2>
             </div>
             <Link href="/signup?intent=institution" className="shrink-0">
-              <button className="rounded-[10px] bg-fm-blue px-6 py-[11px] text-[13px] font-bold text-white">
+              <button className="rounded-[10px] bg-fm-blue px-6 py-[11px] text-[13px] font-bold text-white transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                 Ver el directorio completo
               </button>
             </Link>
@@ -277,9 +276,6 @@ export default function InstitutionsClient() {
       {/* ── FILTROS ── */}
       <section className="bg-white px-6 py-16 md:px-8 md:py-[88px]">
         <div className="mx-auto max-w-[760px]">
-          <div className="mb-4 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
-            Búsqueda estructurada
-          </div>
           <h2 className="mb-[18px] text-2xl font-extrabold leading-[1.1] tracking-[-0.04em] text-fm-ink md:text-[clamp(26px,2.8vw,36px)]">
             Búsqueda pensada para quien contrata, no para quien busca trabajo.
           </h2>
@@ -288,9 +284,17 @@ export default function InstitutionsClient() {
             está estructurado exactamente con los criterios que usan los
             directores de programa al seleccionar profesorado.
           </p>
-          <div className="grid gap-2.5 sm:grid-cols-2">
+          <div ref={filtersRef} className="grid gap-2.5 sm:grid-cols-2">
             {FILTERS.map((f, i) => (
-              <div key={i} className="rounded-[10px] border border-fm-border bg-fm-surface px-4 py-3">
+              <div
+                key={i}
+                className="rounded-[10px] border border-fm-border bg-fm-surface px-4 py-3 transition-all duration-500"
+                style={{
+                  transitionDelay: `${i * 0.05}s`,
+                  opacity: filtersVisible ? 1 : 0,
+                  transform: filtersVisible ? "translateY(0)" : "translateY(14px)",
+                }}
+              >
                 <div className="mb-1 flex items-center gap-[7px]">
                   <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-fm-gold" />
                   <span className="text-[13px] font-semibold text-fm-ink">{f.label}</span>
@@ -322,7 +326,9 @@ export default function InstitutionsClient() {
                   borderTop: "3px solid #1B4FD8",
                   transitionDelay: `${i * 0.12}s`,
                   opacity: howVisible ? 1 : 0,
-                  transform: howVisible ? "translateY(0)" : "translateY(20px)",
+                  // El paso central queda un poco más elevado en reposo —
+                  // rompe a propósito la simetría de "3 tarjetas iguales".
+                  transform: howVisible ? `translateY(${i === 1 ? -10 : 0}px)` : "translateY(20px)",
                 }}
               >
                 <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-fm-blue/[0.08]">
@@ -343,21 +349,26 @@ export default function InstitutionsClient() {
       <section className="bg-white px-6 py-16 md:px-8 md:py-[88px]">
         <div className="mx-auto max-w-[1120px]">
           <div className="mb-12 text-center">
-            <div className="mb-3.5 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
-              Por qué un directorio dedicado
-            </div>
             <h2 className="mb-4 text-[26px] font-extrabold tracking-[-0.04em] text-fm-ink md:text-[clamp(28px,3vw,40px)]">
               Una red generalista tiene millones de perfiles.<br />Aquí están los que enseñan.
             </h2>
             <p className="mx-auto max-w-[520px] text-[15px] text-fm-muted">
-              No todos los profesionales quieren dar clases — ni saben que pueden.
+              No todos los profesionales quieren dar clases, ni saben que pueden.
               FacultyMatch solo incluye perfiles que se han registrado explícitamente
               para dar docencia y están disponibles ahora.
             </p>
           </div>
-          <div className="mx-auto grid max-w-[840px] gap-4 md:grid-cols-2">
+          <div ref={comparisonRef} className="mx-auto grid max-w-[840px] gap-4 md:grid-cols-2">
             {COMPARISON.map((row, i) => (
-              <div key={i} className="rounded-[14px] border border-fm-border bg-fm-surface px-[22px] py-5">
+              <div
+                key={i}
+                className="rounded-[14px] border border-fm-border bg-fm-surface px-[22px] py-5 transition-all duration-500"
+                style={{
+                  transitionDelay: `${i * 0.08}s`,
+                  opacity: comparisonVisible ? 1 : 0,
+                  transform: comparisonVisible ? "translateY(0)" : "translateY(14px)",
+                }}
+              >
                 <div className="mb-3.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#8896B0]">
                   {row.feature}
                 </div>
@@ -395,9 +406,6 @@ export default function InstitutionsClient() {
       <section id="precios" className="bg-white px-6 py-16 md:px-8 md:py-[88px]">
         <div className="mx-auto max-w-[1120px]">
           <div className="mb-13 text-center">
-            <div className="mb-3.5 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
-              Precios para instituciones
-            </div>
             <h2 className="mb-3 text-[26px] font-extrabold tracking-[-0.04em] text-fm-ink md:text-[clamp(28px,3vw,40px)]">
               Empieza gratis. Escala cuando lo necesites.
             </h2>
@@ -406,9 +414,15 @@ export default function InstitutionsClient() {
             </p>
           </div>
 
-          <div className="mx-auto grid max-w-[1060px] gap-5 md:grid-cols-3">
+          <div ref={pricingRef} className="mx-auto grid max-w-[1060px] gap-5 md:grid-cols-3">
             {/* Essential */}
-            <div className="flex flex-col rounded-[20px] border border-fm-border bg-fm-surface p-7">
+            <div
+              className="flex flex-col rounded-[20px] border border-fm-border bg-fm-surface p-7 transition-all duration-500"
+              style={{
+                opacity: pricingVisible ? 1 : 0,
+                transform: pricingVisible ? "translateY(0)" : "translateY(14px)",
+              }}
+            >
               <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#8896B0]">
                 Plan Essential
               </div>
@@ -427,14 +441,21 @@ export default function InstitutionsClient() {
                 ))}
               </div>
               <Link href="/signup?intent=institution">
-                <button className="w-full rounded-[10px] border-[1.5px] border-fm-navy py-3 text-sm font-semibold text-fm-navy">
+                <button className="w-full rounded-[10px] border-[1.5px] border-fm-navy py-3 text-sm font-semibold text-fm-navy transition-transform duration-150 ease-out active:scale-[0.97]">
                   Registrar mi institución
                 </button>
               </Link>
             </div>
 
             {/* Growth */}
-            <div className="relative flex flex-col rounded-[20px] bg-fm-navy p-7 shadow-[0_8px_40px_rgba(27,79,216,0.22)]">
+            <div
+              className="relative flex flex-col rounded-[20px] bg-fm-navy p-7 shadow-[0_8px_40px_rgba(27,79,216,0.22)] transition-all duration-500"
+              style={{
+                transitionDelay: "0.08s",
+                opacity: pricingVisible ? 1 : 0,
+                transform: pricingVisible ? "translateY(0)" : "translateY(14px)",
+              }}
+            >
               <div className="absolute right-5 top-5 rounded-full bg-fm-gold px-2.5 py-1 font-sans text-[10px] font-extrabold uppercase tracking-[0.08em] text-fm-ink">
                 Más popular
               </div>
@@ -456,14 +477,21 @@ export default function InstitutionsClient() {
                 ))}
               </div>
               <Link href="/checkout?plan=institution-growth">
-                <button className="w-full rounded-[10px] bg-fm-gold py-3 text-sm font-bold text-fm-ink">
-                  Activar ahora — 35 €/mes
+                <button className="w-full rounded-[10px] bg-fm-gold py-3 text-sm font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
+                  Activar ahora · 35 €/mes
                 </button>
               </Link>
             </div>
 
             {/* Professional */}
-            <div className="relative flex flex-col rounded-[20px] border border-fm-gold/25 bg-fm-dark p-7">
+            <div
+              className="relative flex flex-col rounded-[20px] border border-fm-gold/25 bg-fm-dark p-7 transition-all duration-500"
+              style={{
+                transitionDelay: "0.16s",
+                opacity: pricingVisible ? 1 : 0,
+                transform: pricingVisible ? "translateY(0)" : "translateY(14px)",
+              }}
+            >
               <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-fm-gold">
                 Plan Professional
               </div>
@@ -482,7 +510,7 @@ export default function InstitutionsClient() {
                 ))}
               </div>
               <Link href="/checkout?plan=institution-pro">
-                <button className="w-full rounded-[10px] border border-white/20 bg-white/10 py-3 text-sm font-bold text-white">
+                <button className="w-full rounded-[10px] border border-white/20 bg-white/10 py-3 text-sm font-bold text-white transition-all duration-150 ease-out hover:bg-white/20 active:scale-[0.97]">
                   Activar Professional
                 </button>
               </Link>
@@ -491,7 +519,7 @@ export default function InstitutionsClient() {
                 <a href="mailto:support@facultymatch.app?subject=Prueba%20Professional%2014%20d%C3%ADas" className="font-bold text-fm-gold">
                   14 días de prueba gratuita
                 </a>
-                {" "}— sin tarjeta
+                , sin tarjeta
               </p>
             </div>
           </div>
@@ -519,12 +547,12 @@ export default function InstitutionsClient() {
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
             <Link href="/signup?intent=institution">
-              <button className="rounded-[10px] bg-white px-[30px] py-3.5 text-sm font-bold text-fm-ink">
+              <button className="rounded-[10px] bg-white px-[30px] py-3.5 text-sm font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                 Acceder al directorio
               </button>
             </Link>
             <Link href="/signup">
-              <button className="rounded-[10px] border-[1.5px] border-white/25 px-[30px] py-3.5 text-sm text-white/75">
+              <button className="rounded-[10px] border-[1.5px] border-white/25 px-[30px] py-3.5 text-sm text-white/75 transition-transform duration-150 ease-out active:scale-[0.97]">
                 Soy docente
               </button>
             </Link>
