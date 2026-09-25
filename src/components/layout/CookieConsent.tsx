@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { X, Cookie } from "lucide-react";
+import { CONSENT_STORAGE_KEY, CONSENT_CHANGED_EVENT } from "@/lib/consent";
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem("cookie_consent");
+    const consent = localStorage.getItem(CONSENT_STORAGE_KEY);
     if (!consent) {
       // Small delay so it doesn't flash on first load
       const timer = setTimeout(() => setVisible(true), 1000);
@@ -16,15 +17,14 @@ export function CookieConsent() {
     }
   }, []);
 
-  const accept = () => {
-    localStorage.setItem("cookie_consent", "accepted");
+  const setConsent = (value: "accepted" | "rejected") => {
+    localStorage.setItem(CONSENT_STORAGE_KEY, value);
+    window.dispatchEvent(new Event(CONSENT_CHANGED_EVENT));
     setVisible(false);
   };
 
-  const reject = () => {
-    localStorage.setItem("cookie_consent", "rejected");
-    setVisible(false);
-  };
+  const accept = () => setConsent("accepted");
+  const reject = () => setConsent("rejected");
 
   if (!visible) return null;
 
