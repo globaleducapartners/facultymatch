@@ -13,6 +13,12 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || 'FacultyMatch <noreply@facultymatch.app>';
 
 export async function signUp(formData: FormData, isSSO: boolean = false) {
+  // Honeypot anti-spam: campo invisible que los bots simples rellenan.
+  // Si llega con valor, se descarta el envío sin crear nada ni dar pistas.
+  if ((formData.get("website") as string | null)?.trim()) {
+    return {};
+  }
+
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const fullName = formData.get("fullName") as string;

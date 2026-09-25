@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-server';
 
 export async function POST(req: NextRequest) {
-  const { email } = await req.json();
+  const { email, website } = await req.json();
+
+  // Honeypot anti-spam: si el campo invisible llega relleno, es un bot.
+  // Se responde como si hubiera funcionado, sin guardar nada.
+  if (typeof website === 'string' && website.trim()) {
+    return NextResponse.json({ ok: true });
+  }
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: 'Email inválido' }, { status: 400 });

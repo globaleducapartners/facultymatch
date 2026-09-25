@@ -6,6 +6,7 @@ import { useState } from "react";
 // no hacía nada. Ahora envía a /api/newsletter (que ya existía).
 export function NewsletterForm() {
   const [email, setEmail] = useState("");
+  const [website, setWebsite] = useState(""); // honeypot anti-spam
   const [state, setState] = useState<"idle" | "loading" | "ok" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -18,7 +19,7 @@ export function NewsletterForm() {
       const res = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ email: email.trim(), website }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -45,6 +46,17 @@ export function NewsletterForm() {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col justify-center gap-3">
+      {/* Honeypot anti-spam: invisible para personas */}
+      <input
+        type="text"
+        name="website"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+      />
       <div className="flex overflow-hidden rounded-[9px] border border-white/15 bg-white/[0.07]">
         <input
           type="email"

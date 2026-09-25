@@ -59,6 +59,8 @@ function SignupForm() {
   const [showPwd,   setShowPwd]   = useState(false);
   const [terms,     setTerms]     = useState(false);
   const [errors,    setErrors]    = useState<Record<string, string>>({});
+  // Honeypot: campo invisible para humanos, que los bots simples rellenan.
+  const [website,   setWebsite]   = useState("");
 
   // ── Validación ──────────────────────────────────────────────────────────────
   const validate = () => {
@@ -91,6 +93,7 @@ function SignupForm() {
       const fullName = `${firstName.trim()} ${lastName.trim()}`;
 
       const formData = new FormData();
+      formData.append("website", website);
       formData.append("email", email.trim().toLowerCase());
       formData.append("password", password);
       formData.append("fullName", fullName);
@@ -261,6 +264,19 @@ function SignupForm() {
 
           {/* Form */}
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            {/* Honeypot anti-spam: oculto para personas, visible para bots que
+                rellenan todos los campos del formulario. Si llega con valor,
+                el servidor descarta el envío en silencio. */}
+            <input
+              type="text"
+              name="website"
+              value={website}
+              onChange={e => setWebsite(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+            />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
                 <label style={lbl}>Nombre <span style={{ color: D.error }}>*</span></label>
