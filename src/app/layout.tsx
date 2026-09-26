@@ -33,8 +33,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: "FacultyMatch | Directorio de talento para la educación superior",
     description: "El directorio de docentes, investigadores y expertos para instituciones educativas. Perfiles revisados. Contacto directo. Sin intermediarios.",
-    images: ["/icon-512.png"],
-  }
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "FacultyMatch" }],
+    locale: "es_ES",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FacultyMatch | Directorio de talento para la educación superior",
+    description: "El directorio de docentes, investigadores y expertos para instituciones educativas. Perfiles revisados. Contacto directo. Sin intermediarios.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({

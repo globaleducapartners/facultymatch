@@ -12,7 +12,16 @@ export const metadata: Metadata = {
     title: "FacultyMatch | Directorio de talento para la educación superior",
     description:
       "Docentes, investigadores y expertos conectados con instituciones que saben lo que buscan.",
-    images: ["/icon-512.png"],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "FacultyMatch" }],
+    locale: "es_ES",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FacultyMatch | Directorio de talento para la educación superior",
+    description:
+      "Docentes, investigadores y expertos conectados con instituciones que saben lo que buscan.",
+    images: ["/og-image.png"],
   },
 };
 

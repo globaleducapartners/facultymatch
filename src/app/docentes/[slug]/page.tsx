@@ -43,7 +43,13 @@ export async function generateMetadata({
     .eq("estado_perfil", "verificado")
     .maybeSingle();
 
-  if (!faculty) return {};
+  if (!faculty) {
+    return {
+      title: "Perfil no encontrado | FacultyMatch",
+      description: "Este perfil docente no existe o ya no está disponible públicamente.",
+      robots: { index: false, follow: true },
+    };
+  }
 
   const { data: up } = await admin
     .from("user_profiles")
@@ -53,8 +59,11 @@ export async function generateMetadata({
 
   const name = up?.full_name || "Docente";
   const description = faculty?.headline
-    ? `${faculty.headline}${faculty?.current_institution ? ` — ${faculty.current_institution}` : ""}`
+    ? `${faculty.headline}${faculty?.current_institution ? ` · ${faculty.current_institution}` : ""}`
     : `Perfil académico de ${name} en FacultyMatch`;
+  const ogImage = up?.avatar_url
+    ? [{ url: up.avatar_url, width: 400, height: 400 }]
+    : [{ url: "/og-image.png", width: 1200, height: 630, alt: "FacultyMatch" }];
 
   return {
     title: `${name} | FacultyMatch`,
@@ -64,7 +73,13 @@ export async function generateMetadata({
       description,
       type: "profile",
       url: `${BASE}/docentes/${slug}`,
-      images: up?.avatar_url ? [{ url: up.avatar_url, width: 400, height: 400 }] : undefined,
+      images: ogImage,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${name} | FacultyMatch`,
+      description,
+      images: ogImage.map((i) => i.url),
     },
     alternates: { canonical: `${BASE}/docentes/${slug}` },
     robots: { index: true, follow: true },

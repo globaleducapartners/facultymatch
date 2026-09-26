@@ -3,6 +3,15 @@ import { createClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { Building2, Search, ArrowRight } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
+import type { Metadata } from "next";
+
+// Puerta de acceso (sign-up/redirección), no contenido propio — sin valor
+// de indexación único, así que fuera del índice de búsqueda.
+export const metadata: Metadata = {
+  title: "Directorio de docentes verificados | FacultyMatch",
+  description: "Accede con tu cuenta institucional para explorar perfiles docentes verificados y encontrar el profesorado adecuado para tus programas.",
+  robots: { index: false, follow: true },
+};
 
 export default async function DirectoryPage({
   searchParams,
