@@ -3,9 +3,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Footer } from "@/components/layout/Footer";
 
-// ─── Mark: "encuentro" — dos círculos que se solapan ──────────────────────
+// ─── Mark: birrete con el punto naranja ───────────────────────────────────
 function Mark({ size = 32 }: { size?: number }) {
   return (
     <svg
@@ -497,11 +498,12 @@ function SplitDocentes() {
           {/* Foto distinta a la del hero (esa es vídeo de otra persona) —
               faculty-benefits.jpg: profesional presentando, encaja con
               "lo que sabes hacer tiene demanda en las aulas". */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src="/images/faculty-benefits.jpg"
             alt="Profesional con experiencia impartiendo formación"
-            className="absolute inset-0 h-full w-full object-cover"
+            fill
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-fm-dark/40 to-transparent" />
           <div className="absolute bottom-5 left-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-fm-dark/60 px-3.5 py-2 text-xs font-semibold text-white backdrop-blur-sm">

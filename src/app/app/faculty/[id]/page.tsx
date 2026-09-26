@@ -1,5 +1,6 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import {
   GraduationCap, Globe, MapPin, Award,
   Briefcase, BookOpen, ExternalLink, FileText,
@@ -216,10 +217,12 @@ export default async function FacultyProfilePage({
         {/* Banner */}
         <div className="relative h-40 sm:h-52">
           {faculty?.banner_url ? (
-            <img
+            <Image
               src={faculty.banner_url}
               alt=""
-              className="absolute inset-0 w-full h-full object-cover"
+              fill
+              sizes="(min-width: 640px) 800px, 100vw"
+              className="object-cover"
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#4F7FE8]" />
@@ -232,11 +235,15 @@ export default async function FacultyProfilePage({
           <div className="-mt-14 mb-4 flex items-end justify-between">
             <div className="relative">
               {facultyUserProfile?.avatar_url ? (
-                <img
-                  src={facultyUserProfile.avatar_url}
-                  alt={facultyName}
-                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover border-4 border-white shadow-lg"
-                />
+                <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden border-4 border-white shadow-lg">
+                  <Image
+                    src={facultyUserProfile.avatar_url}
+                    alt={facultyName}
+                    fill
+                    sizes="112px"
+                    className="object-cover"
+                  />
+                </div>
               ) : (
                 <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#1B4FD8] text-white flex items-center justify-center text-3xl font-bold border-4 border-white shadow-lg">
                   {initials}

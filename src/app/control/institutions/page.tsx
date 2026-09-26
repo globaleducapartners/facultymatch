@@ -294,7 +294,7 @@ export default async function ControlInstitutionsPage() {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-navy to-talentia-blue flex items-center justify-center flex-shrink-0">
                       {inst.logo_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={inst.logo_url} alt="" className="w-full h-full object-cover rounded-xl" />
+                        <img src={inst.logo_url} alt={`Logo de ${inst.name || "la institución"}`} className="w-full h-full object-cover rounded-xl" />
                       ) : (
                         <Building2 size={20} className="text-white" />
                       )}

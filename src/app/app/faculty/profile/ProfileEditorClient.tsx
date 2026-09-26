@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useFormStatus } from "react-dom";
 import { OrcidImportModal } from "./OrcidImportModal";
 import { saveOrcidImport } from "./actions";
@@ -316,11 +317,11 @@ export function ProfileEditorClient({
                   background: avatarUrl ? "transparent" : D.navy,
                   border: `4px solid ${D.white}`,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  overflow: "hidden",
+                  overflow: "hidden", position: "relative",
                   boxShadow: "0 4px 20px rgba(7,19,38,0.18)",
                 }}>
                   {avatarUrl
-                    ? <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ? <Image src={avatarUrl} alt={fullName ? `Foto de perfil de ${fullName}` : "Tu foto de perfil"} fill sizes="120px" style={{ objectFit: "cover" }} />
                     : <span style={{ color: "#fff", fontSize: 34, fontWeight: 800 }}>{initials || "?"}</span>
                   }
                 </div>

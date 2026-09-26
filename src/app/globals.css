@@ -63,7 +63,9 @@
   --color-fm-brass:  #E9A030;
   --color-fm-cream:  #F2F6FC;
   --color-fm-paper:  #F2F6FC;
-  --color-fm-faint:  #8896B0;
+  /* #8896B0 daba 2.98:1 sobre blanco — no pasaba WCAG AA (4.5:1) en texto
+     normal. Oscurecido manteniendo el mismo tono azulado; ahora 5.07:1. */
+  --color-fm-faint:  #5E6F8E;
 }
 
 :root {

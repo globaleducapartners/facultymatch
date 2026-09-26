@@ -141,6 +141,13 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
       return { error: "Por favor completa todos los campos requeridos." };
     }
 
+    // El cliente ya exige 8 caracteres mínimo, pero un POST directo al
+    // servidor lo saltaba — solo se comprobaba que password no estuviera
+    // vacío.
+    if (password.length < 8) {
+      return { error: "La contraseña debe tener al menos 8 caracteres." };
+    }
+
     // Use admin client to create user already confirmed — no email verification needed
     const admin = createAdminClient();
     const { data, error } = await admin.auth.admin.createUser({
