@@ -6,7 +6,7 @@ import {
   Eye, CheckCircle2, XCircle, Loader2, X,
   Mail, Phone, MapPin, Linkedin, GraduationCap,
   ShieldCheck, AlignLeft, Clock, AlertCircle, RefreshCw,
-  Globe, FileText, Award,
+  Globe, FileText, Award, ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -45,6 +45,8 @@ export type Faculty = {
   orcid_id: string | null;
   is_phd: boolean;
   name_visibility: string;
+  profile_slug?: string | null;
+  visibility?: string | null;
   documents: FacultyDoc[];
 };
 
@@ -382,9 +384,20 @@ export default function PendingFacultyPanel({
                   </span>
                 </div>
               </div>
-              <button onClick={closeDrawer} className="text-gray-400 hover:text-gray-600 mt-1">
-                <X size={20} />
-              </button>
+              <div className="flex items-center gap-2 mt-1">
+                <a
+                  href={`/app/faculty/${selected.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+                  title="Ver el perfil completo como lo ve una institución en la plataforma. Aún no tiene enlace público — solo lo tienen los perfiles verificados."
+                >
+                  <ExternalLink size={13} /> Ver en la plataforma
+                </a>
+                <button onClick={closeDrawer} className="text-gray-400 hover:text-gray-600">
+                  <X size={20} />
+                </button>
+              </div>
             </div>
 
             {/* Action Bar */}

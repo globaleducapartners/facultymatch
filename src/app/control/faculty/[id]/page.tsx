@@ -6,7 +6,7 @@ import {
   Mail, Eye, GraduationCap, Globe, MapPin, Award, BookOpen, FileText,
   Languages, Phone, Link as LinkIcon, Calendar, Clock, ChevronRight,
   EyeOff, CheckCircle2, XCircle, AlertTriangle, MessageSquare, User,
-  Trash2, Ban, Send, Bell,
+  Trash2, Ban, Send, Bell, ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 import { FacultyActions } from "./FacultyActionsClient";
@@ -186,6 +186,28 @@ export default async function FacultyDetailPage({
               )}
             </div>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <a
+            href={`/app/faculty/${id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+            title="Ver el perfil completo como lo ve una institución en la plataforma"
+          >
+            <ExternalLink size={13} /> Ver en la plataforma
+          </a>
+          {fp.estado_perfil === "verificado" && fp.profile_slug && fp.visibility === "public" && (
+            <a
+              href={`/docentes/${fp.profile_slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+              title="Enlace público, visible para cualquiera"
+            >
+              <ExternalLink size={13} /> Enlace público
+            </a>
+          )}
         </div>
       </div>
 

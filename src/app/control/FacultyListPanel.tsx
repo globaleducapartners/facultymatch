@@ -221,10 +221,21 @@ export default function FacultyListPanel({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors"
-                  title="Ver perfil público"
+                  title="Ver el perfil completo como lo ve una institución en la plataforma"
                 >
-                  <ExternalLink size={13} /> Ver perfil
+                  <ExternalLink size={13} /> Ver en la plataforma
                 </a>
+                {mode === "approved" && selected.profile_slug && selected.visibility === "public" && (
+                  <a
+                    href={`/docentes/${selected.profile_slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+                    title="Enlace público, visible para cualquiera"
+                  >
+                    <ExternalLink size={13} /> Enlace público
+                  </a>
+                )}
                 <button onClick={closeDrawer} className="text-gray-400 hover:text-gray-600 p-1">
                   <X size={20} />
                 </button>

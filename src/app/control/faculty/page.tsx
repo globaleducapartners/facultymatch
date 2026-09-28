@@ -40,7 +40,7 @@ export default async function FacultyListPage({
   // Fetch faculty_profiles ordered by view_count DESC (primary sort)
   let profileQuery = admin
     .from("faculty_profiles")
-    .select("user_id, view_count, visibility, visibility_source, visibility_updated_at, headline, country, city, location, bio, availability, academic_level, degrees, institutions_taught, faculty_areas, languages, aneca_accreditation, is_phd, estado_perfil")
+    .select("user_id, profile_slug, view_count, visibility, visibility_source, visibility_updated_at, headline, country, city, location, bio, availability, academic_level, degrees, institutions_taught, faculty_areas, languages, aneca_accreditation, is_phd, estado_perfil")
     .order("view_count", { ascending: false })
     .limit(200);
 

@@ -45,8 +45,11 @@ export default async function FacultyLayout({
   const role = profile?.role || (user.user_metadata?.role as string) || null;
 
   // Institution users can view individual faculty profiles (/app/faculty/[id])
-  // but not the faculty dashboard pages (profile editing, settings, etc.)
-  if (role && role !== "faculty" && role !== "institution") {
+  // but not the faculty dashboard pages (profile editing, settings, etc.).
+  // Admins necesitan lo mismo desde /control (botón "Ver perfil") — antes
+  // los expulsaba a /app/institution y el botón del panel no llevaba a
+  // ningún sitio útil.
+  if (role && role !== "faculty" && role !== "institution" && role !== "admin" && role !== "super_admin") {
     redirect("/app/institution");
   }
 

@@ -45,7 +45,7 @@ export default async function ApprovedPage() {
     // Fetch faculty_profiles data (we already have the main rows, but this gives us more fields)
     const { data: fps } = await admin
       .from("faculty_profiles")
-      .select("user_id, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline, updated_at, degrees, languages, website, google_scholar_id, orcid_id, is_phd, aneca_accreditation, academic_level, name_visibility")
+      .select("user_id, profile_slug, visibility, faculty_areas, availability, modalities, linkedin_url, bio, location, city, country, headline, updated_at, degrees, languages, website, google_scholar_id, orcid_id, is_phd, aneca_accreditation, academic_level, name_visibility")
       .in("user_id", ids);
     if (fps) fps.forEach((fp: any) => { fpMap[fp.user_id] = fp; });
 
@@ -92,6 +92,8 @@ export default async function ApprovedPage() {
       orcid_id: fp.orcid_id || null,
       is_phd: fp.is_phd || user.is_phd || false,
       name_visibility: fp.name_visibility || "public",
+      profile_slug: fp.profile_slug || null,
+      visibility: fp.visibility || null,
       documents: docsMap[p.user_id] || [],
     };
   });
