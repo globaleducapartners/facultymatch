@@ -80,17 +80,17 @@ export async function sendFollowUp(contactId: string, message: string) {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;max-width:600px;overflow:hidden;">
-  <tr><td style="background:#0B1220;padding:28px 40px;text-align:center;">
-    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+  <tr><td style="background:#0D2240;padding:28px 40px;text-align:center;">
+    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
   </td></tr>
   <tr><td style="padding:40px;">
-    <h2 style="margin:0 0 8px;color:#0B1220;font-size:20px;font-weight:900;">Nuevo mensaje de ${inst?.name || "una institución"}</h2>
+    <h2 style="margin:0 0 8px;color:#0D2240;font-size:20px;font-weight:900;">Nuevo mensaje de ${inst?.name || "una institución"}</h2>
     <p style="color:#64748b;font-size:15px;margin:0 0 24px;">Hola ${facultyName}, tienes un nuevo mensaje de seguimiento:</p>
-    <div style="background:#EFF6FF;border-left:3px solid #2563EB;border-radius:0 8px 8px 0;padding:20px;margin-bottom:24px;">
-      <p style="margin:0;font-size:14px;color:#0B1220;line-height:1.7;">${message.replace(/\n/g, "<br>")}</p>
+    <div style="background:#EFF6FF;border-left:3px solid #1B4FD8;border-radius:0 8px 8px 0;padding:20px;margin-bottom:24px;">
+      <p style="margin:0;font-size:14px;color:#0D2240;line-height:1.7;">${message.replace(/\n/g, "<br>")}</p>
     </div>
     <a href="https://www.facultymatch.app/app/faculty/requests"
-       style="display:inline-block;background:#2563EB;color:#fff;padding:14px 28px;border-radius:10px;font-weight:700;text-decoration:none;font-size:15px;">
+       style="display:inline-block;background:#1B4FD8;color:#fff;padding:14px 28px;border-radius:10px;font-weight:700;text-decoration:none;font-size:15px;">
       Ver en mi panel →
     </a>
   </td></tr>

@@ -162,8 +162,8 @@ function emailWrapper(content: string) {
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;max-width:600px;">
   <!-- Header -->
-  <tr><td style="background:#0B1220;padding:28px 40px;text-align:center;">
-    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+  <tr><td style="background:#0D2240;padding:28px 40px;text-align:center;">
+    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
   </td></tr>
   <!-- Body -->
   <tr><td style="padding:40px;">
@@ -185,10 +185,10 @@ function buildApprovalEmail(name: string) {
       <div style="width:64px;height:64px;background:#dcfce7;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
         <span style="font-size:32px;">✅</span>
       </div>
-      <h1 style="margin:0;color:#0B1220;font-size:26px;font-weight:900;">¡Tu perfil ha sido verificado, ${name}!</h1>
+      <h1 style="margin:0;color:#0D2240;font-size:26px;font-weight:900;">¡Tu perfil ha sido verificado, ${name}!</h1>
       <p style="color:#64748b;font-size:16px;margin:12px 0 0;line-height:1.6;">
         Hemos revisado tu perfil y cumple con todos nuestros estándares de calidad.
-        A partir de ahora eres parte de la <strong style="color:#0B1220;">red verificada de FacultyMatch</strong>.
+        A partir de ahora eres parte de la <strong style="color:#0D2240;">red verificada de FacultyMatch</strong>.
       </p>
     </div>
     <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:24px;margin-bottom:28px;">
@@ -200,19 +200,19 @@ function buildApprovalEmail(name: string) {
       </ul>
     </div>
     <div style="text-align:center;margin-bottom:32px;">
-      <a href="${SITE}/app/faculty" style="display:inline-block;background:#F97316;color:#fff;padding:16px 36px;border-radius:12px;font-weight:900;font-size:16px;text-decoration:none;">
+      <a href="${SITE}/app/faculty" style="display:inline-block;background:#FF6A1A;color:#fff;padding:16px 36px;border-radius:12px;font-weight:900;font-size:16px;text-decoration:none;">
         Acceder a mi dashboard →
       </a>
     </div>
     <div style="border-top:1px solid #f1f5f9;padding-top:24px;">
-      <p style="margin:0 0 16px;font-weight:900;color:#0B1220;font-size:14px;">Próximos pasos:</p>
+      <p style="margin:0 0 16px;font-weight:900;color:#0D2240;font-size:14px;">Próximos pasos:</p>
       ${[
         ["01", "Completa tu perfil al 100% para aparecer primero"],
         ["02", "Actualiza tu disponibilidad regularmente"],
         ["03", "Responde rápido a las instituciones que te contacten"],
       ].map(([n, t]) => `
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-        <span style="background:#0B1220;color:#fff;font-weight:900;font-size:12px;padding:4px 10px;border-radius:8px;flex-shrink:0;">${n}</span>
+        <span style="background:#0D2240;color:#fff;font-weight:900;font-size:12px;padding:4px 10px;border-radius:8px;flex-shrink:0;">${n}</span>
         <span style="color:#475569;font-size:14px;">${t}</span>
       </div>`).join("")}
     </div>
@@ -221,7 +221,7 @@ function buildApprovalEmail(name: string) {
 
 function buildRejectionEmail(name: string, reason: string) {
   return emailWrapper(`
-    <h1 style="margin:0 0 12px;color:#0B1220;font-size:24px;font-weight:900;">Hola ${name},</h1>
+    <h1 style="margin:0 0 12px;color:#0D2240;font-size:24px;font-weight:900;">Hola ${name},</h1>
     <p style="color:#64748b;font-size:15px;line-height:1.7;margin:0 0 20px;">
       Gracias por registrarte en FacultyMatch. Hemos revisado tu perfil y, de momento,
       no hemos podido completar la verificación.
@@ -235,17 +235,17 @@ function buildRejectionEmail(name: string, reason: string) {
       y nuestro equipo lo revisará de nuevo.
     </p>
     <div style="text-align:center;margin-bottom:16px;">
-      <a href="${SITE}/app/faculty/profile" style="display:inline-block;background:#2563EB;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
+      <a href="${SITE}/app/faculty/profile" style="display:inline-block;background:#1B4FD8;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
         Mejorar mi perfil →
       </a>
     </div>
-    <p style="text-align:center;color:#94a3b8;font-size:13px;">Si tienes dudas, escríbenos a <a href="mailto:support@facultymatch.app" style="color:#2563EB;">support@facultymatch.app</a></p>
+    <p style="text-align:center;color:#94a3b8;font-size:13px;">Si tienes dudas, escríbenos a <a href="mailto:support@facultymatch.app" style="color:#1B4FD8;">support@facultymatch.app</a></p>
   `);
 }
 
 function buildRequiresInfoEmail(name: string, message: string) {
   return emailWrapper(`
-    <h1 style="margin:0 0 12px;color:#0B1220;font-size:24px;font-weight:900;">Hola ${name},</h1>
+    <h1 style="margin:0 0 12px;color:#0D2240;font-size:24px;font-weight:900;">Hola ${name},</h1>
     <p style="color:#64748b;font-size:15px;line-height:1.7;margin:0 0 20px;">
       Estamos revisando tu perfil y necesitamos un poco más de información para completar la verificación.
     </p>
@@ -254,10 +254,10 @@ function buildRequiresInfoEmail(name: string, message: string) {
       <p style="margin:0;color:#1e40af;font-size:14px;line-height:1.6;">${message}</p>
     </div>
     <div style="text-align:center;margin-bottom:16px;">
-      <a href="${SITE}/app/faculty/profile" style="display:inline-block;background:#F97316;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
+      <a href="${SITE}/app/faculty/profile" style="display:inline-block;background:#FF6A1A;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
         Completar mi perfil →
       </a>
     </div>
-    <p style="text-align:center;color:#94a3b8;font-size:13px;">¿Tienes dudas? <a href="mailto:support@facultymatch.app" style="color:#2563EB;">support@facultymatch.app</a></p>
+    <p style="text-align:center;color:#94a3b8;font-size:13px;">¿Tienes dudas? <a href="mailto:support@facultymatch.app" style="color:#1B4FD8;">support@facultymatch.app</a></p>
   `);
 }

@@ -141,8 +141,8 @@ function emailWrapper(content: string) {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;max-width:600px;">
-  <tr><td style="background:#0B1220;padding:28px 40px;text-align:center;">
-    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+  <tr><td style="background:#0D2240;padding:28px 40px;text-align:center;">
+    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
   </td></tr>
   <tr><td style="padding:40px;">${content}</td></tr>
   <tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
@@ -165,11 +165,11 @@ function buildInvitationEmail(
       <div style="width:64px;height:64px;background:#eff6ff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
         <span style="font-size:32px;">🎓</span>
       </div>
-      <h1 style="margin:0;color:#0B1220;font-size:24px;font-weight:900;">
+      <h1 style="margin:0;color:#0D2240;font-size:24px;font-weight:900;">
         ${inviterFirstName} te invita a unirte a FacultyMatch
       </h1>
       <p style="color:#64748b;font-size:15px;margin:12px 0 0;line-height:1.6;">
-        <strong style="color:#0B1220;">${inviterFullName}</strong> quiere conectarte con las mejores
+        <strong style="color:#0D2240;">${inviterFullName}</strong> quiere conectarte con las mejores
         instituciones educativas de habla hispana.
       </p>
     </div>
@@ -184,7 +184,7 @@ function buildInvitationEmail(
 
     <div style="text-align:center;margin-bottom:28px;">
       <a href="${registrationLink}"
-         style="display:inline-block;background:#F97316;color:#fff;padding:16px 40px;border-radius:12px;font-weight:900;font-size:16px;text-decoration:none;">
+         style="display:inline-block;background:#FF6A1A;color:#fff;padding:16px 40px;border-radius:12px;font-weight:900;font-size:16px;text-decoration:none;">
         Unirme a FacultyMatch →
       </a>
       <p style="margin:12px 0 0;color:#94a3b8;font-size:12px;">
@@ -194,7 +194,7 @@ function buildInvitationEmail(
 
     <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;text-align:center;">
       <p style="margin:0 0 4px;color:#64748b;font-size:12px;">¿El enlace no funciona? Usa este código al registrarte:</p>
-      <p style="margin:0;font-family:monospace;font-size:18px;font-weight:900;color:#0B1220;letter-spacing:2px;">${code}</p>
+      <p style="margin:0;font-family:monospace;font-size:18px;font-weight:900;color:#0D2240;letter-spacing:2px;">${code}</p>
     </div>
   `);
 }

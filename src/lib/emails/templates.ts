@@ -1,8 +1,8 @@
 export const COLORS = {
-  navy: "#1E3A8A",
-  blue: "#2563EB",
-  cyan: "#06B6D4",
-  orange: "#F97316",
+  navy: "#0D2240",
+  blue: "#1B4FD8",
+  cyan: "#1B4FD8",
+  orange: "#FF6A1A",
   gray: "#F1F5F9",
   text: "#334155"
 };
@@ -18,18 +18,17 @@ const baseTemplate = (content: string) => `
     body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #EEF2FF; margin: 0; padding: 0; color: ${COLORS.text}; }
     .outer { padding: 40px 20px; }
     .container { max-width: 580px; margin: 0 auto; background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 60px rgba(30,58,138,0.12); }
-    .header { background: linear-gradient(135deg, ${COLORS.navy} 0%, #1d4ed8 100%); padding: 40px 40px 32px; text-align: center; position: relative; }
-    .header-accent { position: absolute; top: 0; right: 0; width: 120px; height: 120px; background: rgba(6,182,212,0.15); border-radius: 0 0 0 120px; }
-    .logo-text { color: white; font-size: 26px; font-weight: 900; letter-spacing: -1px; margin-bottom: 4px; }
-    .logo-text span { color: ${COLORS.cyan}; }
-    .tagline { color: rgba(255,255,255,0.6); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; }
+    .header { background: ${COLORS.navy}; padding: 32px 40px 28px; text-align: center; }
+    .logo-mark { vertical-align: middle; border-radius: 6px; margin-right: 8px; }
+    .logo-text { color: white; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; vertical-align: middle; }
+    .tagline { color: rgba(255,255,255,0.55); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; margin-top: 6px; }
     .content { padding: 44px 40px; }
     .greeting { font-size: 26px; font-weight: 900; color: ${COLORS.navy}; margin: 0 0 16px; line-height: 1.2; }
     .body-text { font-size: 15px; color: #475569; line-height: 1.7; margin: 0 0 20px; }
     .cta-box { background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border: 1px solid #BFDBFE; border-radius: 16px; padding: 28px; margin: 28px 0; text-align: center; }
     .cta-label { font-size: 11px; font-weight: 800; color: #3B82F6; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
-    .button { display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, ${COLORS.blue} 0%, #1d4ed8 100%); color: white !important; text-decoration: none; border-radius: 12px; font-weight: 800; font-size: 15px; letter-spacing: -0.3px; box-shadow: 0 8px 20px rgba(37,99,235,0.35); }
-    .button-orange { background: linear-gradient(135deg, ${COLORS.orange} 0%, #ea580c 100%); box-shadow: 0 8px 20px rgba(249,115,22,0.35); }
+    .button { display: inline-block; padding: 16px 40px; background: ${COLORS.blue}; color: white !important; text-decoration: none; border-radius: 12px; font-weight: 800; font-size: 15px; letter-spacing: -0.3px; box-shadow: 0 8px 20px rgba(27,79,216,0.35); }
+    .button-orange { background: ${COLORS.orange}; box-shadow: 0 8px 20px rgba(255,106,26,0.35); }
     .steps { margin: 28px 0; }
     .step { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; padding: 14px 16px; background: #F8FAFC; border-radius: 12px; border-left: 3px solid ${COLORS.blue}; }
     .step-num { width: 26px; height: 26px; background: ${COLORS.blue}; color: white; border-radius: 50%; font-size: 12px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -47,15 +46,15 @@ const baseTemplate = (content: string) => `
 <div class="outer">
   <div class="container">
     <div class="header">
-      <div class="header-accent"></div>
-      <div class="logo-text">FACULTY<span>MATCH</span></div>
-      <div class="tagline">Conectando Talento Académico Global</div>
+      <img src="https://www.facultymatch.app/icon-192.png" width="30" height="30" alt="" class="logo-mark">
+      <span class="logo-text">facultymatch</span>
+      <div class="tagline">Directorio académico verificado</div>
     </div>
     <div class="content">
       ${content}
     </div>
     <div class="footer">
-      <div class="footer-logo">FACULTYMATCH</div>
+      <div class="footer-logo">facultymatch</div>
       <div class="footer-text">
         &copy; 2026 FacultyMatch Network &mdash; Elevando los estándares de la educación superior global.<br>
         Si no solicitaste este correo, puedes ignorarlo de forma segura.

@@ -14,8 +14,8 @@ function emailWrapper(content: string) {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;max-width:600px;">
-  <tr><td style="background:#0B1220;padding:28px 40px;text-align:center;">
-    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+  <tr><td style="background:#0D2240;padding:28px 40px;text-align:center;">
+    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
   </td></tr>
   <tr><td style="padding:40px;">${content}</td></tr>
   <tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
@@ -70,7 +70,7 @@ export async function runInstitutionInactivityReminder(admin: Admin) {
         to: [email],
         subject: `${inst.name || "Hola"}, tu directorio de docentes te está esperando`,
         html: emailWrapper(`
-          <h1 style="margin:0 0 16px;color:#0B1220;font-size:24px;font-weight:900;">
+          <h1 style="margin:0 0 16px;color:#0D2240;font-size:24px;font-weight:900;">
             ${inst.name || "Hola"}, todavía no habéis hecho vuestra primera búsqueda
           </h1>
           <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.7;">
@@ -133,7 +133,7 @@ export async function runReverificationReminder(admin: Admin) {
         to: [up.email],
         subject: `${firstName}, ¿sigue tu perfil al día?`,
         html: emailWrapper(`
-          <h1 style="margin:0 0 16px;color:#0B1220;font-size:24px;font-weight:900;">
+          <h1 style="margin:0 0 16px;color:#0D2240;font-size:24px;font-weight:900;">
             ${firstName}, hace un año que verificamos tu perfil
           </h1>
           <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.7;">
@@ -228,7 +228,7 @@ export async function runActivationReminder(admin: Admin) {
         to: [email],
         subject: `${firstName}, tu enlace de activación ha caducado`,
         html: emailWrapper(`
-          <h1 style="margin:0 0 16px;color:#0B1220;font-size:24px;font-weight:900;">
+          <h1 style="margin:0 0 16px;color:#0D2240;font-size:24px;font-weight:900;">
             ${firstName}, tu cuenta sigue esperando a activarse
           </h1>
           <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.7;">
@@ -238,7 +238,7 @@ export async function runActivationReminder(admin: Admin) {
             donde lo dejaste.
           </p>
           <div style="text-align:center;margin-bottom:24px;">
-            <a href="${SITE}/auth/verificar-email?email=${encodeURIComponent(email)}" style="display:inline-block;background:#F97316;color:#fff;padding:16px 36px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
+            <a href="${SITE}/auth/verificar-email?email=${encodeURIComponent(email)}" style="display:inline-block;background:#FF6A1A;color:#fff;padding:16px 36px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
               Pedir un enlace nuevo →
             </a>
           </div>
@@ -306,7 +306,7 @@ export async function runUnansweredContactReminder(admin: Admin) {
         to: [up.email],
         subject: `${firstName}, tienes una propuesta sin responder`,
         html: emailWrapper(`
-          <h1 style="margin:0 0 16px;color:#0B1220;font-size:24px;font-weight:900;">
+          <h1 style="margin:0 0 16px;color:#0D2240;font-size:24px;font-weight:900;">
             ${firstName}, ${institutionName} sigue esperando tu respuesta
           </h1>
           <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.7;">

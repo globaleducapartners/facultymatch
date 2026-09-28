@@ -53,15 +53,15 @@ export async function sendInstitutionProfileUpdatedEmail(email: string, institut
   const html = `<!DOCTYPE html><html lang="es"><body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;max-width:600px;">
-<tr><td style="background:#0B1220;padding:24px 40px;text-align:center;border-radius:16px 16px 0 0;">
-  <span style="color:#fff;font-size:20px;font-weight:900;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+<tr><td style="background:#0D2240;padding:24px 40px;text-align:center;border-radius:16px 16px 0 0;">
+  <span style="color:#fff;font-size:20px;font-weight:900;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
 </td></tr>
 <tr><td style="padding:40px;">
-  <h2 style="margin:0 0 12px;color:#0B1220;font-size:22px;font-weight:900;">Perfil actualizado correctamente</h2>
+  <h2 style="margin:0 0 12px;color:#0D2240;font-size:22px;font-weight:900;">Perfil actualizado correctamente</h2>
   <p style="color:#64748b;font-size:15px;line-height:1.7;margin:0 0 24px;">
-    Hemos guardado los cambios en el perfil de <strong style="color:#0B1220;">${institutionName}</strong>.
+    Hemos guardado los cambios en el perfil de <strong style="color:#0D2240;">${institutionName}</strong>.
   </p>
-  <a href="https://www.facultymatch.app/app/institution" style="display:inline-block;background:#2563EB;color:#fff;padding:14px 28px;border-radius:10px;font-weight:700;text-decoration:none;">
+  <a href="https://www.facultymatch.app/app/institution" style="display:inline-block;background:#1B4FD8;color:#fff;padding:14px 28px;border-radius:10px;font-weight:700;text-decoration:none;">
     Ver mi dashboard →
   </a>
 </td></tr>
@@ -82,16 +82,16 @@ export async function sendReferralRewardEmail(email: string, name: string) {
   const html = `<!DOCTYPE html><html lang="es"><body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;max-width:600px;">
-<tr><td style="background:#0B1220;padding:24px 40px;text-align:center;border-radius:16px 16px 0 0;">
-  <span style="color:#fff;font-size:20px;font-weight:900;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+<tr><td style="background:#0D2240;padding:24px 40px;text-align:center;border-radius:16px 16px 0 0;">
+  <span style="color:#fff;font-size:20px;font-weight:900;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
 </td></tr>
 <tr><td style="padding:40px;">
-  <h2 style="margin:0 0 12px;color:#0B1220;font-size:22px;font-weight:900;">¡Enhorabuena, ${name}!</h2>
+  <h2 style="margin:0 0 12px;color:#0D2240;font-size:22px;font-weight:900;">¡Enhorabuena, ${name}!</h2>
   <p style="color:#64748b;font-size:15px;line-height:1.7;margin:0 0 20px;">
     10 colegas se han registrado con tu invitación y han completado la verificación de su perfil.
-    Como premio, hemos activado <strong style="color:#0B1220;">1 año de acceso Professional</strong> en tu cuenta, sin coste.
+    Como premio, hemos activado <strong style="color:#0D2240;">1 año de acceso Professional</strong> en tu cuenta, sin coste.
   </p>
-  <a href="https://www.facultymatch.app/app/faculty" style="display:inline-block;background:#F97316;color:#fff;padding:14px 28px;border-radius:10px;font-weight:700;text-decoration:none;">
+  <a href="https://www.facultymatch.app/app/faculty" style="display:inline-block;background:#FF6A1A;color:#fff;padding:14px 28px;border-radius:10px;font-weight:700;text-decoration:none;">
     Ver mi cuenta →
   </a>
 </td></tr>

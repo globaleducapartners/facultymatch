@@ -97,11 +97,11 @@ function buildReminderEmail(name: string, completeness: number) {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;max-width:600px;">
-  <tr><td style="background:#0B1220;padding:28px 40px;text-align:center;">
-    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+  <tr><td style="background:#0D2240;padding:28px 40px;text-align:center;">
+    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
   </td></tr>
   <tr><td style="padding:40px;">
-    <h1 style="margin:0 0 16px;color:#0B1220;font-size:24px;font-weight:900;">
+    <h1 style="margin:0 0 16px;color:#0D2240;font-size:24px;font-weight:900;">
       ${name}, tu perfil está al ${completeness}%
     </h1>
     <p style="margin:0 0 20px;color:#475569;font-size:15px;line-height:1.7;">

@@ -16,11 +16,11 @@ function wrapEmail(title: string, rows: Array<[string, string]>, opts?: { urgent
       ([label, value], i) => `
       <tr><td style="padding:16px 20px;${i < rows.length - 1 ? "border-bottom:1px solid #e2e8f0;" : ""}">
         <p style="margin:0;font-size:11px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">${label}</p>
-        <p style="margin:4px 0 0;font-size:15px;font-weight:700;color:#0B1220;">${value}</p>
+        <p style="margin:4px 0 0;font-size:15px;font-weight:700;color:#0D2240;">${value}</p>
       </td></tr>`
     )
     .join("");
-  const headerBg = opts?.urgent ? "#7F1D1D" : "#0B1220";
+  const headerBg = opts?.urgent ? "#7F1D1D" : "#0D2240";
 
   return `<!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"></head>
@@ -29,10 +29,10 @@ function wrapEmail(title: string, rows: Array<[string, string]>, opts?: { urgent
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;max-width:600px;">
   <tr><td style="background:${headerBg};padding:24px 40px;text-align:center;">
-    <span style="color:#fff;font-size:20px;font-weight:900;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+    <span style="color:#fff;font-size:20px;font-weight:900;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
   </td></tr>
   <tr><td style="padding:36px 40px;">
-    <h2 style="margin:0 0 16px;color:#0B1220;font-size:22px;font-weight:900;">${title}</h2>
+    <h2 style="margin:0 0 16px;color:#0D2240;font-size:22px;font-weight:900;">${title}</h2>
     <table cellpadding="0" cellspacing="0" width="100%" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:24px;">
       ${rowsHtml}
     </table>

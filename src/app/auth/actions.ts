@@ -527,13 +527,16 @@ export async function contactFaculty(formData: FormData) {
           subject: `📬 ${institutionData?.name || 'Una institución'} quiere contactarte en FacultyMatch`,
           html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:40px 16px;">
-              <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:40px;">
-                <h1 style="color:#0B1220;font-size:24px;margin:0 0 8px;">
+              <div style="background:#0D2240;border-radius:12px 12px 0 0;padding:24px 40px;text-align:center;">
+                <img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;"><span style="color:#fff;font-size:20px;font-weight:900;vertical-align:middle;">facultymatch</span>
+              </div>
+              <div style="background:#fff;border-radius:0 0 12px 12px;border:1px solid #e2e8f0;border-top:none;padding:40px;">
+                <h1 style="color:#0D2240;font-size:24px;margin:0 0 8px;">
                   Tienes un nuevo contacto
                 </h1>
                 <p style="color:#64748b;font-size:16px;margin:0 0 24px;">
                   Hola ${facultyUser.full_name || 'docente'},
-                  <strong style="color:#0B1220;">${institutionData?.name || 'Una institución'}</strong>
+                  <strong style="color:#0D2240;">${institutionData?.name || 'Una institución'}</strong>
                   quiere ponerse en contacto contigo a través de FacultyMatch.
                 </p>
                 <div style="background:#f1f5f9;border-radius:8px;padding:20px;margin-bottom:24px;">
@@ -548,7 +551,7 @@ export async function contactFaculty(formData: FormData) {
                   ${message ? `<p style="margin:0;font-size:14px;color:#64748b;"><strong>Mensaje:</strong> ${message}</p>` : ''}
                 </div>
                 <a href="https://www.facultymatch.app/app/faculty"
-                   style="display:inline-block;background:#2563EB;color:#fff;
+                   style="display:inline-block;background:#1B4FD8;color:#fff;
                           padding:14px 28px;border-radius:8px;font-weight:700;
                           text-decoration:none;font-size:16px;">
                   Ver el contacto en mi dashboard →
@@ -648,16 +651,19 @@ export async function replyToContact(contactId: string, replyMessage: string) {
         subject: `💬 ${facultyName} ha respondido a tu solicitud en FacultyMatch`,
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:40px 16px;">
-            <div style="background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:40px;">
-              <h1 style="color:#0B1220;font-size:22px;margin:0 0 8px;">Has recibido una respuesta</h1>
+            <div style="background:#0D2240;border-radius:12px 12px 0 0;padding:24px 40px;text-align:center;">
+              <img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;"><span style="color:#fff;font-size:20px;font-weight:900;vertical-align:middle;">facultymatch</span>
+            </div>
+            <div style="background:#fff;border-radius:0 0 12px 12px;border:1px solid #e2e8f0;border-top:none;padding:40px;">
+              <h1 style="color:#0D2240;font-size:22px;margin:0 0 8px;">Has recibido una respuesta</h1>
               <p style="color:#64748b;font-size:15px;margin:0 0 24px;">
-                <strong style="color:#0B1220;">${facultyName}</strong> ha respondido a tu solicitud de contacto.
+                <strong style="color:#0D2240;">${facultyName}</strong> ha respondido a tu solicitud de contacto.
               </p>
-              <div style="background:#f1f5f9;border-radius:8px;padding:20px;margin-bottom:24px;border-left:3px solid #2563EB;">
-                <p style="margin:0;font-size:14px;color:#0B1220;line-height:1.7;">${replyMessage.replace(/\n/g, '<br>')}</p>
+              <div style="background:#f1f5f9;border-radius:8px;padding:20px;margin-bottom:24px;border-left:3px solid #1B4FD8;">
+                <p style="margin:0;font-size:14px;color:#0D2240;line-height:1.7;">${replyMessage.replace(/\n/g, '<br>')}</p>
               </div>
               <a href="https://www.facultymatch.app/app/institution/contacts"
-                 style="display:inline-block;background:#2563EB;color:#fff;padding:14px 28px;border-radius:8px;font-weight:700;text-decoration:none;font-size:15px;">
+                 style="display:inline-block;background:#1B4FD8;color:#fff;padding:14px 28px;border-radius:8px;font-weight:700;text-decoration:none;font-size:15px;">
                 Ver en mi panel →
               </a>
               <p style="margin:24px 0 0;font-size:12px;color:#94a3b8;">

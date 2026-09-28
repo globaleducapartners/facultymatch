@@ -138,8 +138,8 @@ function emailWrapper(content: string) {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;max-width:600px;">
-  <tr><td style="background:#0B1220;padding:28px 40px;text-align:center;">
-    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+  <tr><td style="background:#0D2240;padding:28px 40px;text-align:center;">
+    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
   </td></tr>
   <tr><td style="padding:40px;">${content}</td></tr>
   <tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
@@ -157,7 +157,7 @@ function buildExpiryReminderEmail(name: string) {
       <div style="width:64px;height:64px;background:#fef9c3;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
         <span style="font-size:32px;">⏳</span>
       </div>
-      <h1 style="margin:0;color:#0B1220;font-size:24px;font-weight:900;">
+      <h1 style="margin:0;color:#0D2240;font-size:24px;font-weight:900;">
         Tu mes de acceso profesional vence en 3 días, ${name}
       </h1>
       <p style="color:#64748b;font-size:15px;margin:12px 0 0;line-height:1.6;">
@@ -177,14 +177,14 @@ function buildExpiryReminderEmail(name: string) {
 
     <div style="text-align:center;margin-bottom:24px;">
       <a href="${SITE}/app/faculty/settings"
-         style="display:inline-block;background:#F97316;color:#fff;padding:16px 40px;border-radius:12px;font-weight:900;font-size:16px;text-decoration:none;">
+         style="display:inline-block;background:#FF6A1A;color:#fff;padding:16px 40px;border-radius:12px;font-weight:900;font-size:16px;text-decoration:none;">
         Activar mi plan ahora →
       </a>
     </div>
 
     <p style="text-align:center;color:#94a3b8;font-size:13px;margin:0;">
       ¿Tienes dudas? Escríbenos a
-      <a href="mailto:support@facultymatch.app" style="color:#2563EB;">support@facultymatch.app</a>
+      <a href="mailto:support@facultymatch.app" style="color:#1B4FD8;">support@facultymatch.app</a>
     </p>
   `);
 }

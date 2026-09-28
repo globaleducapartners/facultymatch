@@ -77,24 +77,24 @@ export async function POST(request: Request) {
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
   <!-- Logo header -->
-  <tr><td style="background:#0B1220;padding:28px 40px;text-align:center;border-radius:16px 16px 0 0;">
-    <span style="color:#fff;font-size:24px;font-weight:900;letter-spacing:2px;text-transform:uppercase;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+  <tr><td style="background:#0D2240;padding:28px 40px;text-align:center;border-radius:16px 16px 0 0;">
+    <span style="color:#fff;font-size:24px;font-weight:900;letter-spacing:2px;text-transform:uppercase;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
     <p style="margin:6px 0 0;color:#94a3b8;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;">La plataforma académica de referencia</p>
   </td></tr>
   <!-- Accent bar -->
-  <tr><td style="background:linear-gradient(90deg,#2563EB,#1d4ed8);height:3px;"></td></tr>
+  <tr><td style="background:linear-gradient(90deg,#1B4FD8,#1d4ed8);height:3px;"></td></tr>
   <!-- Body -->
   <tr><td style="background:#ffffff;padding:48px 40px;">
     <div style="color:#1e293b;font-size:15px;line-height:1.8;">${body.replace(/\n/g, "<br/>")}</div>
     <div style="margin-top:32px;padding-top:24px;border-top:1px solid #f1f5f9;">
-      <a href="https://www.facultymatch.app/app" style="display:inline-block;background:#2563EB;color:#ffffff;padding:14px 28px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;">
+      <a href="https://www.facultymatch.app/app" style="display:inline-block;background:#1B4FD8;color:#ffffff;padding:14px 28px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;">
         Acceder a mi cuenta →
       </a>
     </div>
   </td></tr>
   <!-- Footer -->
   <tr><td style="background:#f8fafc;padding:24px 40px;text-align:center;border-top:1px solid #e2e8f0;border-radius:0 0 16px 16px;">
-    <p style="margin:0;font-size:12px;color:#64748b;font-weight:600;">FacultyMatch · <a href="https://www.facultymatch.app" style="color:#2563EB;text-decoration:none;">www.facultymatch.app</a></p>
+    <p style="margin:0;font-size:12px;color:#64748b;font-weight:600;">FacultyMatch · <a href="https://www.facultymatch.app" style="color:#1B4FD8;text-decoration:none;">www.facultymatch.app</a></p>
     <p style="margin:4px 0 0;font-size:11px;color:#94a3b8;">Grupo Global Educa SL · <a href="mailto:support@facultymatch.app" style="color:#94a3b8;text-decoration:none;">support@facultymatch.app</a></p>
     <p style="margin:8px 0 0;font-size:10px;color:#cbd5e1;">Has recibido este email porque estás registrado en FacultyMatch. Para darte de baja escribe a support@facultymatch.app</p>
   </td></tr>

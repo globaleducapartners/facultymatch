@@ -346,8 +346,8 @@ function emailWrapper(content: string) {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;max-width:600px;">
-  <tr><td style="background:#0B1220;padding:28px 40px;text-align:center;">
-    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+  <tr><td style="background:#0D2240;padding:28px 40px;text-align:center;">
+    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
   </td></tr>
   <tr><td style="padding:40px;">${content}</td></tr>
   <tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
@@ -371,7 +371,7 @@ function buildActivationEmail(name: string, plan: string, periodEnd: string | nu
       <div style="width:64px;height:64px;background:#fff7ed;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
         <span style="font-size:32px;">🎉</span>
       </div>
-      <h1 style="margin:0;color:#0B1220;font-size:26px;font-weight:900;">¡Plan Professional activado, ${name}!</h1>
+      <h1 style="margin:0;color:#0D2240;font-size:26px;font-weight:900;">¡Plan Professional activado, ${name}!</h1>
       <p style="color:#64748b;font-size:16px;margin:12px 0 0;line-height:1.6;">
         Tu suscripción está activa. Ya tienes acceso completo a todas las funcionalidades premium de FacultyMatch.
       </p>
@@ -381,7 +381,7 @@ function buildActivationEmail(name: string, plan: string, periodEnd: string | nu
       <p style="margin:4px 0 0;color:#64748b;font-size:12px;">Te avisaremos 7 días antes por email.</p>
     </div>` : ''}
     <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:28px;">
-      <p style="margin:0 0 12px;font-weight:900;color:#0B1220;font-size:14px;text-transform:uppercase;letter-spacing:1px;">Funcionalidades activadas:</p>
+      <p style="margin:0 0 12px;font-weight:900;color:#0D2240;font-size:14px;text-transform:uppercase;letter-spacing:1px;">Funcionalidades activadas:</p>
       <ul style="margin:0;padding:0 0 0 20px;color:#475569;font-size:14px;line-height:2;">
         ${isFaculty ? `
         <li>Posicionamiento prioritario en búsquedas</li>
@@ -395,7 +395,7 @@ function buildActivationEmail(name: string, plan: string, periodEnd: string | nu
       </ul>
     </div>
     <div style="text-align:center;margin-bottom:16px;">
-      <a href="${dashboardLink}" style="display:inline-block;background:#F97316;color:#fff;padding:16px 36px;border-radius:12px;font-weight:900;font-size:16px;text-decoration:none;">
+      <a href="${dashboardLink}" style="display:inline-block;background:#FF6A1A;color:#fff;padding:16px 36px;border-radius:12px;font-weight:900;font-size:16px;text-decoration:none;">
         Ir a mi dashboard →
       </a>
     </div>
@@ -408,7 +408,7 @@ function buildRenewalEmail(name: string, days: number, date: string, amount: str
       <div style="width:64px;height:64px;background:#fef9c3;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
         <span style="font-size:32px;">⏰</span>
       </div>
-      <h1 style="margin:0;color:#0B1220;font-size:24px;font-weight:900;">Tu plan se renueva en ${days} días, ${name}</h1>
+      <h1 style="margin:0;color:#0D2240;font-size:24px;font-weight:900;">Tu plan se renueva en ${days} días, ${name}</h1>
       <p style="color:#64748b;font-size:15px;margin:12px 0 0;line-height:1.6;">
         Tu Plan Professional se renovará automáticamente el <strong>${date}</strong> por <strong>${amount}</strong>.
       </p>
@@ -418,7 +418,7 @@ function buildRenewalEmail(name: string, days: number, date: string, amount: str
       <p style="margin:8px 0 0;color:#713f12;font-size:13px;">Escríbenos a <a href="mailto:support@facultymatch.app" style="color:#1d4ed8;">support@facultymatch.app</a> antes de la fecha de renovación y lo gestionamos.</p>
     </div>
     <div style="text-align:center;margin-bottom:16px;">
-      <a href="${SITE}/app/faculty" style="display:inline-block;background:#2563EB;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
+      <a href="${SITE}/app/faculty" style="display:inline-block;background:#1B4FD8;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
         Ver mi plan →
       </a>
     </div>
@@ -428,7 +428,7 @@ function buildRenewalEmail(name: string, days: number, date: string, amount: str
 function buildCancellationEmail(name: string) {
   return emailWrapper(`
     <div style="text-align:center;margin-bottom:32px;">
-      <h1 style="margin:0;color:#0B1220;font-size:24px;font-weight:900;">Hola ${name}, tu suscripción se ha cancelado</h1>
+      <h1 style="margin:0;color:#0D2240;font-size:24px;font-weight:900;">Hola ${name}, tu suscripción se ha cancelado</h1>
       <p style="color:#64748b;font-size:15px;margin:12px 0 0;line-height:1.6;">
         Hemos procesado la cancelación de tu Plan Professional. Tu cuenta sigue activa
         con el plan gratuito — no se ha borrado nada de tu perfil ni de tus datos.
@@ -441,7 +441,7 @@ function buildCancellationEmail(name: string) {
       </p>
     </div>
     <div style="text-align:center;margin-bottom:16px;">
-      <a href="${SITE}/app/faculty" style="display:inline-block;background:#2563EB;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
+      <a href="${SITE}/app/faculty" style="display:inline-block;background:#1B4FD8;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
         Ir a mi panel →
       </a>
     </div>
@@ -454,7 +454,7 @@ function buildPaymentFailedEmail(name: string, settingsPath: string) {
       <div style="width:64px;height:64px;background:#fef2f2;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
         <span style="font-size:32px;">⚠️</span>
       </div>
-      <h1 style="margin:0;color:#0B1220;font-size:24px;font-weight:900;">Hola ${name}, no hemos podido cobrar tu suscripción</h1>
+      <h1 style="margin:0;color:#0D2240;font-size:24px;font-weight:900;">Hola ${name}, no hemos podido cobrar tu suscripción</h1>
       <p style="color:#64748b;font-size:15px;margin:12px 0 0;line-height:1.6;">
         El cobro de tu Plan Professional no se ha completado — puede que la tarjeta
         haya caducado o el banco lo haya rechazado. Volveremos a intentarlo
@@ -463,7 +463,7 @@ function buildPaymentFailedEmail(name: string, settingsPath: string) {
       </p>
     </div>
     <div style="text-align:center;margin-bottom:16px;">
-      <a href="${SITE}${settingsPath}" style="display:inline-block;background:#2563EB;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
+      <a href="${SITE}${settingsPath}" style="display:inline-block;background:#1B4FD8;color:#fff;padding:14px 32px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
         Actualizar método de pago →
       </a>
     </div>

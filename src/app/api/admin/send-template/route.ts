@@ -180,14 +180,14 @@ function buildTemplateHtml(subject: string, body: string) {
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 16px;">
 <tr><td align="center">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;overflow:hidden;">
-  <tr><td style="background:#0B1220;padding:28px 40px;text-align:center;">
-    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;">FACULTY<span style="color:#2563EB;">MATCH</span></span>
+  <tr><td style="background:#0D2240;padding:28px 40px;text-align:center;">
+    <span style="color:#fff;font-size:22px;font-weight:900;letter-spacing:1px;"><img src="https://www.facultymatch.app/icon-192.png" width="26" height="26" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">facultymatch</span>
   </td></tr>
   <tr><td style="padding:40px;">
-    <h2 style="margin:0 0 16px;color:#0B1220;font-size:20px;font-weight:900;">${subject}</h2>
+    <h2 style="margin:0 0 16px;color:#0D2240;font-size:20px;font-weight:900;">${subject}</h2>
     <p style="color:#475569;font-size:15px;line-height:1.7;margin:0;">${body.replace(/\n/g, "<br/>")}</p>
     <div style="margin-top:28px;padding-top:20px;border-top:1px solid #f1f5f9;">
-      <a href="https://www.facultymatch.app/app" style="display:inline-block;background:#2563EB;color:#fff;padding:12px 28px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;">Ir a mi cuenta →</a>
+      <a href="https://www.facultymatch.app/app" style="display:inline-block;background:#1B4FD8;color:#fff;padding:12px 28px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;">Ir a mi cuenta →</a>
     </div>
   </td></tr>
   <tr><td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
