@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { autoReloadOnChunkError } from "@/lib/chunk-error";
 
 // Red de seguridad para un fallo en el propio layout raíz (src/app/layout.tsx)
 // — algo que src/app/error.tsx NO puede capturar, porque ese límite vive
@@ -14,8 +15,14 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [reloading, setReloading] = useState(false);
+
   useEffect(() => {
     console.error("[global-error.tsx]", error);
+    if (autoReloadOnChunkError(error)) {
+      setReloading(true);
+      return;
+    }
     fetch("/api/log-client-error", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -26,6 +33,14 @@ export default function GlobalError({
       }),
     }).catch(() => {});
   }, [error]);
+
+  if (reloading) {
+    return (
+      <html lang="es">
+        <body style={{ margin: 0 }} />
+      </html>
+    );
+  }
 
   return (
     <html lang="es">

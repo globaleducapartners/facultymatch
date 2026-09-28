@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { autoReloadOnChunkError } from "@/lib/chunk-error";
 
 const SANS = `'Inter', system-ui, -apple-system, sans-serif`;
 
@@ -18,8 +19,17 @@ export default function ErrorBoundary({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [reloading, setReloading] = useState(false);
+
   useEffect(() => {
     console.error("[error.tsx]", error);
+    // ChunkLoadError: el navegador pedía un JS de un despliegue anterior que
+    // ya no existe. Se cura solo con una recarga — no es un fallo real, así
+    // que no dispara el aviso a admin (evita ruido en cada despliegue).
+    if (autoReloadOnChunkError(error)) {
+      setReloading(true);
+      return;
+    }
     fetch("/api/log-client-error", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -30,6 +40,8 @@ export default function ErrorBoundary({
       }),
     }).catch(() => {});
   }, [error]);
+
+  if (reloading) return null;
 
   return (
     <div
