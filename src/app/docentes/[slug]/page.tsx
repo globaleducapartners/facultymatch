@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { Logo } from "@/components/ui/Logo";
+import { ProfileViewTracker } from "@/components/profile/ProfileViewTracker";
 
 const BASE = "https://www.facultymatch.app";
 
@@ -167,6 +168,8 @@ export default async function PublicFacultyProfilePage({
 
   return (
     <>
+      <ProfileViewTracker facultyId={faculty.id} source="public" />
+
       {/* JSON-LD structured data */}
       <script
         type="application/ld+json"

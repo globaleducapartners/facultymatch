@@ -139,6 +139,22 @@ export default async function FacultyDetailPage({
     .order("sent_at", { ascending: false })
     .limit(20);
 
+  // Quién ha visto este perfil — page_views se llena desde
+  // /api/faculty/track-view (visor de instituciones + página pública).
+  const { data: profileViews } = await admin
+    .from("page_views")
+    .select("user_type, viewed_at, metadata")
+    .eq("metadata->>faculty_id", id)
+    .order("viewed_at", { ascending: false })
+    .limit(15);
+
+  const VIEWER_TYPE_LABELS: Record<string, string> = {
+    institution: "Institución",
+    faculty: "Docente",
+    admin: "Admin",
+    anonymous: "Visitante anónimo",
+  };
+
   const fp = facultyProfile || {};
   const viewCount = fp.view_count ?? 0;
   const vis = describeVisibility(fp);
@@ -403,6 +419,32 @@ export default async function FacultyDetailPage({
             <StatCard icon={Mail} label="Contactos" value={contactCount ?? 0} color="green" />
             <StatCard icon={GraduationCap} label="Documentos" value={documents?.length ?? 0} color="purple" />
             <StatCard icon={Award} label="Completitud" value={`${completeness}%`} color="orange" />
+          </div>
+
+          {/* Visualizaciones recientes */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <SectionTitle icon={Eye} title="Visualizaciones recientes" />
+            {profileViews && profileViews.length > 0 ? (
+              <div className="space-y-2.5">
+                {profileViews.map((v: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between gap-3 text-sm">
+                    <div className="min-w-0">
+                      <span className="font-bold text-navy">
+                        {VIEWER_TYPE_LABELS[v.user_type] || "Visitante"}
+                      </span>
+                      {v.metadata?.viewer_label && (
+                        <span className="text-gray-500 font-medium"> · {v.metadata.viewer_label}</span>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-400 font-medium flex-shrink-0">{fmtDate(v.viewed_at)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-400">
+                Aún no hay registro de quién ha visitado este perfil.
+              </p>
+            )}
           </div>
 
           {/* Visibility info */}

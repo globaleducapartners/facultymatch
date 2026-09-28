@@ -5,6 +5,8 @@ import { trackEvent } from "@/lib/analytics";
 
 interface Props {
   facultyId: string;
+  /** "public" = página pública /docentes/[slug]; "app" (por defecto) = visor de instituciones en /app/faculty/[id]. */
+  source?: "public" | "app";
 }
 
 /**
@@ -12,7 +14,7 @@ interface Props {
  * Also fires a GA4 event for analytics.
  * Uses a ref to prevent double-counting from React StrictMode double-renders.
  */
-export function ProfileViewTracker({ facultyId }: Props) {
+export function ProfileViewTracker({ facultyId, source = "app" }: Props) {
   const tracked = useRef(false);
 
   useEffect(() => {
@@ -25,7 +27,7 @@ export function ProfileViewTracker({ facultyId }: Props) {
     fetch("/api/faculty/track-view", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ facultyId }),
+      body: JSON.stringify({ facultyId, source }),
       signal: controller.signal,
     }).catch(() => {
       // Silently ignore failures (e.g. offline, abort)
