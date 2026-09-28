@@ -89,9 +89,16 @@ export async function middleware(request: NextRequest) {
     // active_mode as source of truth; fall back to role when null
     const activeMode = profile.active_mode ?? profile.role;
 
-    // Redirigir admins a /control cuando intentan acceder a /app/*
+    // Redirigir admins a /control cuando intentan acceder a /app/*, salvo
+    // la ficha individual de un docente (/app/faculty/[uuid]) — es el "Ver
+    // en la plataforma" del panel de admin, que antes rebotaba aquí mismo
+    // sin llegar nunca a esa página (el layout de /app/faculty ya permite
+    // el rol admin, pero este redirect corría antes y ganaba siempre).
     const role = profile.role;
-    if (role === "admin" || role === "super_admin") {
+    const isAdminViewingFacultyProfile =
+      (role === "admin" || role === "super_admin") &&
+      /^\/app\/faculty\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(pathname);
+    if ((role === "admin" || role === "super_admin") && !isAdminViewingFacultyProfile) {
       if (!pathname.startsWith("/control")) {
         const url = request.nextUrl.clone();
         url.pathname = "/control";
