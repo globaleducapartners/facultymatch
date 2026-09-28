@@ -1,11 +1,20 @@
 import { createAdminClient } from "@/lib/supabase-server";
+import Link from "next/link";
 import Stripe from "stripe";
 import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 import {
   AlertTriangle, DollarSign, Users, Eye, TrendingUp,
-  GraduationCap, Award, Linkedin,
+  GraduationCap, Award, Linkedin, Mail,
   ChevronRight, MessageSquare, Star, Globe,
 } from "lucide-react";
+import { BarChart, SimpleLine, MiniStat, ActivityFeed } from "@/components/control/AnalyticsCharts";
+
+function fmtDateTime(iso: string | null | undefined) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("es-ES", {
+    day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
+  });
+}
 
 // ── Stripe MRR Helper ──────────────────────────────────────────────────────
 
@@ -35,7 +44,13 @@ async function getMRR(): Promise<{ mrr: number; activeSubscriptions: number }> {
 
 // ── ───────────────────────────────────────────────────────────────────────
 
-export default async function MetricsPage() {
+export default async function MetricsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ range?: string }>;
+}) {
+  const params = await searchParams;
+  const rangeDays = parseInt(params.range || "30", 10);
   const admin = createAdminClient();
 
   // ── Section 1: Alerts data ─────────────────────────────────────────────
@@ -253,6 +268,85 @@ export default async function MetricsPage() {
     .not("linkedin_url", "is", null)
     .neq("linkedin_url", "");
 
+  // ── Section 5: Serie temporal (antes /control/analytics) ──────────────
+
+  const now = new Date();
+  const startDate = new Date(now.getTime() - rangeDays * 24 * 60 * 60 * 1000);
+
+  const { data: topProfiles } = await admin
+    .from("faculty_profiles")
+    .select("user_id, view_count, headline")
+    .order("view_count", { ascending: false })
+    .limit(10);
+
+  let topNames: Record<string, string> = {};
+  if (topProfiles?.length) {
+    const ids = topProfiles.map((p: any) => p.user_id);
+    const { data: users } = await admin.from("user_profiles").select("id, full_name").in("id", ids);
+    if (users) users.forEach((u: any) => { topNames[u.id] = u.full_name || "Sin nombre"; });
+  }
+
+  const { data: facultySignups } = await admin
+    .from("user_profiles")
+    .select("created_at")
+    .eq("role", "faculty")
+    .gte("created_at", startDate.toISOString())
+    .order("created_at", { ascending: true })
+    .limit(1000);
+
+  const { data: contactsTimeline } = await admin
+    .from("contacts")
+    .select("created_at")
+    .gte("created_at", startDate.toISOString())
+    .order("created_at", { ascending: true })
+    .limit(1000);
+
+  const dayLabels: string[] = [];
+  const dailySignupCounts: number[] = [];
+  const dailyContactCounts: number[] = [];
+  for (let i = 0; i < rangeDays; i++) {
+    const d = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+    const dateStr = d.toISOString().slice(0, 10);
+    const nextDate = new Date(d.getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    dayLabels.push(dateStr.slice(5));
+    dailySignupCounts.push((facultySignups ?? []).filter((s: any) => s.created_at?.slice(0, 10) === dateStr).length);
+    dailyContactCounts.push((contactsTimeline ?? []).filter((c: any) => {
+      const cd = c.created_at?.slice(0, 10);
+      return cd >= dateStr && cd < nextDate;
+    }).length);
+  }
+  const signupChart = dayLabels.map((l, i) => ({ label: l, value: dailySignupCounts[i] }));
+  const contactChart = dayLabels.map((l, i) => ({ label: l, value: dailyContactCounts[i] }));
+
+  const [recentContacts, recentSignups] = await Promise.all([
+    admin.from("contacts").select("created_at").order("created_at", { ascending: false }).limit(10),
+    admin.from("user_profiles").select("created_at, full_name").eq("role", "faculty").order("created_at", { ascending: false }).limit(10),
+  ]);
+
+  const activityItems: { time: string; text: string; type: string }[] = [];
+  (recentSignups?.data ?? []).forEach((s: any) => {
+    activityItems.push({ time: fmtDateTime(s.created_at), text: `${s.full_name || "Nuevo usuario"} se registró como docente`, type: "signup" });
+  });
+  (recentContacts?.data ?? []).forEach((c: any) => {
+    activityItems.push({ time: fmtDateTime(c.created_at), text: "Nuevo contacto entre institución y docente", type: "contact" });
+  });
+  activityItems.sort((a, b) => b.time.localeCompare(a.time));
+
+  const { count: contactsThisPeriod } = await admin
+    .from("contacts").select("*", { count: "exact", head: true }).gte("created_at", startDate.toISOString());
+  const { count: totalContactsAllTime } = await admin
+    .from("contacts").select("*", { count: "exact", head: true });
+  const { count: totalFavoritesAllTime } = await admin
+    .from("favorites").select("*", { count: "exact", head: true });
+  const { count: favoritesThisPeriod } = await admin
+    .from("favorites").select("*", { count: "exact", head: true }).gte("created_at", startDate.toISOString());
+
+  const ranges = [
+    { label: "7 días", value: "7" },
+    { label: "30 días", value: "30" },
+    { label: "90 días", value: "90" },
+  ];
+
   // ── ────────────────────────────────────────────────────────────────────
 
   function pctOf(part: number, total: number): string {
@@ -264,8 +358,8 @@ export default async function MetricsPage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black text-navy tracking-tight">Dashboard de negocio</h1>
-        <p className="text-gray-500 font-medium mt-1">Métricas accionables en tiempo real.</p>
+        <h1 className="text-3xl font-black text-navy tracking-tight">Métricas y analytics</h1>
+        <p className="text-gray-500 font-medium mt-1">Negocio, actividad y uso de la plataforma en tiempo real.</p>
       </div>
 
       {/* ── SECTION 1: Alertas automáticas ───────────────────────────── */}
@@ -538,6 +632,97 @@ export default async function MetricsPage() {
           </div>
         </div>
       </div>
+
+      {/* ── SECTION 5: Actividad en el tiempo (antes /control/analytics) ── */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Actividad en el tiempo</h2>
+          <div className="flex gap-1 bg-white rounded-xl border border-gray-200 p-1">
+            {ranges.map((r) => (
+              <Link
+                key={r.value}
+                href={`/control/metrics?range=${r.value}`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                  String(rangeDays) === r.value ? "bg-navy text-white" : "text-gray-500 hover:text-navy"
+                }`}
+              >
+                {r.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <MiniStat label="Contactos totales" value={totalContactsAllTime ?? 0} change={`${contactsThisPeriod ?? 0} en período`} positive />
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <MiniStat label="Favoritos totales" value={totalFavoritesAllTime ?? 0} change={`${favoritesThisPeriod ?? 0} en período`} positive />
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 className="text-sm font-black text-navy flex items-center gap-2 mb-4">
+              <Users size={16} className="text-talentia-blue" /> Nuevos docentes por día
+            </h3>
+            <div className="h-48">
+              <BarChart data={signupChart} color="bg-talentia-blue" height={160} emptyLabel="No hay registros en este período" />
+            </div>
+            <SimpleLine data={signupChart} color="text-talentia-blue" height={60} />
+          </div>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 className="text-sm font-black text-navy flex items-center gap-2 mb-4">
+              <Mail size={16} className="text-green-600" /> Contactos por día
+            </h3>
+            <div className="h-48">
+              <BarChart data={contactChart} color="bg-green-500" height={160} emptyLabel="No hay contactos en este período" />
+            </div>
+            <SimpleLine data={contactChart} color="text-green-600" height={60} />
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
+              <Eye size={16} className="text-talentia-blue" />
+              <h3 className="text-sm font-black text-navy">Perfiles más vistos</h3>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {(topProfiles ?? []).length === 0 ? (
+                <p className="px-6 py-8 text-sm text-gray-400 text-center">Sin datos de visitas aún</p>
+              ) : (
+                (topProfiles ?? []).map((fp: any, i: number) => (
+                  <Link
+                    key={fp.user_id}
+                    href={`/control/faculty/${fp.user_id}`}
+                    className="flex items-center gap-3 px-6 py-3 hover:bg-gray-50/50 transition-colors"
+                  >
+                    <span className="w-6 text-center text-xs font-black text-gray-400">#{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-navy truncate">{topNames[fp.user_id] || "Sin nombre"}</p>
+                      {fp.headline && <p className="text-[11px] text-gray-400 truncate">{fp.headline}</p>}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm font-black text-talentia-blue">
+                      <Eye size={14} /> {fp.view_count ?? 0}
+                    </div>
+                  </Link>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
+              <TrendingUp size={16} className="text-energy-orange" />
+              <h3 className="text-sm font-black text-navy">Actividad reciente</h3>
+            </div>
+            <div className="px-6 py-2">
+              <ActivityFeed items={activityItems} emptyLabel="Sin actividad reciente en este período" />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

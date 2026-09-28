@@ -1,4 +1,6 @@
 import { createAdminClient } from "@/lib/supabase-server";
+import Link from "next/link";
+import { Clock, CheckCircle2, Users, Building2, MessageSquare, ArrowRight } from "lucide-react";
 import PendingFacultyPanel from "./PendingFacultyPanel";
 
 export default async function ControlPage() {
@@ -7,6 +9,7 @@ export default async function ControlPage() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const weekStart = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
   // Counts — now from faculty_profiles.estado_perfil
   const [
@@ -14,6 +17,8 @@ export default async function ControlPage() {
     { count: approvedToday },
     { count: approvedMonth },
     { count: totalFaculty },
+    { count: totalInstitutions },
+    { count: contactsThisWeek },
   ] = await Promise.all([
     admin.from('faculty_profiles').select('*', { count: 'exact', head: true })
       .eq('estado_perfil', 'en_revision'),
@@ -24,6 +29,9 @@ export default async function ControlPage() {
       .eq('estado_perfil', 'verificado')
       .gte('verificado_en', startOfMonth.toISOString()),
     admin.from('faculty_profiles').select('*', { count: 'exact', head: true }),
+    admin.from('institutions').select('*', { count: 'exact', head: true }),
+    admin.from('contacts').select('*', { count: 'exact', head: true })
+      .gte('created_at', weekStart.toISOString()),
   ]);
 
   // Fetch pending users (en_revision = waiting for admin review)
@@ -122,9 +130,45 @@ export default async function ControlPage() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-3xl font-black text-navy tracking-tight">Panel de administración</h1>
+          <p className="text-gray-500 font-medium mt-1">
+            Resumen rápido y cola de verificación de docentes.
+          </p>
+        </div>
+        <Link
+          href="/control/metrics"
+          className="flex items-center gap-1.5 text-xs font-bold text-talentia-blue hover:underline"
+        >
+          Ver métricas completas <ArrowRight size={13} />
+        </Link>
+      </div>
+
+      {/* Resumen rápido */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        {[
+          { label: "Pendientes de revisar", value: pendingCount ?? 0, icon: Clock, color: "bg-amber-50 text-amber-600" },
+          { label: "Aprobados este mes", value: approvedMonth ?? 0, icon: CheckCircle2, color: "bg-green-50 text-green-600" },
+          { label: "Docentes totales", value: totalFaculty ?? 0, icon: Users, color: "bg-blue-50 text-talentia-blue" },
+          { label: "Instituciones", value: totalInstitutions ?? 0, icon: Building2, color: "bg-purple-50 text-purple-600" },
+          { label: "Contactos (7 días)", value: contactsThisWeek ?? 0, icon: MessageSquare, color: "bg-orange-50 text-energy-orange" },
+        ].map((kpi, i) => (
+          <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${kpi.color}`}>
+              <kpi.icon size={18} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xl font-black text-navy leading-tight">{kpi.value}</p>
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide truncate">{kpi.label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div>
-        <h1 className="text-3xl font-black text-navy tracking-tight">Verificación de Docentes</h1>
-        <p className="text-gray-500 font-medium mt-1">
+        <h2 className="text-lg font-black text-navy tracking-tight">Verificación de docentes</h2>
+        <p className="text-gray-500 font-medium mt-0.5 text-sm">
           Revisa y aprueba los perfiles pendientes de verificación.
         </p>
       </div>
