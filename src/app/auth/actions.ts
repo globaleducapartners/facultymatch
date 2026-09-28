@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { Resend } from 'resend';
 import { notifyAdminNewRegistration } from "@/lib/admin-alerts";
 import { attributeReferral } from "@/lib/referrals";
+import { rateLimit } from "@/lib/rate-limit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || 'FacultyMatch <noreply@facultymatch.app>';
@@ -139,6 +140,10 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
 
     if (!email || !password || !fullName) {
       return { error: "Por favor completa todos los campos requeridos." };
+    }
+
+    if (!(await rateLimit("signup", 8, 3600))) {
+      return { error: "Demasiados intentos desde tu conexión. Inténtalo de nuevo en un rato." };
     }
 
     // El cliente ya exige 8 caracteres mínimo, pero un POST directo al

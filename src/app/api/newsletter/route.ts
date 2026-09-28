@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase-server';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
   const { email, website } = await req.json();
@@ -8,6 +9,10 @@ export async function POST(req: NextRequest) {
   // Se responde como si hubiera funcionado, sin guardar nada.
   if (typeof website === 'string' && website.trim()) {
     return NextResponse.json({ ok: true });
+  }
+
+  if (!(await rateLimit('newsletter', 5, 3600))) {
+    return NextResponse.json({ error: 'Demasiados intentos. Inténtalo más tarde.' }, { status: 429 });
   }
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
