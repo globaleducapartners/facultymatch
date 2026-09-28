@@ -256,6 +256,94 @@ export async function runActivationReminder(admin: Admin) {
   return { sent, errors };
 }
 
+// ── 6. Resumen semanal de actividad — solo para quien lo activó en ajustes ──
+// Usa el tracking de visualizaciones de la Fase C (page_views +
+// faculty_profiles.view_count). Si un docente no ha tenido ninguna
+// actividad esa semana no se le manda nada — un email de "0 vistas, 0
+// contactos" cada semana desanima más de lo que engancha.
+export async function runWeeklyDigest(admin: Admin) {
+  const weekStart = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const { data: profiles, error } = await admin
+    .from("faculty_profiles")
+    .select("id, user_id")
+    .eq("estado_perfil", "verificado")
+    .eq("is_active", true)
+    .eq("notify_weekly_digest", true)
+    .limit(500);
+
+  if (error) return { sent: 0, skipped: 0, errors: [error.message] };
+  if (!profiles || profiles.length === 0) return { sent: 0, skipped: 0, errors: [] };
+
+  let sent = 0;
+  let skipped = 0;
+  const errors: string[] = [];
+
+  for (const fp of profiles) {
+    try {
+      const [{ count: views }, { count: contacts }, { count: favorites }] = await Promise.all([
+        admin.from("page_views").select("*", { count: "exact", head: true })
+          .eq("metadata->>faculty_id", fp.id).gte("viewed_at", weekStart),
+        admin.from("contacts").select("*", { count: "exact", head: true })
+          .eq("faculty_id", fp.id).gte("created_at", weekStart),
+        admin.from("favorites").select("*", { count: "exact", head: true })
+          .eq("faculty_id", fp.id).gte("created_at", weekStart),
+      ]);
+
+      const v = views ?? 0;
+      const c = contacts ?? 0;
+      const f = favorites ?? 0;
+      if (v === 0 && c === 0 && f === 0) { skipped++; continue; }
+
+      const { data: up } = await admin
+        .from("user_profiles")
+        .select("full_name, email")
+        .eq("id", fp.user_id)
+        .maybeSingle();
+      if (!up?.email) { skipped++; continue; }
+
+      const firstName = up.full_name?.split(" ")[0] || up.email.split("@")[0];
+      const stat = (n: number, label: string, plural: string) =>
+        `<div style="flex:1;min-width:110px;text-align:center;padding:16px 8px;background:#f8fafc;border-radius:12px;">
+          <div style="font-size:28px;font-weight:900;color:#0D2240;">${n}</div>
+          <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">${n === 1 ? label : plural}</div>
+        </div>`;
+
+      await resend.emails.send({
+        from: FROM,
+        to: [up.email],
+        subject: `${firstName}, tu semana en FacultyMatch`,
+        html: emailWrapper(`
+          <h1 style="margin:0 0 16px;color:#0D2240;font-size:24px;font-weight:900;">
+            Tu resumen semanal, ${firstName}
+          </h1>
+          <p style="margin:0 0 24px;color:#475569;font-size:15px;line-height:1.7;">
+            Esto es lo que ha pasado con tu perfil en los últimos 7 días:
+          </p>
+          <div style="display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap;">
+            ${stat(v, "visita", "visitas")}
+            ${stat(c, "contacto", "contactos")}
+            ${stat(f, "favorito", "favoritos")}
+          </div>
+          <div style="text-align:center;margin-bottom:20px;">
+            <a href="${SITE}/app/faculty" style="display:inline-block;background:#1B4FD8;color:#fff;padding:16px 36px;border-radius:12px;font-weight:900;font-size:15px;text-decoration:none;">
+              Ver mi perfil →
+            </a>
+          </div>
+          <p style="margin:0;color:#94a3b8;font-size:12px;text-align:center;line-height:1.6;">
+            Recibes esto porque activaste el resumen semanal en tus ajustes de notificaciones. Puedes desactivarlo cuando quieras.
+          </p>
+        `),
+      });
+      sent++;
+    } catch (e: any) {
+      errors.push(e.message);
+    }
+  }
+
+  return { sent, skipped, errors };
+}
+
 // ── 3. Contacts sitting unanswered ('pending') for 3-4 days ─────────────────
 export async function runUnansweredContactReminder(admin: Admin) {
   const now = new Date();
