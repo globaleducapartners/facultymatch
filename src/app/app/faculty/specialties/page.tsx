@@ -237,8 +237,8 @@ export default async function SpecialtiesPage() {
             background: D.navy, borderRadius: 16, padding: "22px",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-              <Lightbulb size={16} color={D.gold} />
-              <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 800, color: D.gold, letterSpacing: "-0.01em" }}>
+              <Lightbulb size={16} color={D.blue} />
+              <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 800, color: D.blue, letterSpacing: "-0.01em" }}>
                 Consejo Académico
               </span>
             </div>

@@ -234,7 +234,7 @@ export default async function VerificationPage() {
                       </span>
                     </div>
                     {step.completed ? (
-                      <CheckCircle2 size={20} className="text-fm-gold" />
+                      <CheckCircle2 size={20} className="text-emerald-600" />
                     ) : (
                       <Link
                         href={step.href}
@@ -249,8 +249,8 @@ export default async function VerificationPage() {
 
               <div className="pt-4">
                 {verificationStatus === "en_revision" && completedCount > 0 ? (
-                  <div className="p-6 rounded-2xl bg-orange-50 border border-orange-100 flex flex-col items-center text-center space-y-3">
-                    <Loader2 className="animate-spin text-fm-gold" size={24} />
+                  <div className="p-6 rounded-2xl bg-amber-50 border border-amber-100 flex flex-col items-center text-center space-y-3">
+                    <Loader2 className="animate-spin text-amber-600" size={24} />
                     <h4 className="text-sm font-bold text-navy">Tu solicitud está en revisión</h4>
                     <p className="text-xs text-gray-500 font-medium max-w-sm">
                       Nuestro equipo académico está validando tus documentos. Recibirás una
@@ -303,7 +303,7 @@ export default async function VerificationPage() {
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-navy text-white" id="documents">
             <CardHeader>
               <CardTitle className="text-xl font-bold flex items-center gap-2">
-                <Upload size={22} className="text-fm-gold" />
+                <Upload size={22} className="text-[#9DB8FF]" />
                 Subir documentos
               </CardTitle>
               <CardDescription className="text-gray-400 font-medium">
@@ -328,7 +328,7 @@ export default async function VerificationPage() {
                 "Prioridad en resultados",
               ].map((item, idx) => (
                 <li key={idx} className="flex items-center gap-2 text-xs text-gray-600 font-medium">
-                  <div className="w-1.5 h-1.5 rounded-full bg-fm-gold" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#9DB8FF]" />
                   {item}
                 </li>
               ))}

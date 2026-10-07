@@ -73,7 +73,7 @@ export default async function SettingsPage() {
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-                <Bell size={22} className="text-fm-gold" />
+                <Bell size={22} className="text-fm-blue" />
                 Preferencias de Notificaciones
               </CardTitle>
               <CardDescription className="font-medium">
@@ -136,7 +136,7 @@ export default async function SettingsPage() {
           {/* Danger zone */}
           <div className="p-8 rounded-2xl bg-gray-50 border border-gray-100 space-y-6">
             <div className="flex items-center gap-2 text-navy">
-              <AlertTriangle size={20} className="text-fm-gold" />
+              <AlertTriangle size={20} className="text-amber-600" />
               <h4 className="text-sm font-black uppercase tracking-widest">Zona de riesgo</h4>
             </div>
             <p className="text-xs text-gray-500 font-medium leading-relaxed">
