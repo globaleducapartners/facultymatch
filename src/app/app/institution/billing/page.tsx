@@ -73,7 +73,7 @@ export default async function BillingPage() {
               <p className="font-black text-navy text-xl">{planName}</p>
               <p className="text-blue-600 font-bold text-sm mt-0.5">{planPrice}</p>
               {periodEnd && (
-                <p className="text-xs text-gray-400 mt-1">Próxima renovación: {periodEnd}</p>
+                <p className="text-xs text-gray-500 mt-1">Próxima renovación: {periodEnd}</p>
               )}
             </div>
             <div className="space-y-3 pt-1">
@@ -120,8 +120,8 @@ export default async function BillingPage() {
           </div>
           <div>
             <p className="font-black text-navy text-lg">Essential</p>
-            <p className="text-gray-400 font-semibold text-sm mt-0.5">0 € / mes</p>
-            <p className="text-xs text-gray-400 mt-1">Para empezar</p>
+            <p className="text-gray-500 font-semibold text-sm mt-0.5">0 € / mes</p>
+            <p className="text-xs text-gray-500 mt-1">Para empezar</p>
           </div>
           <div className="space-y-2.5 flex-1">
             {essentialFeatures.map((f) => (
@@ -133,7 +133,7 @@ export default async function BillingPage() {
           </div>
           <button
             disabled
-            className="inline-flex items-center justify-center w-full bg-gray-100 text-gray-400 font-black py-2.5 rounded-xl text-sm cursor-not-allowed"
+            className="inline-flex items-center justify-center w-full bg-gray-100 text-gray-500 font-black py-2.5 rounded-xl text-sm cursor-not-allowed"
           >
             Plan actual
           </button>
@@ -177,7 +177,7 @@ export default async function BillingPage() {
           <div>
             <p className="font-black text-navy text-lg">Professional</p>
             <p className="text-blue-600 font-bold text-sm mt-0.5">99 € / mes</p>
-            <p className="text-xs text-gray-400 mt-1">Sin permanencia</p>
+            <p className="text-xs text-gray-500 mt-1">Sin permanencia</p>
           </div>
           <div className="space-y-2.5 flex-1">
             {proFeatures.map((f) => (
@@ -193,7 +193,7 @@ export default async function BillingPage() {
           >
             Activar ahora · 99€/mes
           </Link>
-          <p className="text-[10px] text-gray-400 text-center">
+          <p className="text-[11px] text-gray-500 text-center">
             o{" "}
             <a
               href="mailto:support@facultymatch.app?subject=Prueba%20Professional%2014%20d%C3%ADas"
@@ -206,7 +206,7 @@ export default async function BillingPage() {
         </div>
       </div>
 
-      <p className="text-xs text-gray-400 max-w-4xl">
+      <p className="text-xs text-gray-500 max-w-4xl">
         Sin comisiones por contratación. Sin permanencia. Para soluciones enterprise escríbenos a{" "}
         <a href="mailto:support@facultymatch.app" className="text-blue-500 hover:underline">
           support@facultymatch.app

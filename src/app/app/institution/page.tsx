@@ -197,7 +197,7 @@ export default async function InstitutionDashboardPage({
               <Search size={18} className="text-white" />
             </div>
             <div>
-              <p className="text-white/70 text-[10px] font-black uppercase tracking-widest">Directorio de docentes</p>
+              <p className="text-white/70 text-[11px] font-black uppercase tracking-widest">Directorio de docentes</p>
               <h2 className="text-white text-base font-black leading-tight">Buscar profesorado</h2>
             </div>
           </div>
@@ -268,7 +268,7 @@ export default async function InstitutionDashboardPage({
                 <div className="flex flex-wrap items-center gap-2.5">
                   <h1 className="text-2xl font-black text-[#0C1018] leading-tight">{institution?.name || "Mi Institución"}</h1>
                   {isVerified && (
-                    <span className="inline-flex items-center gap-1.5 bg-[#F7E8C8] border border-[#E9C77A] text-[#B4791E] text-[10px] font-bold px-2.5 py-1 rounded-full">
+                    <span className="inline-flex items-center gap-1.5 bg-[#F7E8C8] border border-[#E9C77A] text-[#B4791E] text-[11px] font-bold px-2.5 py-1 rounded-full">
                       <ShieldCheck size={11} /> Institución verificada
                     </span>
                   )}

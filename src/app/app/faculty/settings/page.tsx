@@ -149,7 +149,7 @@ export default async function SettingsPage() {
           {/* Plan card */}
           {isPro ? (
             <div className="p-8 rounded-2xl bg-blue-50/50 border border-blue-100 text-center space-y-4">
-              <Badge className="bg-fm-blue text-white text-[8px] font-black uppercase tracking-widest border-none">
+              <Badge className="bg-fm-blue text-white text-[11px] font-black uppercase tracking-widest border-none">
                 Plan Profesional
               </Badge>
               <div className="space-y-1">
@@ -180,10 +180,10 @@ export default async function SettingsPage() {
           ) : (
             <div className="p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 space-y-4">
               <div className="flex items-center justify-between">
-                <Badge className="bg-navy text-white text-[8px] font-black uppercase tracking-widest border-none">
+                <Badge className="bg-navy text-white text-[11px] font-black uppercase tracking-widest border-none">
                   Plan Gratuito
                 </Badge>
-                <span className="text-[10px] font-bold text-gray-400">ACTIVO</span>
+                <span className="text-[11px] font-bold text-gray-500">ACTIVO</span>
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">

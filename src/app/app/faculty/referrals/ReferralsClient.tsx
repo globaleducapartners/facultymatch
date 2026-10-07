@@ -164,7 +164,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                   onChange={e => setInviteEmail(e.target.value)}
                   placeholder="colega@universidad.edu"
                   disabled={!canSendMore || sendLoading}
-                  className="flex-1 h-12 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-fm-blue transition-all disabled:bg-gray-50 disabled:text-gray-400"
+                  className="flex-1 h-12 px-4 rounded-xl border border-gray-200 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-fm-blue transition-all disabled:bg-gray-50 disabled:text-gray-500"
                 />
                 <Button
                   type="submit"
@@ -193,7 +193,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                   <Check size={13} /> Invitación enviada correctamente.
                 </p>
               )}
-              <p className="text-[11px] text-gray-400 font-medium">
+              <p className="text-[11px] text-gray-500 font-medium">
                 {MAX_INVITES - stats.invitations_sent} invitaciones por email disponibles.
               </p>
             </CardContent>
@@ -207,7 +207,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                   <Users size={18} className="text-fm-blue" />
                   Mis invitaciones enviadas
                 </CardTitle>
-                <span className="text-sm font-bold text-gray-400">{referrals.length}/{MAX_INVITES}</span>
+                <span className="text-sm font-bold text-gray-500">{referrals.length}/{MAX_INVITES}</span>
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -224,18 +224,18 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
               ) : (
                 <div className="divide-y divide-gray-50">
                   <div className="grid grid-cols-[1fr_auto_auto] gap-4 px-6 py-3 bg-gray-50/50">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Email</span>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Fecha</span>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Estado</span>
+                    <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Email</span>
+                    <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Fecha</span>
+                    <span className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Estado</span>
                   </div>
                   {referrals.map(ref => (
                     <div key={ref.id} className="grid grid-cols-[1fr_auto_auto] gap-4 items-center px-6 py-4 hover:bg-gray-50/50 transition-colors">
                       <span className="text-sm font-medium text-navy truncate">{ref.invitee_email}</span>
-                      <span className="text-xs text-gray-400 font-medium whitespace-nowrap">
+                      <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
                         {formatDateTZ(ref.created_at)}
                       </span>
                       <Badge
-                        className={`text-[10px] font-black uppercase tracking-wider border px-2.5 py-1 rounded-full ${
+                        className={`text-[11px] font-black uppercase tracking-wider border px-2.5 py-1 rounded-full ${
                           STATUS_CLASS[ref.status] || "bg-gray-50 text-gray-500 border-gray-200"
                         }`}
                       >
@@ -284,7 +284,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                   <div className="text-center py-2">
                     <span className="text-5xl font-black text-navy">{stats.successful_referrals}</span>
                     <span className="text-xl font-black text-gray-300"> / 10</span>
-                    <p className="text-xs font-bold text-gray-400 mt-1 uppercase tracking-widest">Colegas verificados</p>
+                    <p className="text-xs font-bold text-gray-500 mt-1 uppercase tracking-widest">Colegas verificados</p>
                   </div>
                   <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
                     <div

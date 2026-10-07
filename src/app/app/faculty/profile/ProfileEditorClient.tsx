@@ -43,7 +43,7 @@ const D = {
   white:   "#FFFFFF",
   ink:     "#0C1018",
   muted:   "#6B7280",
-  faint:   "#9CA3AF",
+  faint:   "#5E6F8E",
   border:  "#D8E2EF",
   green:   "#059669",
   greenBg: "#F0FDF4",

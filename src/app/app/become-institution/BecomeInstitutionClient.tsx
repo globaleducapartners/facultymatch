@@ -14,7 +14,7 @@ const D = {
   white:  "#FFFFFF",
   ink:    "#0C1018",
   muted:  "#6B7280",
-  faint:  "#9CA3AF",
+  faint:  "#5E6F8E",
   border: "#D8E2EF",
   error:  "#DC2626",
   errBg:  "#FEF2F2",

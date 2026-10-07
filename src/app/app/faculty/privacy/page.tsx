@@ -418,7 +418,7 @@ export default async function PrivacyPage({
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-bold text-navy">{opt.label}</span>
                           {opt.badge && (
-                            <Badge className="bg-fm-blue text-white text-[8px] font-black uppercase tracking-widest border-none">
+                            <Badge className="bg-fm-blue text-white text-[11px] font-black uppercase tracking-widest border-none">
                               {opt.badge}
                             </Badge>
                           )}
@@ -456,7 +456,7 @@ export default async function PrivacyPage({
               <form action={blockInstitution} className="flex gap-2">
                 <div className="relative flex-1">
                   <Search
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
                     size={18}
                   />
                   <input
@@ -481,7 +481,7 @@ export default async function PrivacyPage({
               </form>
 
               <div className="space-y-3">
-                <h4 className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">
+                <h4 className="text-xs font-black uppercase tracking-widest text-gray-500 ml-1">
                   Instituciones bloqueadas ({blockedInstitutions.length})
                 </h4>
                 {blockedInstitutions.length > 0 ? (
@@ -492,13 +492,13 @@ export default async function PrivacyPage({
                         className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-red-100 transition-colors group"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-red-50 group-hover:text-red-400 transition-colors">
+                          <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-500 group-hover:bg-red-50 group-hover:text-red-400 transition-colors">
                             <Lock size={18} />
                           </div>
                           <div>
                             <p className="text-sm font-bold text-navy">{inst.name}</p>
                             {inst.domain && (
-                              <p className="text-xs text-gray-400 font-medium mt-0.5">
+                              <p className="text-xs text-gray-500 font-medium mt-0.5">
                                 Bloquea accesos desde @{inst.domain} y todos sus subdominios
                               </p>
                             )}
@@ -522,7 +522,7 @@ export default async function PrivacyPage({
                   </div>
                 ) : (
                   <div className="p-8 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
-                    <p className="text-sm text-gray-400 font-medium">
+                    <p className="text-sm text-gray-500 font-medium">
                       No tienes ninguna institución bloqueada.
                     </p>
                   </div>
@@ -560,7 +560,7 @@ export default async function PrivacyPage({
                         {uniqueLink}
                       </p>
                     </div>
-                    <p className="text-[10px] text-gray-400 font-medium">
+                    <p className="text-[11px] text-gray-400 font-medium">
                       Copia este enlace y compártelo directamente.
                     </p>
                   </div>
@@ -600,7 +600,7 @@ export default async function PrivacyPage({
                       <p className="text-xs font-bold text-navy truncate">
                         facultymatch.app/docentes/{facultyProfile.profile_slug}
                       </p>
-                      <p className="text-[10px] text-blue-600 font-medium">
+                      <p className="text-[11px] text-blue-600 font-medium">
                         Enlace público, visible para cualquier persona
                       </p>
                     </div>
@@ -628,7 +628,7 @@ export default async function PrivacyPage({
               ) : (
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                    <Globe size={18} className="text-gray-400 shrink-0 mt-0.5" />
+                    <Globe size={18} className="text-gray-500 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-bold text-navy">Aún no tienes un enlace público</p>
                       <p className="text-xs text-gray-500 font-medium mt-1 leading-relaxed">
@@ -658,7 +658,7 @@ export default async function PrivacyPage({
                 <Star size={20} className="text-fm-gold" />
                 Visibilidad preferente
                 {isPremium && (
-                  <Badge className="bg-gradient-to-r from-fm-gold to-orange-500 text-white text-[8px] font-black uppercase tracking-widest border-none ml-1">
+                  <Badge className="bg-gradient-to-r from-fm-gold to-orange-500 text-white text-[11px] font-black uppercase tracking-widest border-none ml-1">
                     Pro
                   </Badge>
                 )}
@@ -677,7 +677,7 @@ export default async function PrivacyPage({
                   <p className="text-xs font-medium text-gray-600">
                     Elige hasta 5 instituciones en las que quieres aparecer entre los primeros resultados.
                   </p>
-                  <div className="text-xl font-black text-navy">29€ <span className="text-sm text-gray-400 font-bold">/ año</span></div>
+                  <div className="text-xl font-black text-navy">29€ <span className="text-sm text-gray-500 font-bold">/ año</span></div>
                   <a
                     href="/checkout?plan=faculty-pro"
                     className="inline-flex items-center gap-2 bg-fm-gold hover:bg-orange-500 text-white font-black text-xs px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-orange-100"
@@ -695,7 +695,7 @@ export default async function PrivacyPage({
                   {preferredInstitutions.length < 5 && (
                     <form action={addPreferredInstitution} className="flex gap-2">
                       <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={15} />
                         <input
                           name="preferredName"
                           type="text"
@@ -717,7 +717,7 @@ export default async function PrivacyPage({
                   {/* Current list */}
                   <div className="space-y-2">
                     {preferredInstitutions.length === 0 ? (
-                      <p className="text-xs text-gray-400 font-medium text-center py-4 border border-dashed border-gray-200 rounded-xl">
+                      <p className="text-xs text-gray-500 font-medium text-center py-4 border border-dashed border-gray-200 rounded-xl">
                         Aún no has añadido ninguna institución.
                       </p>
                     ) : (
@@ -742,7 +742,7 @@ export default async function PrivacyPage({
                     <p className="text-xs text-orange-500 font-bold text-center">Límite de 5 instituciones alcanzado.</p>
                   )}
 
-                  <p className="text-[10px] text-gray-400 font-medium leading-relaxed">
+                  <p className="text-[11px] text-gray-500 font-medium leading-relaxed">
                     La visibilidad preferente es una señal de interés. No garantiza contratación ni acceso prioritario a datos de contacto.
                   </p>
                 </div>

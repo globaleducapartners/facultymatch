@@ -158,7 +158,7 @@ export default async function InstitutionHomePage() {
             </div>
             <div>
               <p className="text-2xl font-black text-navy">{stat.value}</p>
-              <p className="text-[10px] font-bold text-fm-faint uppercase tracking-widest leading-tight mt-0.5">{stat.label}</p>
+              <p className="text-[11px] font-bold text-fm-faint uppercase tracking-widest leading-tight mt-0.5">{stat.label}</p>
             </div>
           </Link>
         ))}
@@ -175,7 +175,7 @@ export default async function InstitutionHomePage() {
               <Zap size={16} className="text-white" />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/80">Mejora tu plan</p>
+              <p className="text-[11px] font-black uppercase tracking-widest text-white/80">Mejora tu plan</p>
               <p className="text-sm font-black leading-tight">Más búsquedas, más contactos, sin límites</p>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default async function InstitutionHomePage() {
                   <Search size={18} className="text-white" />
                 </div>
                 <div>
-                  <p className="text-white/70 text-[10px] font-black uppercase tracking-widest">Directorio de docentes</p>
+                  <p className="text-white/70 text-[11px] font-black uppercase tracking-widest">Directorio de docentes</p>
                   <h3 className="text-white font-black">Buscar profesorado para tus programas</h3>
                 </div>
               </div>
@@ -258,7 +258,7 @@ export default async function InstitutionHomePage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="font-black text-navy text-sm truncate">{name}</p>
-                          <Badge className={`border-none text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 ${
+                          <Badge className={`border-none text-[11px] font-black uppercase tracking-wider px-1.5 py-0.5 ${
                             isReplied ? "bg-green-50 text-green-600" :
                             isSent ? "bg-blue-50 text-fm-blue" :
                             "bg-gray-100 text-gray-500"
@@ -270,7 +270,7 @@ export default async function InstitutionHomePage() {
                           <strong className="font-bold text-fm-muted">{lastMsgSender}:</strong> {lastMsgText}
                         </p>
                       </div>
-                      <span className="text-[10px] text-fm-faint font-bold whitespace-nowrap self-start mt-1">
+                      <span className="text-[11px] text-fm-faint font-bold whitespace-nowrap self-start mt-1">
                         {formatDateTZ(lastMsgDate)}
                       </span>
                     </div>
@@ -312,7 +312,7 @@ export default async function InstitutionHomePage() {
                   <item.icon size={16} className={item.color} />
                 </div>
                 <p className="font-black text-navy text-sm group-hover:text-fm-blue transition-colors">{item.label}</p>
-                <p className="text-[10px] text-fm-faint font-bold">{item.sub}</p>
+                <p className="text-[11px] text-fm-faint font-bold">{item.sub}</p>
               </Link>
             ))}
           </div>
@@ -325,7 +325,7 @@ export default async function InstitutionHomePage() {
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-black text-navy text-sm">Perfil de institución</h3>
-              <Badge className={`font-black text-[10px] px-2.5 py-1 rounded-full border-none ${profileCompletion >= 80 ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
+              <Badge className={`font-black text-[11px] px-2.5 py-1 rounded-full border-none ${profileCompletion >= 80 ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
                 {profileCompletion}%
               </Badge>
             </div>
@@ -372,7 +372,7 @@ export default async function InstitutionHomePage() {
             <div className="bg-gradient-to-br from-navy to-[#1a3a6b] text-white rounded-3xl p-5 space-y-3">
               <div className="flex items-center gap-2">
                 <BarChart3 size={14} className="text-energy-orange" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-energy-orange">Plan Professional</span>
+                <span className="text-[11px] font-black uppercase tracking-widest text-energy-orange">Plan Professional</span>
               </div>
               <p className="text-xs font-medium text-white/80 leading-relaxed">
                 Búsquedas ilimitadas, contactos ilimitados y acceso completo al directorio.
@@ -386,7 +386,7 @@ export default async function InstitutionHomePage() {
             <div className="bg-white rounded-3xl border-2 border-dashed border-energy-orange/30 p-5 space-y-3 text-center">
               <div className="flex items-center justify-center gap-2 text-energy-orange">
                 <Zap size={14} />
-                <span className="text-[10px] font-black uppercase tracking-widest">Plan Growth</span>
+                <span className="text-[11px] font-black uppercase tracking-widest">Plan Growth</span>
               </div>
               <p className="text-xs font-medium text-fm-muted leading-relaxed">
                 20 búsquedas y 20 contactos al mes. Pasa a Professional para acceso sin límites.
@@ -399,7 +399,7 @@ export default async function InstitutionHomePage() {
                 <Zap size={12} /> Activar Plan Professional
               </Link>
               {searchesUsed >= 20 && (
-                <p className="text-[10px] text-red-500 font-bold">
+                <p className="text-[11px] text-red-500 font-bold">
                   Has alcanzado el límite de búsquedas de este mes.
                 </p>
               )}
@@ -408,7 +408,7 @@ export default async function InstitutionHomePage() {
             <div className="bg-white rounded-3xl border-2 border-dashed border-energy-orange/30 p-5 space-y-3 text-center">
               <div className="flex items-center justify-center gap-2 text-energy-orange">
                 <Zap size={14} />
-                <span className="text-[10px] font-black uppercase tracking-widest">Plan Professional</span>
+                <span className="text-[11px] font-black uppercase tracking-widest">Plan Professional</span>
               </div>
               <p className="text-xs font-medium text-fm-muted leading-relaxed">
                 Búsquedas y contactos ilimitados. Encuentra el profesorado ideal para todos tus programas.
@@ -421,7 +421,7 @@ export default async function InstitutionHomePage() {
                 <Zap size={12} /> Activar Plan Professional
               </Link>
               {searchesUsed >= 5 && (
-                <p className="text-[10px] text-red-500 font-bold">
+                <p className="text-[11px] text-red-500 font-bold">
                   Has alcanzado el límite de búsquedas gratuitas este mes.
                 </p>
               )}

@@ -96,22 +96,22 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
           <div className="flex items-center gap-2 flex-wrap">
             <h4 className="text-base font-bold text-navy truncate">{req.institution?.name}</h4>
             {instVerified && (
-              <span className="inline-flex items-center gap-1 bg-[#F7E8C8] text-[#B4791E] text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#E9C77A]">
+              <span className="inline-flex items-center gap-1 bg-[#F7E8C8] text-[#B4791E] text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#E9C77A]">
                 <ShieldCheck size={9} /> Verificada
               </span>
             )}
             {req.subject && (
-              <Badge variant="secondary" className="bg-blue-50 text-fm-blue font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 border-blue-100">
+              <Badge variant="secondary" className="bg-blue-50 text-fm-blue font-bold text-[11px] uppercase tracking-wider px-2 py-0.5 border-blue-100">
                 {SUBJECT_LABELS[req.subject] ?? req.subject}
               </Badge>
             )}
             {req.contract_type && (
-              <Badge variant="secondary" className="bg-purple-50 text-purple-600 font-bold text-[9px] uppercase tracking-wider px-2 py-0.5 border-purple-100">
+              <Badge variant="secondary" className="bg-purple-50 text-purple-600 font-bold text-[11px] uppercase tracking-wider px-2 py-0.5 border-purple-100">
                 {CONTRACT_LABELS[req.contract_type] ?? req.contract_type}
               </Badge>
             )}
           </div>
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+          <p className="text-[11px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">
             {formatDateTZ(req.created_at, { day: "numeric", month: "long" })}
             {req.institution?.country && ` · ${req.institution.country}`}
           </p>
@@ -129,17 +129,17 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
                 variant="ghost"
                 disabled={archiving}
                 onClick={async (e) => { e.stopPropagation(); setArchiving(true); await updateStatus(req.id, "archived"); }}
-                className="rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 p-2 h-9 w-9"
+                className="rounded-xl text-gray-500 hover:text-red-600 hover:bg-red-50 p-2 h-9 w-9"
               >
                 <Archive size={15} />
               </Button>
             </>
           ) : (
-            <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 uppercase text-[9px] font-black tracking-widest px-3 py-1">
+            <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 uppercase text-[11px] font-black tracking-widest px-3 py-1">
               <CheckCircle2 size={9} className="inline mr-1" /> Respondida
             </Badge>
           )}
-          {expanded ? <ChevronUp size={14} className="text-gray-400" /> : <ChevronDown size={14} className="text-gray-400" />}
+          {expanded ? <ChevronUp size={14} className="text-gray-500" /> : <ChevronDown size={14} className="text-gray-500" />}
         </div>
       </div>
 
@@ -181,13 +181,13 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
               const isInst = msg.sender === "institution";
               return (
                 <div key={index} className={`flex flex-col ${isInst ? "items-start" : "items-end"} gap-1`}>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">
+                  <p className="text-[11px] font-black text-gray-500 uppercase tracking-widest px-1">
                     {isInst ? req.institution?.name : "Tu respuesta"} {msg.created_at ? `· ${formatDateTimeTZ(msg.created_at)}` : ""}
                   </p>
                   <div className={`max-w-[85%] p-4 rounded-2xl ${isInst ? "bg-gray-100 text-navy rounded-tl-sm" : "bg-fm-blue text-white rounded-tr-sm"}`}>
                     {/* Meta tags for first institution message */}
                     {isInst && index === 0 && (req.modality || req.dates) && (
-                      <div className="flex flex-wrap gap-2 mb-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                      <div className="flex flex-wrap gap-2 mb-2 text-[11px] font-bold text-gray-500 uppercase tracking-widest">
                         {req.modality && <span className="flex items-center gap-1"><Clock size={9} /> {MODALITY_LABELS[req.modality] ?? req.modality}</span>}
                         {req.dates && <span className="flex items-center gap-1"><Clock size={9} /> {req.dates}</span>}
                       </div>
@@ -220,7 +220,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
             {/* Follow-up compose */}
             {showFollowUp && (
               <div className="space-y-3 pt-2 border-t border-gray-100">
-                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Mensaje de seguimiento</p>
+                <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Mensaje de seguimiento</p>
                 <textarea
                   value={followUpMsg}
                   onChange={e => setFollowUpMsg(e.target.value)}
@@ -266,7 +266,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
     <div className="space-y-6">
       {/* Pending */}
       <section>
-        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2">
+        <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
           <Mail size={13} /> Pendientes ({pendingRequests.length})
         </h2>
         <div className="space-y-3">
@@ -278,7 +278,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
                 <Mail size={28} className="text-gray-200" />
               </div>
               <p className="text-navy font-bold text-sm">Bandeja vacía</p>
-              <p className="text-gray-400 text-xs font-medium">No has recibido ninguna solicitud nueva.</p>
+              <p className="text-gray-500 text-xs font-medium">No has recibido ninguna solicitud nueva.</p>
             </div>
           )}
         </div>
@@ -287,7 +287,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
       {/* Replied */}
       {repliedRequests.length > 0 && (
         <section>
-          <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2">
+          <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
             <CheckCircle2 size={13} /> Respondidas ({repliedRequests.length})
           </h2>
           <div className="space-y-3">
@@ -299,7 +299,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
       {/* Archived */}
       {archivedRequests.length > 0 && (
         <section>
-          <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3 flex items-center gap-2">
+          <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
             <Archive size={13} /> Archivadas ({archivedRequests.length})
           </h2>
           <div className="space-y-3 opacity-50">
@@ -308,7 +308,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
                 <div className="bg-gray-100 p-2.5 rounded-xl flex-shrink-0"><Archive size={18} className="text-gray-300" /></div>
                 <div>
                   <h4 className="text-sm font-bold text-navy">{req.institution?.name}</h4>
-                  <p className="text-xs text-gray-400 mt-0.5">Archivada · {formatDateTZ(req.created_at)}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Archivada · {formatDateTZ(req.created_at)}</p>
                 </div>
               </div>
             ))}

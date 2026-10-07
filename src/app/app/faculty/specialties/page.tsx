@@ -13,7 +13,7 @@ const D = {
   white:   "#FFFFFF",
   ink:     "#0C1018",
   muted:   "#6B7280",
-  faint:   "#9CA3AF",
+  faint:   "#5E6F8E",
   border:  "#D8E2EF",
 };
 
@@ -112,7 +112,7 @@ export default async function SpecialtiesPage() {
               </div>
               {specialties.length > 0 && (
                 <span style={{
-                  fontFamily: SANS, fontSize: 10, fontWeight: 700,
+                  fontFamily: SANS, fontSize: 11, fontWeight: 700,
                   color: D.blue, background: "#EFF6FF",
                   padding: "3px 8px", borderRadius: 999, whiteSpace: "nowrap", flexShrink: 0,
                 }}>

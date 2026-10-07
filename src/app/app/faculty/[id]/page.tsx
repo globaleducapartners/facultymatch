@@ -201,7 +201,7 @@ export default async function FacultyProfilePage({
       <ProfileViewTracker facultyId={facultyId} />
       <div className="animate-in fade-in duration-500 pb-12 font-sans">
       {/* ── Breadcrumb ── */}
-      <nav className="flex items-center gap-2 text-sm font-semibold text-slate-400 mb-6">
+      <nav className="flex items-center gap-2 text-sm font-semibold text-slate-500 mb-6">
         <Link
           href={institution ? "/app/institution/search" : "/app/faculty/directory"}
           className="hover:text-[#1B4FD8] transition-colors"
@@ -271,10 +271,10 @@ export default async function FacultyProfilePage({
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#0D2240] tracking-tight leading-tight">{facultyName}</h1>
               {faculty?.is_phd && (
-                <Badge className="bg-purple-50 text-purple-700 border-purple-100 text-[10px] font-bold px-2.5 py-1 rounded-full">PhD</Badge>
+                <Badge className="bg-purple-50 text-purple-700 border-purple-100 text-[11px] font-bold px-2.5 py-1 rounded-full">PhD</Badge>
               )}
               {faculty?.aneca_accreditation && (
-                <Badge className="bg-blue-50 text-[#1B4FD8] border-blue-100 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                <Badge className="bg-blue-50 text-[#1B4FD8] border-blue-100 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
                   <Award size={10} /> ANECA
                 </Badge>
               )}
@@ -290,7 +290,7 @@ export default async function FacultyProfilePage({
               <span className="flex items-center gap-1.5">
                 <Building2 size={15} className="text-[#1B4FD8] shrink-0" />
                 <span className="text-[#0D2240] font-semibold">{faculty.current_institution}</span>
-                {faculty?.academic_level && <span className="text-slate-400 font-normal">· {faculty.academic_level}</span>}
+                {faculty?.academic_level && <span className="text-slate-500 font-normal">· {faculty.academic_level}</span>}
               </span>
             )}
             {(faculty?.city || faculty?.country) && (
@@ -354,12 +354,12 @@ export default async function FacultyProfilePage({
                     <div key={exp.id} className="flex gap-4 items-start p-5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl hover:border-slate-300 transition-colors">
                       <div className="w-1.5 h-1.5 rounded-full bg-[#1B4FD8] mt-2 shrink-0" />
                       <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-[#1B4FD8] uppercase tracking-wider">{exp.area}</p>
+                        <p className="text-[11px] font-bold text-[#1B4FD8] uppercase tracking-wider">{exp.area}</p>
                         <p className="font-bold text-[#0D2240] text-sm sm:text-base">{exp.subarea}</p>
                         {exp.topics?.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 pt-2">
                             {exp.topics.map((t: string) => (
-                              <span key={t} className="text-[10px] font-semibold px-2.5 py-1 bg-white border border-[#E2E8F0] rounded-lg text-slate-500 shadow-3xs">{t}</span>
+                              <span key={t} className="text-[11px] font-semibold px-2.5 py-1 bg-white border border-[#E2E8F0] rounded-lg text-slate-500 shadow-3xs">{t}</span>
                             ))}
                           </div>
                         )}
@@ -394,7 +394,7 @@ export default async function FacultyProfilePage({
                       {deg.field && <p className="text-sm font-semibold text-[#1B4FD8]">{deg.field}</p>}
                       <p className="text-sm text-slate-500 font-medium">
                         {deg.university || deg.institution || deg.school || ""}
-                        {deg.year && <span className="ml-1.5 text-slate-400">({deg.year})</span>}
+                        {deg.year && <span className="ml-1.5 text-slate-500">({deg.year})</span>}
                       </p>
                     </div>
                   </div>
@@ -425,7 +425,7 @@ export default async function FacultyProfilePage({
                   return name ? (
                     <div key={i} className="flex items-center gap-2 bg-[#F8FAFC] border border-[#E2E8F0] px-4 py-2.5 rounded-xl shadow-3xs">
                       <span className="font-bold text-[#0D2240] text-sm">{name}</span>
-                      {level && <span className="text-xs text-slate-400 font-medium bg-white px-1.5 py-0.5 rounded border border-[#E2E8F0]">{level}</span>}
+                      {level && <span className="text-xs text-slate-500 font-medium bg-white px-1.5 py-0.5 rounded border border-[#E2E8F0]">{level}</span>}
                     </div>
                   ) : null;
                 })}
@@ -456,7 +456,7 @@ export default async function FacultyProfilePage({
                 )}
                 {hasInstitutions && (
                   <div className="p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">
+                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">
                       Otras instituciones impartidas
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -503,7 +503,7 @@ export default async function FacultyProfilePage({
                       <BookOpen size={18} />
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Google Scholar</span>
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">Google Scholar</span>
                       <a
                         href={`https://scholar.google.com/citations?user=${faculty.google_scholar_id}`}
                         target="_blank" rel="noopener noreferrer"
@@ -520,7 +520,7 @@ export default async function FacultyProfilePage({
                       <Globe size={18} />
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">ORCID iD</span>
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">ORCID iD</span>
                       <a
                         href={`https://orcid.org/${faculty.orcid_id}`}
                         target="_blank" rel="noopener noreferrer"
@@ -533,7 +533,7 @@ export default async function FacultyProfilePage({
                 )}
                 {faculty?.research_publications && (
                   <div className="pt-5 border-t border-slate-100">
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Publicaciones destacadas</p>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Publicaciones destacadas</p>
                     <div className="space-y-3">
                       {faculty.research_publications
                         .split("\n")
@@ -541,7 +541,7 @@ export default async function FacultyProfilePage({
                         .filter(Boolean)
                         .map((pub: string, idx: number) => (
                           <div key={idx} className="flex gap-3.5 items-start p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl text-sm text-slate-600 leading-relaxed hover:border-slate-300 transition-colors">
-                            <div className="p-1.5 bg-white border border-[#E2E8F0] rounded-lg text-slate-400 shrink-0 mt-0.5">
+                            <div className="p-1.5 bg-white border border-[#E2E8F0] rounded-lg text-slate-500 shrink-0 mt-0.5">
                               <BookOpen size={14} className="text-[#1B4FD8]" />
                             </div>
                             <span className="flex-1 min-w-0 break-words font-medium">{pub}</span>
@@ -567,12 +567,12 @@ export default async function FacultyProfilePage({
                     className="flex items-center justify-between p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl hover:bg-blue-50/50 hover:border-[#1B4FD8]/30 transition-all group shadow-3xs"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-white text-slate-400 border border-[#E2E8F0] rounded-xl group-hover:text-[#1B4FD8] transition-colors shadow-3xs">
+                      <div className="p-2.5 bg-white text-slate-500 border border-[#E2E8F0] rounded-xl group-hover:text-[#1B4FD8] transition-colors shadow-3xs">
                         <FileText size={18} />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-[#0D2240]">{doc.name || doc.file_name || "Documento"}</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">{doc.doc_type || "PDF"}</p>
+                        <p className="text-[11px] font-bold text-slate-500 uppercase">{doc.doc_type || "PDF"}</p>
                       </div>
                     </div>
                     <ExternalLink size={15} className="text-slate-300 group-hover:text-[#1B4FD8] transition-colors mr-1" />
@@ -585,12 +585,12 @@ export default async function FacultyProfilePage({
                     className="flex items-center justify-between p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl hover:bg-blue-50/50 hover:border-[#1B4FD8]/30 transition-all group shadow-3xs"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-white text-slate-400 border border-[#E2E8F0] rounded-xl group-hover:text-[#1B4FD8] transition-colors shadow-3xs">
+                      <div className="p-2.5 bg-white text-slate-500 border border-[#E2E8F0] rounded-xl group-hover:text-[#1B4FD8] transition-colors shadow-3xs">
                         <FileText size={18} />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-[#0D2240]">Curriculum Vitae</p>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">PDF</p>
+                        <p className="text-[11px] font-bold text-slate-500 uppercase">PDF</p>
                       </div>
                     </div>
                     <ExternalLink size={15} className="text-slate-300 group-hover:text-[#1B4FD8] transition-colors mr-1" />
@@ -678,7 +678,7 @@ export default async function FacultyProfilePage({
               {/* Contact details */}
               {(emailToShow || linkedinToShow || phoneToShow || whatsappToShow) && (
                 <div className="space-y-3 pt-5 border-t border-white/10">
-                  <p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest">Contacto directo</p>
+                  <p className="text-[11px] font-bold text-blue-300 uppercase tracking-widest">Contacto directo</p>
                   {emailToShow && (
                     <a href={`mailto:${emailToShow}`} className="flex items-center gap-3 text-sm font-semibold text-white/90 hover:text-white transition-colors">
                       <div className="p-1.5 bg-white/10 rounded-lg shrink-0">
@@ -732,7 +732,7 @@ export default async function FacultyProfilePage({
                 institutionId={institution.id}
               />
               {contactMonthlyLimit !== null && (
-                <p className="text-xs text-gray-400 text-center">
+                <p className="text-xs text-gray-500 text-center">
                   {usedContacts} de {contactMonthlyLimit} contactos usados este mes
                 </p>
               )}
@@ -742,7 +742,7 @@ export default async function FacultyProfilePage({
           ) : institution && !isPro && !canContact ? (
             <div className="bg-white rounded-3xl border-2 border-gray-100 shadow-sm p-6 space-y-5 text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto">
-                <Lock size={22} className="text-gray-400" />
+                <Lock size={22} className="text-gray-500" />
               </div>
               <div>
                 <h3 className="text-base font-bold text-[#0D2240] mb-1">Límite mensual alcanzado</h3>
@@ -802,14 +802,14 @@ export default async function FacultyProfilePage({
               target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-3 bg-white rounded-2xl border border-[#E2E8F0] hover:border-[#1B4FD8] transition-colors group shadow-3xs"
             >
-              <Globe size={13} className="text-slate-400 group-hover:text-[#1B4FD8] shrink-0 transition-colors" />
-              <span className="text-xs font-semibold text-slate-400 group-hover:text-[#1B4FD8] transition-colors truncate">
+              <Globe size={13} className="text-slate-500 group-hover:text-[#1B4FD8] shrink-0 transition-colors" />
+              <span className="text-xs font-semibold text-slate-500 group-hover:text-[#1B4FD8] transition-colors truncate">
                 {`facultymatch.app/docentes/${faculty.profile_slug}`}
               </span>
               <ExternalLink size={11} className="text-slate-300 group-hover:text-[#1B4FD8] shrink-0 transition-colors ml-auto" />
             </a>
           ) : (
-            <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 rounded-2xl border border-[#E2E8F0] text-slate-400">
+            <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 rounded-2xl border border-[#E2E8F0] text-slate-500">
               <Globe size={13} className="shrink-0" />
               <span className="text-xs font-semibold">Este docente aún no tiene enlace público generado</span>
             </div>

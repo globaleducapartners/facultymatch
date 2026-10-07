@@ -44,7 +44,7 @@ export function ReplyDialog({ contactId, institutionName, isOpen, onClose, onSuc
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-5 mt-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-black uppercase tracking-widest text-gray-400">Tu respuesta</label>
+            <label className="text-xs font-black uppercase tracking-widest text-gray-500">Tu respuesta</label>
             <textarea
               value={message}
               onChange={e => setMessage(e.target.value)}

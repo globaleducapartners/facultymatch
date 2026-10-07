@@ -9,7 +9,7 @@ const D = {
   blue:   "#1B4FD8",
   ink:    "#0C1018",
   muted:  "#6B7280",
-  faint:  "#9CA3AF",
+  faint:  "#5E6F8E",
   border: "#D8E2EF",
   surf:   "#F2F6FC",
   white:  "#FFFFFF",

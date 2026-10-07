@@ -158,7 +158,7 @@ export default async function VerificationPage() {
     rechazado: { label: "Rechazado", cls: "bg-red-50 text-red-600 border-red-200" },
   };
 
-  const statusBadge = badges[verificationStatus as string] ?? { label: "Sin verificar", cls: "bg-gray-50 text-gray-400 border-gray-100" };
+  const statusBadge = badges[verificationStatus as string] ?? { label: "Sin verificar", cls: "bg-gray-50 text-gray-500 border-gray-100" };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -198,7 +198,7 @@ export default async function VerificationPage() {
             </CardHeader>
             <CardContent className="space-y-8">
               <div className="space-y-2">
-                <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">
+                <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
                   <span>Progreso de verificación</span>
                   <span>{progress}%</span>
                 </div>
@@ -281,13 +281,13 @@ export default async function VerificationPage() {
                       className={`w-full h-14 rounded-xl font-bold transition-all shadow-lg ${
                         progress === 100
                           ? "bg-fm-blue hover:bg-blue-700 text-white shadow-blue-100"
-                          : "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                          : "bg-gray-100 text-gray-500 cursor-not-allowed shadow-none"
                       }`}
                     >
                       Solicitar verificación oficial
                     </Button>
                     {progress < 100 && (
-                      <p className="text-center text-[10px] text-gray-400 font-medium mt-3 uppercase tracking-widest">
+                      <p className="text-center text-[11px] text-gray-500 font-medium mt-3 uppercase tracking-widest">
                         Necesitas el 100% para habilitar la solicitud.
                       </p>
                     )}

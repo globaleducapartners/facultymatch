@@ -91,18 +91,18 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="text-base font-bold text-navy truncate">{faculty.full_name}</h3>
             {subjectLabel && (
-              <Badge variant="secondary" className="bg-blue-50 text-fm-blue border-blue-100 text-[9px] font-black uppercase tracking-wider px-2 py-0.5">
+              <Badge variant="secondary" className="bg-blue-50 text-fm-blue border-blue-100 text-[11px] font-black uppercase tracking-wider px-2 py-0.5">
                 {subjectLabel}
               </Badge>
             )}
           </div>
-          <p className="text-xs text-gray-400 font-medium truncate">{faculty.headline}</p>
+          <p className="text-xs text-gray-500 font-medium truncate">{faculty.headline}</p>
         </div>
 
         {/* Status + date + expand */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <div className="hidden sm:block text-right">
-            <Badge className={`border-none text-[10px] font-black uppercase tracking-wider ${
+            <Badge className={`border-none text-[11px] font-black uppercase tracking-wider ${
               isReplied ? "bg-green-50 text-green-600" :
               isSent ? "bg-blue-50 text-fm-blue" :
               "bg-gray-100 text-gray-500"
@@ -110,11 +110,11 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
               {isReplied ? <><CheckCircle2 size={10} className="inline mr-1" />Respondida</> :
                isSent ? <><Clock size={10} className="inline mr-1" />Enviada</> : "Archivada"}
             </Badge>
-            <p className="text-[10px] text-gray-400 font-medium mt-1">
+            <p className="text-[11px] text-gray-500 font-medium mt-1">
               {formatDateTZ(contact.created_at)}
             </p>
           </div>
-          {expanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
+          {expanded ? <ChevronUp size={16} className="text-gray-500" /> : <ChevronDown size={16} className="text-gray-500" />}
         </div>
       </div>
 
@@ -157,13 +157,13 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
               const isInst = msg.sender === "institution";
               return (
                 <div key={index} className={`flex flex-col ${isInst ? "items-end" : "items-start"} gap-2`}>
-                  <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                  <div className="flex items-center gap-2 text-[11px] text-gray-500 font-bold uppercase tracking-widest">
                     {!isInst && (
                       <div className="relative w-5 h-5 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center flex-shrink-0">
                         {faculty.avatar_url ? (
                           <Image src={faculty.avatar_url} alt={faculty.full_name} fill sizes="20px" className="object-cover" />
                         ) : (
-                          <span className="text-[8px] font-black text-gray-500">{initials[0]}</span>
+                          <span className="text-[11px] font-black text-gray-500">{initials[0]}</span>
                         )}
                       </div>
                     )}
@@ -176,17 +176,17 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
                     {isInst && index === 0 && (contact.subject || contact.modality || contact.dates) && (
                       <div className="flex flex-wrap gap-2 mb-3 opacity-80">
                         {contact.subject && (
-                          <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+                          <span className="flex items-center gap-1 text-[11px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
                             <Mail size={9} /> {subjectLabel || contact.subject}
                           </span>
                         )}
                         {contact.modality && (
-                          <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+                          <span className="flex items-center gap-1 text-[11px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
                             <MapPin size={9} /> {contact.modality}
                           </span>
                         )}
                         {contact.dates && (
-                          <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+                          <span className="flex items-center gap-1 text-[11px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
                             <Calendar size={9} /> {contact.dates}
                           </span>
                         )}
@@ -251,7 +251,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
             {/* Follow-up compose */}
             {showFollowUp && (
               <div className="space-y-3 pt-2 border-t border-gray-100">
-                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Mensaje de seguimiento</p>
+                <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Mensaje de seguimiento</p>
                 <textarea
                   value={followUpMsg}
                   onChange={e => setFollowUpMsg(e.target.value)}
