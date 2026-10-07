@@ -62,9 +62,6 @@ export async function generateMetadata({
   const description = faculty?.headline
     ? `${faculty.headline}${faculty?.current_institution ? ` · ${faculty.current_institution}` : ""}`
     : `Perfil académico de ${name} en FacultyMatch`;
-  const ogImage = up?.avatar_url
-    ? [{ url: up.avatar_url, width: 400, height: 400 }]
-    : [{ url: "/og-image.png", width: 1200, height: 630, alt: "FacultyMatch" }];
 
   return {
     title: `${name} | FacultyMatch`,
@@ -74,13 +71,11 @@ export async function generateMetadata({
       description,
       type: "profile",
       url: `${BASE}/docentes/${slug}`,
-      images: ogImage,
     },
     twitter: {
       card: "summary_large_image",
       title: `${name} | FacultyMatch`,
       description,
-      images: ogImage.map((i) => i.url),
     },
     alternates: { canonical: `${BASE}/docentes/${slug}` },
     robots: { index: true, follow: true },
@@ -251,7 +246,7 @@ export default async function PublicFacultyProfilePage({
           </nav>
 
           {/* ── HERO CARD ── */}
-          <div className="bg-white rounded-[2rem] border border-slate-200/80 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
             {/* Cover */}
             <div className="relative h-40 sm:h-52 overflow-hidden bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#2563EB]">
               {faculty.banner_url && (
@@ -659,8 +654,7 @@ export default async function PublicFacultyProfilePage({
             <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 self-start">
 
               {/* Contact CTA */}
-              <div className="bg-gradient-to-br from-[#0D2240] to-[#1B4FD8] rounded-[2rem] p-7 sm:p-8 text-white space-y-5 shadow-xl relative overflow-hidden border border-white/10">
-                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl" />
+              <div className="bg-gradient-to-br from-[#0D2240] to-[#1B4FD8] rounded-3xl p-7 sm:p-8 text-white space-y-5 shadow-xl relative overflow-hidden border border-white/10">
                 <div className="relative">
                   <div className="flex items-center gap-2.5 mb-2">
                     <Building2 size={16} className="text-blue-300" />
@@ -693,7 +687,7 @@ export default async function PublicFacultyProfilePage({
               </div>
 
               {/* Verification badges */}
-              <div className="bg-white rounded-[2rem] border border-slate-200/80 shadow-sm p-6 space-y-5">
+              <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 space-y-5">
                 <div className="flex items-center gap-2.5">
                   <Shield size={13} className="text-slate-500" />
                   <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">
@@ -731,7 +725,7 @@ export default async function PublicFacultyProfilePage({
 
               {/* Faculty areas (compact) */}
               {hasFacultyAreas && (
-                <div className="bg-white rounded-[2rem] border border-slate-200/80 shadow-sm p-6 space-y-4">
+                <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-6 space-y-4">
                   <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">Materias</p>
                   <div className="flex flex-wrap gap-2">
                     {faculty.faculty_areas.slice(0, 8).map((area: string) => (
@@ -757,7 +751,7 @@ export default async function PublicFacultyProfilePage({
 
 function Section({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-white rounded-[2rem] border border-slate-200/80 shadow-sm p-7 sm:p-8 ${className}`}>
+    <div className={`bg-white rounded-3xl border border-slate-200/80 shadow-sm p-7 sm:p-8 ${className}`}>
       {children}
     </div>
   );

@@ -1,6 +1,7 @@
 "use server";
 
 import { ensureProfileSlug } from "@/lib/profile-slug";
+import { processReferralSuccess } from "@/lib/referrals";
 import { requireAdmin } from "@/lib/require-admin";
 import { revalidatePath } from "next/cache";
 
@@ -68,6 +69,13 @@ export async function activateFaculty(
     verificado_en: new Date().toISOString(),
   }).eq("user_id", facultyId);
   if (error) throw new Error("No se pudo verificar el perfil: " + error.message);
+
+  // Mismo efecto que "approve" en /api/admin/verify-faculty: si este docente
+  // llegó por un referido, cuenta para quien lo invitó. Antes, verificar
+  // desde esta pantalla no sumaba el referido (el panel de pendientes sí).
+  await processReferralSuccess(admin, facultyId).catch(e =>
+    console.error("[activateFaculty] processReferralSuccess failed:", e)
+  );
   revalidatePath(`/control/faculty/${facultyId}`);
   return { ok: true };
 }

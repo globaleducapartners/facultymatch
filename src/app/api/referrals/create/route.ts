@@ -188,7 +188,7 @@ function buildInvitationEmail(
         Unirme a FacultyMatch →
       </a>
       <p style="margin:12px 0 0;color:#94a3b8;font-size:12px;">
-        El mes gratuito se activa automáticamente al registrarte con este enlace.
+        Cuando actives el plan Professional, introduce el código de abajo en el pago para disfrutar del mes gratuito.
       </p>
     </div>
 
