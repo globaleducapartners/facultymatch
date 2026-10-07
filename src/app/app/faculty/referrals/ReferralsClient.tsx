@@ -95,8 +95,8 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
       {/* Header */}
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 bg-fm-gold/10 rounded-xl flex items-center justify-center">
-            <Gift size={20} className="text-fm-gold" />
+          <div className="w-10 h-10 bg-fm-blue/10 rounded-xl flex items-center justify-center">
+            <Gift size={20} className="text-fm-blue" />
           </div>
           <h1 className="text-3xl font-black text-navy tracking-tight">
             Invita a colegas y gana 1 año Premium
@@ -169,7 +169,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                 <Button
                   type="submit"
                   disabled={!canSendMore || sendLoading || !inviteEmail.trim()}
-                  className="bg-fm-gold hover:bg-orange-600 text-white font-black rounded-xl h-12 px-5 shrink-0 disabled:opacity-60"
+                  className="bg-fm-blue hover:opacity-90 text-white font-black rounded-xl h-12 px-5 shrink-0 disabled:opacity-60"
                 >
                   {sendLoading ? (
                     <Loader2 size={16} className="animate-spin" />
@@ -278,8 +278,8 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
               ) : (
                 <>
                   <div className="flex items-center gap-2">
-                    <Gift size={18} className="text-fm-gold" />
-                    <span className="text-xs font-black uppercase tracking-widest text-fm-gold">Tu progreso</span>
+                    <Gift size={18} className="text-fm-blue" />
+                    <span className="text-xs font-black uppercase tracking-widest text-fm-blue">Tu progreso</span>
                   </div>
                   <div className="text-center py-2">
                     <span className="text-5xl font-black text-navy">{stats.successful_referrals}</span>
@@ -298,8 +298,8 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                       <> Te faltan <strong className="text-fm-blue">{10 - stats.successful_referrals}</strong> más.</>
                     )}
                   </p>
-                  <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 space-y-1">
-                    <p className="text-xs font-black text-fm-gold uppercase tracking-widest">Premio</p>
+                  <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 space-y-1">
+                    <p className="text-xs font-black text-fm-blue uppercase tracking-widest">Premio</p>
                     <p className="text-sm font-bold text-navy">1 año de acceso Professional</p>
                     <p className="text-xs text-gray-500 font-medium">Se activa automáticamente al llegar a 10 colegas verificados.</p>
                   </div>

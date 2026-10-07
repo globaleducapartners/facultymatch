@@ -205,7 +205,7 @@ export default async function EducatorDashboard() {
           </div>
           <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full transition-all duration-1000 bg-fm-gold"
+              className="h-full rounded-full transition-all duration-1000 bg-fm-blue"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -608,11 +608,11 @@ export default async function EducatorDashboard() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-bold text-gray-500">
                 <span>Completado</span>
-                <span className="text-fm-gold font-black">{progress}%</span>
+                <span className="text-fm-blue font-black">{progress}%</span>
               </div>
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-fm-gold transition-all"
+                  className="h-full rounded-full bg-fm-blue transition-all"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -682,8 +682,8 @@ export default async function EducatorDashboard() {
           {isPro ? (
             <div className="bg-gradient-to-br from-navy to-[#1a3a6b] text-white rounded-3xl p-5 space-y-4">
               <div className="flex items-center gap-2">
-                <Sparkles size={15} className="text-fm-gold" />
-                <span className="text-[11px] font-black uppercase tracking-widest text-fm-gold">Plan Professional</span>
+                <Sparkles size={15} className="text-[#9DB8FF]" />
+                <span className="text-[11px] font-black uppercase tracking-widest text-[#9DB8FF]">Plan Professional</span>
               </div>
               <p className="text-xs font-medium text-white/80 leading-relaxed">
                 Tu perfil aparece <strong className="text-white">prioritario</strong> en búsquedas y tienes privacidad avanzada.
@@ -702,7 +702,7 @@ export default async function EducatorDashboard() {
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-fm-gold rounded-full"
+                          className="h-full bg-[#9DB8FF] rounded-full"
                           style={{ width: `${Math.max(5, 100 - Math.round(daysLeft / 3.65))}%` }}
                         />
                       </div>
@@ -713,8 +713,8 @@ export default async function EducatorDashboard() {
               })()}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl border-2 border-dashed border-fm-gold/30 p-5 space-y-4 text-center">
-              <div className="flex items-center justify-center gap-2 text-fm-gold">
+            <div className="bg-white rounded-3xl border-2 border-dashed border-fm-blue/30 p-5 space-y-4 text-center">
+              <div className="flex items-center justify-center gap-2 text-fm-blue">
                 <Zap size={15} />
                 <span className="text-[11px] font-black uppercase tracking-widest">Plan Professional</span>
               </div>
@@ -724,7 +724,7 @@ export default async function EducatorDashboard() {
               <div className="text-xl font-black text-navy">29€ <span className="text-xs text-gray-500 font-bold">/ año</span></div>
               <Link
                 href="/checkout?plan=faculty-pro"
-                className="inline-flex items-center gap-2 w-full justify-center bg-fm-gold hover:bg-orange-600 text-white font-black py-2.5 px-5 rounded-xl text-xs transition-colors"
+                className="inline-flex items-center gap-2 w-full justify-center bg-fm-blue hover:opacity-90 text-white font-black py-2.5 px-5 rounded-xl text-xs transition-colors"
               >
                 <Sparkles size={13} /> Activar Plan Professional
               </Link>
@@ -733,10 +733,10 @@ export default async function EducatorDashboard() {
 
           {/* Referral widget */}
           {successfulReferrals < 10 && (
-            <div className="bg-white rounded-3xl border border-dashed border-fm-gold/40 p-5 space-y-3">
+            <div className="bg-white rounded-3xl border border-dashed border-fm-blue/40 p-5 space-y-3">
               <div className="flex items-center gap-2">
-                <Gift size={14} className="text-fm-gold" />
-                <p className="text-[11px] font-black text-fm-gold uppercase tracking-widest">Invita y Gana</p>
+                <Gift size={14} className="text-fm-blue" />
+                <p className="text-[11px] font-black text-fm-blue uppercase tracking-widest">Invita y Gana</p>
               </div>
               <p className="text-xs text-gray-500 font-medium leading-relaxed">
                 Invita compañeros a FacultyMatch y desbloquea meses gratis de Plan Professional.
@@ -748,14 +748,14 @@ export default async function EducatorDashboard() {
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-fm-gold rounded-full transition-all"
+                    className="h-full bg-fm-blue rounded-full transition-all"
                     style={{ width: `${Math.min(100, (successfulReferrals / 10) * 100)}%` }}
                   />
                 </div>
               </div>
               <Link
                 href="/app/faculty/referrals"
-                className="inline-flex items-center gap-1.5 text-xs font-black text-fm-gold hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-black text-fm-blue hover:underline"
               >
                 Ver mis invitaciones <ArrowRight size={11} />
               </Link>

@@ -445,7 +445,7 @@ export default async function PrivacyPage({
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-                <ShieldCheck size={22} className="text-fm-gold" />
+                <ShieldCheck size={22} className="text-fm-blue" />
                 Bloqueo de instituciones
               </CardTitle>
               <CardDescription className="font-medium">
@@ -536,7 +536,7 @@ export default async function PrivacyPage({
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-navy text-white">
             <CardHeader>
               <CardTitle className="text-xl font-bold flex items-center gap-2">
-                <UserPlus size={22} className="text-fm-gold" />
+                <UserPlus size={22} className="text-[#9DB8FF]" />
                 Invitaciones directas
               </CardTitle>
               <CardDescription className="text-gray-400 font-medium">
@@ -546,7 +546,7 @@ export default async function PrivacyPage({
             <CardContent className="space-y-6">
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
                 <div className="flex items-start gap-3">
-                  <AlertCircle size={18} className="text-fm-gold shrink-0 mt-0.5" />
+                  <AlertCircle size={18} className="text-[#9DB8FF] shrink-0 mt-0.5" />
                   <p className="text-xs text-gray-300 font-medium leading-relaxed">
                     Este enlace permite ver tu perfil aunque esté en modo &quot;Solo instituciones&quot;.
                     Caduca en 7 días una vez regenerado.
@@ -556,7 +556,7 @@ export default async function PrivacyPage({
                 {uniqueLink && (
                   <div className="space-y-2">
                     <div className="bg-white/10 rounded-xl p-3">
-                      <p className="text-xs text-fm-gold font-mono break-all leading-relaxed">
+                      <p className="text-xs text-[#9DB8FF] font-mono break-all leading-relaxed">
                         {uniqueLink}
                       </p>
                     </div>
@@ -569,7 +569,7 @@ export default async function PrivacyPage({
                 <form action={generateUniqueLink}>
                   <button
                     type="submit"
-                    className="w-full bg-fm-gold hover:bg-amber-500 text-navy font-black rounded-xl h-11 uppercase tracking-widest text-xs transition-colors"
+                    className="w-full bg-fm-blue hover:opacity-90 text-white font-black rounded-xl h-11 uppercase tracking-widest text-xs transition-colors"
                   >
                     {uniqueLink ? "Regenerar enlace" : "Generar enlace único"}
                   </button>
@@ -655,10 +655,10 @@ export default async function PrivacyPage({
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                <Star size={20} className="text-fm-gold" />
+                <Star size={20} className="text-fm-blue" />
                 Visibilidad preferente
                 {isPremium && (
-                  <Badge className="bg-gradient-to-r from-fm-gold to-orange-500 text-white text-[11px] font-black uppercase tracking-widest border-none ml-1">
+                  <Badge className="bg-fm-blue text-white text-[11px] font-black uppercase tracking-widest border-none ml-1">
                     Pro
                   </Badge>
                 )}
@@ -669,8 +669,8 @@ export default async function PrivacyPage({
             </CardHeader>
             <CardContent className="space-y-4">
               {!isPremium ? (
-                <div className="rounded-2xl border-2 border-dashed border-fm-gold/30 bg-orange-50/40 p-5 space-y-3 text-center">
-                  <div className="flex items-center justify-center gap-2 text-fm-gold">
+                <div className="rounded-2xl border-2 border-dashed border-fm-blue/30 bg-fm-blue/5 p-5 space-y-3 text-center">
+                  <div className="flex items-center justify-center gap-2 text-fm-blue">
                     <Sparkles size={18} />
                     <span className="text-xs font-black uppercase tracking-widest">Plan Professional</span>
                   </div>
@@ -680,7 +680,7 @@ export default async function PrivacyPage({
                   <div className="text-xl font-black text-navy">29€ <span className="text-sm text-gray-500 font-bold">/ año</span></div>
                   <a
                     href="/checkout?plan=faculty-pro"
-                    className="inline-flex items-center gap-2 bg-fm-gold hover:bg-orange-500 text-white font-black text-xs px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-orange-100"
+                    className="inline-flex items-center gap-2 bg-fm-blue hover:opacity-90 text-white font-black text-xs px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-blue-100"
                   >
                     <Sparkles size={13} /> Activar visibilidad preferente
                   </a>
@@ -702,13 +702,13 @@ export default async function PrivacyPage({
                           list="preferred-univ-list"
                           placeholder="Busca una institución..."
                           required
-                          className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-gold focus:border-transparent outline-none transition-all font-medium"
+                          className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all font-medium"
                         />
                         <datalist id="preferred-univ-list">
                           {allUniversityNames.map((u) => <option key={u} value={u} />)}
                         </datalist>
                       </div>
-                      <Button type="submit" size="sm" className="bg-fm-gold hover:bg-orange-500 text-white font-black rounded-xl px-4 shrink-0">
+                      <Button type="submit" size="sm" className="bg-fm-blue hover:opacity-90 text-white font-black rounded-xl px-4 shrink-0">
                         +
                       </Button>
                     </form>
@@ -722,9 +722,9 @@ export default async function PrivacyPage({
                       </p>
                     ) : (
                       preferredInstitutions.map((name) => (
-                        <div key={name} className="flex items-center justify-between p-3 bg-orange-50 border border-orange-100 rounded-xl">
+                        <div key={name} className="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 rounded-xl">
                           <div className="flex items-center gap-2">
-                            <Star size={13} className="text-fm-gold shrink-0" />
+                            <Star size={13} className="text-fm-blue shrink-0" />
                             <span className="text-sm font-bold text-navy truncate max-w-[180px]">{name}</span>
                           </div>
                           <form action={removePreferredInstitution}>
@@ -763,7 +763,7 @@ export default async function PrivacyPage({
                 "Controla tus datos académicos",
               ].map((item, idx) => (
                 <li key={idx} className="flex items-center gap-2 text-xs text-gray-600 font-medium">
-                  <div className="w-1.5 h-1.5 rounded-full bg-fm-gold" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-fm-blue" />
                   {item}
                 </li>
               ))}
