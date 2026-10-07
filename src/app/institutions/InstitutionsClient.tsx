@@ -157,7 +157,7 @@ export default function InstitutionsClient() {
         <div className="relative z-[2] mx-auto grid w-full max-w-[1120px] items-center gap-10 px-6 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-8">
           <div className="text-center md:text-left">
             <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
-              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/80">
                 Para universidades y escuelas de negocio
               </span>
             </div>
@@ -207,7 +207,7 @@ export default function InstitutionsClient() {
           <div className="mb-10 flex flex-wrap items-end justify-between gap-5">
             <div>
               <h2 className="text-2xl font-extrabold leading-[1.1] tracking-[-0.04em] text-fm-ink md:text-[clamp(26px,2.8vw,36px)]">
-                Una muestra real de los perfiles disponibles.
+                Así se ve un perfil verificado.
               </h2>
             </div>
             <Link href="/signup?intent=institution" className="shrink-0">
@@ -244,8 +244,8 @@ export default function InstitutionsClient() {
                       <div className="mb-0.5 flex items-center justify-between gap-1.5">
                         <span className="text-sm font-bold tracking-[-0.02em] text-fm-ink">{p.org}</span>
                         <div className={`flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 ${p.avail ? "bg-emerald-50" : "bg-gray-100"}`}>
-                          <span className={`h-[5px] w-[5px] rounded-full ${p.avail ? "bg-emerald-600" : "bg-[#8896B0]"}`} />
-                          <span className={`text-[9px] font-bold uppercase tracking-[0.06em] ${p.avail ? "text-emerald-600" : "text-[#8896B0]"}`}>
+                          <span className={`h-[5px] w-[5px] rounded-full ${p.avail ? "bg-emerald-600" : "bg-[#5E6F8E]"}`} />
+                          <span className={`text-[11px] font-bold uppercase tracking-[0.06em] ${p.avail ? "text-emerald-600" : "text-[#5E6F8E]"}`}>
                             {p.avail ? "Disponible" : "No disponible"}
                           </span>
                         </div>
@@ -256,30 +256,30 @@ export default function InstitutionsClient() {
 
                   <div className="flex flex-wrap gap-1.5 border-t border-fm-border pt-2.5">
                     <span
-                      className="rounded-full border px-2.5 py-[3px] text-[10px] font-bold"
+                      className="rounded-full border px-2.5 py-[3px] text-[11px] font-bold"
                       style={{ color: k.text, background: k.bg, borderColor: k.border }}
                     >
                       {p.kind}
                     </span>
-                    <span className="rounded-full border border-fm-border bg-fm-surface px-2.5 py-[3px] text-[10px] font-semibold text-fm-muted">
+                    <span className="rounded-full border border-fm-border bg-fm-surface px-2.5 py-[3px] text-[11px] font-semibold text-fm-muted">
                       {p.area}
                     </span>
-                    <span className="ml-auto rounded-full border border-fm-border bg-fm-surface px-2.5 py-[3px] text-[10px] text-[#8896B0]">
+                    <span className="ml-auto rounded-full border border-fm-border bg-fm-surface px-2.5 py-[3px] text-[11px] text-[#5E6F8E]">
                       {p.years}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8896B0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5E6F8E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                     </svg>
-                    <span className="text-[11px] text-[#8896B0]">{p.lang}</span>
+                    <span className="text-[11px] text-[#5E6F8E]">{p.lang}</span>
                   </div>
                 </div>
               );
             })}
           </div>
-          <p className="text-center text-[13px] text-[#8896B0]">
+          <p className="text-center text-[13px] text-[#5E6F8E]">
             Todos los perfiles son revisados manualmente antes de publicarse en el directorio.
           </p>
         </div>
@@ -311,7 +311,7 @@ export default function InstitutionsClient() {
                   <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-fm-gold" />
                   <span className="text-[13px] font-semibold text-fm-ink">{f.label}</span>
                 </div>
-                <p className="text-xs leading-[1.5] text-[#8896B0]">{f.desc}</p>
+                <p className="text-xs leading-[1.5] text-[#5E6F8E]">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -326,7 +326,7 @@ export default function InstitutionsClient() {
               Cómo funciona
             </div>
             <h2 className="text-[26px] font-extrabold leading-[1.1] tracking-[-0.04em] text-fm-ink md:text-[clamp(28px,3vw,40px)]">
-              Tres pasos. Sin proceso<br />de selección previo.
+              Tres pasos. Sin proceso de selección previo.
             </h2>
           </div>
           <div ref={howRef} className="grid gap-5 md:grid-cols-3">
@@ -362,7 +362,7 @@ export default function InstitutionsClient() {
         <div className="mx-auto max-w-[1120px]">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-[26px] font-extrabold tracking-[-0.04em] text-fm-ink md:text-[clamp(28px,3vw,40px)]">
-              Una red generalista tiene millones de perfiles.<br />Aquí están los que enseñan.
+              Una red generalista tiene millones de perfiles. Aquí están los que enseñan.
             </h2>
             <p className="mx-auto max-w-[520px] text-[15px] text-fm-muted">
               No todos los profesionales quieren dar clases, ni saben que pueden.
@@ -381,7 +381,7 @@ export default function InstitutionsClient() {
                   transform: comparisonVisible ? "translateY(0)" : "translateY(14px)",
                 }}
               >
-                <div className="mb-3.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#8896B0]">
+                <div className="mb-3.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[#5E6F8E]">
                   {row.feature}
                 </div>
                 <div className="flex flex-col gap-3">
@@ -392,7 +392,7 @@ export default function InstitutionsClient() {
                       </svg>
                     </div>
                     <div>
-                      <span className="text-[9px] font-extrabold uppercase tracking-[0.08em] text-fm-blue">FacultyMatch </span>
+                      <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-fm-blue">FacultyMatch </span>
                       <p className="mt-0.5 text-[13px] leading-[1.5] text-fm-ink">{row.fm}</p>
                     </div>
                   </div>
@@ -403,7 +403,7 @@ export default function InstitutionsClient() {
                       </svg>
                     </div>
                     <div>
-                      <span className="text-[9px] font-extrabold uppercase tracking-[0.08em] text-[#8896B0]">Buscarlo por tu cuenta </span>
+                      <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-[#5E6F8E]">Buscarlo por tu cuenta </span>
                       <p className="mt-0.5 text-[13px] leading-[1.5] text-fm-muted">{row.li}</p>
                     </div>
                   </div>
@@ -435,11 +435,11 @@ export default function InstitutionsClient() {
                 transform: pricingVisible ? "translateY(0)" : "translateY(14px)",
               }}
             >
-              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#8896B0]">
+              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#5E6F8E]">
                 Plan Essential
               </div>
               <div className="mb-1 text-[44px] font-black leading-none tracking-[-0.05em] text-fm-ink">0 €</div>
-              <div className="mb-7 text-[13px] text-[#8896B0]">para empezar</div>
+              <div className="mb-7 text-[13px] text-[#5E6F8E]">para empezar</div>
               <div className="mb-7 flex flex-1 flex-col gap-[11px]">
                 {["Registro gratuito", "5 búsquedas al mes", "5 contactos al mes", "Vista de perfil básica"].map((f, i) => (
                   <div key={i} className="flex items-center gap-2.5">
@@ -468,14 +468,14 @@ export default function InstitutionsClient() {
                 transform: pricingVisible ? "translateY(0)" : "translateY(14px)",
               }}
             >
-              <div className="absolute right-5 top-5 rounded-full bg-fm-gold px-2.5 py-1 font-sans text-[10px] font-extrabold uppercase tracking-[0.08em] text-fm-ink">
+              <div className="absolute right-5 top-5 rounded-full bg-fm-gold px-2.5 py-1 font-sans text-[11px] font-extrabold uppercase tracking-[0.08em] text-fm-ink">
                 Más popular
               </div>
               <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-fm-gold">
                 Plan Growth
               </div>
               <div className="mb-1 text-[44px] font-black leading-none tracking-[-0.05em] text-white">35 €</div>
-              <div className="mb-7 text-[13px] text-white/40">al mes · sin permanencia</div>
+              <div className="mb-7 text-[13px] text-white/60">al mes · sin permanencia</div>
               <div className="mb-7 flex flex-1 flex-col gap-[11px]">
                 {["20 búsquedas al mes", "20 contactos al mes", "Filtros avanzados", "Favoritos", "1 usuario", "Soporte por email"].map((f, i) => (
                   <div key={i} className="flex items-center gap-2.5">
@@ -508,7 +508,7 @@ export default function InstitutionsClient() {
                 Plan Professional
               </div>
               <div className="mb-1 text-[44px] font-black leading-none tracking-[-0.05em] text-white">99 €</div>
-              <div className="mb-7 text-[13px] text-white/40">al mes · sin permanencia</div>
+              <div className="mb-7 text-[13px] text-white/60">al mes · sin permanencia</div>
               <div className="mb-7 flex flex-1 flex-col gap-[11px]">
                 {["Búsquedas ilimitadas", "Contactos ilimitados", "Filtros avanzados completos", "Favoritos sin límite", "Hasta 3 usuarios", "Soporte prioritario"].map((f, i) => (
                   <div key={i} className="flex items-center gap-2.5">
@@ -526,7 +526,7 @@ export default function InstitutionsClient() {
                   Activar Professional
                 </button>
               </Link>
-              <p className="mt-2.5 text-center text-[11px] text-white/35">
+              <p className="mt-2.5 text-center text-[11px] text-white/60">
                 o{" "}
                 <a href="mailto:support@facultymatch.app?subject=Prueba%20Professional%2014%20d%C3%ADas" className="font-bold text-fm-gold">
                   14 días de prueba gratuita
@@ -536,7 +536,7 @@ export default function InstitutionsClient() {
             </div>
           </div>
 
-          <p className="mt-6 text-center text-xs text-[#8896B0]">
+          <p className="mt-6 text-center text-xs text-[#5E6F8E]">
             Sin comisiones por contratación. Sin permanencia. Cancela cuando quieras.
           </p>
         </div>
@@ -551,9 +551,9 @@ export default function InstitutionsClient() {
             </div>
             <h2 className="text-2xl font-extrabold leading-[1.1] tracking-[-0.04em] text-white md:text-[clamp(24px,2.8vw,36px)]">
               Tu próximo experto lleva
-              <br />años esperando esta llamada.
+               años esperando esta llamada.
             </h2>
-            <p className="mt-2.5 text-[13px] text-white/40">
+            <p className="mt-2.5 text-[13px] text-white/60">
               Registro gratuito. Sin validación previa. Sin comisiones si contratas.
             </p>
           </div>

@@ -150,12 +150,12 @@ export default function ResourcesPage() {
                 >
                   <div className="mb-4 flex items-center gap-2.5">
                     <span
-                      className="rounded-full px-2.5 py-[3px] text-[10px] font-bold uppercase tracking-[0.1em]"
+                      className="rounded-full px-2.5 py-[3px] text-[11px] font-bold uppercase tracking-[0.1em]"
                       style={{ color: r.tagColor, background: r.tagBg }}
                     >
                       {r.tag}
                     </span>
-                    <span className="text-[11px] text-[#9CA3AF]">{r.readTime} lectura</span>
+                    <span className="text-[11px] text-[#5E6F8E]">{r.readTime} lectura</span>
                   </div>
                   <h3 className="mb-3 text-base font-bold leading-snug tracking-[-0.02em] text-fm-ink">
                     {r.title}
@@ -192,7 +192,7 @@ export default function ResourcesPage() {
                 </span>
               </div>
               <h2 className="mb-[18px] text-[30px] font-black leading-[1.15] tracking-[-0.04em] text-fm-ink">
-                La calidad del claustro<br />
+                La calidad del claustro 
                 determina la calidad de la institución.
               </h2>
               <p className="mb-6 text-[15px] leading-[1.8] text-fm-muted">
@@ -240,7 +240,7 @@ export default function ResourcesPage() {
           coincide con los datos reales del directorio). */}
       <section className="border-y border-fm-border bg-white px-6 py-10 md:px-8">
         <div className="mx-auto flex max-w-[900px] flex-col items-center gap-4 text-center">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#9CA3AF]">
+          <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#5E6F8E]">
             Han hablado de nosotros
           </span>
           <a

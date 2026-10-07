@@ -64,7 +64,7 @@ export function NewsletterForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Tu correo electrónico"
-          className="flex-1 bg-transparent px-[18px] py-3.5 text-sm text-white outline-none placeholder:text-white/40"
+          className="flex-1 bg-transparent px-[18px] py-3.5 text-sm text-white outline-none placeholder:text-white/60"
         />
         <button
           type="submit"

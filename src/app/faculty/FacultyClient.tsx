@@ -105,7 +105,7 @@ export default function FacultyClient() {
         <div className="relative z-[2] mx-auto grid w-full max-w-[1120px] items-center gap-10 px-6 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-8">
           <div className="text-center md:text-left">
             <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
-              <span className="font-sans text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              <span className="font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-white/80">
                 Para docentes y expertos profesionales
               </span>
             </div>
@@ -183,7 +183,7 @@ export default function FacultyClient() {
                   {p.examples.map((ex, j) => (
                     <span
                       key={j}
-                      className="self-start rounded-full border border-fm-border bg-white px-3 py-1.5 text-xs text-[#8896B0]"
+                      className="self-start rounded-full border border-fm-border bg-white px-3 py-1.5 text-xs text-[#5E6F8E]"
                     >
                       {ex}
                     </span>
@@ -206,7 +206,7 @@ export default function FacultyClient() {
             </div>
             <div className="flex-1">
               <h3 className="mb-2.5 text-xl font-extrabold leading-tight tracking-[-0.03em] text-white md:text-2xl">
-                Tu institución actual no verá tu perfil,<br />a menos que tú quieras.
+                Tu institución actual no verá tu perfil, a menos que tú quieras.
               </h3>
               <p className="max-w-[520px] text-sm leading-[1.75] text-white/50">
                 El bloqueo selectivo de instituciones está disponible en todos los planes, incluso el gratuito.
@@ -236,7 +236,7 @@ export default function FacultyClient() {
             )}
             <div ref={benefitsRef}>
               <h2 className="mb-8 text-[26px] font-extrabold leading-[1.1] tracking-[-0.04em] text-fm-ink md:text-[clamp(26px,2.8vw,36px)]">
-                Lo que hace diferente<br />estar en FacultyMatch.
+                Lo que hace diferente estar en FacultyMatch.
               </h2>
               <div className="flex flex-col gap-6">
                 {BENEFITS.map((b, i) => (
@@ -268,7 +268,7 @@ export default function FacultyClient() {
               Precios
             </div>
             <h2 className="text-[26px] font-extrabold tracking-[-0.04em] text-fm-ink md:text-[clamp(28px,3vw,40px)]">
-              Para docentes y expertos,<br />sin coste de entrada.
+              Para docentes y expertos, sin coste de entrada.
             </h2>
           </div>
 
@@ -278,11 +278,11 @@ export default function FacultyClient() {
               className="rounded-[20px] border border-fm-border bg-fm-surface p-8 transition-transform duration-500"
               style={{ transform: pricingVisible ? "translateY(0)" : "translateY(10px)" }}
             >
-              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#8896B0]">
+              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#5E6F8E]">
                 Plan Basic
               </div>
               <div className="mb-1 text-5xl font-black leading-none tracking-[-0.05em] text-fm-ink">0 €</div>
-              <div className="mb-7 text-[13px] text-[#8896B0]">siempre gratuito</div>
+              <div className="mb-7 text-[13px] text-[#5E6F8E]">siempre gratuito</div>
               <div className="mb-8 flex flex-col gap-3">
                 {[
                   "Perfil en el directorio",
@@ -313,14 +313,14 @@ export default function FacultyClient() {
               className="relative overflow-hidden rounded-[20px] bg-fm-navy p-8 transition-transform duration-500"
               style={{ transitionDelay: "0.1s", transform: pricingVisible ? "translateY(0)" : "translateY(10px)" }}
             >
-              <div className="absolute right-5 top-5 rounded-full bg-fm-gold px-2.5 py-1 font-sans text-[10px] font-extrabold uppercase tracking-[0.08em] text-fm-ink">
+              <div className="absolute right-5 top-5 rounded-full bg-fm-gold px-2.5 py-1 font-sans text-[11px] font-extrabold uppercase tracking-[0.08em] text-fm-ink">
                 Popular
               </div>
               <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-fm-gold">
                 Plan Professional
               </div>
               <div className="mb-1 text-5xl font-black leading-none tracking-[-0.05em] text-white">29 €</div>
-              <div className="mb-7 text-[13px] text-white/40">al año · sin permanencia</div>
+              <div className="mb-7 text-[13px] text-white/60">al año · sin permanencia</div>
               <div className="mb-8 flex flex-col gap-3">
                 {[
                   "Todo lo del Plan Basic",
@@ -355,9 +355,9 @@ export default function FacultyClient() {
           <div>
             <h2 className="text-2xl font-extrabold leading-[1.1] tracking-[-0.04em] text-white md:text-[clamp(24px,2.8vw,36px)]">
               Publica hoy. Recibe tu primera
-              <br />solicitud esta semana.
+               solicitud esta semana.
             </h2>
-            <p className="mt-2.5 text-[13px] text-white/40">
+            <p className="mt-2.5 text-[13px] text-white/60">
               Sin permanencia. Sin proceso de admisión previo. Sin comisiones.
             </p>
           </div>

@@ -1,7 +1,7 @@
 // src/components/layout/Footer.tsx — FacultyMatch v2
 import Link from "next/link";
 
-const SANS = `'Inter', system-ui, -apple-system, sans-serif`;
+const SANS = `var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif`;
 const WHATSAPP = `https://wa.me/34616684214?text=${encodeURIComponent("Hola, me gustaría obtener más información sobre FacultyMatch.")}`;
 
 const D = {
@@ -9,7 +9,7 @@ const D = {
   navy:   "#0D2240",
   gold:   "#E9A030",
   border: "rgba(255,255,255,0.07)",
-  text:   "rgba(255,255,255,0.42)",
+  text:   "rgba(255,255,255,0.62)",
   hover:  "rgba(255,255,255,0.72)",
 };
 
@@ -167,7 +167,7 @@ export function Footer() {
           {/* Plataforma */}
           <div>
             <div style={{
-              fontFamily: SANS, fontSize: 10, fontWeight: 700,
+              fontFamily: SANS, fontSize: 11, fontWeight: 700,
               letterSpacing: "0.14em", textTransform: "uppercase" as const,
               color: D.gold, marginBottom: 18,
             }}>
@@ -193,7 +193,7 @@ export function Footer() {
           {/* Legal */}
           <div>
             <div style={{
-              fontFamily: SANS, fontSize: 10, fontWeight: 700,
+              fontFamily: SANS, fontSize: 11, fontWeight: 700,
               letterSpacing: "0.14em", textTransform: "uppercase" as const,
               color: D.gold, marginBottom: 18,
             }}>
@@ -218,7 +218,7 @@ export function Footer() {
           {/* Contacto */}
           <div>
             <div style={{
-              fontFamily: SANS, fontSize: 10, fontWeight: 700,
+              fontFamily: SANS, fontSize: 11, fontWeight: 700,
               letterSpacing: "0.14em", textTransform: "uppercase" as const,
               color: D.gold, marginBottom: 18,
             }}>
@@ -243,10 +243,10 @@ export function Footer() {
           display: "flex", alignItems: "center", justifyContent: "space-between",
           flexWrap: "wrap" as const, gap: 12,
         }}>
-          <span style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.2)" }}>
+          <span style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
             © {new Date().getFullYear()} FacultyMatch · Grupo Global Educa SL. Todos los derechos reservados.
           </span>
-          <span style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.18)" }}>
+          <span style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
             Murcia · España
           </span>
         </div>

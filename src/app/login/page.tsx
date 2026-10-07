@@ -22,14 +22,14 @@ const D = {
   white:  "#FFFFFF",
   ink:    "#0C1018",
   muted:  "#6B7280",
-  faint:  "#9CA3AF",
+  faint:  "#5E6F8E",
   border: "#D8E2EF",
   error:  "#DC2626",
   errBg:  "#FEF2F2",
 };
 
 const inp: React.CSSProperties = {
-  fontFamily: SANS, width: "100%", fontSize: 14, color: D.ink,
+  fontFamily: SANS, width: "100%", fontSize: 16, color: D.ink,
   background: D.white, border: `1px solid ${D.border}`,
   borderRadius: 8, padding: "11px 14px", outline: "none",
   boxSizing: "border-box" as const,
@@ -127,14 +127,14 @@ function LoginContent() {
                 borderRadius: 12, padding: "14px 16px",
               }}>
                 <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.04em" }}>{n}</div>
-                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>{label}</div>
+                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.62)", marginTop: 2 }}>{label}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Pie */}
-        <span style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.22)" }}>
+        <span style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
           © 2026 FacultyMatch · Grupo Global Educa SL
         </span>
       </div>

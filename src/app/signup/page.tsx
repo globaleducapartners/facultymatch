@@ -21,7 +21,7 @@ const D = {
   white:  "#FFFFFF",
   ink:    "#0C1018",
   muted:  "#6B7280",
-  faint:  "#9CA3AF",
+  faint:  "#5E6F8E",
   border: "#D8E2EF",
   error:  "#DC2626",
   errBg:  "#FEF2F2",
@@ -29,7 +29,7 @@ const D = {
 
 // ─── UI helpers ───────────────────────────────────────────────────────────────
 const inp = (err = false): React.CSSProperties => ({
-  fontFamily: SANS, width: "100%", fontSize: 14, color: D.ink,
+  fontFamily: SANS, width: "100%", fontSize: 16, color: D.ink,
   background: D.white, border: `1px solid ${err ? D.error : D.border}`,
   borderRadius: 8, padding: "10px 14px", outline: "none",
   boxSizing: "border-box" as const,
@@ -190,7 +190,7 @@ function SignupForm() {
           </div>
         </div>
 
-        <span style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.22)" }}>
+        <span style={{ fontFamily: SANS, fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
           © 2026 FacultyMatch · Grupo Global Educa SL
         </span>
       </div>

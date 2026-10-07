@@ -7,7 +7,7 @@ import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 
-const SANS = `'Inter', system-ui, -apple-system, sans-serif`;
+const SANS = `var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif`;
 
 const NAV_LINKS = [
   { name: "Para docentes",      href: "/faculty" },

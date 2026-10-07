@@ -224,3 +224,8 @@
     animation: none !important;
   }
 }
+
+/* Titulares equilibrados: sin palabras huérfanas ni saltos de línea forzados */
+h1, h2 {
+  text-wrap: balance;
+}

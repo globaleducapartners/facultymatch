@@ -40,8 +40,8 @@ export default function NotFound() {
         </div>
         
         <div className="pt-8 border-t border-gray-50 flex items-center justify-center gap-8 opacity-40">
-           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">FacultyMatch</span>
-           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">by Talentia</span>
+           <span className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">FacultyMatch</span>
+           <span className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">by Talentia</span>
         </div>
       </div>
     </div>
