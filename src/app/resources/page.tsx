@@ -248,7 +248,7 @@ export default function ResourcesPage() {
       </section>
 
       {/* ── CTA NEWSLETTER ── */}
-      <section className="relative overflow-hidden">
+      <section id="newsletter" className="relative overflow-hidden scroll-mt-16">
         <div
           className="absolute inset-0"
           style={{

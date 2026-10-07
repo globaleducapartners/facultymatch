@@ -6,7 +6,7 @@ const FROM = process.env.RESEND_FROM_EMAIL || 'FacultyMatch <noreply@facultymatc
 
 export async function sendWelcomeEmail(email: string, name: string, role: string, institution?: string) {
   const subject = role === 'faculty'
-    ? `¡Bienvenido a FacultyMatch, ${name}! Tu perfil docente está listo`
+    ? `Bienvenido a FacultyMatch, ${name}: así funciona y cómo sacarle partido`
     : `Bienvenido a FacultyMatch | Cuenta institucional de ${institution}`;
 
   const html = role === 'faculty'

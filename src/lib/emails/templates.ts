@@ -98,31 +98,64 @@ export const getFacultyConfirmEmail = (name: string, confirmLink: string) => bas
   <p class="link-text">${confirmLink}</p>
 `);
 
+const SITE_URL = "https://www.facultymatch.app";
+const LINKEDIN_URL = "https://www.linkedin.com/company/facultymatch";
+// Vacío = no se muestra el botón. Rellenar cuando exista la cuenta oficial.
+const INSTAGRAM_URL = "";
+
+const socialButton = (href: string, label: string) =>
+  `<a href="${href}" style="display:inline-block;margin:4px 4px;padding:10px 18px;border:1px solid #D8E2EF;border-radius:10px;color:${COLORS.navy};font-size:13px;font-weight:700;text-decoration:none;background:#fff;">${label}</a>`;
+
+// Se envía justo después de activar la cuenta (confirmActivation). Es la
+// bienvenida a la comunidad: cómo funciona la plataforma, por qué merece la
+// pena unirse y dónde seguirnos. Sin promesas que dependan de la verificación.
 export const getFacultyWelcomeEmail = (name: string) => baseTemplate(`
-  <div class="greeting">¡Tu perfil está activo, ${name}!</div>
+  <div class="greeting">Bienvenido a FacultyMatch, ${name}</div>
   <p class="body-text">
-    Ya formas parte de la red global de talento académico más exclusiva. Ahora solo queda completar tu perfil para maximizar tu visibilidad ante las mejores instituciones.
+    Tu cuenta ya está activa. FacultyMatch es el directorio de talento docente de la educación superior donde cada perfil lo revisa una persona de nuestro equipo. Así las instituciones encuentran a quien busca de verdad, y tú apareces con un sello que se nota.
   </p>
+
   <div class="cta-box">
-    <div class="cta-label">Accede a tu dashboard</div>
-    <p style="font-size:14px;color:#475569;margin:0 0 18px;">Completa tu perfil, sube tu CV y configura tus preferencias de contacto.</p>
-    <a href="https://facultymatch.app/app/faculty" class="button">Ir a mi perfil &rarr;</a>
+    <div class="cta-label">Siguiente paso</div>
+    <p style="font-size:14px;color:#475569;margin:0 0 18px;">Completa tu perfil en unos minutos. Puedes subir tu CV o rellenarlo tú mismo.</p>
+    <a href="${SITE_URL}/app/faculty/onboarding" class="button">Completar mi perfil &rarr;</a>
   </div>
+
   <div class="steps">
     <div class="step">
-      <div class="step-num">✓</div>
-      <div class="step-text"><span class="step-title">Perfil creado</span><br>Tu cuenta ha sido registrada correctamente.</div>
+      <div class="step-num">1</div>
+      <div class="step-text"><span class="step-title">Crea tu perfil</span><br>Formación, áreas de especialidad, idiomas y experiencia docente. Lo que importa a una institución, en una sola página.</div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
-      <div class="step-text"><span class="step-title">Completa tus datos</span><br>Añade áreas de especialidad, idiomas, experiencia docente y bio profesional.</div>
+      <div class="step-text"><span class="step-title">Lo verificamos</span><br>Una persona de nuestro equipo revisa tu perfil. Cuando lo apruebe, recibirás tu sello de perfil verificado.</div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
-      <div class="step-text"><span class="step-title">Sé visible</span><br>Tu perfil aparecerá en búsquedas de instituciones universitarias verificadas.</div>
+      <div class="step-text"><span class="step-title">Te encuentran</span><br>Las instituciones filtran por área, idioma y disponibilidad. Tú decides quién ve tu perfil y puedes bloquear a las instituciones que quieras.</div>
     </div>
   </div>
-  <p class="body-text" style="margin-top:24px;">Si tienes alguna pregunta, responde directamente a este correo. Nuestro equipo estará encantado de ayudarte.</p>
+
+  <div class="divider"></div>
+
+  <p class="greeting" style="font-size:18px;margin-bottom:8px;">Formar parte de la comunidad</p>
+  <p class="body-text">
+    Cuantos más docentes y expertos verificados somos, más valor tiene el directorio para todos. Síguenos para enterarte de novedades, convocatorias y contenidos pensados para quien da clase y quien contrata a docentes.
+  </p>
+  <div style="text-align:center;margin:8px 0 22px;">
+    ${socialButton(LINKEDIN_URL, "Seguirnos en LinkedIn")}
+    ${INSTAGRAM_URL ? socialButton(INSTAGRAM_URL, "Seguirnos en Instagram") : ""}
+    ${socialButton(`${SITE_URL}/resources#newsletter`, "Apuntarme a la newsletter")}
+  </div>
+
+  <div class="step" style="display:block;">
+    <div class="step-text"><span class="step-title">Recursos para docentes</span><br>Guías, estándares y análisis sobre selección de talento académico: <a href="${SITE_URL}/resources" style="color:${COLORS.blue};font-weight:700;">ver recursos</a>.</div>
+  </div>
+  <div class="step" style="display:block;">
+    <div class="step-text"><span class="step-title">Invita a colegas</span><br>Si conoces a docentes que encajarían, invítalos desde tu panel: <a href="${SITE_URL}/app/faculty/referrals" style="color:${COLORS.blue};font-weight:700;">invita y gana</a>.</div>
+  </div>
+
+  <p class="body-text" style="margin-top:24px;">¿Dudas? Responde a este correo o escríbenos a support@facultymatch.app. Estaremos encantados de ayudarte.</p>
 `);
 
 export const getInstitutionWelcomeEmail = (name: string, institution: string) => baseTemplate(`

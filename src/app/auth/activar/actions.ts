@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { hashToken, isTokenExpired } from "@/lib/activation-token";
+import { sendWelcomeEmail } from "@/lib/emails/service";
 
 // The actual state-changing step — only reachable via an explicit button
 // press on /auth/activar (a POST through this server action), never a bare
@@ -43,6 +44,27 @@ export async function confirmActivation(token: string) {
     .eq("id", row.user_id);
   if (activateError) {
     console.error("[confirmActivation] Failed to update estado_perfil:", activateError);
+  }
+
+  // Bienvenida a la comunidad: una sola vez, porque el token ya se ha marcado
+  // como usado arriba. Si falla el envío no bloquea la activación.
+  if (!activateError) {
+    const { data: up } = await admin
+      .from("user_profiles")
+      .select("full_name, email")
+      .eq("id", row.user_id)
+      .maybeSingle();
+    let to = up?.email as string | null | undefined;
+    if (!to) {
+      const { data: au } = await admin.auth.admin.getUserById(row.user_id);
+      to = au?.user?.email;
+    }
+    if (to) {
+      const first = (up?.full_name || "").trim().split(/\s+/)[0] || "docente";
+      await sendWelcomeEmail(to, first, "faculty").catch((e) =>
+        console.warn("[confirmActivation] welcome email failed:", e)
+      );
+    }
   }
 
   // If the person is already logged in on this device (the common case —
