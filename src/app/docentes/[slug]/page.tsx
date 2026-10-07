@@ -117,8 +117,47 @@ export default async function PublicFacultyProfilePage({
     .eq("estado_perfil", "verificado")
     .maybeSingle();
 
-  // If not found, not public, or not verified → 404
-  if (!faculty) notFound();
+  // Verificado pero privado: el enlace existe (se comparte desde el panel, el
+  // PDF y el email) pero el docente aún no lo ha hecho público. En vez de un
+  // 404 genérico, explicamos qué pasa y ofrecemos la verificación (que a
+  // propósito no exige visibilidad pública). No se muestra ningún dato personal.
+  if (!faculty) {
+    const { data: privateOne } = await admin
+      .from("faculty_profiles")
+      .select("id")
+      .eq("profile_slug", slug)
+      .eq("is_active", true)
+      .eq("estado_perfil", "verificado")
+      .maybeSingle();
+    if (!privateOne) notFound();
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center bg-fm-surface p-6 text-center">
+        <div className="w-full max-w-lg rounded-3xl border border-fm-border bg-white p-10 shadow-[0_8px_40px_rgba(13,34,64,0.06)]">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-fm-blue/[0.08] text-fm-blue">
+            <Shield size={26} />
+          </div>
+          <h1 className="mb-3 text-2xl font-extrabold tracking-[-0.03em] text-fm-ink">Este perfil es privado</h1>
+          <p className="mb-7 text-base leading-relaxed text-fm-muted">
+            Es un perfil verificado por FacultyMatch, pero su titular aún no lo ha hecho público. Puedes comprobar su verificación o explorar el directorio.
+          </p>
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href={`/verificar/${slug}`}
+              className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-fm-blue px-7 text-sm font-bold text-white transition-all duration-150 hover:opacity-90 active:scale-[0.97] sm:w-auto"
+            >
+              Comprobar verificación
+            </Link>
+            <Link
+              href="/directory"
+              className="inline-flex h-12 w-full items-center justify-center rounded-xl border border-fm-border bg-white px-7 text-sm font-bold text-fm-ink transition-all duration-150 hover:border-fm-blue active:scale-[0.97] sm:w-auto"
+            >
+              Ver el directorio
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Fetch user profile for name and avatar
   const { data: userProfile } = await admin
@@ -132,7 +171,11 @@ export default async function PublicFacultyProfilePage({
   // ── Derived data ──
   const fullName = userProfile.full_name || "Docente";
   const avatarUrl = userProfile.avatar_url || null;
-  const initials = fullName.substring(0, 2).toUpperCase();
+  const nameWords = fullName.replace(/\b(dr|dra|prof|profa|d|da)\.?(?=\s)/gi, "").split(/\s+/).filter(Boolean);
+  const initials = (nameWords.length > 1
+    ? nameWords[0][0] + nameWords[nameWords.length - 1][0]
+    : (nameWords[0] || fullName).substring(0, 2)
+  ).toUpperCase();
   const avail = faculty.availability ? (AVAIL_LABELS[faculty.availability] || null) : null;
   const locationStr = [faculty.city, faculty.country || faculty.location].filter(Boolean).join(", ");
   const yearsExp = faculty.years_experience ?? 0;
@@ -201,7 +244,7 @@ export default async function PublicFacultyProfilePage({
         <div className="max-w-5xl mx-auto px-6 pt-8 pb-16 space-y-10">
 
           {/* ── Breadcrumb ── */}
-          <nav className="flex items-center gap-2 text-sm font-semibold text-slate-400">
+          <nav className="flex items-center gap-2 text-sm font-semibold text-slate-500">
             <Link href="/" className="hover:text-[#1B4FD8] transition-colors">Inicio</Link>
             <ChevronRight size={14} />
             <span className="text-[#0D2240] font-bold truncate max-w-[250px]">{fullName}</span>
@@ -243,13 +286,20 @@ export default async function PublicFacultyProfilePage({
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2.5 mb-2">
                     <h1 className="text-3xl sm:text-[2.5rem] font-black text-[#0D2240] leading-tight">{fullName}</h1>
+                    <Link
+                      href={`/verificar/${slug}`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-fm-gold/40 bg-fm-gold/10 px-3 py-1 text-[11px] font-bold text-[#92600A] hover:bg-fm-gold/20"
+                      title="Perfil verificado por el equipo de FacultyMatch"
+                    >
+                      <CheckCircle2 size={12} /> Verificado
+                    </Link>
                     {isPhd && (
-                      <Badge className="bg-purple-50 text-purple-700 border-purple-200 text-[10px] font-bold px-3 py-1 rounded-full">
+                      <Badge className="bg-purple-50 text-purple-700 border-purple-200 text-[11px] font-bold px-3 py-1 rounded-full">
                         PhD
                       </Badge>
                     )}
                     {hasAneca && (
-                      <Badge className="bg-amber-50 text-amber-700 border-amber-200 text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
+                      <Badge className="bg-amber-50 text-amber-700 border-amber-200 text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
                         <Award size={11} /> ANECA
                       </Badge>
                     )}
@@ -381,7 +431,7 @@ export default async function PublicFacultyProfilePage({
                             )}
                             <p className="text-sm text-slate-500 font-medium">
                               {deg.university || deg.institution || ""}
-                              {deg.year && <span className="ml-2 text-slate-400 font-normal">({deg.year})</span>}
+                              {deg.year && <span className="ml-2 text-slate-500 font-normal">({deg.year})</span>}
                             </p>
                           </div>
                         </div>
@@ -430,7 +480,7 @@ export default async function PublicFacultyProfilePage({
                     )}
                     {hasInstitutionsTaught && (
                       <div className="p-5 bg-slate-50/70 border border-slate-100 rounded-2xl space-y-3">
-                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                           Otras instituciones
                         </p>
                         <div className="flex flex-wrap gap-2.5">
@@ -464,7 +514,7 @@ export default async function PublicFacultyProfilePage({
                         >
                           <span className="font-bold text-[#0D2240] text-[15px]">{name}</span>
                           {level && (
-                            <span className="text-xs text-slate-400 font-medium bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                            <span className="text-xs text-slate-500 font-medium bg-white px-2.5 py-1 rounded-lg border border-slate-200">
                               {level}
                             </span>
                           )}
@@ -503,7 +553,7 @@ export default async function PublicFacultyProfilePage({
                           <BookOpen size={20} />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+                          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
                             Google Scholar
                           </span>
                           <a
@@ -523,7 +573,7 @@ export default async function PublicFacultyProfilePage({
                           <Globe size={20} />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+                          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
                             ORCID iD
                           </span>
                           <a
@@ -539,7 +589,7 @@ export default async function PublicFacultyProfilePage({
                     )}
                     {faculty.research_publications && (
                       <div className="pt-6 border-t border-slate-200/80">
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">
                           Publicaciones destacadas
                         </p>
                         <div className="grid gap-3">
@@ -552,7 +602,7 @@ export default async function PublicFacultyProfilePage({
                                 key={idx}
                                 className="flex gap-4 items-start p-5 bg-slate-50/70 border border-slate-100 rounded-2xl"
                               >
-                                <div className="p-2 bg-white border border-slate-200 rounded-xl text-slate-400 shrink-0">
+                                <div className="p-2 bg-white border border-slate-200 rounded-xl text-slate-500 shrink-0">
                                   <BookOpen size={15} className="text-[#1B4FD8]" />
                                 </div>
                                 <span className="text-[14px] text-slate-600 leading-relaxed font-medium flex-1 min-w-0 break-words">{pub}</span>
@@ -638,15 +688,15 @@ export default async function PublicFacultyProfilePage({
                   href="/login"
                   className="flex items-center justify-center gap-2.5 w-full bg-white/10 text-white font-bold py-3.5 rounded-2xl hover:bg-white/20 transition-colors text-sm border border-white/10"
                 >
-                  Ya tengo cuenta — Acceder
+                  Ya tengo cuenta: Acceder
                 </Link>
               </div>
 
               {/* Verification badges */}
               <div className="bg-white rounded-[2rem] border border-slate-200/80 shadow-sm p-6 space-y-5">
                 <div className="flex items-center gap-2.5">
-                  <Shield size={13} className="text-slate-400" />
-                  <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                  <Shield size={13} className="text-slate-500" />
+                  <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">
                     Verificaciones
                   </p>
                 </div>
@@ -658,7 +708,7 @@ export default async function PublicFacultyProfilePage({
                       </div>
                       <div>
                         <p className="text-sm font-bold text-[#0D2240]">Doctorado</p>
-                        <p className="text-[11px] font-medium text-slate-400">Título de doctor verificado</p>
+                        <p className="text-[11px] font-medium text-slate-500">Título de doctor verificado</p>
                       </div>
                     </div>
                   )}
@@ -669,12 +719,12 @@ export default async function PublicFacultyProfilePage({
                       </div>
                       <div>
                         <p className="text-sm font-bold text-[#0D2240]">ANECA</p>
-                        <p className="text-[11px] font-medium text-slate-400">Acreditación verificada</p>
+                        <p className="text-[11px] font-medium text-slate-500">Acreditación verificada</p>
                       </div>
                     </div>
                   )}
                   {!isPhd && !hasAneca && (
-                    <p className="text-sm text-slate-400 font-medium">Sin verificaciones adicionales</p>
+                    <p className="text-sm text-slate-500 font-medium">Sin verificaciones adicionales</p>
                   )}
                 </div>
               </div>
@@ -682,7 +732,7 @@ export default async function PublicFacultyProfilePage({
               {/* Faculty areas (compact) */}
               {hasFacultyAreas && (
                 <div className="bg-white rounded-[2rem] border border-slate-200/80 shadow-sm p-6 space-y-4">
-                  <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">Materias</p>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-slate-500">Materias</p>
                   <div className="flex flex-wrap gap-2">
                     {faculty.faculty_areas.slice(0, 8).map((area: string) => (
                       <span

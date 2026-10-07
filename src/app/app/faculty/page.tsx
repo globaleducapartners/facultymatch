@@ -655,7 +655,24 @@ export default async function EducatorDashboard() {
           </div>
 
           {/* Public profile */}
-          {facultyProfile?.profile_slug && (
+          {facultyProfile?.profile_slug && facultyProfile.visibility !== "public" && (
+            <Link
+              href="/app/faculty/privacy"
+              className="block bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-3 hover:border-fm-blue/30 hover:shadow-md transition-all group"
+            >
+              <div className="flex items-center gap-2">
+                <Globe size={16} className="text-gray-500" />
+                <h3 className="font-black text-navy text-sm">Perfil público</h3>
+              </div>
+              <p className="text-xs text-gray-500 font-medium leading-relaxed">
+                Tu perfil es privado, por eso tu enlace público aún no funciona. Cámbialo a público cuando quieras que las instituciones puedan verlo.
+              </p>
+              <div className="flex items-center gap-1.5 text-xs font-black text-fm-blue group-hover:underline">
+                Ir a privacidad <ExternalLink size={12} />
+              </div>
+            </Link>
+          )}
+          {facultyProfile?.profile_slug && facultyProfile.visibility === "public" && (
             <a
               href={`https://facultymatch.app/docentes/${facultyProfile.profile_slug}`}
               target="_blank"
