@@ -73,9 +73,9 @@ export function Navbar() {
         height: 64,
         background: scrolled ? "rgba(255,255,255,0.97)" : D.white,
         backdropFilter: scrolled ? "blur(16px)" : "none",
-        borderBottom: `1px solid ${scrolled ? D.border : D.border}`,
+        borderBottom: `1px solid ${D.border}`,
         boxShadow: scrolled ? "0 1px 12px rgba(7,19,38,0.07)" : "0 1px 0 #D8E2EF",
-        transition: "all 0.25s ease",
+        transition: "background 0.25s ease, box-shadow 0.25s ease",
         fontFamily: SANS,
       }}>
         <div style={{
@@ -152,7 +152,9 @@ export function Navbar() {
           <button
             className="fm-hamburger transition-transform duration-150 ease-out active:scale-90"
             onClick={() => setMenuOpen(!menuOpen)}
-            style={{ background: "none", border: "none", cursor: "pointer", padding: 4 }}
+            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={menuOpen}
+            style={{ background: "none", border: "none", cursor: "pointer", padding: 11, margin: -11 }}
           >
             {menuOpen ? <X size={22} color={D.ink} /> : <Menu size={22} color={D.ink} />}
           </button>

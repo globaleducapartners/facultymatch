@@ -156,7 +156,7 @@ export default function InstitutionsClient() {
         />
         <div className="relative z-[2] mx-auto grid w-full max-w-[1120px] items-center gap-10 px-6 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-8">
           <div className="text-center md:text-left">
-            <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
+            <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-[#6D93F5] py-0.5 pl-3">
               <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/80">
                 Para universidades y escuelas de negocio
               </span>
@@ -308,7 +308,7 @@ export default function InstitutionsClient() {
                 }}
               >
                 <div className="mb-1 flex items-center gap-[7px]">
-                  <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-fm-gold" />
+                  <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-fm-blue" />
                   <span className="text-[13px] font-semibold text-fm-ink">{f.label}</span>
                 </div>
                 <p className="text-xs leading-[1.5] text-[#5E6F8E]">{f.desc}</p>
@@ -322,7 +322,7 @@ export default function InstitutionsClient() {
       <section className="bg-fm-surface px-6 py-16 md:px-8 md:py-[88px]">
         <div className="mx-auto max-w-[1120px]">
           <div className="mb-11 text-center md:mb-15">
-            <div className="mb-3.5 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
+            <div className="mb-3.5 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-blue">
               Cómo funciona
             </div>
             <h2 className="text-[26px] font-extrabold leading-[1.1] tracking-[-0.04em] text-fm-ink md:text-[clamp(28px,3vw,40px)]">
@@ -333,20 +333,20 @@ export default function InstitutionsClient() {
             {HOW.map((s, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-fm-border bg-white p-7 transition-all duration-500"
+                className={`rounded-2xl border border-fm-border bg-white p-7 transition-all duration-500 ${i === 1 ? "md:-translate-y-2.5" : ""}`}
                 style={{
                   borderTop: "3px solid #1B4FD8",
                   transitionDelay: `${i * 0.12}s`,
                   opacity: howVisible ? 1 : 0,
                   // El paso central queda un poco más elevado en reposo —
                   // rompe a propósito la simetría de "3 tarjetas iguales".
-                  transform: howVisible ? `translateY(${i === 1 ? -10 : 0}px)` : "translateY(20px)",
+                  transform: howVisible ? undefined : "translateY(20px)",
                 }}
               >
                 <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-fm-blue/[0.08]">
                   {s.icon}
                 </div>
-                <div className="mb-2.5 text-[28px] font-black leading-none tracking-[-0.03em] text-fm-gold/50">
+                <div className="mb-2.5 text-[28px] font-black leading-none tracking-[-0.03em] text-fm-blue/40">
                   {s.n}
                 </div>
                 <h3 className="mb-2.5 text-base font-bold text-fm-ink">{s.title}</h3>
@@ -443,9 +443,9 @@ export default function InstitutionsClient() {
               <div className="mb-7 flex flex-1 flex-col gap-[11px]">
                 {["Registro gratuito", "5 búsquedas al mes", "5 contactos al mes", "Vista de perfil básica"].map((f, i) => (
                   <div key={i} className="flex items-center gap-2.5">
-                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-fm-gold/15">
+                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-fm-blue/10">
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6l3 3 5-5" stroke="#E9A030" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M2 6l3 3 5-5" stroke="#1B4FD8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                     <span className="text-[13px] text-fm-muted">{f}</span>
@@ -468,10 +468,10 @@ export default function InstitutionsClient() {
                 transform: pricingVisible ? "translateY(0)" : "translateY(14px)",
               }}
             >
-              <div className="absolute right-5 top-5 rounded-full bg-fm-gold px-2.5 py-1 font-sans text-[11px] font-extrabold uppercase tracking-[0.08em] text-fm-ink">
+              <div className="absolute right-5 top-5 rounded-full bg-fm-blue px-2.5 py-1 font-sans text-[11px] font-extrabold uppercase tracking-[0.08em] text-white">
                 Más popular
               </div>
-              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-fm-gold">
+              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#9DB8FF]">
                 Plan Growth
               </div>
               <div className="mb-1 text-[44px] font-black leading-none tracking-[-0.05em] text-white">35 €</div>
@@ -479,9 +479,9 @@ export default function InstitutionsClient() {
               <div className="mb-7 flex flex-1 flex-col gap-[11px]">
                 {["20 búsquedas al mes", "20 contactos al mes", "Filtros avanzados", "Favoritos", "1 usuario", "Soporte por email"].map((f, i) => (
                   <div key={i} className="flex items-center gap-2.5">
-                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-fm-gold/20">
+                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-[#9DB8FF]/15">
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6l3 3 5-5" stroke="#E9A030" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M2 6l3 3 5-5" stroke="#9DB8FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                     <span className="text-[13px] text-white/65">{f}</span>
@@ -489,7 +489,7 @@ export default function InstitutionsClient() {
                 ))}
               </div>
               <Link href="/checkout?plan=institution-growth">
-                <button className="w-full rounded-[10px] bg-fm-gold py-3 text-sm font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
+                <button className="w-full rounded-[10px] bg-fm-blue py-3 text-sm font-bold text-white transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                   Activar ahora · 35 €/mes
                 </button>
               </Link>
@@ -497,14 +497,14 @@ export default function InstitutionsClient() {
 
             {/* Professional */}
             <div
-              className="relative flex flex-col rounded-[20px] border border-fm-gold/25 bg-fm-dark p-7 transition-all duration-500"
+              className="relative flex flex-col rounded-[20px] border border-white/15 bg-fm-dark p-7 transition-all duration-500"
               style={{
                 transitionDelay: "0.16s",
                 opacity: pricingVisible ? 1 : 0,
                 transform: pricingVisible ? "translateY(0)" : "translateY(14px)",
               }}
             >
-              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-fm-gold">
+              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#9DB8FF]">
                 Plan Professional
               </div>
               <div className="mb-1 text-[44px] font-black leading-none tracking-[-0.05em] text-white">99 €</div>
@@ -512,9 +512,9 @@ export default function InstitutionsClient() {
               <div className="mb-7 flex flex-1 flex-col gap-[11px]">
                 {["Búsquedas ilimitadas", "Contactos ilimitados", "Filtros avanzados completos", "Favoritos sin límite", "Hasta 3 usuarios", "Soporte prioritario"].map((f, i) => (
                   <div key={i} className="flex items-center gap-2.5">
-                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-fm-gold/15">
+                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-[#9DB8FF]/15">
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6l3 3 5-5" stroke="#E9A030" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M2 6l3 3 5-5" stroke="#9DB8FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                     <span className="text-[13px] text-white/65">{f}</span>
@@ -528,7 +528,7 @@ export default function InstitutionsClient() {
               </Link>
               <p className="mt-2.5 text-center text-[11px] text-white/60">
                 o{" "}
-                <a href="mailto:support@facultymatch.app?subject=Prueba%20Professional%2014%20d%C3%ADas" className="font-bold text-fm-gold">
+                <a href="mailto:support@facultymatch.app?subject=Prueba%20Professional%2014%20d%C3%ADas" className="font-bold text-[#9DB8FF]">
                   14 días de prueba gratuita
                 </a>
                 , sin tarjeta
@@ -546,7 +546,7 @@ export default function InstitutionsClient() {
       <section className="bg-gradient-to-br from-fm-dark to-fm-navy">
         <div className="mx-auto flex max-w-[1120px] flex-col items-start justify-between gap-8 px-6 py-16 md:flex-row md:items-center md:px-8 md:py-18">
           <div>
-            <div className="mb-3 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
+            <div className="mb-3 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-[#9DB8FF]">
               Empieza hoy
             </div>
             <h2 className="text-2xl font-extrabold leading-[1.1] tracking-[-0.04em] text-white md:text-[clamp(24px,2.8vw,36px)]">

@@ -164,14 +164,14 @@ function SignupForm() {
             </span>
           </div>
           <h2 style={{ fontFamily: SANS, fontSize: 30, fontWeight: 900, color: "#fff", lineHeight: 1.18, margin: "0 0 24px", letterSpacing: "-0.04em" }}>
-            Las instituciones pagan por tu experiencia.
+            Las instituciones te encuentran por tu experiencia.
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[
               "Universidades y escuelas de negocio te buscan por tu conocimiento",
               "Publica tu perfil y que tu experiencia hable por ti",
               "Tú decides qué instituciones pueden contactarte",
-              "Gratuito siempre, sin comisiones",
+              "Perfil gratuito, sin comisiones",
             ].map((t, i) => (
               <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                 <div style={{
@@ -212,7 +212,7 @@ function SignupForm() {
           }}>
             <Logo variant="light" />
             <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff", margin: "14px 0 0", letterSpacing: "-0.01em" }}>
-              Las instituciones pagan por tu experiencia.
+              Las instituciones te encuentran por tu experiencia.
             </p>
           </div>
 
@@ -278,32 +278,32 @@ function SignupForm() {
             />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <div>
-                <label style={lbl}>Nombre <span style={{ color: D.error }}>*</span></label>
-                <input style={inp(!!errors.firstName)} value={firstName}
+                <label htmlFor="su-first" style={lbl}>Nombre <span style={{ color: D.error }}>*</span></label>
+                <input id="su-first" autoComplete="given-name" style={inp(!!errors.firstName)} value={firstName}
                   onChange={e => setFirstName(e.target.value)} placeholder="María" />
                 {errors.firstName && <p style={errStyle}>{errors.firstName}</p>}
               </div>
               <div>
-                <label style={lbl}>Apellidos <span style={{ color: D.error }}>*</span></label>
-                <input style={inp(!!errors.lastName)} value={lastName}
+                <label htmlFor="su-last" style={lbl}>Apellidos <span style={{ color: D.error }}>*</span></label>
+                <input id="su-last" autoComplete="family-name" style={inp(!!errors.lastName)} value={lastName}
                   onChange={e => setLastName(e.target.value)} placeholder="García" />
                 {errors.lastName && <p style={errStyle}>{errors.lastName}</p>}
               </div>
             </div>
             <div>
-              <label style={lbl}>Email <span style={{ color: D.error }}>*</span></label>
-              <input type="email" style={inp(!!errors.email)} value={email}
+              <label htmlFor="su-email" style={lbl}>Email <span style={{ color: D.error }}>*</span></label>
+              <input id="su-email" type="email" autoComplete="email" style={inp(!!errors.email)} value={email}
                 onChange={e => setEmail(e.target.value)} placeholder="tu@email.com" />
               {errors.email && <p style={errStyle}>{errors.email}</p>}
             </div>
             <div>
-              <label style={lbl}>Contraseña <span style={{ color: D.error }}>*</span></label>
+              <label htmlFor="su-pwd" style={lbl}>Contraseña <span style={{ color: D.error }}>*</span></label>
               <div style={{ position: "relative" }}>
-                <input type={showPwd ? "text" : "password"}
+                <input id="su-pwd" autoComplete="new-password" type={showPwd ? "text" : "password"}
                   style={{ ...inp(!!errors.password), paddingRight: 48 }}
                   value={password} onChange={e => setPassword(e.target.value)}
                   placeholder="Mínimo 8 caracteres" />
-                <button type="button" onClick={() => setShowPwd(!showPwd)} style={{
+                <button type="button" aria-label={showPwd ? "Ocultar contraseña" : "Mostrar contraseña"} onClick={() => setShowPwd(!showPwd)} style={{
                   position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
                   background: "none", border: "none", cursor: "pointer",
                   fontFamily: SANS, fontSize: 12, color: D.faint,

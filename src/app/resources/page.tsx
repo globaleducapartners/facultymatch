@@ -80,11 +80,6 @@ export default function ResourcesPage() {
         />
         <div className="relative z-[2] mx-auto grid w-full max-w-[1100px] items-center gap-10 px-5 py-16 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-10 md:py-0 md:min-h-[520px]">
           <div className="text-center md:text-left">
-            <div className="mb-6 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
-              <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-gold">
-                Centro de conocimiento
-              </span>
-            </div>
 
             <h1 className="mb-5 text-balance text-[34px] font-extrabold leading-[1.08] tracking-[-0.03em] text-white md:text-[clamp(34px,4vw,50px)]">
               Recursos para docentes e instituciones.
@@ -186,11 +181,6 @@ export default function ResourcesPage() {
             </div>
 
             <div>
-              <div className="mb-5 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
-                <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-gold">
-                  Por qué publicamos esto
-                </span>
-              </div>
               <h2 className="mb-[18px] text-[30px] font-black leading-[1.15] tracking-[-0.04em] text-fm-ink">
                 La calidad del claustro 
                 determina la calidad de la institución.
@@ -269,8 +259,8 @@ export default function ResourcesPage() {
         <div className="relative z-[2] mx-auto max-w-[1100px] px-5 py-14 md:px-10 md:py-18">
           <div className="grid gap-8 md:grid-cols-2 md:gap-14">
             <div>
-              <div className="mb-5 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
-                <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-gold">
+              <div className="mb-5 inline-flex items-center border-l-2 border-[#6D93F5] py-0.5 pl-3">
+                <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#9DB8FF]">
                   FacultyMatch Monthly
                 </span>
               </div>
@@ -278,7 +268,7 @@ export default function ResourcesPage() {
                 El reporte mensual de la educación superior.
               </h2>
               <p className="mb-5 text-[15px] leading-[1.8] text-white/55">
-                Tendencias de reclutamiento, cambios regulatorios y nuevas oportunidades docentes. Una vez al mes. Sin spam.
+                Tendencias de reclutamiento, cambios regulatorios y nuevas oportunidades docentes. Una vez al mes.
               </p>
               <div className="flex flex-col gap-2.5">
                 {["Cero spam", "Cancelable en cualquier momento", "Solo contenido relevante"].map((item, i) => (

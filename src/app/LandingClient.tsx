@@ -375,9 +375,9 @@ function ProductTrio() {
       <div className="mx-auto max-w-[1120px]">
         <div className="mx-auto mb-12 max-w-[560px] text-center md:mb-16">
           <h2 className="mb-3.5 text-[1.7rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.7rem,3.4vw,2.5rem)]">
-            De tu CV a un perfil verificado.
+            Así se ve por dentro.
           </h2>
-          <p className="text-[15.5px] text-[#5B6B85]">Así es el camino real dentro de FacultyMatch, sin datos sensibles a la vista.</p>
+          <p className="text-[15.5px] text-[#5B6B85]">Del CV al perfil verificado, tal como lo verás dentro de FacultyMatch.</p>
         </div>
 
         <div className="grid gap-5 md:grid-cols-3">
@@ -542,7 +542,7 @@ function SplitInstituciones() {
   ];
 
   return (
-    <section className="overflow-hidden bg-white">
+    <section className="overflow-hidden bg-fm-surface">
       <div ref={ref} className="mx-auto grid max-w-[1120px] md:grid-cols-2 md:min-h-[520px]">
         <div
           className="order-2 flex flex-col justify-center px-6 pb-9 pt-0 transition-transform duration-700 md:order-1 md:py-16 md:pl-16 md:pr-8"
@@ -561,7 +561,7 @@ function SplitInstituciones() {
           <div className="mb-7 grid grid-cols-2 gap-2.5">
             {["Área de conocimiento", "Acreditación ANECA", "Idioma de impartición", "Modalidad", "Disponibilidad real", "Tipo de perfil"].map((f, i) => (
               <div key={i} className="flex items-center gap-1.5 rounded-lg border border-fm-border bg-fm-surface px-3.5 py-2.5 text-[13px] font-semibold text-fm-navy">
-                <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-fm-gold" />
+                <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-fm-blue" />
                 {f}
               </div>
             ))}
@@ -710,7 +710,7 @@ function CtaFinal() {
   return (
     <section className="bg-gradient-to-br from-fm-navy to-fm-blue px-6 py-[72px] text-center md:px-8 md:py-20">
       <div className="mx-auto max-w-[680px]">
-        <span className="mb-[18px] block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
+        <span className="mb-[18px] block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white/70">
           Únete a la red
         </span>
         <h2 className="mb-[18px] text-[1.75rem] font-black leading-[1.08] tracking-[-0.04em] text-white md:text-[clamp(1.75rem,3.5vw,3rem)]">

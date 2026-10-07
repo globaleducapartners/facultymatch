@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -84,7 +83,6 @@ const BENEFITS = [
 ];
 
 export default function FacultyClient() {
-  const isMob = useIsMobile();
   const { ref: benefitsRef, inView: benefitsVisible } = useInView(0.1);
   const { ref: profilesRef, inView: profilesVisible } = useInView(0.1);
   const { ref: pricingRef, inView: pricingVisible } = useInView(0.1);
@@ -104,7 +102,7 @@ export default function FacultyClient() {
         />
         <div className="relative z-[2] mx-auto grid w-full max-w-[1120px] items-center gap-10 px-6 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-8">
           <div className="text-center md:text-left">
-            <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
+            <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-[#6D93F5] py-0.5 pl-3">
               <span className="font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-white/80">
                 Para docentes y expertos profesionales
               </span>
@@ -165,13 +163,13 @@ export default function FacultyClient() {
             {PROFILES.map((p, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-fm-border bg-fm-surface p-7 transition-transform duration-500"
+                className={`rounded-2xl border border-fm-border bg-fm-surface p-7 transition-transform duration-500 ${i === 1 ? "md:-translate-y-2.5" : ""}`}
                 style={{
                   borderTop: `3px solid ${p.dot.includes("blue") ? "#1B4FD8" : p.dot.includes("gold") ? "#E9A030" : "#059669"}`,
                   transitionDelay: `${i * 0.12}s`,
                   // El paso central queda un poco más elevado en reposo —
                   // rompe a propósito la simetría de "3 tarjetas iguales".
-                  transform: profilesVisible ? `translateY(${i === 1 ? -10 : 0}px)` : "translateY(10px)",
+                  transform: profilesVisible ? undefined : "translateY(10px)",
                 }}
               >
                 <div className="mb-3.5 flex items-center gap-2.5">
@@ -200,7 +198,7 @@ export default function FacultyClient() {
         <div className="mx-auto max-w-[1120px]">
           <div className="flex flex-col items-start gap-5 rounded-[20px] border border-white/10 bg-white/5 p-7 md:flex-row md:items-center md:gap-10 md:p-10">
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-fm-blue/40 bg-fm-blue/30">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#E9A030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9DB8FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
             </div>
@@ -214,7 +212,7 @@ export default function FacultyClient() {
               </p>
             </div>
             <Link href="/signup" className="shrink-0">
-              <button className="whitespace-nowrap rounded-[10px] bg-fm-gold px-7 py-3.5 text-sm font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
+              <button className="whitespace-nowrap rounded-[10px] bg-fm-blue px-7 py-3.5 text-sm font-bold text-white transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                 Publicar con privacidad →
               </button>
             </Link>
@@ -226,14 +224,12 @@ export default function FacultyClient() {
       <section className="bg-fm-surface px-6 py-16 md:px-8 md:py-[88px]">
         <div className="mx-auto max-w-[1120px]">
           <div className="grid items-center gap-0 md:grid-cols-2 md:gap-[72px]">
-            {!isMob && (
-              <div className="h-[440px] overflow-hidden rounded-[20px]">
-                <div
-                  className="h-full w-full bg-cover bg-top"
-                  style={{ backgroundImage: "url(/images/faculty-benefits.jpg)" }}
-                />
-              </div>
-            )}
+            <div className="mb-8 h-[240px] overflow-hidden rounded-[20px] md:mb-0 md:h-[440px]">
+              <div
+                className="h-full w-full bg-cover bg-top"
+                style={{ backgroundImage: "url(/images/faculty-benefits.jpg)" }}
+              />
+            </div>
             <div ref={benefitsRef}>
               <h2 className="mb-8 text-[26px] font-extrabold leading-[1.1] tracking-[-0.04em] text-fm-ink md:text-[clamp(26px,2.8vw,36px)]">
                 Lo que hace diferente estar en FacultyMatch.
@@ -264,7 +260,7 @@ export default function FacultyClient() {
       <section id="precios" className="bg-white px-6 py-16 md:px-8 md:py-[88px]">
         <div className="mx-auto max-w-[1120px]">
           <div className="mb-13 text-center">
-            <div className="mb-3.5 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-gold">
+            <div className="mb-3.5 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-blue">
               Precios
             </div>
             <h2 className="text-[26px] font-extrabold tracking-[-0.04em] text-fm-ink md:text-[clamp(28px,3vw,40px)]">
@@ -292,9 +288,9 @@ export default function FacultyClient() {
                   "Bloqueo de instituciones específicas",
                 ].map((f, i) => (
                   <div key={i} className="flex items-center gap-2.5">
-                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-fm-gold/15">
+                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-fm-blue/10">
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6l3 3 5-5" stroke="#E9A030" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M2 6l3 3 5-5" stroke="#1B4FD8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                     <span className="text-sm text-fm-muted">{f}</span>
@@ -313,10 +309,10 @@ export default function FacultyClient() {
               className="relative overflow-hidden rounded-[20px] bg-fm-navy p-8 transition-transform duration-500"
               style={{ transitionDelay: "0.1s", transform: pricingVisible ? "translateY(0)" : "translateY(10px)" }}
             >
-              <div className="absolute right-5 top-5 rounded-full bg-fm-gold px-2.5 py-1 font-sans text-[11px] font-extrabold uppercase tracking-[0.08em] text-fm-ink">
+              <div className="absolute right-5 top-5 rounded-full bg-fm-blue px-2.5 py-1 font-sans text-[11px] font-extrabold uppercase tracking-[0.08em] text-white">
                 Popular
               </div>
-              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-fm-gold">
+              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#9DB8FF]">
                 Plan Professional
               </div>
               <div className="mb-1 text-5xl font-black leading-none tracking-[-0.05em] text-white">29 €</div>
@@ -330,9 +326,9 @@ export default function FacultyClient() {
                   "Soporte por email prioritario",
                 ].map((f, i) => (
                   <div key={i} className="flex items-center gap-2.5">
-                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-fm-gold/20">
+                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-[#9DB8FF]/15">
                       <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6l3 3 5-5" stroke="#E9A030" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M2 6l3 3 5-5" stroke="#9DB8FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                     <span className="text-sm text-white/65">{f}</span>
@@ -340,7 +336,7 @@ export default function FacultyClient() {
                 ))}
               </div>
               <Link href="/checkout?plan=faculty-pro">
-                <button className="w-full rounded-[10px] bg-fm-gold py-3.5 text-sm font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
+                <button className="w-full rounded-[10px] bg-fm-blue py-3.5 text-sm font-bold text-white transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                   Activar Professional
                 </button>
               </Link>

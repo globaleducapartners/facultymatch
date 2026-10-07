@@ -92,7 +92,7 @@ function LoginContent() {
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {[
-              "Tu perfil sigue activo en el directorio",
+              "Retoma tu perfil donde lo dejaste",
               "Las instituciones pueden seguir encontrándote",
               "Gestiona tu disponibilidad y privacidad",
               "Revisa las solicitudes que hayas recibido",
@@ -119,8 +119,8 @@ function LoginContent() {
             gap: 12,
           }}>
             {[
-              { n: "Verificados", label: "Expertos y docentes con experiencia REAL confirmada" },
-              { n: "Activas",  label: "Universidades y escuelas de negocio" },
+              { n: "+100", label: "Perfiles verificados por nuestro equipo" },
+              { n: "Humana", label: "Cada perfil lo revisa una persona" },
             ].map(({ n, label }) => (
               <div key={label} style={{
                 background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",

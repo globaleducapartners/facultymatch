@@ -41,7 +41,7 @@ export function Footer() {
       <style>{`
         .fm-footer-grid {
           display: grid;
-          grid-template-columns: 2.2fr 1fr 1fr 1fr;
+          grid-template-columns: 2.2fr 1fr 1fr;
           gap: 40px;
         }
         .fm-footer-trust {
@@ -169,7 +169,7 @@ export function Footer() {
             <div style={{
               fontFamily: SANS, fontSize: 11, fontWeight: 700,
               letterSpacing: "0.14em", textTransform: "uppercase" as const,
-              color: D.gold, marginBottom: 18,
+              color: "#9DB8FF", marginBottom: 18,
             }}>
               Plataforma
             </div>
@@ -195,7 +195,7 @@ export function Footer() {
             <div style={{
               fontFamily: SANS, fontSize: 11, fontWeight: 700,
               letterSpacing: "0.14em", textTransform: "uppercase" as const,
-              color: D.gold, marginBottom: 18,
+              color: "#9DB8FF", marginBottom: 18,
             }}>
               Legal
             </div>
@@ -212,28 +212,6 @@ export function Footer() {
                   {l.label}
                 </Link>
               ))}
-            </div>
-          </div>
-
-          {/* Contacto */}
-          <div>
-            <div style={{
-              fontFamily: SANS, fontSize: 11, fontWeight: 700,
-              letterSpacing: "0.14em", textTransform: "uppercase" as const,
-              color: D.gold, marginBottom: 18,
-            }}>
-              Contacto
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <a href="mailto:support@facultymatch.app" style={{ fontFamily: SANS, fontSize: 13, color: D.text, textDecoration: "none" }}>
-                Email
-              </a>
-              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" style={{ fontFamily: SANS, fontSize: 13, color: D.text, textDecoration: "none" }}>
-                WhatsApp
-              </a>
-              <a href="https://linkedin.com/company/facultymatch" target="_blank" rel="noopener noreferrer" style={{ fontFamily: SANS, fontSize: 13, color: D.text, textDecoration: "none" }}>
-                LinkedIn
-              </a>
             </div>
           </div>
         </div>
