@@ -189,8 +189,8 @@ export default function InstitutionsClient() {
           <div className="fm-animate-up fm-animate-up-delay-2 relative mx-auto w-full max-w-[440px] md:mx-0 md:max-w-none">
             <div className="relative aspect-[3/2] overflow-hidden rounded-2xl border border-white/10">
               <Image
-                src="/images/institutions-hero-photo.jpg"
-                alt="Campus universitario"
+                src="/images/institutions-oficina.jpg"
+                alt="Profesional escribiendo en una pizarra en una oficina con vistas a la ciudad"
                 fill
                 sizes="(min-width: 768px) 45vw, 90vw"
                 className="object-cover"

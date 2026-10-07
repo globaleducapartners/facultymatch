@@ -317,29 +317,14 @@ function Ticker() {
 function HowItWorks() {
   const steps = [
     {
-      icon: (
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1B4FD8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-        </svg>
-      ),
       title: "Publica en 10 minutos",
       body: "Sube tu CV o rellénalo tú mismo. Un experto de nuestro equipo revisa y aprueba cada perfil antes de publicarlo.",
     },
     {
-      icon: (
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1B4FD8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
-        </svg>
-      ),
       title: "Llegas a quien te busca",
       body: "Las instituciones filtran por área, idioma y disponibilidad real. Apareces cuando alguien necesita justo lo que ofreces.",
     },
     {
-      icon: (
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1B4FD8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      ),
       title: "Tú decides el sí",
       body: "La institución contacta directamente. Tú pones las condiciones, el ritmo y el precio. Tú aceptas o rechazas.",
     },
@@ -347,32 +332,36 @@ function HowItWorks() {
 
   return (
     <section className="bg-white px-6 py-16 md:px-8 md:py-[88px]">
-      <div className="mx-auto max-w-[1120px]">
-        <div className="mx-auto mb-12 max-w-[560px] text-center md:mb-16">
+      <div className="mx-auto grid max-w-[1120px] items-center gap-10 md:grid-cols-[5fr_7fr] md:gap-16">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl md:aspect-[5/6]">
+          <Image
+            src="/images/como-funciona-pizarra.jpg"
+            alt="Docente escribiendo en una pizarra durante una sesión de clase"
+            fill
+            sizes="(min-width: 768px) 440px, 100vw"
+            className="object-cover object-[30%_20%]"
+          />
+        </div>
+
+        <div>
           <h2 className="mb-3.5 text-[1.7rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.7rem,3.4vw,2.5rem)]">
             De la experiencia al aula.
           </h2>
-          <p className="text-[15.5px] text-[#5B6B85]">Sin intermediarios. Sin comisiones por contratación.</p>
-        </div>
+          <p className="mb-8 text-[15.5px] text-[#5B6B85]">Sin intermediarios. Sin comisiones por contratación.</p>
 
-        <div className="relative grid gap-10 md:grid-cols-3 md:gap-6">
-          {/* Hilo que conecta los 3 pasos — solo desktop, donde están en fila */}
-          <div
-            aria-hidden="true"
-            className="absolute left-[calc(16.6%+48px)] right-[calc(16.6%+48px)] top-12 hidden h-px bg-gradient-to-r from-fm-border via-fm-blue/40 to-fm-border md:block"
-          />
-          {steps.map((step, i) => (
-            <div
-              key={i}
-              className={`relative text-center ${i === 1 ? "md:-translate-y-3" : ""}`}
-            >
-              <div className="relative z-10 mx-auto mb-[22px] flex h-24 w-24 items-center justify-center rounded-full border border-fm-border bg-white shadow-[0_4px_24px_rgba(7,19,38,0.06)]">
-                {step.icon}
-              </div>
-              <h3 className="mb-[9px] text-[16.5px] font-bold tracking-[-0.02em] text-fm-ink">{step.title}</h3>
-              <p className="mx-auto max-w-[34ch] text-[13.5px] leading-[1.7] text-[#5B6B85]">{step.body}</p>
-            </div>
-          ))}
+          <ol className="divide-y divide-fm-border border-y border-fm-border">
+            {steps.map((step, i) => (
+              <li key={i} className="flex gap-5 py-6">
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-fm-navy text-[13px] font-bold text-white [font-variant-numeric:tabular-nums]">
+                  {i + 1}
+                </span>
+                <div>
+                  <h3 className="mb-1.5 text-[17px] font-bold tracking-[-0.02em] text-fm-ink">{step.title}</h3>
+                  <p className="max-w-[46ch] text-[14.5px] leading-[1.7] text-[#5B6B85]">{step.body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>
@@ -492,28 +481,16 @@ function SplitDocentes() {
   const { ref, inView } = useInView(0.1);
 
   return (
-    <section className="overflow-hidden bg-fm-surface">
+    <section className="overflow-hidden bg-white">
       <div ref={ref} className="mx-auto grid max-w-[1120px] md:grid-cols-2 md:min-h-[520px]">
         <div className="relative order-first h-[260px] overflow-hidden rounded-2xl md:order-2 md:h-auto md:rounded-none">
-          {/* Foto distinta a la del hero (esa es vídeo de otra persona) —
-              faculty-benefits.jpg: profesional presentando, encaja con
-              "lo que sabes hacer tiene demanda en las aulas". */}
           <Image
-            src="/images/faculty-benefits.jpg"
-            alt="Profesional con experiencia impartiendo formación"
+            src="/images/docentes-pizarra.jpg"
+            alt="Docente señalando una pizarra mientras explica en clase"
             fill
-            sizes="(min-width: 768px) 50vw, 100vw"
-            className="object-cover"
+            sizes="(min-width: 768px) 560px, 100vw"
+            className="object-cover object-[28%_30%]"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-fm-dark/40 to-transparent" />
-          <div className="absolute bottom-5 left-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-fm-dark/60 px-3.5 py-2 text-xs font-semibold text-white backdrop-blur-sm">
-            <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-fm-gold">
-              <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5">
-                <path d="M2 6l3 3 5-5" stroke="#0D2240" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-            Docentes con experiencia real
-          </div>
         </div>
 
         <div
@@ -534,9 +511,9 @@ function SplitDocentes() {
               "Control total de tu visibilidad y privacidad",
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2.5">
-                <span className="mt-px flex h-[19px] w-[19px] shrink-0 items-center justify-center rounded-md bg-fm-gold/15">
+                <span className="mt-px flex h-[19px] w-[19px] shrink-0 items-center justify-center rounded-md bg-fm-blue/10">
                   <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5">
-                    <path d="M2 6l3 3 5-5" stroke="#B4791E" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M2 6l3 3 5-5" stroke="#1B4FD8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </span>
                 <span className="text-[13.5px] leading-[1.55] text-[#43526B]">{item}</span>

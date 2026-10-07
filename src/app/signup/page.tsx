@@ -142,13 +142,12 @@ function SignupForm() {
     <div id="fm-signup-layout" style={{ minHeight: "100vh", display: "grid", gridTemplateColumns: "2fr 3fr", fontFamily: SANS }}>
 
       {/* ── Panel izquierdo — foto real + overlay ── */}
-      {/* Antes era un degradado plano sin imagen — pobre para quien llega
-          desde un anuncio. Reutiliza faculty-benefits.jpg, ya aprobada y en
-          uso público en la home y /faculty. */}
+      {/* Foto de la misma sesión que el hero de la home (retrato vertical,
+          2:3) para que el panel 0.64:1 apenas recorte. */}
       <div id="fm-signup-left" style={{
-        background: `linear-gradient(180deg, rgba(7,19,38,0.55) 0%, rgba(7,19,38,0.75) 55%, rgba(7,19,38,0.94) 100%), url(/images/faculty-benefits.jpg)`,
+        background: `linear-gradient(180deg, rgba(7,19,38,0.55) 0%, rgba(7,19,38,0.75) 55%, rgba(7,19,38,0.94) 100%), url(/images/signup-tablet.jpg)`,
         backgroundSize: "cover",
-        backgroundPosition: "90% 20%",
+        backgroundPosition: "center 12%",
         padding: "48px 44px",
         display: "flex", flexDirection: "column", justifyContent: "space-between",
       }}>
@@ -207,9 +206,9 @@ function SignupForm() {
             display: "none",
             margin: "-36px -24px 24px",
             padding: "20px 24px 22px",
-            background: `linear-gradient(180deg, rgba(7,19,38,0.5) 0%, rgba(7,19,38,0.88) 100%), url(/images/faculty-benefits.jpg)`,
+            background: `linear-gradient(180deg, rgba(7,19,38,0.5) 0%, rgba(7,19,38,0.88) 100%), url(/images/signup-tablet.jpg)`,
             backgroundSize: "cover",
-            backgroundPosition: "center 15%",
+            backgroundPosition: "center 14%",
           }}>
             <Logo variant="light" />
             <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff", margin: "14px 0 0", letterSpacing: "-0.01em" }}>

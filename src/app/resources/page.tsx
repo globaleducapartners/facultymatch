@@ -69,7 +69,7 @@ export default function ResourcesPage() {
       <Navbar />
 
       {/* ── HERO ── */}
-      {/* Sin media externa (antes hotlinkeaba mixkit.co + unsplash.com). */}
+      
       <section className="relative overflow-hidden">
         <div
           className="absolute inset-0"
@@ -78,33 +78,48 @@ export default function ResourcesPage() {
               "radial-gradient(720px 440px at 18% 4%, rgba(27,79,216,0.3), transparent 60%), linear-gradient(160deg, #0B1B33 0%, #071326 72%)",
           }}
         />
-        <div className="relative z-[2] flex min-h-[500px] flex-col items-center justify-center px-5 py-16 text-center md:px-10 md:py-20">
-          <div className="mb-6 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
-            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-gold">
-              Centro de conocimiento
-            </span>
+        <div className="relative z-[2] mx-auto grid w-full max-w-[1100px] items-center gap-10 px-5 py-16 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-10 md:py-0 md:min-h-[520px]">
+          <div className="text-center md:text-left">
+            <div className="mb-6 inline-flex items-center border-l-2 border-fm-gold py-0.5 pl-3">
+              <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-gold">
+                Centro de conocimiento
+              </span>
+            </div>
+
+            <h1 className="mb-5 text-balance text-[34px] font-extrabold leading-[1.08] tracking-[-0.03em] text-white md:text-[clamp(34px,4vw,50px)]">
+              Recursos para docentes e instituciones.
+            </h1>
+
+            <p className="mx-auto mb-9 max-w-[480px] text-base leading-[1.75] text-white/70 md:mx-0">
+              Guías, estándares y análisis para elevar los criterios de selección
+              de talento académico en la educación superior.
+            </p>
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center md:justify-start">
+              <Link
+                href="/signup"
+                className="rounded-[10px] bg-white px-8 py-3.5 text-center text-sm font-bold tracking-[-0.01em] text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+              >
+                Publicar mi perfil
+              </Link>
+              <Link
+                href="/signup?intent=institution"
+                className="rounded-[10px] border border-white/30 px-8 py-3.5 text-center text-sm text-white/80 transition-transform duration-150 ease-out active:scale-[0.97]"
+              >
+                Buscar docentes
+              </Link>
+            </div>
           </div>
 
-          <h1 className="mb-5 max-w-[680px] text-[34px] font-black leading-[1.05] tracking-[-0.04em] text-white md:text-[54px]">
-            Recursos para docentes<br />e instituciones.
-          </h1>
-
-          <p className="mb-9 max-w-[480px] text-base leading-[1.75] text-white/60">
-            Guías, estándares y análisis para elevar los criterios de selección
-            de talento académico en la educación superior.
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/signup">
-              <button className="rounded-[7px] bg-white px-[30px] py-3.5 text-sm font-bold tracking-[-0.01em] text-fm-ink">
-                Publicar mi perfil
-              </button>
-            </Link>
-            <Link href="/signup?intent=institution">
-              <button className="rounded-[7px] border border-white/30 px-[30px] py-3.5 text-sm text-white/80">
-                Buscar docentes
-              </button>
-            </Link>
+          <div className="relative mx-auto aspect-[3/2] w-full max-w-[440px] overflow-hidden rounded-2xl border border-white/10 md:mx-0 md:max-w-none">
+            <Image
+              src="/images/resources-pizarra.jpg"
+              alt="Profesora escribiendo un esquema en una pizarra"
+              fill
+              sizes="(min-width: 768px) 45vw, 90vw"
+              className="object-cover"
+              priority
+            />
           </div>
         </div>
       </section>
