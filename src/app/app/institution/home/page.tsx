@@ -168,7 +168,7 @@ export default async function InstitutionHomePage() {
       {!isPro && !isGrowth && (
         <Link
           href="/app/institution/billing"
-          className="lg:hidden flex items-center justify-between gap-3 bg-gradient-to-r from-energy-orange to-orange-500 text-white rounded-2xl px-5 py-4 shadow-lg shadow-orange-200 hover:shadow-xl transition-all"
+          className="lg:hidden flex items-center justify-between gap-3 bg-fm-blue text-white rounded-2xl px-5 py-4 shadow-lg shadow-blue-200 hover:shadow-xl transition-all"
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -325,7 +325,7 @@ export default async function InstitutionHomePage() {
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-black text-navy text-sm">Perfil de institución</h3>
-              <Badge className={`font-black text-[11px] px-2.5 py-1 rounded-full border-none ${profileCompletion >= 80 ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
+              <Badge className={`font-black text-[11px] px-2.5 py-1 rounded-full border-none ${profileCompletion >= 80 ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
                 {profileCompletion}%
               </Badge>
             </div>
@@ -371,8 +371,8 @@ export default async function InstitutionHomePage() {
           {isPro ? (
             <div className="bg-gradient-to-br from-navy to-[#1a3a6b] text-white rounded-3xl p-5 space-y-3">
               <div className="flex items-center gap-2">
-                <BarChart3 size={14} className="text-energy-orange" />
-                <span className="text-[11px] font-black uppercase tracking-widest text-energy-orange">Plan Professional</span>
+                <BarChart3 size={14} className="text-[#9DB8FF]" />
+                <span className="text-[11px] font-black uppercase tracking-widest text-[#9DB8FF]">Plan Professional</span>
               </div>
               <p className="text-xs font-medium text-white/80 leading-relaxed">
                 Búsquedas ilimitadas, contactos ilimitados y acceso completo al directorio.
@@ -383,8 +383,8 @@ export default async function InstitutionHomePage() {
               </div>
             </div>
           ) : isGrowth ? (
-            <div className="bg-white rounded-3xl border-2 border-dashed border-energy-orange/30 p-5 space-y-3 text-center">
-              <div className="flex items-center justify-center gap-2 text-energy-orange">
+            <div className="bg-white rounded-3xl border-2 border-dashed border-fm-blue/30 p-5 space-y-3 text-center">
+              <div className="flex items-center justify-center gap-2 text-fm-blue">
                 <Zap size={14} />
                 <span className="text-[11px] font-black uppercase tracking-widest">Plan Growth</span>
               </div>
@@ -394,7 +394,7 @@ export default async function InstitutionHomePage() {
               <div className="text-lg font-black text-navy">99€ <span className="text-xs text-fm-faint font-bold">/ mes</span></div>
               <Link
                 href="/app/institution/billing"
-                className="inline-flex items-center gap-2 w-full justify-center bg-energy-orange hover:bg-orange-600 text-white font-black py-2.5 px-4 rounded-xl text-xs transition-colors"
+                className="inline-flex items-center gap-2 w-full justify-center bg-fm-blue hover:opacity-90 text-white font-black py-2.5 px-4 rounded-xl text-xs transition-colors"
               >
                 <Zap size={12} /> Activar Plan Professional
               </Link>
@@ -405,8 +405,8 @@ export default async function InstitutionHomePage() {
               )}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl border-2 border-dashed border-energy-orange/30 p-5 space-y-3 text-center">
-              <div className="flex items-center justify-center gap-2 text-energy-orange">
+            <div className="bg-white rounded-3xl border-2 border-dashed border-fm-blue/30 p-5 space-y-3 text-center">
+              <div className="flex items-center justify-center gap-2 text-fm-blue">
                 <Zap size={14} />
                 <span className="text-[11px] font-black uppercase tracking-widest">Plan Professional</span>
               </div>
@@ -416,7 +416,7 @@ export default async function InstitutionHomePage() {
               <div className="text-lg font-black text-navy">99€ <span className="text-xs text-fm-faint font-bold">/ mes</span></div>
               <Link
                 href="/app/institution/billing"
-                className="inline-flex items-center gap-2 w-full justify-center bg-energy-orange hover:bg-orange-600 text-white font-black py-2.5 px-4 rounded-xl text-xs transition-colors"
+                className="inline-flex items-center gap-2 w-full justify-center bg-fm-blue hover:opacity-90 text-white font-black py-2.5 px-4 rounded-xl text-xs transition-colors"
               >
                 <Zap size={12} /> Activar Plan Professional
               </Link>

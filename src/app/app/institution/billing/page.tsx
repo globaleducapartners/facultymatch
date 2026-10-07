@@ -142,26 +142,26 @@ export default async function BillingPage() {
         {/* Growth */}
         <div className="relative bg-[#0D2240] rounded-2xl p-7 space-y-5 flex flex-col shadow-lg shadow-blue-900/20">
           <div className="absolute -top-3 left-5">
-            <span className="bg-[#E9A030] text-[#0D2240] text-xs font-black px-3 py-1 rounded-full">
+            <span className="bg-fm-blue text-white text-xs font-black px-3 py-1 rounded-full">
               Más popular
             </span>
           </div>
           <div>
             <p className="font-black text-white text-lg">Growth</p>
-            <p className="text-[#E9A030] font-bold text-sm mt-0.5">35 € / mes</p>
+            <p className="text-[#9DB8FF] font-bold text-sm mt-0.5">35 € / mes</p>
             <p className="text-xs text-white/40 mt-1">Sin permanencia</p>
           </div>
           <div className="space-y-2.5 flex-1">
             {growthFeatures.map((f) => (
               <div key={f} className="flex items-start gap-2">
-                <CheckCircle2 size={14} className="text-[#E9A030] flex-shrink-0 mt-0.5" />
+                <CheckCircle2 size={14} className="text-[#9DB8FF] flex-shrink-0 mt-0.5" />
                 <span className="text-xs text-white/65">{f}</span>
               </div>
             ))}
           </div>
           <Link
             href="/checkout?plan=institution-growth"
-            className="inline-flex items-center justify-center w-full bg-[#E9A030] hover:bg-amber-400 text-[#0D2240] font-black py-2.5 rounded-xl text-sm transition-colors"
+            className="inline-flex items-center justify-center w-full bg-fm-blue hover:opacity-90 text-white font-black py-2.5 rounded-xl text-sm transition-colors"
           >
             Activar ahora · 35€/mes
           </Link>
