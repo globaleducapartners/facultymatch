@@ -426,7 +426,7 @@ export default function InstitutionsClient() {
             </p>
           </div>
 
-          <div ref={pricingRef} className="mx-auto grid max-w-[1060px] gap-5 md:grid-cols-3">
+          <div ref={pricingRef} className="mx-auto grid max-w-[760px] gap-5 md:grid-cols-2">
             {/* Essential */}
             <div
               className="flex flex-col rounded-[20px] border border-fm-border bg-fm-surface p-7 transition-all duration-500"
@@ -455,42 +455,6 @@ export default function InstitutionsClient() {
               <Link href="/signup?intent=institution">
                 <button className="w-full rounded-[10px] border-[1.5px] border-fm-navy py-3 text-sm font-semibold text-fm-navy transition-transform duration-150 ease-out active:scale-[0.97]">
                   Registrar mi institución
-                </button>
-              </Link>
-            </div>
-
-            {/* Growth */}
-            <div
-              className="relative flex flex-col rounded-[20px] bg-fm-navy p-7 shadow-[0_8px_40px_rgba(27,79,216,0.22)] transition-all duration-500"
-              style={{
-                transitionDelay: "0.08s",
-                opacity: pricingVisible ? 1 : 0,
-                transform: pricingVisible ? "translateY(0)" : "translateY(14px)",
-              }}
-            >
-              <div className="absolute right-5 top-5 rounded-full bg-fm-blue px-2.5 py-1 font-sans text-[11px] font-extrabold uppercase tracking-[0.08em] text-white">
-                Más popular
-              </div>
-              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#9DB8FF]">
-                Plan Growth
-              </div>
-              <div className="mb-1 text-[44px] font-black leading-none tracking-[-0.05em] text-white">35 €</div>
-              <div className="mb-7 text-[13px] text-white/60">al mes · sin permanencia</div>
-              <div className="mb-7 flex flex-1 flex-col gap-[11px]">
-                {["20 búsquedas al mes", "20 contactos al mes", "Filtros avanzados", "Favoritos", "1 usuario", "Soporte por email"].map((f, i) => (
-                  <div key={i} className="flex items-center gap-2.5">
-                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] bg-[#9DB8FF]/15">
-                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6l3 3 5-5" stroke="#9DB8FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
-                    <span className="text-[13px] text-white/65">{f}</span>
-                  </div>
-                ))}
-              </div>
-              <Link href="/checkout?plan=institution-growth">
-                <button className="w-full rounded-[10px] bg-fm-blue py-3 text-sm font-bold text-white transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
-                  Activar ahora · 35 €/mes
                 </button>
               </Link>
             </div>

@@ -44,8 +44,7 @@ export default async function InstitutionSearchRoute({
 
   const subscriptionActive = userProfile?.subscription_status === "active" || userProfile?.subscription_status === "trialing";
   const isPro = userProfile?.plan === "institution-pro" && subscriptionActive;
-  const isGrowth = userProfile?.plan === "institution-growth" && subscriptionActive;
-  const searchMonthlyLimit = isPro ? null : isGrowth ? 20 : 5;
+  const searchMonthlyLimit = isPro ? null : 5;
 
   const hasSearchParams = !!(
     params.query || params.area || params.subarea || params.country ||
@@ -145,7 +144,7 @@ export default async function InstitutionSearchRoute({
     logPrefix: "[institution/search]",
   });
 
-  const contactMonthlyLimit = isPro ? null : isGrowth ? 20 : 5;
+  const contactMonthlyLimit = isPro ? null : 5;
 
   return (
     <>
@@ -157,7 +156,6 @@ export default async function InstitutionSearchRoute({
         searchParams={params}
         initialFavorites={favorites}
         isPro={isPro}
-        isGrowth={isGrowth}
         contactMonthlyLimit={contactMonthlyLimit}
         searchMonthlyLimit={searchMonthlyLimit ?? 5}
         searchLimitReached={searchLimitReached}

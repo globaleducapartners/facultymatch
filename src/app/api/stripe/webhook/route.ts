@@ -13,10 +13,8 @@ function buildPriceMap() {
   const map: Record<string, string> = {};
   const fp = process.env.STRIPE_PRICE_FACULTY_PRO;
   const ip = process.env.STRIPE_PRICE_INSTITUTION_PRO;
-  const ig = process.env.STRIPE_PRICE_INSTITUTION_GROWTH;
   if (fp) map[fp] = 'faculty-pro';
   if (ip) map[ip] = 'institution-pro';
-  if (ig) map[ig] = 'institution-growth';
   // Always include known IDs as fallback
   map['price_1TDvExLw5PCavs69t029xaaY'] = 'faculty-pro';
   map['price_1TDvFgLw5PCavs69YGuYE0Z0'] = 'institution-pro';
@@ -115,7 +113,7 @@ export async function POST(req: NextRequest) {
       // client_reference_id (set by our own /api/stripe/checkout) is a
       // direct id lookup — reliable regardless of user count. Falls back to
       // an email scan for subscriptions created directly in the Stripe
-      // dashboard (e.g. today's manual Growth-plan signups), which have no
+      // dashboard (e.g. manual signups), which have no
       // client_reference_id.
       const refId = session.client_reference_id;
       const user = refId
@@ -317,7 +315,7 @@ export async function POST(req: NextRequest) {
       const renewalDate = up.subscription_current_period_end
         ? new Date(up.subscription_current_period_end).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
         : '';
-      const amount = up.plan === 'faculty-pro' ? '29€' : up.plan === 'institution-growth' ? '35€' : '99€';
+      const amount = up.plan === 'faculty-pro' ? '29€' : '99€';
 
       resend.emails.send({
         from: FROM,

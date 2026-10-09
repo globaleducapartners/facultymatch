@@ -50,8 +50,6 @@ interface InstitutionSearchPageProps {
   searchParams: any;
   initialFavorites: string[];
   isPro: boolean;
-  /** Growth tier: paid, but capped (unlike Pro) — distinct from Essential/free */
-  isGrowth?: boolean;
   /** Contacts allowed per month for this plan; null = unlimited (Pro) */
   contactMonthlyLimit: number | null;
   /** Searches allowed per month for this plan; used only for the limit-reached message */
@@ -125,7 +123,6 @@ export function InstitutionSearchPage({
   searchParams,
   initialFavorites,
   isPro,
-  isGrowth = false,
   contactMonthlyLimit,
   searchMonthlyLimit = 5,
   searchLimitReached,
@@ -276,9 +273,9 @@ export function InstitutionSearchPage({
           <div className="flex items-center gap-3 flex-wrap">
             <Badge
               variant="outline"
-              className={`font-bold px-4 py-1.5 rounded-full ${isPro ? "bg-blue-50 text-fm-blue border-blue-100" : isGrowth ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-gray-50 text-gray-500 border-gray-200"}`}
+              className={`font-bold px-4 py-1.5 rounded-full ${isPro ? "bg-blue-50 text-fm-blue border-blue-100" : "bg-gray-50 text-gray-500 border-gray-200"}`}
             >
-              {isPro ? "Plan Professional" : isGrowth ? "Plan Growth" : "Plan Essential"}
+              {isPro ? "Plan Professional" : "Plan Essential"}
             </Badge>
             <Button variant="outline" asChild className="rounded-full border-gray-200 font-bold">
               <Link href="/app/institution/favorites" className="flex items-center gap-2">

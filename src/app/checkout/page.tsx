@@ -19,7 +19,9 @@ const StripeLogo = () => (
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
-  const planId = searchParams.get("plan") || "faculty-pro";
+  // Enlaces antiguos al plan Growth (ya retirado) llevan al plan Professional.
+  const rawPlan = searchParams.get("plan") || "faculty-pro";
+  const planId = rawPlan === "institution-growth" ? "institution-pro" : rawPlan;
   const plan: PlanConfig = PLANS[planId] || PLANS["faculty-pro"];
 
   const [loading, setLoading] = useState(false);

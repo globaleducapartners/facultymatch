@@ -462,8 +462,7 @@ export async function contactFaculty(formData: FormData) {
     .maybeSingle();
   const contactSubActive = contactPlanProfile?.subscription_status === 'active' || contactPlanProfile?.subscription_status === 'trialing';
   const isContactPro = contactPlanProfile?.plan === 'institution-pro' && contactSubActive;
-  const isContactGrowth = contactPlanProfile?.plan === 'institution-growth' && contactSubActive;
-  const contactMonthlyLimit = isContactPro ? null : isContactGrowth ? 20 : 5;
+  const contactMonthlyLimit = isContactPro ? null : 5;
 
   if (contactMonthlyLimit !== null) {
     const now = new Date();

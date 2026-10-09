@@ -32,8 +32,7 @@ export default async function InstitutionHomePage() {
 
   const subscriptionActive = userProfile?.subscription_status === "active" || userProfile?.subscription_status === "trialing";
   const isPro = userProfile?.plan === "institution-pro" && subscriptionActive;
-  const isGrowth = userProfile?.plan === "institution-growth" && subscriptionActive;
-  const searchMonthlyLimit = isPro ? null : isGrowth ? 20 : 5;
+  const searchMonthlyLimit = isPro ? null : 5;
 
   const currentMonth = new Date().toISOString().slice(0, 7);
   const [year, monthNum] = currentMonth.split("-").map(Number);
@@ -165,7 +164,7 @@ export default async function InstitutionHomePage() {
       </div>
 
       {/* ── Upgrade banner (mobile only, freemium) ── */}
-      {!isPro && !isGrowth && (
+      {!isPro && (
         <Link
           href="/app/institution/billing"
           className="lg:hidden flex items-center justify-between gap-3 bg-fm-blue text-white rounded-2xl px-5 py-4 shadow-lg shadow-blue-200 hover:shadow-xl transition-all"
@@ -180,7 +179,7 @@ export default async function InstitutionHomePage() {
             </div>
           </div>
           <span className="text-xs font-black bg-white/20 px-3 py-1.5 rounded-xl whitespace-nowrap flex-shrink-0">
-            Desde 35€/mes →
+            99€/mes →
           </span>
         </Link>
       )}
@@ -381,28 +380,6 @@ export default async function InstitutionHomePage() {
                 <CheckCircle2 size={13} className="text-green-400" />
                 <span className="text-xs font-bold text-white/80">Activo</span>
               </div>
-            </div>
-          ) : isGrowth ? (
-            <div className="bg-white rounded-3xl border-2 border-dashed border-fm-blue/30 p-5 space-y-3 text-center">
-              <div className="flex items-center justify-center gap-2 text-fm-blue">
-                <Zap size={14} />
-                <span className="text-[11px] font-black uppercase tracking-widest">Plan Growth</span>
-              </div>
-              <p className="text-xs font-medium text-fm-muted leading-relaxed">
-                20 búsquedas y 20 contactos al mes. Pasa a Professional para acceso sin límites.
-              </p>
-              <div className="text-lg font-black text-navy">99€ <span className="text-xs text-fm-faint font-bold">/ mes</span></div>
-              <Link
-                href="/app/institution/billing"
-                className="inline-flex items-center gap-2 w-full justify-center bg-fm-blue hover:opacity-90 text-white font-black py-2.5 px-4 rounded-xl text-xs transition-colors"
-              >
-                <Zap size={12} /> Activar Plan Professional
-              </Link>
-              {searchesUsed >= 20 && (
-                <p className="text-[11px] text-red-500 font-bold">
-                  Has alcanzado el límite de búsquedas de este mes.
-                </p>
-              )}
             </div>
           ) : (
             <div className="bg-white rounded-3xl border-2 border-dashed border-fm-blue/30 p-5 space-y-3 text-center">

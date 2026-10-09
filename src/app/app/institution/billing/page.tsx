@@ -17,7 +17,6 @@ export default async function BillingPage() {
     .single();
 
   const isPro     = profile?.plan === "institution-pro"    && profile?.subscription_status === "active";
-  const isGrowth  = profile?.plan === "institution-growth" && profile?.subscription_status === "active";
 
   const periodEnd = profile?.subscription_current_period_end
     ? formatDateTZ(profile.subscription_current_period_end, { day: "numeric", month: "long", year: "numeric" })
@@ -27,15 +26,6 @@ export default async function BillingPage() {
     "5 búsquedas al mes",
     "5 contactos al mes",
     "Vista de perfil básica",
-    "1 usuario por cuenta",
-    "Soporte por email",
-  ];
-
-  const growthFeatures = [
-    "20 búsquedas al mes",
-    "20 contactos al mes",
-    "Filtros avanzados",
-    "Favoritos",
     "1 usuario por cuenta",
     "Soporte por email",
   ];
@@ -50,10 +40,10 @@ export default async function BillingPage() {
   ];
 
   // ── Active plan card (when subscribed) ───────────────────────────────────
-  if (isPro || isGrowth) {
-    const planName     = isPro ? "Plan Professional" : "Plan Growth";
-    const planPrice    = isPro ? "99€/mes" : "35€/mes";
-    const planFeatures = isPro ? proFeatures : growthFeatures;
+  if (isPro) {
+    const planName     = "Plan Professional";
+    const planPrice    = "99€/mes";
+    const planFeatures = proFeatures;
 
     return (
       <div className="space-y-8 animate-in fade-in duration-500">
@@ -84,14 +74,6 @@ export default async function BillingPage() {
                 </div>
               ))}
             </div>
-            {!isPro && (
-              <Link
-                href="/checkout?plan=institution-pro"
-                className="inline-flex items-center justify-center w-full bg-[#1d4ed8] hover:bg-blue-700 text-white font-black py-3 rounded-xl text-sm transition-colors"
-              >
-                Mejorar a Professional · 99€/mes
-              </Link>
-            )}
             <div className="pt-2">
               <StripeCancelButton />
             </div>
@@ -101,7 +83,7 @@ export default async function BillingPage() {
     );
   }
 
-  // ── Free (Essential) plan: 3-column comparison ───────────────────────────
+  // ── Free (Essential) plan: 2-column comparison ───────────────────────────
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div>
@@ -109,7 +91,7 @@ export default async function BillingPage() {
         <p className="text-gray-500 font-medium">Elige el plan que mejor se adapta a tu institución.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl">
 
         {/* Essential */}
         <div className="relative bg-white rounded-2xl border border-gray-200 p-7 space-y-5 flex flex-col">
@@ -137,34 +119,6 @@ export default async function BillingPage() {
           >
             Plan actual
           </button>
-        </div>
-
-        {/* Growth */}
-        <div className="relative bg-[#0D2240] rounded-2xl p-7 space-y-5 flex flex-col shadow-lg shadow-blue-900/20">
-          <div className="absolute -top-3 left-5">
-            <span className="bg-fm-blue text-white text-xs font-black px-3 py-1 rounded-full">
-              Más popular
-            </span>
-          </div>
-          <div>
-            <p className="font-black text-white text-lg">Growth</p>
-            <p className="text-[#9DB8FF] font-bold text-sm mt-0.5">35 € / mes</p>
-            <p className="text-xs text-white/40 mt-1">Sin permanencia</p>
-          </div>
-          <div className="space-y-2.5 flex-1">
-            {growthFeatures.map((f) => (
-              <div key={f} className="flex items-start gap-2">
-                <CheckCircle2 size={14} className="text-[#9DB8FF] flex-shrink-0 mt-0.5" />
-                <span className="text-xs text-white/65">{f}</span>
-              </div>
-            ))}
-          </div>
-          <Link
-            href="/checkout?plan=institution-growth"
-            className="inline-flex items-center justify-center w-full bg-fm-blue hover:opacity-90 text-white font-black py-2.5 rounded-xl text-sm transition-colors"
-          >
-            Activar ahora · 35€/mes
-          </Link>
         </div>
 
         {/* Professional */}

@@ -75,8 +75,7 @@ export default async function FacultyProfilePage({
   // contactan a través del formulario mientras les quede cuota del mes.
   const subActive = viewerProfile?.subscription_status === "active" || viewerProfile?.subscription_status === "trialing";
   const isPro = viewerProfile?.plan === "institution-pro" && subActive;
-  const isGrowth = viewerProfile?.plan === "institution-growth" && subActive;
-  const contactMonthlyLimit = isPro ? null : isGrowth ? 20 : 5;
+  const contactMonthlyLimit = isPro ? null : 5;
 
   let usedContacts = 0;
   if (institution && contactMonthlyLimit !== null) {
