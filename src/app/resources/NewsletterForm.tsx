@@ -37,8 +37,8 @@ export function NewsletterForm() {
 
   if (state === "ok") {
     return (
-      <div className="flex flex-col justify-center gap-2 rounded-[9px] border border-fm-blue/25 bg-fm-blue/[0.12] px-[18px] py-4 text-sm text-white/85">
-        <span className="font-bold text-white">Suscripción confirmada.</span>
+      <div className="flex flex-col justify-center gap-2 rounded-[10px] border border-fm-blue/25 bg-fm-blue/[0.08] px-[18px] py-4 text-sm text-[#4B5A7A]">
+        <span className="font-bold text-fm-navy">Suscripción confirmada.</span>
         Recibirás el próximo reporte mensual en tu correo.
       </div>
     );
@@ -57,27 +57,29 @@ export function NewsletterForm() {
         aria-hidden="true"
         style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
       />
-      <div className="flex overflow-hidden rounded-[9px] border border-white/15 bg-white/[0.07]">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Tu correo electrónico"
-          className="flex-1 bg-transparent px-[18px] py-3.5 text-sm text-white outline-none placeholder:text-white/60"
+          aria-label="Tu correo electrónico"
+          autoComplete="email"
+          className="min-w-0 flex-1 rounded-[10px] border border-[#D8E2EF] bg-white px-4 py-3 text-base text-fm-ink outline-none placeholder:text-[#5E6F8E] focus:border-fm-blue"
         />
         <button
           type="submit"
           disabled={state === "loading"}
-          className="shrink-0 bg-fm-blue px-[22px] text-[13px] font-bold tracking-[-0.01em] text-white disabled:opacity-60"
+          className="shrink-0 rounded-[10px] bg-fm-blue px-6 py-3 text-sm font-bold text-white transition-all duration-150 hover:opacity-90 active:scale-[0.97] disabled:opacity-60"
         >
           {state === "loading" ? "Enviando…" : "Suscribirme"}
         </button>
       </div>
       {state === "error" ? (
-        <p className="text-center text-[11px] text-red-300">{errorMsg}</p>
+        <p className="text-center text-xs text-red-600">{errorMsg}</p>
       ) : (
-        <p className="text-center text-[11px] text-white/25">
+        <p className="text-center text-xs text-[#5E6F8E]">
           Una vez al mes. Sin spam. Cancela cuando quieras.
         </p>
       )}

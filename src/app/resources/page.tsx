@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { NewsletterForm } from "./NewsletterForm";
+import { DarkBand, Row, SectionRows } from "@/components/sections/skeleton";
 
 export const metadata: Metadata = {
   title: "Recursos para docentes e instituciones | FacultyMatch",
@@ -19,7 +20,6 @@ const RESOURCES = [
     desc: "Guía práctica para instituciones sobre selección, diversificación y fidelización de talento académico. Equilibra perfiles investigadores con expertos profesionales.",
     readTime: "8 min",
     href: "/resources/claustro-docente",
-    tagColor: "#1B4FD8", tagBg: "#EFF6FF",
   },
   {
     tag: "Calidad",
@@ -27,7 +27,6 @@ const RESOURCES = [
     desc: "Conoce los criterios y el proceso de auditoría que aplicamos para validar credenciales académicas, títulos de doctorado y experiencia profesional verificada.",
     readTime: "5 min",
     href: "/resources/estandares-verificacion",
-    tagColor: "#065F46", tagBg: "#F0FDF4",
   },
   {
     tag: "Tendencias",
@@ -35,7 +34,6 @@ const RESOURCES = [
     desc: "Análisis de las tendencias pedagógicas en entornos virtuales y cómo los docentes expertos pueden posicionarse en el mercado de microcredenciales internacionales.",
     readTime: "12 min",
     href: "/resources/docencia-online-microcredenciales",
-    tagColor: "#92400E", tagBg: "#FEF3C7",
   },
   {
     tag: "Docentes",
@@ -43,7 +41,6 @@ const RESOURCES = [
     desc: "Mejores prácticas para destacar tu trayectoria académica. Cómo estructurar áreas de conocimiento y generar confianza en las instituciones.",
     readTime: "6 min",
     href: "/resources/optimiza-perfil-docente",
-    tagColor: "#1B4FD8", tagBg: "#EFF6FF",
   },
   {
     tag: "Estructura",
@@ -51,7 +48,6 @@ const RESOURCES = [
     desc: "Cómo clasificamos las disciplinas y sub-áreas siguiendo estándares internacionales. Una herramienta clave para el matching preciso entre oferta y demanda.",
     readTime: "10 min",
     href: "/resources/taxonomia-academica",
-    tagColor: "#5B21B6", tagBg: "#F5F3FF",
   },
   {
     tag: "Gestión",
@@ -59,7 +55,6 @@ const RESOURCES = [
     desc: "Plan de acción para directores académicos: desde la identificación de necesidades hasta la firma de la colaboración docente.",
     readTime: "15 min",
     href: "/resources/reclutamiento-90-dias",
-    tagColor: "#9A3412", tagBg: "#FFF7ED",
   },
 ];
 
@@ -121,17 +116,12 @@ export default function ResourcesPage() {
 
       {/* ── ARTÍCULOS ── */}
       <section className="bg-white">
-        <div className="mx-auto max-w-[1100px] px-5 py-12 md:px-10 md:py-20">
-          <div className="mb-14 text-center">
-            <div className="mb-4 inline-flex items-center border-l-2 border-fm-blue py-0.5 pl-3">
-              <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-fm-blue">
-                Guías y análisis
-              </span>
-            </div>
-            <h2 className="mb-3 text-[32px] font-black leading-[1.1] tracking-[-0.04em] text-fm-ink">
+        <div className="mx-auto max-w-[1180px] px-6 py-16 md:px-8 md:py-[104px]">
+          <div className="mx-auto mb-12 max-w-[640px] text-center md:mb-16">
+            <h2 className="mb-3.5 text-balance text-[1.7rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.7rem,3.4vw,2.5rem)]">
               Lo que necesitas saber sobre talento académico.
             </h2>
-            <p className="mx-auto max-w-[460px] text-[15px] leading-[1.7] text-fm-muted">
+            <p className="text-base text-[#5B6B85]">
               Contenido escrito por directores de programa y especialistas en gestión académica.
             </p>
           </div>
@@ -139,27 +129,16 @@ export default function ResourcesPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {RESOURCES.map((r, i) => (
               <Link key={i} href={r.href} className="no-underline">
-                <div
-                  className="flex h-full cursor-pointer flex-col rounded-2xl border border-fm-border bg-white p-6 transition-shadow hover:shadow-lg"
-                  style={{ borderTop: "3px solid #1B4FD8" }}
-                >
-                  <div className="mb-4 flex items-center gap-2.5">
-                    <span
-                      className="rounded-full px-2.5 py-[3px] text-[11px] font-bold uppercase tracking-[0.1em]"
-                      style={{ color: r.tagColor, background: r.tagBg }}
-                    >
-                      {r.tag}
-                    </span>
-                    <span className="text-[11px] text-[#5E6F8E]">{r.readTime} lectura</span>
-                  </div>
-                  <h3 className="mb-3 text-base font-bold leading-snug tracking-[-0.02em] text-fm-ink">
+                <article className="flex h-full cursor-pointer flex-col rounded-2xl border border-[#E1E7F5] bg-white p-6 transition-shadow hover:shadow-lg">
+                  <p className="mb-3 font-mono text-xs font-semibold text-[#5E6F8E]">
+                    {r.tag} · {r.readTime} de lectura
+                  </p>
+                  <h3 className="mb-3 text-[17px] font-bold leading-snug tracking-[-0.02em] text-fm-ink">
                     {r.title}
                   </h3>
-                  <p className="mb-5 flex-1 text-[13px] leading-[1.75] text-fm-muted">{r.desc}</p>
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-fm-blue">
-                    Leer artículo <span className="text-sm">→</span>
-                  </div>
-                </div>
+                  <p className="mb-5 flex-1 text-sm leading-[1.7] text-[#5B6B85]">{r.desc}</p>
+                  <div className="text-sm font-bold text-fm-blue">Leer artículo →</div>
+                </article>
               </Link>
             ))}
           </div>
@@ -167,62 +146,42 @@ export default function ResourcesPage() {
       </section>
 
       {/* ── SOBRE EL KNOWLEDGE CENTER ── */}
-      <section className="bg-fm-surface">
-        <div className="mx-auto max-w-[1100px] px-5 py-12 md:px-10 md:py-20">
-          <div className="grid items-center gap-0 md:grid-cols-2 md:gap-[60px]">
-            <div className="relative hidden h-[420px] overflow-hidden rounded-2xl md:block">
-              <Image
-                src="/images/resources-event-photo.jpg"
-                alt="Profesionales asistiendo a una jornada de formación"
-                fill
-                sizes="(min-width: 768px) 45vw, 0px"
-                className="object-cover"
-              />
-            </div>
-
-            <div>
-              <h2 className="mb-[18px] text-[30px] font-black leading-[1.15] tracking-[-0.04em] text-fm-ink">
-                La calidad del claustro 
-                determina la calidad de la institución.
-              </h2>
-              <p className="mb-6 text-[15px] leading-[1.8] text-fm-muted">
+      <SectionRows>
+        <Row
+          title="La calidad del claustro determina la calidad de la institución."
+          body={
+            <>
+              <p>
                 Estos recursos ayudan a directores de programa y coordinadores académicos a tomar mejores decisiones sobre su talento docente. Y a los propios docentes, a entender qué valoran las instituciones.
               </p>
-              <div className="mb-8 flex flex-col gap-4">
-                {[
-                  { label: "Criterio universitario", body: "Alineado con los estándares de las agencias de calidad y acreditación." },
-                  { label: "Enfoque práctico",       body: "Guías pensadas para decisiones reales de selección de profesorado." },
-                  { label: "Se mantiene al día",     body: "Revisamos el contenido cuando cambia la normativa relevante." },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3.5">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-fm-blue/20 bg-fm-blue/10">
-                      <span className="text-xs font-extrabold text-fm-blue">0{i + 1}</span>
-                    </div>
-                    <div>
-                      <h4 className="mb-0.5 text-sm font-bold tracking-[-0.02em] text-fm-ink">{item.label}</h4>
-                      <p className="text-[13px] leading-[1.6] text-fm-muted">{item.body}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-                <a
-                  href="mailto:support@facultymatch.app"
-                  className="inline-flex rounded-[7px] border border-fm-border px-6 py-[11px] text-[13px] font-semibold text-fm-navy hover:border-fm-blue hover:text-fm-blue transition-colors"
-                >
-                  Contactar con el equipo
+              <p className="mt-4 text-sm">
+                ¿Hablamos? Llámanos al{" "}
+                <a href="tel:+34616684214" className="font-semibold text-fm-navy hover:text-fm-blue">
+                  +34 616 684 214
                 </a>
-                <span className="text-[13px] text-fm-muted">
-                  o llámanos:{" "}
-                  <a href="tel:+34616684214" className="font-semibold text-fm-navy hover:text-fm-blue">
-                    +34 616 684 214
-                  </a>
-                </span>
-              </div>
-            </div>
+                .
+              </p>
+            </>
+          }
+          bullets={[
+            <><b>Criterio universitario.</b> Alineado con los estándares de las agencias de calidad y acreditación.</>,
+            <><b>Enfoque práctico.</b> Guías pensadas para decisiones reales de selección de profesorado.</>,
+            <><b>Se mantiene al día.</b> Revisamos el contenido cuando cambia la normativa relevante.</>,
+          ]}
+          href="mailto:support@facultymatch.app"
+          cta="Contactar con el equipo →"
+        >
+          <div className="relative aspect-[4/3.1] overflow-hidden rounded-[14px]">
+            <Image
+              src="/images/resources-event-photo.jpg"
+              alt="Profesionales asistiendo a una jornada de formación"
+              fill
+              sizes="(min-width: 768px) 520px, 100vw"
+              className="object-cover"
+            />
           </div>
-        </div>
-      </section>
+        </Row>
+      </SectionRows>
 
       {/* ── PRENSA ── */}
       {/* Sello de "hablan de nosotros" — solo el nombre del medio enlazado, sin
@@ -248,45 +207,19 @@ export default function ResourcesPage() {
       </section>
 
       {/* ── CTA NEWSLETTER ── */}
-      <section id="newsletter" className="relative overflow-hidden scroll-mt-16">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(680px 420px at 80% 6%, rgba(255,106,26,0.14), transparent 55%), linear-gradient(160deg, #0B1B33 0%, #071326 72%)",
-          }}
-        />
-        <div className="relative z-[2] mx-auto max-w-[1100px] px-5 py-14 md:px-10 md:py-18">
-          <div className="grid gap-8 md:grid-cols-2 md:gap-14">
-            <div>
-              <div className="mb-5 inline-flex items-center border-l-2 border-[#6D93F5] py-0.5 pl-3">
-                <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#9DB8FF]">
-                  FacultyMatch Monthly
-                </span>
-              </div>
-              <h2 className="mb-4 text-[28px] font-black leading-[1.15] tracking-[-0.04em] text-white">
-                El reporte mensual de la educación superior.
-              </h2>
-              <p className="mb-5 text-[15px] leading-[1.8] text-white/55">
-                Tendencias de reclutamiento, cambios regulatorios y nuevas oportunidades docentes. Una vez al mes.
-              </p>
-              <div className="flex flex-col gap-2.5">
-                {["Cero spam", "Cancelable en cualquier momento", "Solo contenido relevante"].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2.5">
-                    <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border border-fm-blue/30 bg-fm-blue/20">
-                      <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
-                        <path d="M1 3L3 5L7 1" stroke="#1B4FD8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
-                    <span className="text-[13px] text-white/50">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+      <div id="newsletter" className="scroll-mt-16">
+        <DarkBand>
+          <h2 className="mx-auto max-w-[22ch] text-balance text-[1.5rem] font-extrabold leading-[1.12] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.5rem,2.8vw,2.1rem)]">
+            El reporte mensual de la educación superior.
+          </h2>
+          <p className="mx-auto mt-3.5 max-w-[52ch] text-base text-[#5B6B85]">
+            Tendencias de reclutamiento, cambios regulatorios y nuevas oportunidades docentes. Una vez al mes.
+          </p>
+          <div className="mx-auto mt-7 max-w-[460px]">
             <NewsletterForm />
           </div>
-        </div>
-      </section>
+        </DarkBand>
+      </div>
     </div>
   );
 }

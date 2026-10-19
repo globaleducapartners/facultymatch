@@ -56,7 +56,7 @@ export function Row({
 }: {
   flip?: boolean;
   title: string;
-  body?: string;
+  body?: React.ReactNode;
   bullets?: React.ReactNode[];
   href?: string;
   cta?: string;
@@ -68,7 +68,7 @@ export function Row({
         <h2 className="mb-4 text-balance text-[1.6rem] font-extrabold leading-[1.12] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.6rem,3vw,2.3rem)]">
           {title}
         </h2>
-        {body && <p className="max-w-[46ch] text-base leading-[1.7] text-[#5B6B85]">{body}</p>}
+        {body && <div className="max-w-[46ch] text-base leading-[1.7] text-[#5B6B85]">{body}</div>}
         {bullets && (
           <ul className="mt-6 grid gap-3">
             {bullets.map((b, i) => (
