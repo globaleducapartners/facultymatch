@@ -9,6 +9,9 @@ export const alt = "Perfil verificado en FacultyMatch";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+// Caché de 60 s; se invalida al momento al cambiar visibilidad o verificación.
+export const revalidate = 60;
+
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const admin = createAdminClient();

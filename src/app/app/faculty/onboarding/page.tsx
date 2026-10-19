@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, getCurrentUser, getCurrentProfile } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { ProfileWizardClient } from "./ProfileWizardClient";
 import { SignupConversionPixel } from "@/components/SignupConversionPixel";
@@ -10,15 +10,11 @@ export default async function OnboardingPage({
 }) {
   const { fm_signup: signupRole } = await searchParams;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+  const profile = await getCurrentProfile(user.id);
 
   const { data: facultyProfile } = await supabase
     .from("faculty_profiles")

@@ -1,6 +1,6 @@
 "use server";
 
-import { ensureProfileSlug } from "@/lib/profile-slug";
+import { ensureProfileSlug, revalidatePublicProfile } from "@/lib/profile-slug";
 import { processReferralSuccess } from "@/lib/referrals";
 import { requireAdmin } from "@/lib/require-admin";
 import { revalidatePath } from "next/cache";
@@ -13,6 +13,7 @@ export async function hideFaculty(facultyId: string) {
     visibility_updated_at: new Date().toISOString(),
   }).eq("user_id", facultyId);
   if (error) throw new Error("No se pudo ocultar el perfil: " + error.message);
+  await revalidatePublicProfile(admin, facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
@@ -24,6 +25,7 @@ export async function unhideFaculty(facultyId: string) {
     visibility_updated_at: new Date().toISOString(),
   }).eq("user_id", facultyId);
   if (error) throw new Error("No se pudo mostrar el perfil: " + error.message);
+  await revalidatePublicProfile(admin, facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
@@ -36,6 +38,7 @@ export async function revokeFaculty(facultyId: string) {
     verificado_en: new Date().toISOString(),
   }).eq("user_id", facultyId);
   if (error) throw new Error("No se pudo revocar la verificación: " + error.message);
+  await revalidatePublicProfile(admin, facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);
 }
 
@@ -76,6 +79,7 @@ export async function activateFaculty(
   await processReferralSuccess(admin, facultyId).catch(e =>
     console.error("[activateFaculty] processReferralSuccess failed:", e)
   );
+  await revalidatePublicProfile(admin, facultyId);
   revalidatePath(`/control/faculty/${facultyId}`);
   return { ok: true };
 }

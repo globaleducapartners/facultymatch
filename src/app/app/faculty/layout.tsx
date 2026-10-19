@@ -1,4 +1,4 @@
-import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient, getCurrentUser } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { switchActiveMode } from "@/app/auth/actions";
@@ -31,7 +31,7 @@ export default async function FacultyLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) redirect("/login");
 

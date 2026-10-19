@@ -1,4 +1,4 @@
-import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient, getCurrentUser } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { extractDomainFromWebsite, extractDomainFromEmail } from "@/lib/domain";
@@ -26,7 +26,7 @@ export default async function InstitutionDashboardPage({
 }) {
   const { error: errorParam, fm_signup: signupRole } = await searchParams;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const { data: userProfile } = await supabase

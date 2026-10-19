@@ -18,6 +18,11 @@ const csp = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    // Las páginas dinámicas (todo /app) se reutilizan 30 s al volver a ellas:
+    // atrás/adelante y saltos repetidos entre pantallas son instantáneos.
+    staleTimes: { dynamic: 30, static: 180 },
+  },
   images: {
     remotePatterns: [
       {

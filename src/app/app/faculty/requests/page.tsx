@@ -1,10 +1,10 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, getCurrentUser } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { RequestsClient } from "./RequestsClient";
 
 export default async function RequestsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) redirect("/login");
 

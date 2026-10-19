@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { OrcidImportModal } from "../../profile/OrcidImportModal";
+import dynamic from "next/dynamic";
+
+const OrcidImportModal = dynamic(() => import("../../profile/OrcidImportModal").then((m) => m.OrcidImportModal), { ssr: false });
 import { saveOrcidImportFromWizard } from "../actions";
 import { GraduationCap, Briefcase, PlusCircle } from "lucide-react";
 import { ChipGroup } from "@/components/ui/ChipGroup";

@@ -1,4 +1,4 @@
-import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient, getCurrentUser } from "@/lib/supabase-server";
 import { InstitutionSearchPage } from "@/components/dashboard/InstitutionSearchPage";
 import { redirect } from "next/navigation";
 import { parseFacultySearchParams, searchFacultyProfiles } from "@/lib/faculty-search";
@@ -12,7 +12,7 @@ export default async function FacultyDirectoryPage({
   const params = await searchParams;
   const filters = parseFacultySearchParams(params);
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   // Institution users go to their own search

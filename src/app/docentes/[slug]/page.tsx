@@ -13,6 +13,9 @@ import Image from "next/image";
 import { Logo } from "@/components/ui/Logo";
 import { ProfileViewTracker } from "@/components/profile/ProfileViewTracker";
 
+// Caché de 60 s; se invalida al momento al cambiar visibilidad o verificación.
+export const revalidate = 60;
+
 const BASE = "https://www.facultymatch.app";
 
 const AVAIL_LABELS: Record<string, { label: string; color: string; bg: string }> = {

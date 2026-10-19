@@ -1,4 +1,4 @@
-import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient, getCurrentUser } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import {
@@ -56,7 +56,7 @@ export default async function FacultyProfilePage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const admin = createAdminClient();

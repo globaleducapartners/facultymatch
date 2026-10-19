@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, getCurrentUser } from "@/lib/supabase-server";
 import {
   CheckCircle2, ShieldCheck, Upload, FileText, GraduationCap,
   AlertCircle, ArrowRight, Loader2, Languages, MapPin, Eye, Download,
@@ -14,7 +14,7 @@ import { notifyAdminProfileNeedsReview } from "@/lib/admin-alerts";
 
 export default async function VerificationPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) return null;
 

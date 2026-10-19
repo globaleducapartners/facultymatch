@@ -1,4 +1,4 @@
-import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient, getCurrentUser } from "@/lib/supabase-server";
 import { ShieldCheck, Eye, EyeOff, Lock, UserPlus, Search, X, AlertCircle, Sparkles, Star, Globe, ExternalLink } from "lucide-react";
 import { CopyButton } from "@/components/profile/CopyButton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { ensureProfileSlug } from "@/lib/profile-slug";
+import { ensureProfileSlug, revalidatePublicProfile } from "@/lib/profile-slug";
 import { extractDomainFromWebsite, extractDomainFromEmail, matchesBlockedDomain } from "@/lib/domain";
 
 export default async function PrivacyPage({
@@ -18,7 +18,7 @@ export default async function PrivacyPage({
 }) {
   const { saved, blocked, error } = await searchParams;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) redirect("/login");
 
@@ -111,6 +111,7 @@ export default async function PrivacyPage({
       console.error("[updateVisibility]", error);
       redirect("/app/faculty/privacy?error=save-failed");
     }
+    await revalidatePublicProfile(admin, user.id);
     revalidatePath("/app/faculty/privacy");
     redirect("/app/faculty/privacy?saved=1");
   }

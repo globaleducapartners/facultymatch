@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, getCurrentUser } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Zap, Star } from "lucide-react";
@@ -7,7 +7,7 @@ import { formatDateTZ } from "@/lib/utils";
 
 export default async function BillingPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const { data: profile } = await supabase

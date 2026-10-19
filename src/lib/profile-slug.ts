@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase-server";
 import { toSlug } from "@/lib/utils";
+import { revalidatePath } from "next/cache";
 
 /**
  * Ensures a faculty profile has a profile_slug. Returns the existing slug
@@ -45,4 +46,25 @@ export async function ensureProfileSlug(
   await admin.from("faculty_profiles").update({ profile_slug: candidate }).eq("id", facultyId);
 
   return candidate;
+}
+
+/**
+ * La ficha pública (/docentes/[slug]) y su tarjeta se sirven desde caché
+ * (60 s). Cuando cambia algo que afecta a quién puede verla —visibilidad,
+ * verificación— se invalida al momento en lugar de esperar a que caduque.
+ */
+export async function revalidatePublicProfile(
+  admin: ReturnType<typeof createAdminClient>,
+  facultyId: string
+) {
+  try {
+    const { data } = await admin
+      .from("faculty_profiles")
+      .select("profile_slug")
+      .eq("user_id", facultyId)
+      .maybeSingle();
+    if (data?.profile_slug) revalidatePath(`/docentes/${data.profile_slug}`);
+  } catch (e) {
+    console.warn("[revalidatePublicProfile] failed:", e);
+  }
 }

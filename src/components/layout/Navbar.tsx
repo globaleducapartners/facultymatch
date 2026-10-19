@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
-import { createBrowserClient } from "@supabase/ssr";
 
 const SANS = `var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif`;
 
@@ -29,11 +28,14 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    // El cliente de Supabase se carga en diferido: la barra pública pinta sin
+    // él y las páginas de marketing dejan de descargar ese JavaScript al entrar.
     const getUser = async () => {
+      const { createBrowserClient } = await import("@supabase/ssr");
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       if (user) {

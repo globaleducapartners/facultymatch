@@ -1,4 +1,4 @@
-import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient, getCurrentUser } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Mail, ChevronLeft } from "lucide-react";
@@ -15,7 +15,7 @@ const SUBJECT_LABELS: Record<string, string> = {
 
 export default async function ContactsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const { data: institution } = await supabase

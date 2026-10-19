@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { VisualEditsMessenger } from "orchids-visual-edits";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { CookieConsent } from "@/components/layout/CookieConsent";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
@@ -66,7 +65,6 @@ export default function RootLayout({
           </div>
           <ConditionalFooter />
           <CookieConsent />
-          <VisualEditsMessenger />
           <GoogleAnalytics />
           <AcquisitionTracker />
 

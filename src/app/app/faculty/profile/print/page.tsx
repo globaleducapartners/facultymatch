@@ -1,10 +1,10 @@
-import { createClient } from "@/lib/supabase-server";
+import { createClient, getCurrentUser } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { PrintProfileClient } from "./PrintProfileClient";
 
 export default async function PrintProfilePage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const [{ data: profile }, { data: faculty }, { data: expertise }] = await Promise.all([

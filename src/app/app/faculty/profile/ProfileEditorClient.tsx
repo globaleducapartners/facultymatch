@@ -3,7 +3,10 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useFormStatus } from "react-dom";
-import { OrcidImportModal } from "./OrcidImportModal";
+import dynamic from "next/dynamic";
+
+// El modal de ORCID (600+ líneas) solo se abre a petición: se descarga entonces.
+const OrcidImportModal = dynamic(() => import("./OrcidImportModal").then((m) => m.OrcidImportModal), { ssr: false });
 import { saveOrcidImport } from "./actions";
 import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 

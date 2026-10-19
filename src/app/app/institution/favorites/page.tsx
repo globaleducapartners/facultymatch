@@ -1,4 +1,4 @@
-import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { createAdminClient, getCurrentUser } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { EducatorCard } from "@/components/dashboard/EducatorCard";
 import { Star } from "lucide-react";
@@ -6,9 +6,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default async function FavoritesPage() {
-  const supabase = await createClient();
   const admin = createAdminClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const { data: institution } = await admin

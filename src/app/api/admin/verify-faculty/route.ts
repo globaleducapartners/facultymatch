@@ -1,5 +1,5 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
-import { ensureProfileSlug } from "@/lib/profile-slug";
+import { ensureProfileSlug, revalidatePublicProfile } from "@/lib/profile-slug";
 import { processReferralSuccess } from "@/lib/referrals";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
@@ -82,6 +82,7 @@ export async function POST(request: Request) {
       }).catch(e => console.warn("[verify-faculty] approval email failed:", e));
     }
 
+    await revalidatePublicProfile(admin, facultyId);
     return NextResponse.json({ success: true, action: "approved" });
   }
 
@@ -105,6 +106,7 @@ export async function POST(request: Request) {
       }).catch(e => console.warn("[verify-faculty] rejection email failed:", e));
     }
 
+    await revalidatePublicProfile(admin, facultyId);
     return NextResponse.json({ success: true, action: "rejected" });
   }
 
@@ -135,6 +137,7 @@ export async function POST(request: Request) {
       }).catch(e => console.warn("[verify-faculty] info email failed:", e));
     }
 
+    await revalidatePublicProfile(admin, facultyId);
     return NextResponse.json({ success: true, action: "requires_info" });
   }
 

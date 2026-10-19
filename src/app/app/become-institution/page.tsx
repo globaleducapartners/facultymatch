@@ -1,11 +1,11 @@
-import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient, getCurrentUser } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { BecomeInstitutionClient } from "./BecomeInstitutionClient";
 import { extractDomainFromWebsite, extractDomainFromEmail } from "@/lib/domain";
 
 export default async function BecomeInstitutionPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect("/login?redirect=/app/become-institution");
 
   const { data: profile } = await supabase

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-server";
+import { getCurrentUser, getCurrentProfile } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { Topbar } from "@/components/topbar";
@@ -8,16 +8,11 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) redirect("/login");
 
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+  const profile = await getCurrentProfile(user.id);
 
   // Use DB profile + user_metadata fallback so Topbar always has display info
   // Apply field-level fallbacks — even when profile exists but some fields are null

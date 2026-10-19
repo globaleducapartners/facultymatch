@@ -1,4 +1,4 @@
-import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { createClient, createAdminClient, getCurrentUser, getCurrentProfile } from "@/lib/supabase-server";
 import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 import {
   ArrowRight,
@@ -44,14 +44,10 @@ export default async function EducatorDashboard() {
   const supabase = await createClient();
   const admin = createAdminClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) return null;
 
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  const profile = await getCurrentProfile(user.id);
 
   // Institution-only accounts go to institution dashboard
   if (profile?.role === "institution") {

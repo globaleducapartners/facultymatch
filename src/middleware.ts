@@ -126,8 +126,18 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
+// Solo se ejecuta donde hace falta (zona privada, pago y redirección de los
+// enlaces de Supabase con ?code= o ?token_hash=). Las páginas públicas ya no
+// pasan por aquí. Corre en Node, en la misma región que Supabase: antes corría
+// en el borde, cerca del usuario pero lejos de la base de datos, y cada
+// consulta de la barrera cruzaba el Atlántico (dos por pantalla de /app).
 export const config = {
+  runtime: "nodejs",
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api/).*)",
+    "/app/:path*",
+    "/control/:path*",
+    "/checkout/:path*",
+    { source: "/:path*", has: [{ type: "query", key: "code" }] },
+    { source: "/:path*", has: [{ type: "query", key: "token_hash" }] },
   ],
 };

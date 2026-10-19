@@ -9,7 +9,10 @@ import { Step3Specialty } from "./steps/Step3Specialty";
 import { Step4Modality } from "./steps/Step4Modality";
 import { Step5Review } from "./steps/Step5Review";
 import { saveWizardStep, publishProfile } from "./actions";
-import { CvImportStep } from "./CvImportStep";
+import dynamic from "next/dynamic";
+
+// La lectura del CV solo hace falta si la persona elige esa vía.
+const CvImportStep = dynamic(() => import("./CvImportStep").then((m) => m.CvImportStep), { ssr: false });
 import type { CvWizardPrefill } from "@/lib/cv-import-mapping";
 
 // ─── Design tokens ─────────────────────────────────────────────────────────────
