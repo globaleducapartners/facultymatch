@@ -154,15 +154,6 @@ function SignupForm() {
         <Logo variant="light" />
 
         <div>
-          <div style={{
-            display: "inline-flex", alignItems: "center",
-            borderLeft: "2px solid #FF6A1A", paddingLeft: 12, paddingTop: 2, paddingBottom: 2,
-            marginBottom: 20,
-          }}>
-            <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#FF6A1A" }}>
-              Para docentes y expertos
-            </span>
-          </div>
           <h2 style={{ fontFamily: SANS, fontSize: 30, fontWeight: 900, color: "#fff", lineHeight: 1.18, margin: "0 0 24px", letterSpacing: "-0.04em" }}>
             Las instituciones te encuentran por tu experiencia.
           </h2>
@@ -174,16 +165,9 @@ function SignupForm() {
               "Perfil gratuito, sin comisiones",
             ].map((t, i) => (
               <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <div style={{
-                  width: 18, height: 18, borderRadius: "50%",
-                  background: "rgba(27,79,216,0.25)", border: "1px solid rgba(27,79,216,0.4)",
-                  flexShrink: 0, marginTop: 1,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
-                    <path d="M1 3L3 5L7 1" stroke="#1B4FD8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9DB8FF" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ flexShrink: 0, marginTop: 3 }}>
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
                 <span style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.65)", lineHeight: 1.55 }}>{t}</span>
               </div>
             ))}

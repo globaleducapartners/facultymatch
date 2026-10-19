@@ -66,24 +66,20 @@ function LoginContent() {
 
       {/* ── Panel izquierdo — dark ── */}
       <div id="fm-login-left" style={{
+        position: "relative", overflow: "hidden",
         background: `linear-gradient(160deg, ${D.dark} 0%, ${D.navy} 100%)`,
         padding: "48px 44px",
         display: "flex", flexDirection: "column", justifyContent: "space-between",
       }}>
+        {/* Círculos de marca (el encuentro) */}
+        <span aria-hidden style={{ position: "absolute", right: -60, top: 90, width: 170, height: 170, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.3)" }} />
+        <span aria-hidden style={{ position: "absolute", right: 30, top: 170, width: 90, height: 90, borderRadius: "50%", background: "#FF6A1A" }} />
+
         {/* Wordmark */}
         <Logo variant="light" />
 
         {/* Cuerpo */}
         <div>
-          <div style={{
-            display: "inline-flex", alignItems: "center",
-            borderLeft: `2px solid ${D.gold}`, paddingLeft: 12, paddingTop: 2, paddingBottom: 2,
-            marginBottom: 20,
-          }}>
-            <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.gold }}>
-              Tu red académica
-            </span>
-          </div>
           <h2 style={{
             fontFamily: SANS, fontSize: 32, fontWeight: 900, color: "#fff",
             lineHeight: 1.15, margin: "0 0 28px", letterSpacing: "-0.04em",
@@ -98,39 +94,14 @@ function LoginContent() {
               "Revisa las solicitudes que hayas recibido",
             ].map((t, i) => (
               <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <div style={{
-                  width: 18, height: 18, borderRadius: "50%",
-                  background: "rgba(27,79,216,0.25)", border: "1px solid rgba(27,79,216,0.4)",
-                  flexShrink: 0, marginTop: 1,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
-                    <path d="M1 3L3 5L7 1" stroke="#1B4FD8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9DB8FF" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ flexShrink: 0, marginTop: 3 }}>
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
                 <span style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.65)", lineHeight: 1.55 }}>{t}</span>
               </div>
             ))}
           </div>
 
-          {/* Stat strip */}
-          <div style={{
-            marginTop: 40, display: "grid", gridTemplateColumns: "1fr 1fr",
-            gap: 12,
-          }}>
-            {[
-              { n: "+100", label: "Perfiles verificados por nuestro equipo" },
-              { n: "Humana", label: "Cada perfil lo revisa una persona" },
-            ].map(({ n, label }) => (
-              <div key={label} style={{
-                background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: 12, padding: "14px 16px",
-              }}>
-                <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.04em" }}>{n}</div>
-                <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.62)", marginTop: 2 }}>{label}</div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Pie */}

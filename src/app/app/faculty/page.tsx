@@ -736,7 +736,7 @@ export default async function EducatorDashboard() {
                 <span className="text-[11px] font-black uppercase tracking-widest">Plan Professional</span>
               </div>
               <p className="text-xs font-medium text-gray-600 leading-relaxed">
-                Aparece primero en búsquedas, bloquea instituciones y controla tu privacidad avanzada.
+                Aparece primero en búsquedas, visibilidad preferente ante instituciones y estadísticas de visitas.
               </p>
               <div className="text-xl font-black text-navy">29€ <span className="text-xs text-gray-500 font-bold">/ año</span></div>
               <Link

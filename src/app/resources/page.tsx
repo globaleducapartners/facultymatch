@@ -189,9 +189,6 @@ export default function ResourcesPage() {
           coincide con los datos reales del directorio). */}
       <section className="border-y border-fm-border bg-white px-6 py-10 md:px-8">
         <div className="mx-auto flex max-w-[900px] flex-col items-center gap-4 text-center">
-          <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#5E6F8E]">
-            Han hablado de nosotros
-          </span>
           <a
             href="https://alicanteplaza.es/alicanteplaza/empresas/asi-es-facultymatch-el-linkedin-de-docentes-impulsada-por-un-noveldense-para-universidades-y-escuelas-de-negocio"
             target="_blank"

@@ -72,7 +72,7 @@ function CheckoutContent() {
           <Logo />
         </Link>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-green-600">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-green-600">
             <Lock size={13} className="text-green-500" />
             Pago 100% seguro
           </div>
@@ -98,7 +98,7 @@ function CheckoutContent() {
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 space-y-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs font-black uppercase tracking-widest text-talentia-blue mb-1">{plan.badge}</p>
+                <p className="text-sm font-bold text-fm-blue mb-1">{plan.badge}</p>
                 <h2 className="text-2xl font-black text-navy">{plan.name}</h2>
                 <p className="text-gray-500 font-medium text-sm mt-1">{plan.description}</p>
               </div>
@@ -110,7 +110,7 @@ function CheckoutContent() {
 
             {plan.promo && (
               <div className="bg-orange-50 border border-orange-100 rounded-2xl px-4 py-3">
-                <p className="text-xs font-black text-energy-orange uppercase tracking-widest">{plan.promo}</p>
+                <p className="text-sm font-bold text-fm-blue">{plan.promo}</p>
               </div>
             )}
 
@@ -133,7 +133,7 @@ function CheckoutContent() {
             ].map(({ icon: Icon, label }) => (
               <div key={label} className="bg-white rounded-2xl border border-gray-100 p-4 text-center space-y-2">
                 <Icon size={20} className="text-talentia-blue mx-auto" />
-                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">{label}</p>
+                <p className="text-xs font-semibold text-gray-500">{label}</p>
               </div>
             ))}
           </div>

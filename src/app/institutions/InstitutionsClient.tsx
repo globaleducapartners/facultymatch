@@ -249,7 +249,7 @@ export default function InstitutionsClient() {
                 transform: pricingVisible ? "translateY(0)" : "translateY(14px)",
               }}
             >
-              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#5E6F8E]">
+              <div className="mb-[18px] font-sans text-sm font-bold text-[#5E6F8E]">
                 Plan Essential
               </div>
               <div className="mb-1 text-[44px] font-black leading-none tracking-[-0.05em] text-fm-ink">0 €</div>
@@ -282,7 +282,7 @@ export default function InstitutionsClient() {
                 transform: pricingVisible ? "translateY(0)" : "translateY(14px)",
               }}
             >
-              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#9DB8FF]">
+              <div className="mb-[18px] font-sans text-sm font-bold text-[#9DB8FF]">
                 Plan Professional
               </div>
               <div className="mb-1 text-[44px] font-black leading-none tracking-[-0.05em] text-white">99 €</div>
@@ -324,9 +324,6 @@ export default function InstitutionsClient() {
       <section className="bg-gradient-to-br from-fm-dark to-fm-navy">
         <div className="mx-auto flex max-w-[1120px] flex-col items-start justify-between gap-8 px-6 py-16 md:flex-row md:items-center md:px-8 md:py-18">
           <div>
-            <div className="mb-3 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-[#9DB8FF]">
-              Empieza hoy
-            </div>
             <h2 className="text-2xl font-extrabold leading-[1.1] tracking-[-0.04em] text-white md:text-[clamp(24px,2.8vw,36px)]">
               Tu próximo experto lleva
                años esperando esta llamada.

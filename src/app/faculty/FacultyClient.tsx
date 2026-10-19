@@ -210,9 +210,6 @@ export default function FacultyClient() {
       <section id="precios" className="bg-white px-6 py-16 md:px-8 md:py-[88px]">
         <div className="mx-auto max-w-[1120px]">
           <div className="mb-13 text-center">
-            <div className="mb-3.5 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-fm-blue">
-              Precios
-            </div>
             <h2 className="text-[26px] font-extrabold tracking-[-0.04em] text-fm-ink md:text-[clamp(28px,3vw,40px)]">
               Para docentes y expertos, sin coste de entrada.
             </h2>
@@ -224,7 +221,7 @@ export default function FacultyClient() {
               className="rounded-[20px] border border-fm-border bg-fm-surface p-8 transition-transform duration-500"
               style={{ transform: pricingVisible ? "translateY(0)" : "translateY(10px)" }}
             >
-              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#5E6F8E]">
+              <div className="mb-[18px] font-sans text-sm font-bold text-[#5E6F8E]">
                 Plan Basic
               </div>
               <div className="mb-1 text-5xl font-black leading-none tracking-[-0.05em] text-fm-ink">0 €</div>
@@ -259,10 +256,7 @@ export default function FacultyClient() {
               className="relative overflow-hidden rounded-[20px] bg-fm-navy p-8 transition-transform duration-500"
               style={{ transitionDelay: "0.1s", transform: pricingVisible ? "translateY(0)" : "translateY(10px)" }}
             >
-              <div className="absolute right-5 top-5 rounded-full bg-fm-blue px-2.5 py-1 font-sans text-[11px] font-extrabold uppercase tracking-[0.08em] text-white">
-                Popular
-              </div>
-              <div className="mb-[18px] font-sans text-[11px] font-bold uppercase tracking-[0.12em] text-[#9DB8FF]">
+              <div className="mb-[18px] font-sans text-sm font-bold text-[#9DB8FF]">
                 Plan Professional
               </div>
               <div className="mb-1 text-5xl font-black leading-none tracking-[-0.05em] text-white">29 €</div>
