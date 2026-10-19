@@ -13,20 +13,19 @@ const D = {
   navy:    "#0D2240",
   white:   "#FFFFFF",
   ink:     "#0C1018",
-  muted:   "#6B7280",
-  faint:   "#9CA3AF",
+  muted:   "#5B6B85",
+  faint:   "#5E6F8E",
   border:  "#D8E2EF",
   surf:    "#F2F6FC",
 };
 
 const lbl: React.CSSProperties = {
-  fontFamily: SANS, fontSize: 11, fontWeight: 700,
-  letterSpacing: "0.1em", textTransform: "uppercase" as const,
-  color: D.faint, display: "block", marginBottom: 6,
+  fontFamily: SANS, fontSize: 14, fontWeight: 600,
+  color: D.ink, display: "block", marginBottom: 6,
 };
 
 const inp: React.CSSProperties = {
-  fontFamily: SANS, width: "100%", fontSize: 14, color: D.ink,
+  fontFamily: SANS, width: "100%", fontSize: 16, color: D.ink,
   background: D.white, border: `1px solid ${D.border}`,
   borderRadius: 10, padding: "11px 14px", outline: "none",
   boxSizing: "border-box" as const, transition: "border-color 0.2s",
@@ -148,18 +147,19 @@ export function Step4Modality({ data, updateData }: Props) {
                   alignItems: "center",
                   gap: 4,
                   outline: "none",
-                  borderRadius: 999,
+                  borderRadius: 8,
                   fontWeight: 600,
-                  fontSize: 12,
+                  fontSize: 13,
                   padding: "6px 14px",
-                  background: isAdded ? "#1B4FD8" : "#F2F6FC",
-                  color: isAdded ? "#FFFFFF" : "#4B5A7A",
+                  background: "#FFFFFF",
+                  color: isAdded ? "#1B4FD8" : "#0D2240",
                   border: isAdded ? "1px solid #1B4FD8" : "1px solid #D8E2EF",
+                  boxShadow: isAdded ? "inset 0 0 0 1px #1B4FD8" : "none",
                   transition: "all 0.15s ease",
                 }}
               >
                 {lang}
-                {isAdded && <span style={{ fontSize: 10, marginLeft: 2 }}>✓</span>}
+                
               </button>
             );
           })}

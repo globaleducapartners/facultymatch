@@ -56,16 +56,16 @@ export function SecuritySettingsSection({ currentEmail }: Props) {
               <Mail size={20} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+              <p className="text-[10px] font-bold text-gray-400">
                 Correo electrónico
               </p>
-              <p className="text-sm font-bold text-navy">{currentEmail}</p>
+              <p className="text-sm font-bold text-fm-navy">{currentEmail}</p>
             </div>
           </div>
           <Button
             variant="outline"
             onClick={() => { setEmailOpen(!emailOpen); setEmailMsg(null); }}
-            className="border-gray-200 text-navy font-bold rounded-xl h-10 px-6 hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+            className="border-gray-200 text-fm-navy font-bold rounded-xl h-10 px-6 hover:bg-gray-50 transition-colors flex items-center gap-1.5"
           >
             Cambiar email
             {emailOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
@@ -91,7 +91,7 @@ export function SecuritySettingsSection({ currentEmail }: Props) {
               <Button
                 type="submit"
                 disabled={loadingEmail}
-                className="bg-talentia-blue hover:bg-blue-700 text-white font-bold h-10 px-6 rounded-xl text-sm"
+                className="bg-fm-blue hover:bg-blue-700 text-white font-bold h-10 px-6 rounded-xl text-sm"
               >
                 {loadingEmail ? "Enviando..." : "Enviar confirmación"}
               </Button>
@@ -108,16 +108,16 @@ export function SecuritySettingsSection({ currentEmail }: Props) {
               <Lock size={20} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+              <p className="text-[10px] font-bold text-gray-400">
                 Contraseña
               </p>
-              <p className="text-sm font-bold text-navy">••••••••••••</p>
+              <p className="text-sm font-bold text-fm-navy">••••••••••••</p>
             </div>
           </div>
           <Button
             variant="outline"
             onClick={() => { setPasswordOpen(!passwordOpen); setPasswordMsg(null); }}
-            className="border-gray-200 text-navy font-bold rounded-xl h-10 px-6 hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+            className="border-gray-200 text-fm-navy font-bold rounded-xl h-10 px-6 hover:bg-gray-50 transition-colors flex items-center gap-1.5"
           >
             Actualizar
             {passwordOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
@@ -151,7 +151,7 @@ export function SecuritySettingsSection({ currentEmail }: Props) {
               <Button
                 type="submit"
                 disabled={loadingPassword}
-                className="bg-talentia-blue hover:bg-blue-700 text-white font-bold h-10 px-6 rounded-xl text-sm"
+                className="bg-fm-blue hover:bg-blue-700 text-white font-bold h-10 px-6 rounded-xl text-sm"
               >
                 {loadingPassword ? "Guardando..." : "Actualizar contraseña"}
               </Button>

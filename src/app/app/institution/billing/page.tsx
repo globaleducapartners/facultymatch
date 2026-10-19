@@ -46,21 +46,21 @@ export default async function BillingPage() {
     const planFeatures = proFeatures;
 
     return (
-      <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="space-y-8 duration-500">
         <div>
-          <h1 className="text-3xl font-bold text-navy">Plan & Facturación</h1>
+          <h1 className="text-3xl font-bold text-fm-navy">Plan & Facturación</h1>
           <p className="text-gray-500 font-medium">Gestiona tu suscripción.</p>
         </div>
 
         <div className="max-w-md">
           <div className="relative bg-white rounded-2xl border-2 border-blue-600 p-8 shadow-sm space-y-6">
             <div className="absolute -top-3 left-6">
-              <span className="bg-blue-600 text-white text-xs font-black px-3 py-1 rounded-full flex items-center gap-1">
+              <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-md flex items-center gap-1">
                 <Zap size={11} /> Activo
               </span>
             </div>
             <div>
-              <p className="font-black text-navy text-xl">{planName}</p>
+              <p className="font-extrabold text-fm-navy text-xl">{planName}</p>
               <p className="text-blue-600 font-bold text-sm mt-0.5">{planPrice}</p>
               {periodEnd && (
                 <p className="text-xs text-gray-500 mt-1">Próxima renovación: {periodEnd}</p>
@@ -85,9 +85,9 @@ export default async function BillingPage() {
 
   // ── Free (Essential) plan: 2-column comparison ───────────────────────────
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 duration-500">
       <div>
-        <h1 className="text-3xl font-bold text-navy">Plan & Facturación</h1>
+        <h1 className="text-3xl font-bold text-fm-navy">Plan & Facturación</h1>
         <p className="text-gray-500 font-medium">Elige el plan que mejor se adapta a tu institución.</p>
       </div>
 
@@ -96,12 +96,12 @@ export default async function BillingPage() {
         {/* Essential */}
         <div className="relative bg-white rounded-2xl border border-gray-200 p-7 space-y-5 flex flex-col">
           <div className="absolute -top-3 left-5">
-            <span className="bg-gray-100 text-gray-600 text-xs font-black px-3 py-1 rounded-full border border-gray-200">
+            <span className="bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1 rounded-md border border-gray-200">
               Tu plan actual
             </span>
           </div>
           <div>
-            <p className="font-black text-navy text-lg">Essential</p>
+            <p className="font-extrabold text-fm-navy text-lg">Essential</p>
             <p className="text-gray-500 font-semibold text-sm mt-0.5">0 € / mes</p>
             <p className="text-xs text-gray-500 mt-1">Para empezar</p>
           </div>
@@ -115,7 +115,7 @@ export default async function BillingPage() {
           </div>
           <button
             disabled
-            className="inline-flex items-center justify-center w-full bg-gray-100 text-gray-500 font-black py-2.5 rounded-xl text-sm cursor-not-allowed"
+            className="inline-flex items-center justify-center w-full bg-gray-100 text-gray-500 font-bold py-2.5 rounded-xl text-sm cursor-not-allowed"
           >
             Plan actual
           </button>
@@ -124,12 +124,12 @@ export default async function BillingPage() {
         {/* Professional */}
         <div className="relative bg-white rounded-2xl border-2 border-blue-600 p-7 space-y-5 flex flex-col shadow-sm">
           <div className="absolute -top-3 left-5">
-            <span className="bg-blue-600 text-white text-xs font-black px-3 py-1 rounded-full flex items-center gap-1">
+            <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-md flex items-center gap-1">
               <Star size={10} /> Completo
             </span>
           </div>
           <div>
-            <p className="font-black text-navy text-lg">Professional</p>
+            <p className="font-extrabold text-fm-navy text-lg">Professional</p>
             <p className="text-blue-600 font-bold text-sm mt-0.5">99 € / mes</p>
             <p className="text-xs text-gray-500 mt-1">Sin permanencia</p>
           </div>
@@ -143,7 +143,7 @@ export default async function BillingPage() {
           </div>
           <Link
             href="/checkout?plan=institution-pro"
-            className="inline-flex items-center justify-center w-full bg-[#1d4ed8] hover:bg-blue-700 text-white font-black py-2.5 rounded-xl text-sm transition-colors"
+            className="inline-flex items-center justify-center w-full bg-[#1d4ed8] hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors"
           >
             Activar ahora · 99€/mes
           </Link>

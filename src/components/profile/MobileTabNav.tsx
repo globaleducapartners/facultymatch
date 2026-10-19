@@ -23,7 +23,7 @@ export function MobileTabNav({ currentTab }: { currentTab: string }) {
     <div className="md:hidden space-y-2">
       {/* Progress dots */}
       <div className="flex items-center justify-between px-1">
-        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+        <span className="text-[10px] font-bold text-gray-400">
           {step} / {PROFILE_TABS.length} secciones
         </span>
         <div className="flex gap-1">
@@ -31,10 +31,10 @@ export function MobileTabNav({ currentTab }: { currentTab: string }) {
             <div
               key={t.value}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                t.value === currentTab
-                  ? "w-6 bg-talentia-blue"
-                  : "w-2 bg-gray-200"
-              }`}
+ t.value === currentTab
+ ? "w-6 bg-fm-blue"
+ : "w-2 bg-gray-200"
+ }`}
             />
           ))}
         </div>
@@ -45,7 +45,7 @@ export function MobileTabNav({ currentTab }: { currentTab: string }) {
         <select
           value={currentTab}
           onChange={(e) => router.push(`?tab=${e.target.value}`)}
-          className="w-full appearance-none bg-white border border-gray-200 rounded-2xl px-5 py-4 pr-12 text-sm font-bold text-navy focus:outline-none focus:ring-2 focus:ring-talentia-blue cursor-pointer shadow-sm"
+          className="w-full appearance-none bg-white border border-gray-200 rounded-2xl px-5 py-4 pr-12 text-sm font-bold text-fm-navy focus:outline-none focus:ring-2 focus:ring-fm-blue cursor-pointer shadow-sm"
         >
           {PROFILE_TABS.map((t) => (
             <option key={t.value} value={t.value}>

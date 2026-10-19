@@ -16,7 +16,7 @@ export function InstitutionBannerEditor({ institutionId, currentBannerUrl }: Pro
   const [pickerOpen, setPickerOpen] = useState(false);
 
   return (
-    <div className="h-36 bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#4F7FE8] relative overflow-hidden">
+    <div className="h-36 bg-fm-navy relative overflow-hidden">
       {currentBannerUrl ? (
         <img
           src={currentBannerUrl}

@@ -82,16 +82,16 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
           {faculty.avatar_url ? (
             <Image src={faculty.avatar_url} alt={faculty.full_name} fill sizes="48px" className="object-cover" />
           ) : (
-            <span className="text-sm font-black">{initials}</span>
+            <span className="text-sm font-bold">{initials}</span>
           )}
         </div>
 
         {/* Name + headline */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="text-base font-bold text-navy truncate">{faculty.full_name}</h3>
+            <h3 className="text-base font-bold text-fm-navy truncate">{faculty.full_name}</h3>
             {subjectLabel && (
-              <Badge variant="secondary" className="bg-blue-50 text-fm-blue border-blue-100 text-[11px] font-black uppercase tracking-wider px-2 py-0.5">
+              <Badge variant="secondary" className="bg-white text-fm-blue border-fm-border text-[11px] font-bold px-2 py-0.5">
                 {subjectLabel}
               </Badge>
             )}
@@ -102,11 +102,11 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
         {/* Status + date + expand */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <div className="hidden sm:block text-right">
-            <Badge className={`border-none text-[11px] font-black uppercase tracking-wider ${
-              isReplied ? "bg-green-50 text-green-600" :
-              isSent ? "bg-blue-50 text-fm-blue" :
-              "bg-gray-100 text-gray-500"
-            }`}>
+            <Badge className={`border-none text-[11px] font-bold ${
+ isReplied ? "bg-green-50 text-green-600" :
+ isSent ? "bg-blue-50 text-fm-blue" :
+ "bg-gray-100 text-gray-500"
+ }`}>
               {isReplied ? <><CheckCircle2 size={10} className="inline mr-1" />Respondida</> :
                isSent ? <><Clock size={10} className="inline mr-1" />Enviada</> : "Archivada"}
             </Badge>
@@ -157,13 +157,13 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
               const isInst = msg.sender === "institution";
               return (
                 <div key={index} className={`flex flex-col ${isInst ? "items-end" : "items-start"} gap-2`}>
-                  <div className="flex items-center gap-2 text-[11px] text-gray-500 font-bold uppercase tracking-widest">
+                  <div className="flex items-center gap-2 text-[11px] text-gray-500 font-bold">
                     {!isInst && (
                       <div className="relative w-5 h-5 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center flex-shrink-0">
                         {faculty.avatar_url ? (
                           <Image src={faculty.avatar_url} alt={faculty.full_name} fill sizes="20px" className="object-cover" />
                         ) : (
-                          <span className="text-[11px] font-black text-gray-500">{initials[0]}</span>
+                          <span className="text-[11px] font-bold text-gray-500">{initials[0]}</span>
                         )}
                       </div>
                     )}
@@ -171,22 +171,22 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
                     <span>·</span>
                     <span>{formatDateTimeTZ(msg.created_at)}</span>
                   </div>
-                  <div className={`max-w-[80%] p-4 rounded-2xl ${isInst ? "bg-fm-blue text-white rounded-tr-sm" : "bg-gray-100 text-navy rounded-tl-sm"}`}>
+                  <div className={`max-w-[80%] p-4 rounded-2xl ${isInst ? "bg-fm-blue text-white rounded-tr-sm" : "bg-gray-100 text-fm-navy rounded-tl-sm"}`}>
                     {/* Meta tags only for first institution message */}
                     {isInst && index === 0 && (contact.subject || contact.modality || contact.dates) && (
                       <div className="flex flex-wrap gap-2 mb-3 opacity-80">
                         {contact.subject && (
-                          <span className="flex items-center gap-1 text-[11px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+                          <span className="flex items-center gap-1 text-[11px] font-bold bg-white/20 px-2 py-0.5 rounded-md">
                             <Mail size={9} /> {subjectLabel || contact.subject}
                           </span>
                         )}
                         {contact.modality && (
-                          <span className="flex items-center gap-1 text-[11px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+                          <span className="flex items-center gap-1 text-[11px] font-bold bg-white/20 px-2 py-0.5 rounded-md">
                             <MapPin size={9} /> {contact.modality}
                           </span>
                         )}
                         {contact.dates && (
-                          <span className="flex items-center gap-1 text-[11px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+                          <span className="flex items-center gap-1 text-[11px] font-bold bg-white/20 px-2 py-0.5 rounded-md">
                             <Calendar size={9} /> {contact.dates}
                           </span>
                         )}
@@ -200,7 +200,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
 
             {/* Pending status message when not yet replied */}
             {isSent && !sent && (
-              <div className="flex items-center gap-2 py-2 px-4 bg-blue-50 rounded-xl text-xs font-medium text-fm-blue">
+              <div className="flex items-center gap-2 py-2 px-4 bg-white rounded-xl text-xs font-medium text-fm-blue">
                 <Clock size={13} />
                 Esperando respuesta del docente...
               </div>
@@ -208,7 +208,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
 
             {/* Success message after follow-up sent */}
             {sent && (
-              <div className="flex items-center gap-2 py-2 px-4 bg-green-50 rounded-xl text-xs font-bold text-green-700">
+              <div className="flex items-center gap-2 py-2 px-4 bg-white rounded-xl text-xs font-bold text-green-700">
                 <CheckCircle2 size={13} />
                 Mensaje de seguimiento enviado correctamente.
               </div>
@@ -240,7 +240,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
                 {!showFollowUp && (
                   <button
                     onClick={() => setShowFollowUp(true)}
-                    className="ml-auto flex items-center gap-1.5 bg-navy text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-blue-900 transition-colors"
+                    className="ml-auto flex items-center gap-1.5 bg-fm-navy text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-blue-900 transition-colors"
                   >
                     <Send size={12} /> Enviar seguimiento
                   </button>
@@ -251,7 +251,7 @@ export function ContactThread({ contact, faculty, institutionName, subjectLabel 
             {/* Follow-up compose */}
             {showFollowUp && (
               <div className="space-y-3 pt-2 border-t border-gray-100">
-                <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Mensaje de seguimiento</p>
+                <p className="text-xs font-bold text-gray-500">Mensaje de seguimiento</p>
                 <textarea
                   value={followUpMsg}
                   onChange={e => setFollowUpMsg(e.target.value)}

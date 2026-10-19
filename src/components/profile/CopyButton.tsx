@@ -27,7 +27,7 @@ export function CopyButton({ url }: { url: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="flex items-center gap-1.5 bg-white border border-gray-200 hover:border-talentia-blue hover:bg-blue-50 text-navy text-xs font-bold px-3 py-2 rounded-xl transition-all shrink-0"
+      className="flex items-center gap-1.5 bg-white border border-gray-200 hover:border-fm-blue hover:bg-blue-50 text-fm-navy text-xs font-bold px-3 py-2 rounded-xl transition-all shrink-0"
       title="Copiar enlace"
     >
       {copied ? (

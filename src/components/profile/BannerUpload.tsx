@@ -142,7 +142,7 @@ export function BannerUpload({ userId, currentBannerUrl, onClose, target = "facu
                 borderRadius: 12, overflow: "hidden", cursor: "pointer",
                 border: selected === "" || selected === UNSET ? "2px solid #1B4FD8" : "2px solid #D8E2EF",
                 height: 64,
-                background: "linear-gradient(135deg, #0D2240 0%, #1B4FD8 55%, #4F7FE8 100%)",
+                background: "#0D2240",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 position: "relative",
               }}

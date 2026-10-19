@@ -16,7 +16,7 @@ import type { CvProfile } from "@/lib/cv-extraction-schema";
 const SANS = `'Inter', system-ui, -apple-system, sans-serif`;
 const D = {
   blue: "#1B4FD8", navy: "#0D2240", white: "#FFFFFF", ink: "#0C1018",
-  muted: "#6B7280", faint: "#9CA3AF", border: "#D8E2EF", surf: "#F2F6FC",
+  muted: "#5B6B85", faint: "#5E6F8E", border: "#D8E2EF", surf: "#F2F6FC",
   green: "#059669", greenBg: "#F0FDF4",
 };
 
@@ -156,7 +156,7 @@ export function CvImportStep({ userId, onConfirm, onBack }: Props) {
               }}
             >
               <div style={{ minWidth: 0, flex: 1 }}>
-                <p style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: D.faint, textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 2px" }}>
+                <p style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: D.faint, margin: "0 0 2px" }}>
                   {item.label}
                 </p>
                 <p style={{ fontFamily: SANS, fontSize: 13, color: D.ink, margin: 0, whiteSpace: "pre-line" }}>

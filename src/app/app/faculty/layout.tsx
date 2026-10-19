@@ -4,24 +4,24 @@ import { headers } from "next/headers";
 import { switchActiveMode } from "@/app/auth/actions";
 import { Building2, ArrowRight, Clock, XCircle, AlertCircle } from "lucide-react";
 
-const ESTADO_BANNERS: Record<string, { icon: React.ElementType; title: string; description: string; color: string }> = {
+const ESTADO_BANNERS: Record<string, { icon: React.ElementType; title: string; description: string; dot: string }> = {
   en_revision: {
     icon: Clock,
     title: "Tu perfil está en revisión",
     description: "Nuestro equipo está revisando tu perfil. Te notificaremos por email cuando esté verificado. Mientras tanto, no eres visible para las instituciones.",
-    color: "bg-amber-50 border-amber-200 text-amber-800",
+    dot: "bg-amber-500",
   },
   rechazado: {
     icon: XCircle,
     title: "Perfil no verificado",
     description: "Tu perfil no ha superado el proceso de verificación. Revisa las notas de nuestro equipo, corrige la información y vuelve a enviarlo desde la configuración de tu perfil.",
-    color: "bg-red-50 border-red-200 text-red-800",
+    dot: "bg-red-600",
   },
   incompleto: {
     icon: AlertCircle,
     title: "Perfil incompleto",
     description: "Completa tu perfil al 100% para enviarlo a revisión y empezar a recibir propuestas de instituciones.",
-    color: "bg-blue-50 border-blue-200 text-blue-800",
+    dot: "bg-fm-blue",
   },
 };
 
@@ -99,23 +99,19 @@ export default async function FacultyLayout({
     <>
       {/* Estado banner (en_revision, rechazado, incompleto) */}
       {estadoBannerConfig && (
-        <div className={`${estadoBannerConfig.color} border rounded-2xl p-4 mb-6 flex items-start gap-3`}>
-          <div className="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center flex-shrink-0">
-            <estadoBannerConfig.icon size={18} />
-          </div>
-          <div className="flex-1">
-            <p className="font-bold text-sm">{estadoBannerConfig.title}</p>
-            <p className="text-sm font-medium mt-0.5 opacity-80">{estadoBannerConfig.description}</p>
-          </div>
+        <div className="mb-6 rounded-xl border border-fm-border bg-white p-5">
+          <p className="flex items-center gap-2.5 text-[15px] font-semibold text-fm-ink">
+            <span className={`h-2 w-2 shrink-0 rounded-full ${estadoBannerConfig.dot}`} aria-hidden />
+            {estadoBannerConfig.title}
+          </p>
+          <p className="mt-1.5 max-w-[70ch] text-sm leading-relaxed text-[#5B6B85]">{estadoBannerConfig.description}</p>
         </div>
       )}
 
       {showInstitutionBanner && (
-        <div className="bg-[#EEF3FE] border border-fm-blue/20 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="mb-6 flex flex-col items-start justify-between gap-4 rounded-xl border border-fm-border bg-white p-5 sm:flex-row sm:items-center">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-fm-blue/10 flex items-center justify-center flex-shrink-0">
-              <Building2 size={18} className="text-fm-blue" />
-            </div>
+            <Building2 size={18} className="mt-0.5 shrink-0 text-fm-blue" />
             <div>
               <p className="font-bold text-fm-navy text-sm">
                 Tienes acceso como institución

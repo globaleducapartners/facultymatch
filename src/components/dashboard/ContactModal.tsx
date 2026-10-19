@@ -66,19 +66,19 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] rounded-3xl p-8 border-none shadow-2xl">
+      <DialogContent className="sm:max-w-[500px] rounded-2xl p-8 border-none shadow-sm">
         {success ? (
-          <div className="py-12 flex flex-col items-center text-center space-y-4 animate-in zoom-in-95 duration-300">
-            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-2">
+          <div className="py-12 flex flex-col items-center text-center space-y-4 duration-300">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center text-green-500 mb-2">
               <Mail size={40} />
             </div>
-            <h2 className="text-2xl font-black text-navy">¡Solicitud enviada!</h2>
+            <h2 className="text-2xl font-extrabold text-fm-navy">¡Solicitud enviada!</h2>
             <p className="text-gray-500 font-medium">Hemos notificado a {facultyName}. Recibirás un correo cuando responda.</p>
           </div>
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="text-2xl font-black text-navy">Contactar con {facultyName}</DialogTitle>
+              <DialogTitle className="text-2xl font-extrabold text-fm-navy">Contactar con {facultyName}</DialogTitle>
               <DialogDescription className="text-gray-500 font-medium">
                 Expresa tu interés en una colaboración académica.
               </DialogDescription>
@@ -88,7 +88,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
+                    <label className="text-xs font-bold text-gray-400 ml-1 flex items-center gap-2">
                       <BookOpen size={14} /> Tipo de colaboración
                     </label>
                     <select
@@ -105,7 +105,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Tipo de contrato</label>
+                    <label className="text-xs font-bold text-gray-400 ml-1">Tipo de contrato</label>
                     <select
                       name="contract_type"
                       className="w-full px-5 py-3 rounded-xl border border-gray-100 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all font-medium text-sm appearance-none"
@@ -121,7 +121,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
+                    <label className="text-xs font-bold text-gray-400 ml-1 flex items-center gap-2">
                       <MapPin size={14} /> Modalidad
                     </label>
                     <select
@@ -135,7 +135,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1 flex items-center gap-2">
+                    <label className="text-xs font-bold text-gray-400 ml-1 flex items-center gap-2">
                       <Calendar size={14} /> Fechas estimadas
                     </label>
                     <input
@@ -149,7 +149,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-widest text-gray-400 ml-1">Mensaje de propuesta</label>
+                  <label className="text-xs font-bold text-gray-400 ml-1">Mensaje de propuesta</label>
                   <textarea
                     name="message"
                     required
@@ -161,7 +161,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
               </div>
 
               {error && (
-                <div className="p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-bold animate-in shake-100 duration-500">
+                <div className="p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-bold shake-100 duration-500">
                   {error}
                 </div>
               )}
@@ -178,7 +178,7 @@ export function ContactModal({ isOpen, onClose, facultyId, facultyName, institut
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-fm-blue hover:bg-blue-700 text-white font-bold py-6 rounded-xl shadow-lg shadow-blue-100"
+                  className="flex-1 bg-fm-blue hover:bg-blue-700 text-white font-bold py-6 rounded-xl shadow-sm"
                 >
                   {loading ? <Loader2 className="animate-spin" size={20} /> : "Enviar propuesta"}
                 </Button>

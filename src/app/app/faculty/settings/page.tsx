@@ -45,9 +45,9 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 duration-500">
       <div>
-        <h1 className="text-3xl font-bold text-navy">Ajustes de cuenta</h1>
+        <h1 className="text-3xl font-bold text-fm-navy">Ajustes de cuenta</h1>
         <p className="text-gray-500 font-medium">Gestiona tu seguridad, notificaciones y datos privados.</p>
       </div>
 
@@ -56,7 +56,7 @@ export default async function SettingsPage() {
           {/* Sección 1: Seguridad */}
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
+              <CardTitle className="text-xl font-bold text-fm-navy flex items-center gap-2">
                 <ShieldCheck size={22} className="text-fm-blue" />
                 Seguridad & Acceso
               </CardTitle>
@@ -72,7 +72,7 @@ export default async function SettingsPage() {
           {/* Sección 2: Notificaciones */}
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
+              <CardTitle className="text-xl font-bold text-fm-navy flex items-center gap-2">
                 <Bell size={22} className="text-fm-blue" />
                 Preferencias de Notificaciones
               </CardTitle>
@@ -110,7 +110,7 @@ export default async function SettingsPage() {
           {/* Sección 3: GDPR */}
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
+              <CardTitle className="text-xl font-bold text-fm-navy flex items-center gap-2">
                 <Download size={22} className="text-fm-blue" />
                 Tus datos (GDPR)
               </CardTitle>
@@ -122,7 +122,7 @@ export default async function SettingsPage() {
               <div className="flex flex-col md:flex-row items-center gap-4">
                 <a
                   href="/api/faculty/export-data"
-                  className="flex-1 w-full border border-gray-100 hover:bg-gray-50 text-navy font-bold rounded-xl h-12 flex items-center justify-center gap-2 text-sm transition-colors"
+                  className="flex-1 w-full border border-gray-100 hover:bg-gray-50 text-fm-navy font-bold rounded-xl h-12 flex items-center justify-center gap-2 text-sm transition-colors"
                 >
                   <Download size={18} /> Exportar mis datos
                 </a>
@@ -135,9 +135,9 @@ export default async function SettingsPage() {
         <div className="lg:col-span-4 space-y-8">
           {/* Danger zone */}
           <div className="p-8 rounded-2xl bg-gray-50 border border-gray-100 space-y-6">
-            <div className="flex items-center gap-2 text-navy">
+            <div className="flex items-center gap-2 text-fm-navy">
               <AlertTriangle size={20} className="text-amber-600" />
-              <h4 className="text-sm font-black uppercase tracking-widest">Zona de riesgo</h4>
+              <h4 className="text-sm font-bold">Zona de riesgo</h4>
             </div>
             <p className="text-xs text-gray-500 font-medium leading-relaxed">
               Si eliminas tu cuenta, todos tus datos académicos, documentos y contactos se perderán
@@ -148,14 +148,14 @@ export default async function SettingsPage() {
 
           {/* Plan card */}
           {isPro ? (
-            <div className="p-8 rounded-2xl bg-blue-50/50 border border-blue-100 text-center space-y-4">
-              <Badge className="bg-fm-blue text-white text-[11px] font-black uppercase tracking-widest border-none">
+            <div className="p-8 rounded-2xl bg-white border border-fm-border text-center space-y-4">
+              <Badge className="bg-fm-blue text-white text-[11px] font-bold border-none">
                 Plan Profesional
               </Badge>
               <div className="space-y-1">
                 <div className="flex items-center justify-center gap-2">
                   <CheckCircle2 size={20} className="text-green-500" />
-                  <h4 className="text-lg font-black text-navy">Activo</h4>
+                  <h4 className="text-lg font-extrabold text-fm-navy">Activo</h4>
                 </div>
                 <p className="text-xs text-gray-500 font-medium">
                   Tienes acceso a todas las funciones profesionales.
@@ -178,9 +178,9 @@ export default async function SettingsPage() {
               </div>
             </div>
           ) : (
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 space-y-4">
+            <div className="p-8 rounded-2xl bg-white border border-blue-100 space-y-4">
               <div className="flex items-center justify-between">
-                <Badge className="bg-navy text-white text-[11px] font-black uppercase tracking-widest border-none">
+                <Badge className="bg-fm-navy text-white text-[11px] font-bold border-none">
                   Plan Gratuito
                 </Badge>
                 <span className="text-[11px] font-bold text-gray-500">ACTIVO</span>
@@ -188,7 +188,7 @@ export default async function SettingsPage() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Sparkles size={18} className="text-fm-blue" />
-                  <h4 className="text-base font-black text-navy">Pasa al Plan Profesional</h4>
+                  <h4 className="text-base font-bold text-fm-navy">Pasa al Plan Profesional</h4>
                 </div>
                 <p className="text-xs text-gray-500 font-medium">
                   Desbloquea funciones avanzadas de privacidad y visibilidad.

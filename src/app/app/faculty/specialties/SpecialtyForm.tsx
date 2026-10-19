@@ -25,7 +25,6 @@ const inp: React.CSSProperties = {
 
 const lbl: React.CSSProperties = {
   fontFamily: SANS, fontSize: 11, fontWeight: 700,
-  letterSpacing: "0.1em", textTransform: "uppercase" as const,
   color: D.faint, display: "block", marginBottom: 6,
 };
 

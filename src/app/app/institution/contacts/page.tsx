@@ -57,13 +57,13 @@ export default async function ContactsPage() {
   });
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 max-w-4xl mx-auto">
+    <div className="space-y-8 duration-500 max-w-4xl mx-auto">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild className="rounded-full hover:bg-gray-100">
           <Link href="/app/institution/home"><ChevronLeft size={24} /></Link>
         </Button>
         <div>
-          <h1 className="text-3xl font-bold text-navy">Conversaciones</h1>
+          <h1 className="text-3xl font-bold text-fm-navy">Conversaciones</h1>
           <p className="text-gray-500 font-medium">Tus propuestas y respuestas de docentes.</p>
         </div>
       </div>
@@ -84,9 +84,9 @@ export default async function ContactsPage() {
           })}
         </div>
       ) : (
-        <div className="bg-white p-20 rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center text-center">
-          <div className="bg-blue-50 p-6 rounded-full text-fm-blue mb-6"><Mail size={48} /></div>
-          <h3 className="text-xl font-bold text-navy mb-2">No has iniciado conversaciones aún</h3>
+        <div className="bg-white p-20 rounded-2xl border border-gray-200 flex flex-col items-center text-center">
+          <div className="bg-white p-6 rounded-full text-fm-blue mb-6"><Mail size={48} /></div>
+          <h3 className="text-xl font-bold text-fm-navy mb-2">No has iniciado conversaciones aún</h3>
           <p className="text-gray-500 max-w-xs mx-auto font-medium">
             Cuando encuentres un docente que encaje con tu programa, podrás contactarle directamente desde el directorio.
           </p>

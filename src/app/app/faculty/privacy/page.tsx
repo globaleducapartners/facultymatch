@@ -303,37 +303,37 @@ export default async function PrivacyPage({
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 duration-500">
       <div>
-        <h1 className="text-3xl font-bold text-navy">Visibilidad & Privacidad</h1>
+        <h1 className="text-3xl font-bold text-fm-navy">Visibilidad & Privacidad</h1>
         <p className="text-gray-500 font-medium">
           Tú tienes el control total de quién puede ver tu perfil académico.
         </p>
       </div>
 
       {saved === "1" && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
-          ✓ Configuración guardada correctamente
+        <div className="bg-white border border-fm-border rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
+           Configuración guardada correctamente
         </div>
       )}
       {blocked === "1" && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
-          ✓ Institución bloqueada correctamente
+        <div className="bg-white border border-fm-border rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
+           Institución bloqueada correctamente
         </div>
       )}
       {saved === "slug" && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
-          ✓ Enlace público generado correctamente. Ya puedes compartir tu perfil.
+        <div className="bg-white border border-fm-border rounded-2xl px-5 py-4 flex items-center gap-3 text-green-800 font-bold text-sm">
+           Enlace público generado correctamente. Ya puedes compartir tu perfil.
         </div>
       )}
       {error === "save-failed" && (
         <div className="bg-red-50 border border-red-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-red-700 font-bold text-sm">
-          ✗ No se pudo guardar el bloqueo. Inténtalo de nuevo.
+           No se pudo guardar el bloqueo. Inténtalo de nuevo.
         </div>
       )}
       {error === "no-name" && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex items-center gap-3 text-amber-800 font-bold text-sm">
-          ⚠ Primero completa tu nombre en la sección <a href="/app/faculty/profile" className="underline font-black">Editar perfil</a> para generar el enlace público.
+        <div className="bg-white border border-fm-border rounded-2xl px-5 py-4 flex items-center gap-3 text-amber-800 font-bold text-sm">
+           Primero completa tu nombre en la sección <a href="/app/faculty/profile" className="underline font-extrabold">Editar perfil</a> para generar el enlace público.
         </div>
       )}
 
@@ -341,7 +341,7 @@ export default async function PrivacyPage({
         <div className="lg:col-span-7 space-y-8">
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
+              <CardTitle className="text-xl font-bold text-fm-navy flex items-center gap-2">
                 <Eye size={22} className="text-fm-blue" />
                 Modo de visibilidad
               </CardTitle>
@@ -353,7 +353,7 @@ export default async function PrivacyPage({
               <form action={updateVisibility}>
                 {/* Name visibility */}
                 <div className="mb-8">
-                  <p className="text-sm font-black text-navy mb-3 flex items-center gap-2">
+                  <p className="text-sm font-bold text-fm-navy mb-3 flex items-center gap-2">
                     <Eye size={15} className="text-fm-blue" /> Visibilidad de tu nombre
                   </p>
                   <RadioGroup
@@ -368,7 +368,7 @@ export default async function PrivacyPage({
                       <div key={opt.id} className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:border-blue-100 transition-all cursor-pointer">
                         <RadioGroupItem value={opt.value} id={opt.id} className="mt-1" />
                         <Label htmlFor={opt.id} className="flex-1 cursor-pointer">
-                          <span className="font-bold text-navy block mb-0.5">{opt.label}</span>
+                          <span className="font-bold text-fm-navy block mb-0.5">{opt.label}</span>
                           <p className="text-sm text-gray-500 font-medium leading-relaxed">{opt.desc}</p>
                         </Label>
                       </div>
@@ -376,11 +376,11 @@ export default async function PrivacyPage({
                   </RadioGroup>
                 </div>
 
-                <p className="text-sm font-black text-navy mb-3 flex items-center gap-2">
+                <p className="text-sm font-bold text-fm-navy mb-3 flex items-center gap-2">
                   <ShieldCheck size={15} className="text-fm-blue" /> Modo de visibilidad del perfil
                 </p>
                 {(facultyProfile as any)?.estado_perfil !== "verificado" && (
-                  <div className="mb-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                  <div className="mb-4 flex items-start gap-3 rounded-xl border border-fm-border bg-white px-4 py-3">
                     <ShieldCheck size={16} className="text-amber-600 mt-0.5 flex-shrink-0" />
                     <p className="text-sm text-amber-800 font-medium leading-relaxed">
                       Elegir "Público" no te hace visible de inmediato: tu perfil solo aparece en el
@@ -416,9 +416,9 @@ export default async function PrivacyPage({
                       <RadioGroupItem value={opt.value} id={opt.id} className="mt-1" />
                       <Label htmlFor={opt.id} className="flex-1 cursor-pointer">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-bold text-navy">{opt.label}</span>
+                          <span className="font-bold text-fm-navy">{opt.label}</span>
                           {opt.badge && (
-                            <Badge className="bg-fm-blue text-white text-[11px] font-black uppercase tracking-widest border-none">
+                            <Badge className="bg-fm-blue text-white text-[11px] font-bold border-none">
                               {opt.badge}
                             </Badge>
                           )}
@@ -433,7 +433,7 @@ export default async function PrivacyPage({
                 <div className="mt-8">
                   <Button
                     type="submit"
-                    className="bg-fm-blue hover:bg-blue-700 text-white font-bold h-12 px-10 rounded-xl shadow-lg shadow-blue-100"
+                    className="bg-fm-blue hover:bg-blue-700 text-white font-bold h-12 px-10 rounded-xl shadow-sm"
                   >
                     Guardar configuración
                   </Button>
@@ -444,7 +444,7 @@ export default async function PrivacyPage({
 
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
+              <CardTitle className="text-xl font-bold text-fm-navy flex items-center gap-2">
                 <ShieldCheck size={22} className="text-fm-blue" />
                 Bloqueo de instituciones
               </CardTitle>
@@ -474,14 +474,14 @@ export default async function PrivacyPage({
                 </div>
                 <Button
                   type="submit"
-                  className="bg-fm-blue hover:bg-blue-700 text-white font-black rounded-xl px-5 shrink-0 h-auto"
+                  className="bg-fm-blue hover:bg-blue-700 text-white font-extrabold rounded-xl px-5 shrink-0 h-auto"
                 >
                   Bloquear
                 </Button>
               </form>
 
               <div className="space-y-3">
-                <h4 className="text-xs font-black uppercase tracking-widest text-gray-500 ml-1">
+                <h4 className="text-xs font-bold text-gray-500 ml-1">
                   Instituciones bloqueadas ({blockedInstitutions.length})
                 </h4>
                 {blockedInstitutions.length > 0 ? (
@@ -496,7 +496,7 @@ export default async function PrivacyPage({
                             <Lock size={18} />
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-navy">{inst.name}</p>
+                            <p className="text-sm font-bold text-fm-navy">{inst.name}</p>
                             {inst.domain && (
                               <p className="text-xs text-gray-500 font-medium mt-0.5">
                                 Bloquea accesos desde @{inst.domain} y todos sus subdominios
@@ -521,7 +521,7 @@ export default async function PrivacyPage({
                     ))}
                   </div>
                 ) : (
-                  <div className="p-8 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                  <div className="p-8 text-center bg-gray-50/50 rounded-2xl border border-gray-200">
                     <p className="text-sm text-gray-500 font-medium">
                       No tienes ninguna institución bloqueada.
                     </p>
@@ -533,7 +533,7 @@ export default async function PrivacyPage({
         </div>
 
         <div className="lg:col-span-5 space-y-8">
-          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-navy text-white">
+          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-fm-navy text-white">
             <CardHeader>
               <CardTitle className="text-xl font-bold flex items-center gap-2">
                 <UserPlus size={22} className="text-[#9DB8FF]" />
@@ -569,7 +569,7 @@ export default async function PrivacyPage({
                 <form action={generateUniqueLink}>
                   <button
                     type="submit"
-                    className="w-full bg-fm-blue hover:opacity-90 text-white font-black rounded-xl h-11 uppercase tracking-widest text-xs transition-colors"
+                    className="w-full bg-fm-blue hover:opacity-90 text-white font-bold rounded-xl h-11 text-xs transition-colors"
                   >
                     {uniqueLink ? "Regenerar enlace" : "Generar enlace único"}
                   </button>
@@ -581,7 +581,7 @@ export default async function PrivacyPage({
           {/* ── Perfil público ── */}
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader>
-              <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
+              <CardTitle className="text-xl font-bold text-fm-navy flex items-center gap-2">
                 <Globe size={20} className="text-fm-blue" />
                 Perfil público
               </CardTitle>
@@ -592,12 +592,12 @@ export default async function PrivacyPage({
             <CardContent className="space-y-4">
               {facultyProfile?.profile_slug ? (
                 <>
-                  <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
+                  <div className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-fm-border">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0">
                       <Globe size={18} className="text-fm-blue" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-navy truncate">
+                      <p className="text-xs font-bold text-fm-navy truncate">
                         facultymatch.app/docentes/{facultyProfile.profile_slug}
                       </p>
                       <p className="text-[11px] text-blue-600 font-medium">
@@ -607,7 +607,7 @@ export default async function PrivacyPage({
                     <CopyButton url={`${siteUrl}/docentes/${facultyProfile.profile_slug}`} />
                   </div>
                   {facultyProfile?.visibility !== "public" && (
-                    <div className="flex items-start gap-2.5 p-3 bg-amber-50 rounded-xl border border-amber-100">
+                    <div className="flex items-start gap-2.5 p-3 bg-white rounded-xl border border-fm-border">
                       <AlertCircle size={15} className="text-amber-600 shrink-0 mt-0.5" />
                       <p className="text-xs text-amber-800 font-medium leading-relaxed">
                         Tu visibilidad no está configurada como <strong>Pública</strong>. El enlace solo funcionará
@@ -619,7 +619,7 @@ export default async function PrivacyPage({
                     href={`${siteUrl}/docentes/${facultyProfile.profile_slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full bg-white border border-gray-200 hover:border-fm-blue hover:bg-blue-50/50 text-navy font-bold py-3 rounded-xl text-sm transition-all"
+                    className="flex items-center justify-center gap-2 w-full bg-white border border-gray-200 hover:border-fm-blue hover:bg-blue-50/50 text-fm-navy font-bold py-3 rounded-xl text-sm transition-all"
                   >
                     <ExternalLink size={14} />
                     Abrir perfil público
@@ -627,10 +627,10 @@ export default async function PrivacyPage({
                 </>
               ) : (
                 <div className="space-y-4">
-                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                  <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-200">
                     <Globe size={18} className="text-gray-500 shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-bold text-navy">Aún no tienes un enlace público</p>
+                      <p className="text-sm font-bold text-fm-navy">Aún no tienes un enlace público</p>
                       <p className="text-xs text-gray-500 font-medium mt-1 leading-relaxed">
                         Genera un enlace único para compartir tu perfil con instituciones. Se creará
                         automáticamente a partir de tu nombre.
@@ -654,11 +654,11 @@ export default async function PrivacyPage({
           {/* ── Visibilidad Preferente (premium) ── */}
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+              <CardTitle className="text-lg font-bold text-fm-navy flex items-center gap-2">
                 <Star size={20} className="text-fm-blue" />
                 Visibilidad preferente
                 {isPremium && (
-                  <Badge className="bg-fm-blue text-white text-[11px] font-black uppercase tracking-widest border-none ml-1">
+                  <Badge className="bg-fm-blue text-white text-[11px] font-bold border-none ml-1">
                     Pro
                   </Badge>
                 )}
@@ -669,18 +669,18 @@ export default async function PrivacyPage({
             </CardHeader>
             <CardContent className="space-y-4">
               {!isPremium ? (
-                <div className="rounded-2xl border-2 border-dashed border-fm-blue/30 bg-fm-blue/5 p-5 space-y-3 text-center">
+                <div className="rounded-2xl border border-fm-blue/30 bg-fm-blue/5 p-5 space-y-3 text-center">
                   <div className="flex items-center justify-center gap-2 text-fm-blue">
                     <Sparkles size={18} />
-                    <span className="text-xs font-black uppercase tracking-widest">Plan Professional</span>
+                    <span className="text-xs font-bold">Plan Professional</span>
                   </div>
                   <p className="text-xs font-medium text-gray-600">
                     Elige hasta 5 instituciones en las que quieres aparecer entre los primeros resultados.
                   </p>
-                  <div className="text-xl font-black text-navy">29€ <span className="text-sm text-gray-500 font-bold">/ año</span></div>
+                  <div className="text-xl font-extrabold text-fm-navy">29€ <span className="text-sm text-gray-500 font-bold">/ año</span></div>
                   <a
                     href="/checkout?plan=faculty-pro"
-                    className="inline-flex items-center gap-2 bg-fm-blue hover:opacity-90 text-white font-black text-xs px-5 py-2.5 rounded-xl transition-colors shadow-lg shadow-blue-100"
+                    className="inline-flex items-center gap-2 bg-fm-blue hover:opacity-90 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-colors shadow-sm"
                   >
                     <Sparkles size={13} /> Activar visibilidad preferente
                   </a>
@@ -708,7 +708,7 @@ export default async function PrivacyPage({
                           {allUniversityNames.map((u) => <option key={u} value={u} />)}
                         </datalist>
                       </div>
-                      <Button type="submit" size="sm" className="bg-fm-blue hover:opacity-90 text-white font-black rounded-xl px-4 shrink-0">
+                      <Button type="submit" size="sm" className="bg-fm-blue hover:opacity-90 text-white font-extrabold rounded-xl px-4 shrink-0">
                         +
                       </Button>
                     </form>
@@ -717,15 +717,15 @@ export default async function PrivacyPage({
                   {/* Current list */}
                   <div className="space-y-2">
                     {preferredInstitutions.length === 0 ? (
-                      <p className="text-xs text-gray-500 font-medium text-center py-4 border border-dashed border-gray-200 rounded-xl">
+                      <p className="text-xs text-gray-500 font-medium text-center py-4 border border-gray-200 rounded-xl">
                         Aún no has añadido ninguna institución.
                       </p>
                     ) : (
                       preferredInstitutions.map((name) => (
-                        <div key={name} className="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 rounded-xl">
+                        <div key={name} className="flex items-center justify-between p-3 bg-white border border-fm-border rounded-xl">
                           <div className="flex items-center gap-2">
                             <Star size={13} className="text-fm-blue shrink-0" />
-                            <span className="text-sm font-bold text-navy truncate max-w-[180px]">{name}</span>
+                            <span className="text-sm font-bold text-fm-navy truncate max-w-[180px]">{name}</span>
                           </div>
                           <form action={removePreferredInstitution}>
                             <input type="hidden" name="preferredName" value={name} />
@@ -750,7 +750,7 @@ export default async function PrivacyPage({
             </CardContent>
           </Card>
 
-          <div className="p-6 rounded-2xl bg-blue-50 border border-blue-100 space-y-4">
+          <div className="p-6 rounded-2xl bg-white border border-fm-border space-y-4">
             <div className="flex items-center gap-2 text-fm-blue">
               <EyeOff size={20} />
               <h4 className="text-sm font-bold">Control de privacidad</h4>

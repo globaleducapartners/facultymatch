@@ -161,24 +161,24 @@ export default async function VerificationPage() {
   const statusBadge = badges[verificationStatus as string] ?? { label: "Sin verificar", cls: "bg-gray-50 text-gray-500 border-gray-100" };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-navy">Verificación académica</h1>
+          <h1 className="text-3xl font-bold text-fm-navy">Verificación académica</h1>
           <p className="text-gray-500 font-medium">
             Eleva tu credibilidad institucional con el sello Verificado de FacultyMatch.
           </p>
         </div>
         <Badge
           variant="outline"
-          className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border-2 ${statusBadge.cls}`}
+          className={`px-4 py-1.5 rounded-md text-xs font-bold border-2 ${statusBadge.cls}`}
         >
           {statusBadge.label}
         </Badge>
       </div>
 
       {verificationStatus === "incompleto" && verificationNotes && (
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-3">
+        <div className="bg-white border border-fm-border rounded-2xl p-4 flex items-start gap-3">
           <AlertCircle size={18} className="text-fm-blue shrink-0 mt-0.5" />
           <div>
             <p className="font-bold text-blue-900 text-sm">Información requerida</p>
@@ -191,14 +191,14 @@ export default async function VerificationPage() {
         <div className="lg:col-span-8 space-y-8">
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden">
             <CardHeader className="pb-4">
-              <CardTitle className="text-xl font-bold text-navy">Checklist de requisitos</CardTitle>
+              <CardTitle className="text-xl font-bold text-fm-navy">Checklist de requisitos</CardTitle>
               <CardDescription className="font-medium">
                 Debes cumplir estos puntos para solicitar la verificación oficial.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-8">
               <div className="space-y-2">
-                <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
+                <div className="flex justify-between text-xs font-bold text-gray-500 mb-2">
                   <span>Progreso de verificación</span>
                   <span>{progress}%</span>
                 </div>
@@ -210,25 +210,25 @@ export default async function VerificationPage() {
                   <div
                     key={step.id}
                     className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
-                      step.completed
-                        ? "bg-blue-50/30 border-blue-100"
-                        : "bg-gray-50/50 border-gray-100"
-                    }`}
+ step.completed
+ ? "bg-blue-50/30 border-blue-100"
+ : "bg-gray-50/50 border-gray-100"
+ }`}
                   >
                     <div className="flex items-center gap-4">
                       <div
                         className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                          step.completed
-                            ? "bg-white text-fm-blue shadow-sm"
-                            : "bg-white text-gray-300 shadow-sm"
-                        }`}
+ step.completed
+ ? "bg-white text-fm-blue shadow-sm"
+ : "bg-white text-gray-300 shadow-sm"
+ }`}
                       >
                         <step.icon size={20} />
                       </div>
                       <span
                         className={`text-sm font-bold ${
-                          step.completed ? "text-navy" : "text-gray-500"
-                        }`}
+ step.completed ? "text-fm-navy" : "text-gray-500"
+ }`}
                       >
                         {step.label}
                       </span>
@@ -238,7 +238,7 @@ export default async function VerificationPage() {
                     ) : (
                       <Link
                         href={step.href}
-                        className="flex items-center gap-1 text-fm-blue hover:text-blue-700 font-bold text-xs uppercase tracking-widest transition-colors"
+                        className="flex items-center gap-1 text-fm-blue hover:text-blue-700 font-bold text-xs transition-colors"
                       >
                         Completar <ArrowRight size={14} />
                       </Link>
@@ -249,18 +249,18 @@ export default async function VerificationPage() {
 
               <div className="pt-4">
                 {verificationStatus === "en_revision" && completedCount > 0 ? (
-                  <div className="p-6 rounded-2xl bg-amber-50 border border-amber-100 flex flex-col items-center text-center space-y-3">
+                  <div className="p-6 rounded-2xl bg-white border border-fm-border flex flex-col items-center text-center space-y-3">
                     <Loader2 className="animate-spin text-amber-600" size={24} />
-                    <h4 className="text-sm font-bold text-navy">Tu solicitud está en revisión</h4>
+                    <h4 className="text-sm font-bold text-fm-navy">Tu solicitud está en revisión</h4>
                     <p className="text-xs text-gray-500 font-medium max-w-sm">
                       Nuestro equipo académico está validando tus documentos. Recibirás una
                       notificación en un plazo de 48-72 horas.
                     </p>
                   </div>
                 ) : verificationStatus === "verificado" ? (
-                  <div className="p-6 rounded-2xl bg-blue-50 border border-blue-100 flex flex-col items-center text-center space-y-4">
+                  <div className="p-6 rounded-2xl bg-white border border-fm-border flex flex-col items-center text-center space-y-4">
                     <ShieldCheck className="text-fm-blue" size={32} />
-                    <h4 className="text-sm font-bold text-navy">¡Eres un docente Verificado!</h4>
+                    <h4 className="text-sm font-bold text-fm-navy">¡Eres un docente Verificado!</h4>
                     <p className="text-xs text-gray-500 font-medium max-w-sm">
                       Tu perfil ahora goza de máxima visibilidad y confianza institucional.
                     </p>
@@ -278,16 +278,16 @@ export default async function VerificationPage() {
                     <Button
                       type="submit"
                       disabled={progress < 100}
-                      className={`w-full h-14 rounded-xl font-bold transition-all shadow-lg ${
-                        progress === 100
-                          ? "bg-fm-blue hover:bg-blue-700 text-white shadow-blue-100"
-                          : "bg-gray-100 text-gray-500 cursor-not-allowed shadow-none"
-                      }`}
+                      className={`w-full h-14 rounded-xl font-bold transition-all shadow-sm ${
+ progress === 100
+ ? "bg-fm-blue hover:bg-blue-700 text-white "
+ : "bg-gray-100 text-gray-500 cursor-not-allowed shadow-none"
+ }`}
                     >
                       Solicitar verificación oficial
                     </Button>
                     {progress < 100 && (
-                      <p className="text-center text-[11px] text-gray-500 font-medium mt-3 uppercase tracking-widest">
+                      <p className="text-center text-[11px] text-gray-500 font-medium mt-3">
                         Necesitas el 100% para habilitar la solicitud.
                       </p>
                     )}
@@ -300,7 +300,7 @@ export default async function VerificationPage() {
 
         <div className="lg:col-span-4 space-y-8">
           {/* Document upload */}
-          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-navy text-white" id="documents">
+          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-fm-navy text-white" id="documents">
             <CardHeader>
               <CardTitle className="text-xl font-bold flex items-center gap-2">
                 <Upload size={22} className="text-[#9DB8FF]" />
@@ -315,7 +315,7 @@ export default async function VerificationPage() {
             </CardContent>
           </Card>
 
-          <div className="p-6 rounded-2xl bg-blue-50 border border-blue-100 space-y-4">
+          <div className="p-6 rounded-2xl bg-white border border-fm-border space-y-4">
             <div className="flex items-center gap-2 text-fm-blue">
               <ShieldCheck size={20} />
               <h4 className="text-sm font-bold">¿Por qué verificarse?</h4>

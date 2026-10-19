@@ -8,21 +8,21 @@ const D = {
   navy:    "#0D2240",
   white:   "#FFFFFF",
   ink:     "#0C1018",
-  muted:   "#6B7280",
-  faint:   "#9CA3AF",
+  muted:   "#5B6B85",
+  faint:   "#5E6F8E",
   border:  "#D8E2EF",
   surf:    "#F2F6FC",
 };
 
 const inp: React.CSSProperties = {
-  fontFamily: SANS, width: "100%", fontSize: 14, color: D.ink,
+  fontFamily: SANS, width: "100%", fontSize: 16, color: D.ink,
   background: D.white, border: `1px solid ${D.border}`,
   borderRadius: 10, padding: "11px 14px", outline: "none",
   boxSizing: "border-box" as const, transition: "border-color 0.2s",
 };
 
 const selectStyle: React.CSSProperties = {
-  fontFamily: SANS, width: "100%", fontSize: 14, color: D.ink,
+  fontFamily: SANS, width: "100%", fontSize: 16, color: D.ink,
   background: D.white, border: `1px solid ${D.border}`,
   borderRadius: 10, padding: "11px 14px", outline: "none",
   boxSizing: "border-box" as const, transition: "border-color 0.2s",
@@ -31,9 +31,8 @@ const selectStyle: React.CSSProperties = {
 };
 
 const lbl: React.CSSProperties = {
-  fontFamily: SANS, fontSize: 11, fontWeight: 700,
-  letterSpacing: "0.1em", textTransform: "uppercase" as const,
-  color: D.faint, display: "block", marginBottom: 6,
+  fontFamily: SANS, fontSize: 14, fontWeight: 600,
+  color: D.ink, display: "block", marginBottom: 6,
 };
 
 const COUNTRIES = [

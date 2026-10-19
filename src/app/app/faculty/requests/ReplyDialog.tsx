@@ -38,13 +38,13 @@ export function ReplyDialog({ contactId, institutionName, isOpen, onClose, onSuc
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[480px] rounded-3xl p-8 border-none shadow-2xl">
+      <DialogContent className="sm:max-w-[480px] rounded-2xl p-8 border-none shadow-sm">
         <DialogHeader>
-          <DialogTitle className="text-xl font-black text-navy">Responder a {institutionName}</DialogTitle>
+          <DialogTitle className="text-xl font-extrabold text-fm-navy">Responder a {institutionName}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-5 mt-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-black uppercase tracking-widest text-gray-500">Tu respuesta</label>
+            <label className="text-xs font-bold text-gray-500">Tu respuesta</label>
             <textarea
               value={message}
               onChange={e => setMessage(e.target.value)}
@@ -64,7 +64,7 @@ export function ReplyDialog({ contactId, institutionName, isOpen, onClose, onSuc
             <Button
               type="submit"
               disabled={loading || !message.trim()}
-              className="flex-1 bg-fm-blue hover:bg-blue-700 text-white font-bold py-6 rounded-xl shadow-lg shadow-blue-100"
+              className="flex-1 bg-fm-blue hover:bg-blue-700 text-white font-bold py-6 rounded-xl shadow-sm"
             >
               {loading ? <Loader2 className="animate-spin" size={18} /> : <><Send size={15} className="mr-2" />Enviar respuesta</>}
             </Button>

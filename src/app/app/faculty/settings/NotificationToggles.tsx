@@ -27,7 +27,7 @@ export function NotificationToggles({
       {items.map((item) => (
         <div key={item.key} className="py-4 flex items-center justify-between gap-8">
           <div className="space-y-1">
-            <h4 className="text-sm font-bold text-navy">{item.title}</h4>
+            <h4 className="text-sm font-bold text-fm-navy">{item.title}</h4>
             <p className="text-xs text-gray-500 font-medium">{item.desc}</p>
           </div>
           <Switch

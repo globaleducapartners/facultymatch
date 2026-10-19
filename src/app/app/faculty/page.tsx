@@ -1,33 +1,13 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 import {
-  CheckCircle2,
-  ShieldCheck,
-  Mail,
-  Plus,
   ArrowRight,
-  GraduationCap,
-  Eye,
-  EyeOff,
-  Lock,
   MapPin,
-  Clock,
-  Briefcase,
-  AlertCircle,
-  XCircle,
-  Sparkles,
-  CalendarDays,
-  Gift,
-  Globe,
   ExternalLink,
-  Zap,
-  Star,
   Bell,
-  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import DismissNotificationButton from "@/components/profile/DismissNotificationButton";
 import { formatDateTZ, formatDateTimeTZ } from "@/lib/utils";
 
@@ -40,38 +20,23 @@ const RESOURCES = [
     slug: "optimiza-perfil-docente",
     title: "Cómo optimizar tu perfil docente para conseguir más oportunidades",
     category: "Perfil",
-    emoji: "🚀",
-    color: "blue",
   },
   {
     slug: "estandares-verificacion",
     title: "Estándares de verificación: cómo validamos cada perfil",
     category: "Verificación",
-    emoji: "🛡️",
-    color: "amber",
   },
   {
     slug: "docencia-online-microcredenciales",
     title: "El futuro de la docencia online y las microcredenciales",
     category: "Tendencias",
-    emoji: "📈",
-    color: "green",
   },
   {
     slug: "taxonomia-academica",
     title: "Cómo clasificamos el conocimiento para que te encuentren",
     category: "Estructura",
-    emoji: "🗂️",
-    color: "purple",
   },
 ];
-
-const COLOR_MAP: Record<string, { bg: string; text: string; border: string }> = {
-  blue:   { bg: "bg-blue-50",   text: "text-fm-blue", border: "border-blue-100" },
-  amber:  { bg: "bg-amber-50",  text: "text-amber-600",     border: "border-amber-100" },
-  green:  { bg: "bg-green-50",  text: "text-green-600",     border: "border-green-100" },
-  purple: { bg: "bg-purple-50", text: "text-purple-600",    border: "border-purple-100" },
-};
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -172,616 +137,304 @@ export default async function EducatorDashboard() {
 
   const firstName = profile?.full_name?.split(" ")[0] || userMeta?.full_name?.split(" ")[0] || user.email?.split("@")[0];
 
+  const STATUS: Record<string, { dot: string; title: string; body: string }> = {
+    verificado: { dot: "bg-fm-gold", title: "Perfil verificado", body: "Tu perfil es visible para instituciones de todo el mundo." },
+    en_revision: { dot: "bg-amber-500", title: "Tu perfil está en revisión", body: "Nuestro equipo está revisando tu perfil. Recibirás un email en 24-48 horas laborables." },
+    incompleto: { dot: "bg-fm-blue", title: "Perfil incompleto", body: verificationNotes || "Completa tu perfil para enviarlo a revisión y empezar a recibir propuestas." },
+    rechazado: { dot: "bg-red-600", title: "Perfil no aprobado", body: verificationNotes || "Revisa la información de tu perfil y vuelve a enviarlo." },
+  };
+  const status = STATUS[verificationStatus] ?? STATUS.incompleto;
+  const visibility = facultyProfile?.visibility;
+  const isPublic = visibility === "public";
+
+  const cardCls = "rounded-xl border border-fm-border bg-white";
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-20 lg:pb-0">
+    <div className="space-y-6 pb-20 lg:pb-0">
 
-      {/* ── Hero ── */}
-      <div className="relative overflow-hidden rounded-3xl bg-white border border-gray-100 shadow-sm p-8">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
-          <div>
-            <p className="text-gray-500 text-sm font-bold uppercase tracking-widest mb-1">Panel docente</p>
-            <h1 className="text-3xl font-black tracking-tight text-navy mb-1">Hola, {firstName} 👋</h1>
-            <p className="text-gray-500 font-medium text-sm">
-              {progress === 100
-                ? "Tu perfil está completo. Las instituciones pueden encontrarte fácilmente."
-                : `Completa tu perfil para maximizar tu visibilidad ante instituciones.`}
-            </p>
-          </div>
-          <Button
-            asChild
-            className="bg-fm-blue hover:bg-navy text-white font-bold rounded-xl h-10 px-5 whitespace-nowrap flex-shrink-0"
-          >
-            <Link href="/app/faculty/profile" className="flex items-center gap-2">
-              Editar perfil <ArrowRight size={15} />
-            </Link>
-          </Button>
+      {/* ── Cabecera ── */}
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-[1.75rem] font-extrabold tracking-[-0.035em] text-fm-ink">Hola, {firstName}.</h1>
+          <p className="mt-1 text-[#5B6B85]">
+            {progress === 100
+              ? "Tu perfil está completo. Las instituciones pueden encontrarte fácilmente."
+              : "Esto es lo que necesita tu atención."}
+          </p>
         </div>
-
-        {/* Progress */}
-        <div className="mt-6 space-y-2">
-          <div className="flex justify-between text-sm font-bold text-gray-500">
-            <span>Perfil completado</span>
-            <span className="text-navy font-black">{progress}%</span>
-          </div>
-          <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-1000 bg-fm-blue"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          {pendingItems.length > 0 && (
-            <p className="text-gray-500 text-xs font-medium">
-              Faltan {pendingItems.length} sección{pendingItems.length !== 1 ? "es" : ""}:{" "}
-              {pendingItems.map((i) => i.label).join(", ")}.
-            </p>
-          )}
-        </div>
+        <Button asChild className="h-11 rounded-[10px] bg-fm-blue px-6 font-bold text-white hover:opacity-90">
+          <Link href="/app/faculty/profile">{progress === 100 ? "Editar perfil" : "Completar perfil"}</Link>
+        </Button>
       </div>
 
-      {/* ── ORCID Import Banner ── */}
-      {!facultyProfile?.orcid_import_data && (
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-4">
-          <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B4FD8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <p className="font-black text-blue-800 text-sm">¡Tráete tu perfil de ORCID!</p>
-            <p className="text-sm text-blue-600 font-medium">
-              Impórtalo y rellena tu perfil en segundos. Afiliaciones, publicaciones, citas y más, todo desde tu ORCID.
-            </p>
-            <Link href="/app/faculty/profile?tab=research" className="text-sm font-black text-blue-700 hover:underline mt-1 inline-block">
-              Ir a importar →
-            </Link>
-          </div>
-        </div>
-      )}
+      {/* ── Estado y progreso ── */}
+      <div className={`${cardCls} p-6`}>
+        {verificationStatus === "verificado" && (
+          <>
+            <div className="mb-5 flex items-center gap-2.5 text-[15px] font-semibold text-fm-ink">
+              <span className={`h-2 w-2 shrink-0 rounded-full ${status.dot}`} aria-hidden />
+              {status.title}
+              <span className="font-normal text-[#5B6B85]">{status.body}</span>
+            </div>
+          </>
+        )}
+        {verificationStatus === "rechazado" && (
+          <Link href="/app/faculty/profile" className="mb-5 inline-block text-sm font-bold text-fm-blue hover:underline">
+            Mejorar mi perfil
+          </Link>
+        )}
 
-      {/* ── Verification banners ── */}
-      {verificationStatus === "verificado" && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-start gap-4">
-          <div className="w-9 h-9 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <CheckCircle2 size={18} className="text-green-600" />
-          </div>
-          <div>
-            <p className="font-black text-green-800 text-sm">Perfil verificado</p>
-            <p className="text-sm text-green-600 font-medium">Tu perfil es visible para instituciones de todo el mundo.</p>
-          </div>
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-semibold text-fm-ink">Perfil completado</span>
+          <span className="font-extrabold tabular-nums text-fm-ink">{progress}%</span>
         </div>
-      )}
-      {verificationStatus === "en_revision" && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-4">
-          <div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Clock size={18} className="text-amber-600" />
-          </div>
-          <div>
-            <p className="font-black text-amber-800 text-sm">Perfil en revisión</p>
-            <p className="text-sm text-amber-600 font-medium">
-              Nuestro equipo está revisando tu perfil. Recibirás un email en 24-48 horas laborables.
-            </p>
-          </div>
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#E6ECF7]" role="img" aria-label={`Perfil completado al ${progress}%`}>
+          <div className="h-full rounded-full bg-fm-blue transition-[width] duration-500" style={{ width: `${progress}%` }} />
         </div>
-      )}
-      {verificationStatus === "incompleto" && (
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-start gap-4">
-          <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <AlertCircle size={18} className="text-blue-600" />
-          </div>
-          <div>
-            <p className="font-black text-blue-800 text-sm">Perfil incompleto</p>
-            {verificationNotes && <p className="text-sm text-blue-600 font-medium">{verificationNotes}</p>}
-            <Link href="/app/faculty/profile" className="text-sm font-black text-blue-700 hover:underline mt-1 inline-block">
-              Completar mi perfil →
-            </Link>
-          </div>
-        </div>
-      )}
-      {verificationStatus === "rechazado" && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-4">
-          <div className="w-9 h-9 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <XCircle size={18} className="text-red-600" />
-          </div>
-          <div>
-            <p className="font-black text-red-800 text-sm">Perfil no aprobado</p>
-            {verificationNotes && <p className="text-sm text-red-600 font-medium">{verificationNotes}</p>}
-            <Link href="/app/faculty/profile" className="text-sm font-black text-red-700 hover:underline mt-1 inline-block">
-              Mejorar mi perfil →
-            </Link>
-          </div>
-        </div>
-      )}
+        {pendingItems.length > 0 && (
+          <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5 text-sm">
+            {pendingItems.map((item) => (
+              <li key={item.label}>
+                <Link href={item.href} className="font-semibold text-fm-blue hover:underline">
+                  Añadir {item.label.charAt(0).toLowerCase() + item.label.slice(1)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
-      {/* ── Admin Notifications ── */}
+      {/* ── Avisos del equipo ── */}
       {adminNotifications && adminNotifications.length > 0 && adminNotifications.map((notif: any) => (
-        <div key={notif.id} className="bg-purple-50 border border-purple-200 rounded-2xl p-4 flex items-start gap-4">
-          <div className="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <Bell size={18} className="text-purple-600" />
-          </div>
+        <div key={notif.id} className={`${cardCls} flex items-start gap-3 p-5`}>
+          <Bell size={18} className="mt-0.5 shrink-0 text-fm-blue" />
           <div className="flex-1">
-            <p className="font-black text-purple-800 text-sm">{notif.subject}</p>
-            {notif.body && <p className="text-sm text-purple-600 font-medium mt-0.5">{notif.body}</p>}
-            <p className="text-[11px] text-purple-400 font-semibold mt-1">
-              {formatDateTimeTZ(notif.sent_at)}
-            </p>
+            <p className="text-sm font-bold text-fm-ink">{notif.subject}</p>
+            {notif.body && <p className="mt-0.5 text-sm text-[#5B6B85]">{notif.body}</p>}
+            <p className="mt-1 text-xs text-[#5E6F8E]">{formatDateTimeTZ(notif.sent_at)}</p>
           </div>
           <DismissNotificationButton notificationId={notif.id} />
         </div>
       ))}
 
-      {/* ── Visibility & Completeness Alerts ── */}
-      {(progress < 100 || !facultyProfile?.visibility || facultyProfile?.visibility === "hidden" || facultyProfile?.visibility === "private") && (
-        <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-4">
-          <div className="flex items-center gap-2">
-            <AlertCircle size={18} className="text-fm-blue" />
-            <h3 className="font-black text-navy text-sm">Avisos importantes sobre tu perfil</h3>
+      {/* ── Importar de ORCID ── */}
+      {!facultyProfile?.orcid_import_data && (
+        <div className={`${cardCls} flex flex-wrap items-center justify-between gap-3 p-5`}>
+          <div>
+            <p className="text-sm font-bold text-fm-ink">Tráete tu perfil de ORCID</p>
+            <p className="mt-0.5 text-sm text-[#5B6B85]">Afiliaciones, publicaciones y citas, todo desde tu ORCID en segundos.</p>
           </div>
-          <div className="grid gap-3">
-            {progress < 100 && (
-              <div className="flex items-start gap-3 p-3 bg-amber-50/60 rounded-xl border border-amber-100">
-                <div className="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <AlertCircle size={14} className="text-amber-700" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs font-black text-amber-900">Perfil incompleto ({progress}% completado)</p>
-                  <p className="text-xs text-amber-700 font-medium mt-0.5">
-                    Faltan completar las siguientes secciones: <strong className="font-bold">{pendingItems.map((i) => i.label).join(", ")}</strong>. Completa tu perfil para que sea más atractivo y fácil de encontrar por las universidades.
-                  </p>
-                  <Link href="/app/faculty/profile" className="text-xs font-black text-amber-800 hover:underline mt-1.5 inline-block">
-                    Completar secciones faltantes →
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            {facultyProfile?.visibility === "hidden" && (
-              <div className="flex items-start gap-3 p-3 bg-red-50/60 rounded-xl border border-red-100">
-                <div className="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <EyeOff size={14} className="text-red-700" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs font-black text-red-900">Perfil Oculto</p>
-                  <p className="text-xs text-red-700 font-medium mt-0.5">
-                    Tu visibilidad está configurada como <strong className="font-bold">Oculto</strong>. Ninguna institución podrá encontrarte en el buscador ni en el directorio.
-                  </p>
-                  <Link href="/app/faculty/privacy" className="text-xs font-black text-red-800 hover:underline mt-1.5 inline-block">
-                    Modificar visibilidad del perfil →
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            {facultyProfile?.visibility === "private" && (
-              <div className="flex items-start gap-3 p-3 bg-blue-50/60 rounded-xl border border-blue-100">
-                <div className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Lock size={14} className="text-blue-700" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs font-black text-blue-900">Perfil privado (Solo instituciones)</p>
-                  <p className="text-xs text-blue-700 font-medium mt-0.5">
-                    Tu visibilidad está configurada para mostrarse <strong className="font-bold">solo a instituciones verificadas</strong>. Los visitantes públicos no registrados no pueden ver tu información.
-                  </p>
-                  <Link href="/app/faculty/privacy" className="text-xs font-black text-blue-800 hover:underline mt-1.5 inline-block">
-                    Gestionar privacidad del perfil →
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            {!facultyProfile?.visibility && (
-              <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
-                <div className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <AlertCircle size={14} className="text-gray-500" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs font-black text-gray-800">Visibilidad no configurada</p>
-                  <p className="text-xs text-gray-500 font-medium mt-0.5">
-                    No has configurado tu preferencia de privacidad. Por defecto tu perfil es público en la plataforma.
-                  </p>
-                  <Link href="/app/faculty/privacy" className="text-xs font-black text-gray-700 hover:underline mt-1.5 inline-block">
-                    Configurar privacidad →
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
+          <Link href="/app/faculty/profile?tab=research" className="text-sm font-bold text-fm-blue hover:underline">
+            Ir a importar
+          </Link>
         </div>
       )}
 
-      {/* ── Main grid ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        {/* ── Left / main column ── */}
-        <div className="lg:col-span-2 space-y-8">
-
-          {/* Pending checklist */}
-          {pendingItems.length > 0 && (
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-black text-navy">Completa tu perfil</h2>
-                  <p className="text-sm text-gray-500 font-medium">Te falta{pendingItems.length !== 1 ? "n" : ""} {pendingItems.length} {pendingItems.length === 1 ? "sección" : "secciones"}</p>
-                </div>
-                <Badge className="bg-blue-50 text-fm-blue border-none font-black text-xs px-3 py-1">
-                  {progress}%
-                </Badge>
-              </div>
-              <div className="space-y-2">
-                {pendingItems.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-gray-200 hover:border-fm-blue hover:bg-blue-50/50 transition-all group"
-                  >
-                    <div className="w-7 h-7 rounded-full border-2 border-dashed border-gray-300 group-hover:border-fm-blue flex items-center justify-center flex-shrink-0 transition-colors">
-                      <Plus size={13} className="text-gray-300 group-hover:text-fm-blue transition-colors" />
-                    </div>
-                    <span className="text-sm font-bold text-gray-500 group-hover:text-navy transition-colors flex-1">{item.label}</span>
-                    <ArrowRight size={14} className="text-gray-300 group-hover:text-fm-blue transition-colors" />
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Personal stats */}
-          <div className="grid grid-cols-1 min-[480px]:grid-cols-3 gap-4">
-            {[
-              { icon: Star, label: "En favoritos", value: (favoritesCount ?? 0).toString(), color: "text-fm-gold", bg: "bg-orange-50" },
-              { icon: Mail, label: "Solicitudes recibidas", value: (contactsCount ?? 0).toString(), color: "text-fm-blue", bg: "bg-blue-50" },
-              { icon: Globe, label: "Idiomas", value: languages.length > 0 ? languages.map((l: any) => (typeof l === "string" ? l : l.lang ?? "")).filter(Boolean).join(", ") : "—", color: "text-purple-600", bg: "bg-purple-50" },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-2">
-                <div className={`w-9 h-9 ${stat.bg} rounded-xl flex items-center justify-center`}>
-                  <stat.icon size={16} className={stat.color} />
-                </div>
-                <p className="text-lg font-black text-navy leading-tight truncate">{stat.value}</p>
-                <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest leading-tight">{stat.label}</p>
-              </div>
-            ))}
+      {/* ── Cifras ── */}
+      <div className={`${cardCls} grid grid-cols-1 divide-y divide-fm-border min-[480px]:grid-cols-3 min-[480px]:divide-x min-[480px]:divide-y-0`}>
+        {[
+          { label: "En favoritos", value: (favoritesCount ?? 0).toString() },
+          { label: "Solicitudes recibidas", value: (contactsCount ?? 0).toString() },
+          { label: "Idiomas", value: languages.length > 0 ? languages.map((l: any) => (typeof l === "string" ? l : l.lang ?? "")).filter(Boolean).join(", ") : "—" },
+        ].map((stat) => (
+          <div key={stat.label} className="min-w-0 px-6 py-5">
+            <p className="truncate text-[1.6rem] font-extrabold leading-none tracking-[-0.03em] text-fm-ink tabular-nums">{stat.value}</p>
+            <p className="mt-2 text-sm text-[#5B6B85]">{stat.label}</p>
           </div>
+        ))}
+      </div>
 
-          {/* Resources */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-black text-navy">Recursos para docentes</h2>
-                <p className="text-sm text-gray-500 font-medium">Consejos y guías para impulsar tu carrera académica.</p>
-              </div>
-              <a
-                href="/resources"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-black text-fm-blue hover:underline flex items-center gap-1"
-              >
-                Ver todos <ArrowRight size={12} />
-              </a>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {RESOURCES.map((r) => {
-                const c = COLOR_MAP[r.color] ?? COLOR_MAP.blue;
-                return (
-                  <a
-                    key={r.slug}
-                    href={`/resources/${r.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`group bg-white rounded-2xl border ${c.border} hover:shadow-md transition-all p-5 flex flex-col gap-3`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className={`text-[11px] font-black uppercase tracking-widest ${c.text} ${c.bg} px-2.5 py-1 rounded-full`}>
-                        {r.category}
-                      </span>
-                      <span className="text-2xl">{r.emoji}</span>
-                    </div>
-                    <p className="text-sm font-bold text-navy leading-snug group-hover:text-fm-blue transition-colors line-clamp-2">
-                      {r.title}
-                    </p>
-                    <span className={`text-xs font-black ${c.text} flex items-center gap-1 mt-auto`}>
-                      Leer artículo <ArrowRight size={11} />
-                    </span>
-                  </a>
-                );
-              })}
-            </div>
-          </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.7fr_1fr]">
 
-          {/* Recent requests */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-black text-navy">Solicitudes recientes</h2>
-              <Button variant="ghost" size="sm" className="text-fm-blue font-black text-xs rounded-xl hover:bg-blue-50" asChild>
-                <Link href="/app/faculty/requests">Ver todas →</Link>
-              </Button>
+        {/* ── Columna principal ── */}
+        <div className="min-w-0 space-y-6">
+
+          {/* Solicitudes recientes */}
+          <div className={cardCls}>
+            <div className="flex items-center justify-between px-6 pb-2 pt-5">
+              <h2 className="text-base font-bold tracking-[-0.02em] text-fm-ink">Solicitudes recientes</h2>
+              <Link href="/app/faculty/requests" className="text-sm font-bold text-fm-blue hover:underline">Ver todas</Link>
             </div>
             {recentRequests && recentRequests.length > 0 ? (
-              <div className="space-y-3">
+              <ul>
                 {recentRequests.map((req: any) => (
-                  <div key={req.id} className="flex items-start gap-3 p-4 bg-gray-50/60 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
-                    <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                      <Mail size={15} className="text-fm-blue" />
+                  <li key={req.id} className="border-t border-fm-border px-6 py-3.5">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="truncate text-sm font-bold text-fm-ink">{req.institution?.name ?? "Institución"}</p>
+                      <span className="shrink-0 text-xs text-[#5E6F8E]">{formatDateTZ(req.created_at)}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="font-black text-navy text-sm truncate">{req.institution?.name ?? "Institución"}</p>
-                        <span className="text-[11px] font-bold text-gray-500 whitespace-nowrap">
-                          {formatDateTZ(req.created_at)}
-                        </span>
-                      </div>
-                      {req.message && (
-                        <p className="text-xs text-gray-500 font-medium mt-0.5 truncate">{req.message}</p>
-                      )}
-                    </div>
-                  </div>
+                    {req.message && <p className="mt-0.5 truncate text-[13px] text-[#5E6F8E]">{req.message}</p>}
+                  </li>
                 ))}
-              </div>
+              </ul>
             ) : (
-              <div className="text-center py-10 border border-dashed border-gray-200 rounded-2xl">
-                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Mail size={20} className="text-fm-blue" />
-                </div>
-                <p className="font-bold text-navy text-sm">Aún no tienes solicitudes</p>
-                <p className="text-gray-500 text-xs mt-1 max-w-xs mx-auto">
+              <div className="border-t border-fm-border px-6 py-8">
+                <p className="text-sm font-bold text-fm-ink">Aún no tienes solicitudes</p>
+                <p className="mt-1 max-w-[46ch] text-sm text-[#5B6B85]">
                   Cuando una institución quiera contactarte, aparecerá aquí. Completa tu perfil para aparecer primero.
                 </p>
               </div>
             )}
           </div>
+
+          {/* Recursos */}
+          <div className={cardCls}>
+            <div className="flex items-center justify-between px-6 pb-2 pt-5">
+              <h2 className="text-base font-bold tracking-[-0.02em] text-fm-ink">Recursos para docentes</h2>
+              <a href="/resources" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-fm-blue hover:underline">
+                Ver todos
+              </a>
+            </div>
+            <ul>
+              {RESOURCES.map((r) => (
+                <li key={r.slug} className="border-t border-fm-border">
+                  <a
+                    href={`/resources/${r.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between gap-4 px-6 py-3.5 transition-colors hover:bg-fm-surface"
+                  >
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold leading-snug text-fm-ink">{r.title}</span>
+                      <span className="mt-0.5 block text-xs text-[#5E6F8E]">{r.category}</span>
+                    </span>
+                    <ArrowRight size={15} className="shrink-0 text-[#5E6F8E]" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        {/* ── Right sidebar ── */}
-        <div className="space-y-6">
+        {/* ── Columna lateral ── */}
+        <div className="min-w-0 space-y-6">
 
-          {/* Profile status card */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-black text-navy text-sm">Estado del perfil</h3>
-              <Badge className={`font-black text-[11px] px-2.5 py-1 rounded-full border-none ${progress >= 80 ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"}`}>
-                {progress >= 80 ? "PUBLICADO" : "BORRADOR"}
-              </Badge>
-            </div>
-            {/* Mini profile preview — como apareces en el directorio */}
-            <div className="rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-              {/* Cover strip */}
-              <div className="relative">
-                {facultyProfile?.banner_url ? (
-                  <div className="h-14 bg-cover bg-center" style={{ backgroundImage: `url(${facultyProfile.banner_url})` }} />
+          {/* Cómo apareces */}
+          <div className={`${cardCls} p-5`}>
+            <h3 className="text-base font-bold tracking-[-0.02em] text-fm-ink">Así apareces</h3>
+            <div className="mt-4 flex items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-fm-navy text-sm font-extrabold text-white">
+                {profile?.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={profile.avatar_url} alt={profile.full_name} className="h-full w-full object-cover" />
                 ) : (
-                  <div className="h-14 bg-gradient-to-br from-[#0D2240] to-[#1B4FD8]" />
+                  profile?.full_name?.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase() || "?"
                 )}
-                {/* Avatar */}
-                <div className="absolute left-1/2 -translate-x-1/2 -bottom-7">
-                  <div className="w-[52px] h-[52px] rounded-full border-[3px] border-white overflow-hidden shadow-lg bg-[#0D2240] flex items-center justify-center">
-                    {profile?.avatar_url ? (
-                      <img src={profile.avatar_url} alt={profile.full_name} className="object-cover w-full h-full" />
-                    ) : (
-                      <span className="text-white text-sm font-black">
-                        {profile?.full_name?.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase() || "?"}
-                      </span>
-                    )}
-                  </div>
-                </div>
               </div>
-              {/* Info */}
-              <div className="pt-9 px-4 pb-4 flex flex-col items-center gap-1.5 text-center">
-                <div className="flex items-center gap-1.5">
-                  <h3 className="text-sm font-black text-[#0C1018] leading-tight truncate max-w-[180px]">
-                    {profile?.full_name || "Tu nombre"}
-                  </h3>
-                  {isPro && (
-                    <span className="text-[11px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full border border-amber-200 flex-shrink-0">Pro</span>
-                  )}
-                </div>
-                <p className="text-[11px] text-[#6B7280] font-medium line-clamp-2 leading-snug">
-                  {facultyProfile?.headline || <span className="text-gray-300 italic">Sin titular</span>}
+              <div className="min-w-0">
+                <p className="flex items-center gap-2 truncate text-sm font-bold text-fm-ink">
+                  {profile?.full_name || "Tu nombre"}
+                  {isPro && <span className="text-xs font-semibold text-[#5E6F8E]">Pro</span>}
                 </p>
-                {(facultyProfile?.location || facultyProfile?.city) && (
-                  <div className="flex items-center gap-1 text-[#5E6F8E]">
-                    <MapPin size={9} />
-                    <span className="text-[11px] font-medium truncate">
-                      {[facultyProfile.city, facultyProfile.location].filter(Boolean).join(", ")}
-                    </span>
-                  </div>
-                )}
-                {facultyProfile?.availability && (
-                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-200">
-                    {facultyProfile.availability === "open" ? "Disponible ahora" : facultyProfile.availability}
-                  </span>
-                )}
-                {/* Areas & experience tags */}
-                <div className="flex items-center justify-center flex-wrap gap-1 mt-0.5">
-                  {areas.slice(0, 2).map((a: any) => (
-                    <span key={a.id} className="text-[11px] font-bold text-[#1B4FD8] bg-[#EFF6FF] px-2 py-0.5 rounded-lg truncate max-w-[110px]">
-                      {a.area}
-                    </span>
-                  ))}
-                  {(facultyProfile?.years_experience ?? 0) > 0 && (
-                    <span className="text-[11px] font-bold text-[#6B7280] bg-[#F2F6FC] border border-[#D8E2EF] px-2 py-0.5 rounded-lg flex items-center gap-0.5">
-                      <Briefcase size={7} />{facultyProfile.years_experience}a
-                    </span>
-                  )}
-                </div>
+                <p className="line-clamp-2 text-[13px] leading-snug text-[#5B6B85]">
+                  {facultyProfile?.headline || "Sin titular"}
+                </p>
               </div>
             </div>
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-xs font-bold text-gray-500">
-                <span>Completado</span>
-                <span className="text-fm-blue font-black">{progress}%</span>
-              </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-fm-blue transition-all"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-            <Button asChild className="w-full bg-fm-blue hover:bg-navy text-white font-bold h-10 rounded-xl text-sm">
-              <Link href="/app/faculty/profile">Editar perfil</Link>
-            </Button>
-          </div>
-
-          {/* Privacy */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-fm-blue" />
-              <h3 className="font-black text-navy text-sm">Privacidad</h3>
-            </div>
-            <div className={`flex items-center justify-between p-3 rounded-xl border transition-all ${facultyProfile?.visibility === "public" ? "bg-blue-50 border-blue-100" : "bg-gray-50 border-gray-100"}`}>
-              <div className="flex items-center gap-2">
-                {facultyProfile?.visibility === "public"
-                  ? <Eye size={15} className="text-fm-blue" />
-                  : <EyeOff size={15} className="text-gray-500" />}
-                <div>
-                  <p className="text-xs font-black text-navy">{facultyProfile?.visibility === "public" ? "Pública" : "Privada"}</p>
-                  <p className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">Visibilidad</p>
-                </div>
-              </div>
-              <Link href="/app/faculty/privacy" className="text-xs font-black text-fm-blue hover:underline">
-                Cambiar
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-3 bg-gray-50 rounded-xl text-center">
-                <p className="text-xl font-black text-navy">{languages.length}</p>
-                <p className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">Idiomas</p>
-              </div>
-              <div className="p-3 bg-gray-50 rounded-xl text-center">
-                <p className="text-xl font-black text-navy">{history.length}</p>
-                <p className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">Cargos</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Public profile */}
-          {facultyProfile?.profile_slug && facultyProfile.visibility !== "public" && (
-            <Link
-              href="/app/faculty/privacy"
-              className="block bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-3 hover:border-fm-blue/30 hover:shadow-md transition-all group"
-            >
-              <div className="flex items-center gap-2">
-                <Globe size={16} className="text-gray-500" />
-                <h3 className="font-black text-navy text-sm">Perfil público</h3>
-              </div>
-              <p className="text-xs text-gray-500 font-medium leading-relaxed">
-                Tu perfil es privado, por eso tu enlace público aún no funciona. Cámbialo a público cuando quieras que las instituciones puedan verlo.
-              </p>
-              <div className="flex items-center gap-1.5 text-xs font-black text-fm-blue group-hover:underline">
-                Ir a privacidad <ExternalLink size={12} />
-              </div>
+            <ul className="mt-4 space-y-1 text-[13px] text-[#5B6B85]">
+              {(facultyProfile?.location || facultyProfile?.city) && (
+                <li className="flex items-center gap-1.5"><MapPin size={13} />{[facultyProfile.city, facultyProfile.location].filter(Boolean).join(", ")}</li>
+              )}
+              {facultyProfile?.availability && (
+                <li>{facultyProfile.availability === "open" ? "Disponible ahora" : facultyProfile.availability}</li>
+              )}
+              {areas.length > 0 && <li>{areas.slice(0, 2).map((a: any) => a.area).join(" · ")}</li>}
+              {(facultyProfile?.years_experience ?? 0) > 0 && <li>{facultyProfile.years_experience} años de experiencia</li>}
+            </ul>
+            <Link href="/app/faculty/profile" className="mt-4 inline-block text-sm font-bold text-fm-blue hover:underline">
+              Editar perfil
             </Link>
-          )}
-          {facultyProfile?.profile_slug && facultyProfile.visibility === "public" && (
-            <a
-              href={`https://facultymatch.app/docentes/${facultyProfile.profile_slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-3 hover:border-fm-blue/30 hover:shadow-md transition-all group"
-            >
-              <div className="flex items-center gap-2">
-                <Globe size={16} className="text-fm-blue" />
-                <h3 className="font-black text-navy text-sm">Perfil público</h3>
-              </div>
-              <p className="text-xs font-semibold text-fm-blue truncate">
-                facultymatch.app/docentes/{facultyProfile.profile_slug}
-              </p>
-              <p className="text-xs text-gray-500 font-medium leading-relaxed">
-                Comparte este enlace para que cualquier institución pueda ver tu perfil académico.
-              </p>
-              <div className="flex items-center gap-1.5 text-xs font-black text-fm-blue group-hover:underline">
-                Abrir perfil público <ExternalLink size={12} />
-              </div>
-            </a>
-          )}
+          </div>
 
-          {/* Plan card */}
+          {/* Visibilidad */}
+          <div className={`${cardCls} p-5`}>
+            <h3 className="text-base font-bold tracking-[-0.02em] text-fm-ink">Visibilidad</h3>
+            <div className="mt-3 flex items-center justify-between gap-3 text-sm">
+              <span className="font-semibold text-fm-ink">
+                {isPublic ? "Perfil público" : visibility === "hidden" ? "Perfil oculto" : "Perfil privado"}
+              </span>
+              <Link href="/app/faculty/privacy" className="font-bold text-fm-blue hover:underline">Cambiar</Link>
+            </div>
+            {isPublic && facultyProfile?.profile_slug ? (
+              <a
+                href={`https://facultymatch.app/docentes/${facultyProfile.profile_slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex max-w-full items-center gap-1.5 truncate text-[13px] font-semibold text-fm-blue hover:underline"
+              >
+                facultymatch.app/docentes/{facultyProfile.profile_slug}
+                <ExternalLink size={12} className="shrink-0" />
+              </a>
+            ) : (
+              <p className="mt-2 text-[13px] leading-relaxed text-[#5B6B85]">
+                {visibility === "hidden"
+                  ? "Ninguna institución podrá encontrarte en el buscador ni en el directorio."
+                  : "Tu enlace público aún no funciona. Cámbialo a público cuando quieras que las instituciones puedan verlo."}
+              </p>
+            )}
+          </div>
+
+          {/* Plan */}
           {isPro ? (
-            <div className="bg-gradient-to-br from-navy to-[#1a3a6b] text-white rounded-3xl p-5 space-y-4">
-              <div className="flex items-center gap-2">
-                <Sparkles size={15} className="text-[#9DB8FF]" />
-                <span className="text-[11px] font-black uppercase tracking-widest text-[#9DB8FF]">Plan Professional</span>
-              </div>
-              <p className="text-xs font-medium text-white/80 leading-relaxed">
+            <div className="rounded-xl bg-fm-navy p-5 text-white">
+              <h3 className="text-base font-bold tracking-[-0.02em]">Plan Professional</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/75">
                 Tu perfil aparece <strong className="text-white">prioritario</strong> en búsquedas y tienes privacidad avanzada.
               </p>
               {profile?.subscription_current_period_end && (() => {
                 const end = new Date(profile.subscription_current_period_end);
                 const daysLeft = Math.max(0, Math.round((end.getTime() - Date.now()) / 86400000));
                 return (
-                  <div className="bg-white/10 rounded-2xl p-3 space-y-1">
-                    <div className="flex items-center gap-1.5 text-white/60 text-[11px] font-bold uppercase tracking-widest">
-                      <CalendarDays size={11} /> Renovación
-                    </div>
-                    <p className="text-white font-black text-xs">
+                  <div className="mt-4 border-t border-white/15 pt-3 text-sm">
+                    <p className="text-white/60">Renovación</p>
+                    <p className="mt-0.5 font-semibold">
                       {formatDateTZ(profile.subscription_current_period_end, { day: "2-digit", month: "long", year: "numeric" })}
+                      <span className="ml-2 font-normal text-white/60">{daysLeft} días</span>
                     </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#9DB8FF] rounded-full"
-                          style={{ width: `${Math.max(5, 100 - Math.round(daysLeft / 3.65))}%` }}
-                        />
-                      </div>
-                      <span className="text-[11px] font-black text-white/60">{daysLeft}d</span>
-                    </div>
                   </div>
                 );
               })()}
             </div>
           ) : (
-            <div className="bg-white rounded-3xl border-2 border-dashed border-fm-blue/30 p-5 space-y-4 text-center">
-              <div className="flex items-center justify-center gap-2 text-fm-blue">
-                <Zap size={15} />
-                <span className="text-[11px] font-black uppercase tracking-widest">Plan Professional</span>
-              </div>
-              <p className="text-xs font-medium text-gray-600 leading-relaxed">
+            <div className={`${cardCls} p-5`}>
+              <h3 className="text-base font-bold tracking-[-0.02em] text-fm-ink">Plan Professional</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#5B6B85]">
                 Aparece primero en búsquedas, visibilidad preferente ante instituciones y estadísticas de visitas.
               </p>
-              <div className="text-xl font-black text-navy">29€ <span className="text-xs text-gray-500 font-bold">/ año</span></div>
+              <p className="mt-3 text-[1.4rem] font-extrabold tracking-[-0.03em] text-fm-ink">
+                29 € <span className="text-sm font-medium text-[#5B6B85]">/ año</span>
+              </p>
               <Link
                 href="/checkout?plan=faculty-pro"
-                className="inline-flex items-center gap-2 w-full justify-center bg-fm-blue hover:opacity-90 text-white font-black py-2.5 px-5 rounded-xl text-xs transition-colors"
+                className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-[10px] bg-fm-blue text-sm font-bold text-white transition-all duration-150 hover:opacity-90 active:scale-[0.97]"
               >
-                <Sparkles size={13} /> Activar Plan Professional
+                Activar plan Professional
               </Link>
             </div>
           )}
 
-          {/* Referral widget */}
+          {/* Invita y gana */}
           {successfulReferrals < 10 && (
-            <div className="bg-white rounded-3xl border border-dashed border-fm-blue/40 p-5 space-y-3">
-              <div className="flex items-center gap-2">
-                <Gift size={14} className="text-fm-blue" />
-                <p className="text-[11px] font-black text-fm-blue uppercase tracking-widest">Invita y Gana</p>
-              </div>
-              <p className="text-xs text-gray-500 font-medium leading-relaxed">
+            <div className={`${cardCls} p-5`}>
+              <h3 className="text-base font-bold tracking-[-0.02em] text-fm-ink">Invita y Gana</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#5B6B85]">
                 Invita compañeros a FacultyMatch y desbloquea meses gratis de Plan Professional.
               </p>
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-xs font-bold text-gray-500">
-                  <span>Invitaciones exitosas</span>
-                  <span className="text-navy font-black">{successfulReferrals}/10</span>
-                </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-fm-blue rounded-full transition-all"
-                    style={{ width: `${Math.min(100, (successfulReferrals / 10) * 100)}%` }}
-                  />
-                </div>
+              <div className="mt-3 flex justify-between text-sm">
+                <span className="text-[#5B6B85]">Invitaciones exitosas</span>
+                <span className="font-extrabold tabular-nums text-fm-ink">{successfulReferrals}/10</span>
               </div>
-              <Link
-                href="/app/faculty/referrals"
-                className="inline-flex items-center gap-1.5 text-xs font-black text-fm-blue hover:underline"
-              >
-                Ver mis invitaciones <ArrowRight size={11} />
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#E6ECF7]">
+                <div className="h-full rounded-full bg-fm-blue" style={{ width: `${Math.min(100, (successfulReferrals / 10) * 100)}%` }} />
+              </div>
+              <Link href="/app/faculty/referrals" className="mt-3 inline-block text-sm font-bold text-fm-blue hover:underline">
+                Ver mis invitaciones
               </Link>
             </div>
           )}
 
         </div>
       </div>
-
-      </div>
+    </div>
   );
 }

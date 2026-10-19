@@ -46,11 +46,11 @@ export function LanguageEditor({ initialLanguages, onChange }: Props) {
           {languages.map((l, i) => (
             <div
               key={i}
-              className="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 rounded-xl"
+              className="flex items-center justify-between p-3 bg-white border border-fm-border rounded-xl"
             >
               <div className="flex items-center gap-3">
-                <span className="font-bold text-navy text-sm">{l.lang}</span>
-                <span className="text-xs font-bold bg-white border border-blue-200 text-talentia-blue px-2 py-0.5 rounded-full">
+                <span className="font-bold text-fm-navy text-sm">{l.lang}</span>
+                <span className="text-xs font-bold bg-white border border-blue-200 text-fm-blue px-2 py-0.5 rounded-md">
                   {l.level}
                 </span>
               </div>
@@ -79,7 +79,7 @@ export function LanguageEditor({ initialLanguages, onChange }: Props) {
             }
           }}
           placeholder="Ej: Inglés, Francés, Alemán..."
-          className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-talentia-blue focus:border-transparent outline-none text-sm font-medium"
+          className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none text-sm font-medium"
         />
         <datalist id="fm-language-suggestions">
           <option value="Español" />
@@ -99,7 +99,7 @@ export function LanguageEditor({ initialLanguages, onChange }: Props) {
         <select
           value={newLevel}
           onChange={(e) => setNewLevel(e.target.value)}
-          className="px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-talentia-blue outline-none text-sm font-medium appearance-none"
+          className="px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-fm-blue outline-none text-sm font-medium appearance-none"
         >
           {CEFR_LEVELS.map((l) => (
             <option key={l} value={l}>
@@ -110,7 +110,7 @@ export function LanguageEditor({ initialLanguages, onChange }: Props) {
         <button
           type="button"
           onClick={add}
-          className="px-4 py-2.5 bg-talentia-blue hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-colors flex items-center gap-1"
+          className="px-4 py-2.5 bg-fm-blue hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition-colors flex items-center gap-1"
         >
           <Plus size={16} /> Añadir
         </button>

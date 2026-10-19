@@ -180,10 +180,10 @@ export function Topbar({ user, profile }: TopbarProps) {
             <button
               type="submit"
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                profile.active_mode === "faculty"
-                  ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
-                  : "text-[#4B5A7A] hover:text-[#080F1E]"
-              }`}
+ profile.active_mode === "faculty"
+ ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
+ : "text-[#4B5A7A] hover:text-[#080F1E]"
+ }`}
             >
               <GraduationCap size={13} />
               Modo docente
@@ -194,10 +194,10 @@ export function Topbar({ user, profile }: TopbarProps) {
             <button
               type="submit"
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                profile.active_mode === "institution"
-                  ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
-                  : "text-[#4B5A7A] hover:text-[#080F1E]"
-              }`}
+ profile.active_mode === "institution"
+ ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
+ : "text-[#4B5A7A] hover:text-[#080F1E]"
+ }`}
             >
               <Building2 size={13} />
               Modo institución
@@ -215,10 +215,10 @@ export function Topbar({ user, profile }: TopbarProps) {
               type="submit"
               title="Modo docente"
               className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all ${
-                profile.active_mode === "faculty"
-                  ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
-                  : "text-[#4B5A7A]"
-              }`}
+ profile.active_mode === "faculty"
+ ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
+ : "text-[#4B5A7A]"
+ }`}
             >
               <GraduationCap size={15} />
             </button>
@@ -229,10 +229,10 @@ export function Topbar({ user, profile }: TopbarProps) {
               type="submit"
               title="Modo institución"
               className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all ${
-                profile.active_mode === "institution"
-                  ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
-                  : "text-[#4B5A7A]"
-              }`}
+ profile.active_mode === "institution"
+ ? "bg-white text-[#0D2240] shadow-sm border border-[#D8E2EF]"
+ : "text-[#4B5A7A]"
+ }`}
             >
               <Building2 size={15} />
             </button>
@@ -251,17 +251,17 @@ export function Topbar({ user, profile }: TopbarProps) {
             >
               <Bell size={22} />
               {notifLoaded && notifications.length > 0 && (
-                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 shadow-sm">{notifications.length}</span>
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-red-500 text-white text-[9px] font-extrabold rounded-full flex items-center justify-center px-1 shadow-sm">{notifications.length}</span>
               )}
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-[#D8E2EF] z-50 overflow-hidden" style={{ boxShadow: "0 8px 40px rgba(7,19,38,0.14)" }}>
+              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-sm border border-[#D8E2EF] z-50 overflow-hidden" style={{ boxShadow: "0 8px 40px rgba(7,19,38,0.14)" }}>
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2E8F0]">
-                  <span className="text-sm font-black text-[#080F1E]">Notificaciones</span>
+                  <span className="text-sm font-bold text-[#080F1E]">Notificaciones</span>
                   {notifications.length > 0 && (
-                    <span className="text-[10px] font-black text-white bg-[#1B4FD8] px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-bold text-white bg-[#1B4FD8] px-2 py-0.5 rounded-md">
                       {notifications.length}
                     </span>
                   )}
@@ -292,10 +292,10 @@ export function Topbar({ user, profile }: TopbarProps) {
                         <div className="flex items-start gap-3">
                           <div
                             className={`mt-0.5 w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                              n.type === "contact"
-                                ? "bg-[#0D2240]/10 text-[#0D2240]"
-                                : "bg-red-100 text-red-600"
-                            }`}
+ n.type === "contact"
+ ? "bg-[#0D2240]/10 text-[#0D2240]"
+ : "bg-red-100 text-red-600"
+ }`}
                           >
                             {n.type === "contact" ? (
                               <Building2 size={15} />
@@ -304,7 +304,7 @@ export function Topbar({ user, profile }: TopbarProps) {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-black text-navy">{n.title}</p>
+                            <p className="text-xs font-bold text-fm-navy">{n.title}</p>
                             <p className="text-xs text-gray-500 font-medium mt-0.5 line-clamp-2">
                               {n.body}
                             </p>

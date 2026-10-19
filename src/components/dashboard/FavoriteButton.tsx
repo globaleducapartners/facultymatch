@@ -43,7 +43,7 @@ export function FavoriteButton({ facultyId, institutionId, initialIsFavorite }: 
       variant="outline" 
       onClick={handleToggle}
       disabled={loading}
-      className={`flex-1 h-12 rounded-xl transition-all border-white/20 font-bold ${isFavorite ? "bg-orange-50/20 text-energy-orange" : "bg-white/10 text-white hover:bg-white/20"}`}
+      className={`flex-1 h-12 rounded-xl transition-all border-white/20 font-bold ${isFavorite ? "bg-orange-50/20 text-fm-blue" : "bg-white/10 text-white hover:bg-white/20"}`}
     >
       <Star size={18} className={`mr-2 ${isFavorite ? "fill-current" : ""}`} />
       {isFavorite ? "Guardado" : "Guardar"}

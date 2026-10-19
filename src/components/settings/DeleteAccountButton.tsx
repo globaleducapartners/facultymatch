@@ -51,11 +51,11 @@ export function DeleteAccountButton({ role }: Props) {
         <>
           <div className="fixed inset-0 bg-black/50 z-[60]" onClick={() => { setOpen(false); setConfirm(""); setError(null); }} />
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6">
+            <div className="bg-white rounded-2xl shadow-sm w-full max-w-md p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2 text-red-600">
                   <AlertTriangle size={20} />
-                  <h3 className="text-lg font-black">Eliminar cuenta</h3>
+                  <h3 className="text-lg font-extrabold">Eliminar cuenta</h3>
                 </div>
                 <button onClick={() => { setOpen(false); setConfirm(""); setError(null); }} className="text-gray-400 hover:text-gray-600">
                   <X size={18} />
@@ -65,7 +65,7 @@ export function DeleteAccountButton({ role }: Props) {
                 Esta acción es <strong className="text-red-600">permanente e irreversible</strong>.
                 Se eliminarán todos tus datos, perfil y registros asociados.
               </p>
-              <p className="text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
+              <p className="text-xs font-bold text-gray-500 mb-2">
                 Escribe ELIMINAR para confirmar
               </p>
               <input
@@ -73,7 +73,7 @@ export function DeleteAccountButton({ role }: Props) {
                 value={confirm}
                 onChange={e => setConfirm(e.target.value)}
                 placeholder="ELIMINAR"
-                className="w-full px-4 py-3 rounded-xl border border-red-200 bg-red-50/50 focus:ring-2 focus:ring-red-400 outline-none font-bold text-navy mb-4 text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-red-200 bg-red-50/50 focus:ring-2 focus:ring-red-400 outline-none font-bold text-fm-navy mb-4 text-sm"
               />
               {error && (
                 <p className="text-xs text-red-600 font-bold mb-3">{error}</p>
@@ -90,7 +90,7 @@ export function DeleteAccountButton({ role }: Props) {
                 <Button
                   onClick={handleDelete}
                   disabled={confirm !== "ELIMINAR" || loading}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl"
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-extrabold rounded-xl"
                 >
                   {loading ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
                   Eliminar definitivamente

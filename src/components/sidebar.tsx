@@ -25,13 +25,6 @@ const educatorItems = [
   { label: "Ajustes",        href: "/app/faculty/settings",     icon: Settings,     group: "mas" },
 ];
 
-const GROUP_LABELS: Record<string, string> = {
-  principal: "",
-  perfil: "Mi perfil",
-  actividad: "Actividad",
-  mas: "Más",
-};
-
 const facultyBottomNavItems = [
   { label: "Inicio",       href: "/app/faculty",             icon: Home },
   { label: "Perfil",       href: "/app/faculty/profile",     icon: User },
@@ -101,13 +94,11 @@ export function Sidebar({ activeMode }: { activeMode?: string | null } = {}) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={cn(
-                  "flex flex-col items-center gap-0.5 px-2 py-1 min-w-0 rounded-lg transition-colors",
-                  isActive ? "text-[#1B4FD8]" : "text-gray-400"
-                )}
+                className={cn("flex flex-col items-center gap-0.5 px-2 py-1 min-w-0 rounded-lg transition-colors",
+ isActive ? "text-[#1B4FD8]" : "text-gray-500")}
               >
                 <item.icon size={20} />
-                <span className="text-[9px] font-bold leading-tight">{item.label}</span>
+                <span className="text-[11px] font-semibold leading-tight">{item.label}</span>
               </Link>
             );
           })}
@@ -125,13 +116,11 @@ export function Sidebar({ activeMode }: { activeMode?: string | null } = {}) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={cn(
-                  "flex flex-col items-center gap-0.5 px-2 py-1 min-w-0 rounded-lg transition-colors",
-                  isActive ? "text-[#1B4FD8]" : "text-gray-400"
-                )}
+                className={cn("flex flex-col items-center gap-0.5 px-2 py-1 min-w-0 rounded-lg transition-colors",
+ isActive ? "text-[#1B4FD8]" : "text-gray-500")}
               >
                 <item.icon size={20} />
-                <span className="text-[9px] font-bold leading-tight">{item.label}</span>
+                <span className="text-[11px] font-semibold leading-tight">{item.label}</span>
               </Link>
             );
           })}
@@ -140,9 +129,8 @@ export function Sidebar({ activeMode }: { activeMode?: string | null } = {}) {
 
       {/* Mobile/tablet hamburger — shows on mobile for non-bottom-nav access, tablet for all */}
       <button
-        className={cn(
-          "fixed bottom-6 right-6 z-50 bg-[#0D2240] text-white p-3 rounded-full shadow-lg items-center justify-center lg:hidden",
-          // On mobile: only show for non-faculty/institution (e.g. admin), or always show
+        className={cn("fixed bottom-6 right-6 z-50 bg-[#0D2240] text-white p-3 rounded-xl items-center justify-center lg:hidden",
+ // On mobile: only show for non-faculty/institution (e.g. admin), or always show
           // For faculty/institution we have bottom nav, but hamburger gives full sidebar access
           isFaculty || isInstitution ? "hidden md:flex" : "flex"
         )}
@@ -160,10 +148,8 @@ export function Sidebar({ activeMode }: { activeMode?: string | null } = {}) {
       )}
 
       {/* Sidebar */}
-      <aside className={cn(
-        "fixed lg:static inset-y-0 left-0 z-40 w-64 bg-[#0D2240] border-r border-white/10 flex flex-col transition-transform duration-300 transform",
-        isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-      )}>
+      <aside className={cn("fixed lg:static inset-y-0 left-0 z-40 w-64 shrink-0 bg-[#0D2240] border-r border-white/10 flex flex-col transition-transform duration-300 transform",
+ isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0")}>
         {/* Logo at top */}
         <div className="p-4 pb-2 border-b border-white/10">
           <Logo variant="light" />
@@ -172,37 +158,28 @@ export function Sidebar({ activeMode }: { activeMode?: string | null } = {}) {
         <div className="flex-1 overflow-y-auto py-3 px-3 pb-20 lg:pb-3">
           <nav className="space-y-0.5">
             {navItems.map((item, idx) => {
-              const isActive = item.href === "/app/institution"
-                ? pathname === "/app/institution"
+              const isActive = item.href === "/app/institution" || item.href === "/app/faculty"
+                ? pathname === item.href
                 : pathname === item.href || pathname?.startsWith(item.href + "/");
               const prevItem = (navItems as typeof educatorItems)[idx - 1];
-              const showGroupLabel =
-                "group" in item &&
-                GROUP_LABELS[item.group as string] &&
-                (!prevItem || (prevItem as typeof item).group !== item.group);
+              const startsGroup =
+                "group" in item && !!prevItem && (prevItem as typeof item).group !== item.group;
               return (
                 <div key={item.href}>
-                  {showGroupLabel && (
-                    <p className="text-[9px] font-black uppercase tracking-widest text-[#F7F5F0]/40 px-3 pt-4 pb-1.5 select-none">
-                      {GROUP_LABELS[(item as typeof educatorItems[0]).group]}
-                    </p>
-                  )}
+                  {startsGroup && <div className="mx-3 my-2.5 h-px bg-white/10" aria-hidden />}
                   <Link
                     href={item.href}
                     onClick={() => setIsOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 relative",
+                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors duration-150",
                       isActive
-                        ? "bg-white text-[#0D2240]"
-                        : "text-[#F7F5F0]/70 hover:bg-white/5 hover:text-white"
+                        ? "bg-white/[0.12] font-semibold text-white"
+                        : "font-medium text-white/70 hover:bg-white/[0.06] hover:text-white"
                     )}
                   >
                     <item.icon
                       size={18}
-                      className={cn(
-                        "flex-shrink-0 ml-0.5",
-                        isActive ? "text-[#0D2240]" : "text-[#F7F5F0]/50"
-                      )}
+                      className={cn("flex-shrink-0 ml-0.5", isActive ? "text-white" : "text-white/60")}
                     />
                     <span className="flex-1">{item.label}</span>
                   </Link>
@@ -216,9 +193,9 @@ export function Sidebar({ activeMode }: { activeMode?: string | null } = {}) {
         <div className="p-3 border-t border-white/10">
           <a
             href="mailto:support@facultymatch.app"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-[#F7F5F0]/70 hover:bg-white/5 hover:text-white transition-all duration-150"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/[0.06] hover:text-white transition-colors duration-150"
           >
-            <HelpCircle size={18} className="text-[#F7F5F0]/50 flex-shrink-0" />
+            <HelpCircle size={18} className="text-white/60 flex-shrink-0" />
             <span>Centro de ayuda</span>
           </a>
         </div>

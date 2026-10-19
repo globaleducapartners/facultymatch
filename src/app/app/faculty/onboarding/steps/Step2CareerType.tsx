@@ -13,24 +13,23 @@ const D = {
   gold:    "#E9A030",
   white:   "#FFFFFF",
   ink:     "#0C1018",
-  muted:   "#6B7280",
-  faint:   "#9CA3AF",
+  muted:   "#5B6B85",
+  faint:   "#5E6F8E",
   border:  "#D8E2EF",
   surf:    "#F2F6FC",
   green:   "#059669",
 };
 
 const inp: React.CSSProperties = {
-  fontFamily: SANS, width: "100%", fontSize: 14, color: D.ink,
+  fontFamily: SANS, width: "100%", fontSize: 16, color: D.ink,
   background: D.white, border: `1px solid ${D.border}`,
   borderRadius: 10, padding: "11px 14px", outline: "none",
   boxSizing: "border-box" as const, transition: "border-color 0.2s",
 };
 
 const lbl: React.CSSProperties = {
-  fontFamily: SANS, fontSize: 11, fontWeight: 700,
-  letterSpacing: "0.1em", textTransform: "uppercase" as const,
-  color: D.faint, display: "block", marginBottom: 6,
+  fontFamily: SANS, fontSize: 14, fontWeight: 600,
+  color: D.ink, display: "block", marginBottom: 6,
 };
 
 const crossLinkStyle: React.CSSProperties = {
@@ -131,19 +130,13 @@ export function Step2CareerType({ data, updateData, user, facultyProfile }: Prop
           onClick={() => updateData({ careerType: isAcademic ? (data.careerType === "combinado" ? "profesional" : null) : "academica" })}
           style={{
             fontFamily: SANS, cursor: "pointer", textAlign: "left" as const,
-            padding: 24, borderRadius: 14, border: `2px solid ${isAcademic ? D.blue : D.border}`,
-            background: isAcademic ? "#EFF6FF" : D.white,
+            padding: 24, borderRadius: 12, border: `1.5px solid ${isAcademic ? D.blue : D.border}`,
+            background: D.white,
             transition: "all 0.2s", display: "flex", flexDirection: "column" as const, gap: 12,
             outline: "none",
           }}
         >
-          <div style={{
-            width: 48, height: 48, borderRadius: 12,
-            background: isAcademic ? D.blue : D.surf,
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <GraduationCap size={24} color={isAcademic ? "#fff" : D.navy} />
-          </div>
+                      <GraduationCap size={24} color={isAcademic ? D.blue : D.navy} />
           <div>
             <div style={{ fontSize: 16, fontWeight: 800, color: D.ink, marginBottom: 4 }}>
               Académica
@@ -160,19 +153,13 @@ export function Step2CareerType({ data, updateData, user, facultyProfile }: Prop
           onClick={() => updateData({ careerType: isProfessional ? (data.careerType === "combinado" ? "academica" : null) : "profesional" })}
           style={{
             fontFamily: SANS, cursor: "pointer", textAlign: "left" as const,
-            padding: 24, borderRadius: 14, border: `2px solid ${isProfessional ? D.blue : D.border}`,
-            background: isProfessional ? "#EFF6FF" : D.white,
+            padding: 24, borderRadius: 12, border: `1.5px solid ${isProfessional ? D.blue : D.border}`,
+            background: D.white,
             transition: "all 0.2s", display: "flex", flexDirection: "column" as const, gap: 12,
             outline: "none",
           }}
         >
-          <div style={{
-            width: 48, height: 48, borderRadius: 12,
-            background: isProfessional ? D.blue : D.surf,
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <Briefcase size={24} color={isProfessional ? "#fff" : D.navy} />
-          </div>
+                      <Briefcase size={24} color={isProfessional ? D.blue : D.navy} />
           <div>
             <div style={{ fontSize: 16, fontWeight: 800, color: D.ink, marginBottom: 4 }}>
               Profesional
@@ -188,7 +175,7 @@ export function Step2CareerType({ data, updateData, user, facultyProfile }: Prop
       {isAcademic && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div style={{
-            background: D.surf, border: `1px solid ${D.border}`, borderRadius: 12, padding: 20,
+            background: D.white, border: `1px solid ${D.border}`, borderRadius: 12, padding: 20,
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
               <GraduationCap size={18} color={D.blue} />
@@ -216,31 +203,12 @@ export function Step2CareerType({ data, updateData, user, facultyProfile }: Prop
             </button>
           </div>
 
-          {/* Tip for academic users without ORCID */}
+          {/* Aviso para quien no tiene ORCID */}
           {data.careerType === "academica" && (
-            <div style={{
-              background: "#F0FDF4", border: "1px solid #BBF7D0",
-              borderRadius: 12, padding: "14px 18px",
-              display: "flex", alignItems: "flex-start", gap: 10,
-            }}>
-              <div style={{
-                width: 24, height: 24, borderRadius: 8,
-                background: D.green, display: "flex", alignItems: "center", justifyContent: "center",
-                flexShrink: 0, marginTop: 1,
-              }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 6L9 17l-5-5" />
-                </svg>
-              </div>
-              <div>
-                <p style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: "#166534", margin: "0 0 4px" }}>
-                  ¿No tienes ORCID? No hay problema
-                </p>
-                <p style={{ fontFamily: SANS, fontSize: 12, color: "#15803D", margin: 0, lineHeight: 1.6 }}>
-                  Puedes continuar y añadir tu especialidad, acreditaciones y publicaciones en los siguientes pasos. Todo de forma manual y sin prisas.
-                </p>
-              </div>
-            </div>
+            <p style={{ fontFamily: SANS, fontSize: 14, color: D.muted, lineHeight: 1.6, margin: 0 }}>
+              <strong style={{ color: D.ink }}>¿No tienes ORCID? No hay problema.</strong>{" "}
+              Puedes continuar y añadir tu especialidad, acreditaciones y publicaciones en los siguientes pasos. Todo de forma manual y sin prisas.
+            </p>
           )}
         </div>
       )}

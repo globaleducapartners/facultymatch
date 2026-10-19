@@ -32,7 +32,7 @@ export function StripeUpgradeButton({ userEmail }: Props) {
     <button
       onClick={handleUpgrade}
       disabled={loading}
-      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-talentia-blue to-blue-600 hover:from-blue-700 hover:to-blue-800 disabled:opacity-60 text-white font-black h-12 rounded-xl transition-all shadow-lg shadow-blue-100 uppercase tracking-widest text-xs"
+      className="w-full flex items-center justify-center gap-2 bg-fm-navy hover:opacity-90 disabled:opacity-60 text-white font-bold h-12 rounded-xl transition-all shadow-sm text-xs"
     >
       {loading ? (
         <Loader2 size={16} className="animate-spin" />

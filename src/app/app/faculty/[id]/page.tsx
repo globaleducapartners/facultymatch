@@ -32,7 +32,7 @@ const AVAIL: Record<string, { label: string; color: string; bg: string }> = {
 // ── Section wrapper ──────────────────────────────────────────────────────────
 function Section({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-white rounded-3xl border border-[#E2E8F0] shadow-xs p-6 sm:p-8 ${className}`}>
+    <div className={`bg-white rounded-2xl border border-[#E2E8F0] shadow-xs p-6 sm:p-8 ${className}`}>
       {children}
     </div>
   );
@@ -41,7 +41,7 @@ function Section({ children, className = "" }: { children: React.ReactNode; clas
 function SectionTitle({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <h2 className="flex items-center gap-3 text-lg font-bold text-[#0D2240] tracking-tight mb-6">
-      <div className="p-2 bg-blue-50 text-[#1B4FD8] rounded-xl shrink-0">
+      <div className="p-2 bg-white text-[#1B4FD8] rounded-xl shrink-0">
         {icon}
       </div>
       {title}
@@ -198,7 +198,7 @@ export default async function FacultyProfilePage({
   return (
     <>
       <ProfileViewTracker facultyId={facultyId} />
-      <div className="animate-in fade-in duration-500 pb-12 font-sans">
+      <div className="duration-500 pb-12 font-sans">
       {/* ── Breadcrumb ── */}
       <nav className="flex items-center gap-2 text-sm font-semibold text-slate-500 mb-6">
         <Link
@@ -212,7 +212,7 @@ export default async function FacultyProfilePage({
       </nav>
 
       {/* ── HEADER CARD ── */}
-      <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-xs overflow-hidden mb-5">
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden mb-5">
         {/* Banner */}
         <div className="relative h-40 sm:h-52">
           {faculty?.banner_url ? (
@@ -224,7 +224,7 @@ export default async function FacultyProfilePage({
               className="object-cover"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#4F7FE8]" />
+            <div className="absolute inset-0 bg-fm-navy" />
           )}
         </div>
 
@@ -234,7 +234,7 @@ export default async function FacultyProfilePage({
           <div className="-mt-14 mb-4 flex items-end justify-between">
             <div className="relative">
               {facultyUserProfile?.avatar_url ? (
-                <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden border-4 border-white shadow-lg">
+                <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-4 border-white shadow-sm">
                   <Image
                     src={facultyUserProfile.avatar_url}
                     alt={facultyName}
@@ -244,7 +244,7 @@ export default async function FacultyProfilePage({
                   />
                 </div>
               ) : (
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#1B4FD8] text-white flex items-center justify-center text-3xl font-bold border-4 border-white shadow-lg">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-[#1B4FD8] text-white flex items-center justify-center text-3xl font-bold border-4 border-white shadow-sm">
                   {initials}
                 </div>
               )}
@@ -257,7 +257,7 @@ export default async function FacultyProfilePage({
             {/* Availability badge — visible on desktop in header */}
             {availInfo && (
               <span
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-full shadow-xs"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold px-4 py-1.5 rounded-md shadow-xs"
                 style={{ color: availInfo.color, background: availInfo.bg }}
               >
                 <CalendarCheck size={13} /> {availInfo.label}
@@ -270,10 +270,10 @@ export default async function FacultyProfilePage({
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl sm:text-3xl font-bold text-[#0D2240] tracking-tight leading-tight">{facultyName}</h1>
               {faculty?.is_phd && (
-                <Badge className="bg-purple-50 text-purple-700 border-purple-100 text-[11px] font-bold px-2.5 py-1 rounded-full">PhD</Badge>
+                <Badge className="bg-white text-purple-700 border-fm-border text-[11px] font-bold px-2.5 py-1 rounded-md">PhD</Badge>
               )}
               {faculty?.aneca_accreditation && (
-                <Badge className="bg-blue-50 text-[#1B4FD8] border-blue-100 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                <Badge className="bg-white text-[#1B4FD8] border-fm-border text-[11px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
                   <Award size={10} /> ANECA
                 </Badge>
               )}
@@ -317,7 +317,7 @@ export default async function FacultyProfilePage({
             {/* Mobile availability */}
             {availInfo && (
               <span
-                className="sm:hidden inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full"
+                className="sm:hidden inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-md"
                 style={{ color: availInfo.color, background: availInfo.bg }}
               >
                 {availInfo.label}
@@ -353,7 +353,7 @@ export default async function FacultyProfilePage({
                     <div key={exp.id} className="flex gap-4 items-start p-5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl hover:border-slate-300 transition-colors">
                       <div className="w-1.5 h-1.5 rounded-full bg-[#1B4FD8] mt-2 shrink-0" />
                       <div className="space-y-1">
-                        <p className="text-[11px] font-bold text-[#1B4FD8] uppercase tracking-wider">{exp.area}</p>
+                        <p className="text-[11px] font-bold text-[#1B4FD8]">{exp.area}</p>
                         <p className="font-bold text-[#0D2240] text-sm sm:text-base">{exp.subarea}</p>
                         {exp.topics?.length > 0 && (
                           <div className="flex flex-wrap gap-1.5 pt-2">
@@ -369,7 +369,7 @@ export default async function FacultyProfilePage({
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {faculty!.faculty_areas!.map((area: string) => (
-                    <Badge key={area} className="bg-blue-50 text-[#1B4FD8] border-blue-100 px-3 py-1.5 rounded-xl text-xs font-bold">{area}</Badge>
+                    <Badge key={area} className="bg-white text-[#1B4FD8] border-fm-border px-3 py-1.5 rounded-xl text-xs font-bold">{area}</Badge>
                   ))}
                 </div>
               )}
@@ -383,7 +383,7 @@ export default async function FacultyProfilePage({
               <div className="space-y-6">
                 {hasDegrees && faculty!.degrees!.map((deg: any, i: number) => (
                   <div key={i} className="flex gap-4 items-start p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
-                    <div className="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center shrink-0 border border-purple-100 shadow-3xs">
+                    <div className="w-10 h-10 text-purple-600 rounded-xl flex items-center justify-center shrink-0 border shadow-3xs">
                       <GraduationCap size={18} />
                     </div>
                     <div className="space-y-0.5">
@@ -400,7 +400,7 @@ export default async function FacultyProfilePage({
                 ))}
                 {faculty?.aneca_accreditation && (
                   <div className="flex gap-4 items-start p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
-                    <div className="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center shrink-0 border border-amber-100 shadow-3xs">
+                    <div className="w-10 h-10 text-amber-600 rounded-xl flex items-center justify-center shrink-0 border shadow-3xs">
                       <Award size={18} />
                     </div>
                     <div className="space-y-0.5">
@@ -439,7 +439,7 @@ export default async function FacultyProfilePage({
               <div className="space-y-6">
                 {faculty?.current_institution && (
                   <div className="flex gap-4 items-start p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
-                    <div className="w-10 h-10 bg-blue-50 text-[#1B4FD8] rounded-xl flex items-center justify-center shrink-0 border border-blue-100 shadow-3xs">
+                    <div className="w-10 h-10 text-[#1B4FD8] rounded-xl flex items-center justify-center shrink-0 border shadow-3xs">
                       <Building2 size={18} />
                     </div>
                     <div className="space-y-0.5">
@@ -455,7 +455,7 @@ export default async function FacultyProfilePage({
                 )}
                 {hasInstitutions && (
                   <div className="p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">
+                    <p className="text-[11px] font-bold text-slate-500 mb-3">
                       Otras instituciones impartidas
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -498,11 +498,11 @@ export default async function FacultyProfilePage({
               <div className="space-y-5">
                 {faculty?.google_scholar_id && (
                   <div className="flex items-center gap-4 p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
-                    <div className="w-10 h-10 bg-blue-50 text-[#1B4FD8] rounded-xl flex items-center justify-center shrink-0 border border-blue-100 shadow-3xs">
+                    <div className="w-10 h-10 text-[#1B4FD8] rounded-xl flex items-center justify-center shrink-0 border shadow-3xs">
                       <BookOpen size={18} />
                     </div>
                     <div>
-                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">Google Scholar</span>
+                      <span className="text-[11px] font-bold text-slate-500 block mb-0.5">Google Scholar</span>
                       <a
                         href={`https://scholar.google.com/citations?user=${faculty.google_scholar_id}`}
                         target="_blank" rel="noopener noreferrer"
@@ -515,11 +515,11 @@ export default async function FacultyProfilePage({
                 )}
                 {faculty?.orcid_id && (
                   <div className="flex items-center gap-4 p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl">
-                    <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0 border border-emerald-100 shadow-3xs">
+                    <div className="w-10 h-10 text-emerald-600 rounded-xl flex items-center justify-center shrink-0 border shadow-3xs">
                       <Globe size={18} />
                     </div>
                     <div>
-                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">ORCID iD</span>
+                      <span className="text-[11px] font-bold text-slate-500 block mb-0.5">ORCID iD</span>
                       <a
                         href={`https://orcid.org/${faculty.orcid_id}`}
                         target="_blank" rel="noopener noreferrer"
@@ -532,7 +532,7 @@ export default async function FacultyProfilePage({
                 )}
                 {faculty?.research_publications && (
                   <div className="pt-5 border-t border-slate-100">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Publicaciones destacadas</p>
+                    <p className="text-xs font-bold text-slate-500 mb-3">Publicaciones destacadas</p>
                     <div className="space-y-3">
                       {faculty.research_publications
                         .split("\n")
@@ -571,7 +571,7 @@ export default async function FacultyProfilePage({
                       </div>
                       <div>
                         <p className="text-sm font-bold text-[#0D2240]">{doc.name || doc.file_name || "Documento"}</p>
-                        <p className="text-[11px] font-bold text-slate-500 uppercase">{doc.doc_type || "PDF"}</p>
+                        <p className="text-[11px] font-bold text-slate-500">{doc.doc_type || "PDF"}</p>
                       </div>
                     </div>
                     <ExternalLink size={15} className="text-slate-300 group-hover:text-[#1B4FD8] transition-colors mr-1" />
@@ -589,7 +589,7 @@ export default async function FacultyProfilePage({
                       </div>
                       <div>
                         <p className="text-sm font-bold text-[#0D2240]">Curriculum Vitae</p>
-                        <p className="text-[11px] font-bold text-slate-500 uppercase">PDF</p>
+                        <p className="text-[11px] font-bold text-slate-500">PDF</p>
                       </div>
                     </div>
                     <ExternalLink size={15} className="text-slate-300 group-hover:text-[#1B4FD8] transition-colors mr-1" />
@@ -611,7 +611,7 @@ export default async function FacultyProfilePage({
                     className="flex items-center gap-3.5 p-4 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl hover:bg-blue-50/50 hover:border-[#1B4FD8]/30 transition-all group shadow-3xs"
                   >
                     <div className="w-9 h-9 bg-[#0A66C2] rounded-xl flex items-center justify-center shrink-0 border border-blue-700 shadow-3xs">
-                      <span className="text-white text-sm font-black">in</span>
+                      <span className="text-white text-sm font-bold">in</span>
                     </div>
                     <span className="text-sm font-bold text-[#0D2240] group-hover:text-[#1B4FD8] flex-1 truncate">LinkedIn</span>
                     <ExternalLink size={15} className="text-slate-300 group-hover:text-[#1B4FD8] transition-colors shrink-0 mr-1" />
@@ -642,7 +642,7 @@ export default async function FacultyProfilePage({
 
           {/* Contact card — Pro institution */}
           {institution && isPro ? (
-            <div className="bg-[#0D2240] rounded-3xl p-6 sm:p-8 shadow-xl text-white space-y-6 relative overflow-hidden border border-[#1B4FD8]/30">
+            <div className="bg-[#0D2240] rounded-2xl p-6 sm:p-8 shadow-sm text-white space-y-6 relative overflow-hidden border border-[#1B4FD8]/30">
               <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/5 rounded-full blur-xl" />
               <div>
                 <h3 className="text-xl font-bold mb-1 tracking-tight">¿Interesado?</h3>
@@ -677,7 +677,7 @@ export default async function FacultyProfilePage({
               {/* Contact details */}
               {(emailToShow || linkedinToShow || phoneToShow || whatsappToShow) && (
                 <div className="space-y-3 pt-5 border-t border-white/10">
-                  <p className="text-[11px] font-bold text-blue-300 uppercase tracking-widest">Contacto directo</p>
+                  <p className="text-[11px] font-bold text-blue-300">Contacto directo</p>
                   {emailToShow && (
                     <a href={`mailto:${emailToShow}`} className="flex items-center gap-3 text-sm font-semibold text-white/90 hover:text-white transition-colors">
                       <div className="p-1.5 bg-white/10 rounded-lg shrink-0">
@@ -713,14 +713,14 @@ export default async function FacultyProfilePage({
                 </div>
               )}
 
-              <div className="pt-4 border-t border-white/10 flex items-center justify-between text-[11px] font-bold text-blue-300 uppercase tracking-widest">
+              <div className="pt-4 border-t border-white/10 flex items-center justify-between text-[11px] font-bold text-blue-300">
                 <span>{faculty?.view_count ?? 0} visitas</span>
                 {availInfo && <span style={{ color: availInfo.color }}>{availInfo.label}</span>}
               </div>
             </div>
 
           ) : institution && !isPro && canContact ? (
-            <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-sm p-6 sm:p-8 space-y-5">
+            <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-6 sm:p-8 space-y-5">
               <div>
                 <h3 className="text-lg font-bold text-[#0D2240] mb-1 tracking-tight">¿Interesado?</h3>
                 <p className="text-sm text-slate-500 font-medium">Envía una propuesta a este docente para explorar una colaboración.</p>
@@ -739,7 +739,7 @@ export default async function FacultyProfilePage({
             </div>
 
           ) : institution && !isPro && !canContact ? (
-            <div className="bg-white rounded-3xl border-2 border-gray-100 shadow-sm p-6 space-y-5 text-center">
+            <div className="bg-white rounded-2xl border-2 border-gray-100 shadow-sm p-6 space-y-5 text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto">
                 <Lock size={22} className="text-gray-500" />
               </div>
@@ -759,8 +759,8 @@ export default async function FacultyProfilePage({
             </div>
 
           ) : canSwitchRole && activeMode !== "institution" ? (
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-3xl p-6 text-center space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center mx-auto">
+            <div className="bg-white border border-blue-200 rounded-2xl p-6 text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto">
                 <Building2 size={28} className="text-[#1B4FD8]" />
               </div>
               <div>
@@ -781,8 +781,8 @@ export default async function FacultyProfilePage({
             </div>
 
           ) : (
-            <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-sm p-6 text-center space-y-3">
-              <div className="bg-blue-50 p-3.5 rounded-2xl w-14 h-14 flex items-center justify-center mx-auto text-[#1B4FD8]">
+            <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm p-6 text-center space-y-3">
+              <div className="p-3.5 rounded-2xl w-14 h-14 flex items-center justify-center mx-auto text-[#1B4FD8]">
                 <Building2 size={28} />
               </div>
               <div>

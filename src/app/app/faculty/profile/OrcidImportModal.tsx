@@ -276,7 +276,7 @@ export function OrcidImportModal({ user, facultyProfile, onClose, onSave }: Prop
               background: D.surf, borderRadius: 12, padding: "14px 18px",
               marginBottom: 20, border: `1px solid ${D.border}`,
             }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: D.faint, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: D.faint, marginBottom: 4 }}>
                 Nombre detectado
               </div>
               <div style={{ fontSize: 16, fontWeight: 800, color: D.ink }}>
@@ -285,7 +285,7 @@ export function OrcidImportModal({ user, facultyProfile, onClose, onSave }: Prop
             </div>
 
             {/* Sections to import */}
-            <p style={{ fontSize: 12, fontWeight: 700, color: D.muted, marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: D.muted, marginBottom: 12, }}>
               Selecciona los datos que quieres importar
             </p>
 

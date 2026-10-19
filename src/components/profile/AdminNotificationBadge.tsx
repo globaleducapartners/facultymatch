@@ -86,11 +86,11 @@ export default function AdminNotificationBadge() {
       {/* Bell button */}
       <button
         onClick={() => setOpen(!open)}
-        className="relative p-2 rounded-xl bg-blue-50 text-talentia-blue hover:bg-blue-100 transition-colors"
+        className="relative p-2 rounded-xl bg-white text-fm-blue hover:bg-blue-100 transition-colors"
       >
         <Bell size={18} />
         {unread > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -100,12 +100,12 @@ export default function AdminNotificationBadge() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl border border-gray-100 shadow-xl z-50 overflow-hidden">
+          <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl border border-gray-100 shadow-sm z-50 overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-xs font-black text-navy">Notificaciones</h3>
+              <h3 className="text-xs font-bold text-fm-navy">Notificaciones</h3>
               <button
                 onClick={markAllAsRead}
-                className="text-[10px] font-black text-talentia-blue hover:underline"
+                className="text-[10px] font-bold text-fm-blue hover:underline"
               >
                 Marcar todas leídas
               </button>
@@ -115,7 +115,7 @@ export default function AdminNotificationBadge() {
                 <div key={n.id} className="px-4 py-3 hover:bg-gray-50/50 transition-colors group">
                   <div className="flex items-start gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-navy truncate">{n.subject}</p>
+                      <p className="text-xs font-bold text-fm-navy truncate">{n.subject}</p>
                       {n.body && (
                         <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-2">{n.body}</p>
                       )}

@@ -103,12 +103,12 @@ export function CVUpload({ facultyId, existingDocs }: CVUploadProps) {
         {existingDocs.map((doc) => (
           <div key={doc.id} className="flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl shadow-sm group">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-50 rounded-xl text-talentia-blue">
+              <div className="p-2 bg-white rounded-xl text-fm-blue">
                 <FileText size={20} />
               </div>
               <div>
-                <p className="text-sm font-bold text-navy">{doc.name}</p>
-                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                <p className="text-sm font-bold text-fm-navy">{doc.name}</p>
+                <p className="text-[10px] text-gray-400 font-medium">
                   {new Date(doc.created_at).toLocaleDateString()}
                 </p>
               </div>
@@ -131,33 +131,33 @@ export function CVUpload({ facultyId, existingDocs }: CVUploadProps) {
             onChange={handleUpload}
             accept=".pdf,.docx"
           />
-          <div className="py-12 border-2 border-dashed border-gray-200 rounded-3xl text-center space-y-4 hover:border-talentia-blue hover:bg-blue-50/30 transition-all group">
+          <div className="py-12 border border-gray-200 rounded-2xl text-center space-y-4 hover:border-fm-blue hover:bg-blue-50/30 transition-all group">
             <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto group-hover:bg-white transition-all shadow-sm">
-              <Upload size={24} className="text-gray-300 group-hover:text-talentia-blue transition-all" />
+              <Upload size={24} className="text-gray-300 group-hover:text-fm-blue transition-all" />
             </div>
             <div className="space-y-1 px-8">
-              <p className="text-navy font-bold">Haz clic para subir tu Curriculum</p>
+              <p className="text-fm-navy font-bold">Haz clic para subir tu Curriculum</p>
               <p className="text-gray-500 text-xs font-medium">PDF o DOCX hasta 5MB</p>
             </div>
           </div>
         </label>
       ) : (
-        <div className="py-12 border-2 border-dashed border-blue-200 bg-blue-50/30 rounded-3xl text-center space-y-6 animate-in zoom-in-95">
+        <div className="py-12 border border-fm-border bg-white rounded-2xl text-center space-y-6">
           <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto shadow-sm">
-            <Loader2 size={24} className="text-talentia-blue animate-spin" />
+            <Loader2 size={24} className="text-fm-blue animate-spin" />
           </div>
           <div className="space-y-3 px-12">
-            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-talentia-blue">
+            <div className="flex items-center justify-between text-[10px] font-bold text-fm-blue">
               <span>Subiendo archivo...</span>
               <span>{progress}%</span>
             </div>
-            <Progress value={progress} className="h-1.5 bg-blue-100" />
+            <Progress value={progress} className="h-1.5 bg-white" />
           </div>
         </div>
       )}
 
       {error && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 animate-in slide-in-from-top-2">
+        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600">
           <AlertCircle size={18} />
           <p className="text-sm font-bold">{error}</p>
         </div>

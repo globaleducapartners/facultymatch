@@ -18,7 +18,7 @@ export function ContactModalWrapper({ facultyId, facultyName, institutionId }: C
     <>
       <Button 
         onClick={() => setIsOpen(true)}
-        className="w-full bg-energy-orange hover:bg-orange-600 text-white font-bold h-14 rounded-xl shadow-xl shadow-orange-100 transition-all text-lg"
+        className="w-full bg-fm-blue hover:bg-orange-600 text-white font-bold h-14 rounded-xl shadow-sm transition-all text-lg"
       >
         <Mail size={20} className="mr-2" /> Contactar ahora
       </Button>

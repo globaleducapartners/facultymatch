@@ -85,7 +85,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
     <div className={`bg-white rounded-2xl border shadow-sm transition-all ${isPending ? "border-blue-100 hover:border-blue-200" : "border-green-100"}`}>
       {/* Header */}
       <div className="flex items-center gap-4 p-5 cursor-pointer" onClick={() => setExpanded(!expanded)}>
-        <div className="relative w-10 h-10 bg-navy/10 text-navy rounded-xl flex items-center justify-center font-black text-xs flex-shrink-0 overflow-hidden">
+        <div className="relative w-10 h-10 bg-fm-navy/10 text-fm-navy rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0 overflow-hidden">
           {instLogo ? (
             <Image src={instLogo} alt={req.institution?.name ?? ""} fill sizes="40px" className="object-cover" />
           ) : (
@@ -94,24 +94,24 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="text-base font-bold text-navy truncate">{req.institution?.name}</h4>
+            <h4 className="text-base font-bold text-fm-navy truncate">{req.institution?.name}</h4>
             {instVerified && (
-              <span className="inline-flex items-center gap-1 bg-[#F7E8C8] text-[#B4791E] text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#E9C77A]">
+              <span className="inline-flex items-center gap-1 bg-[#F7E8C8] text-[#B4791E] text-[11px] font-bold px-2 py-0.5 rounded-md border border-[#E9C77A]">
                 <ShieldCheck size={9} /> Verificada
               </span>
             )}
             {req.subject && (
-              <Badge variant="secondary" className="bg-blue-50 text-fm-blue font-bold text-[11px] uppercase tracking-wider px-2 py-0.5 border-blue-100">
+              <Badge variant="secondary" className="bg-white text-fm-blue font-bold text-[11px] px-2 py-0.5 border-fm-border">
                 {SUBJECT_LABELS[req.subject] ?? req.subject}
               </Badge>
             )}
             {req.contract_type && (
-              <Badge variant="secondary" className="bg-purple-50 text-purple-600 font-bold text-[11px] uppercase tracking-wider px-2 py-0.5 border-purple-100">
+              <Badge variant="secondary" className="bg-white text-purple-600 font-bold text-[11px] px-2 py-0.5 border-fm-border">
                 {CONTRACT_LABELS[req.contract_type] ?? req.contract_type}
               </Badge>
             )}
           </div>
-          <p className="text-[11px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">
+          <p className="text-[11px] text-gray-500 font-bold mt-0.5">
             {formatDateTZ(req.created_at, { day: "numeric", month: "long" })}
             {req.institution?.country && ` · ${req.institution.country}`}
           </p>
@@ -135,7 +135,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
               </Button>
             </>
           ) : (
-            <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50 uppercase text-[11px] font-black tracking-widest px-3 py-1">
+            <Badge variant="outline" className="text-green-600 border-fm-border bg-white text-[11px] font-bold px-3 py-1">
               <CheckCircle2 size={9} className="inline mr-1" /> Respondida
             </Badge>
           )}
@@ -181,13 +181,13 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
               const isInst = msg.sender === "institution";
               return (
                 <div key={index} className={`flex flex-col ${isInst ? "items-start" : "items-end"} gap-1`}>
-                  <p className="text-[11px] font-black text-gray-500 uppercase tracking-widest px-1">
+                  <p className="text-[11px] font-bold text-gray-500 px-1">
                     {isInst ? req.institution?.name : "Tu respuesta"} {msg.created_at ? `· ${formatDateTimeTZ(msg.created_at)}` : ""}
                   </p>
-                  <div className={`max-w-[85%] p-4 rounded-2xl ${isInst ? "bg-gray-100 text-navy rounded-tl-sm" : "bg-fm-blue text-white rounded-tr-sm"}`}>
+                  <div className={`max-w-[85%] p-4 rounded-2xl ${isInst ? "bg-gray-100 text-fm-navy rounded-tl-sm" : "bg-fm-blue text-white rounded-tr-sm"}`}>
                     {/* Meta tags for first institution message */}
                     {isInst && index === 0 && (req.modality || req.dates) && (
-                      <div className="flex flex-wrap gap-2 mb-2 text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                      <div className="flex flex-wrap gap-2 mb-2 text-[11px] font-bold text-gray-500">
                         {req.modality && <span className="flex items-center gap-1"><Clock size={9} /> {MODALITY_LABELS[req.modality] ?? req.modality}</span>}
                         {req.dates && <span className="flex items-center gap-1"><Clock size={9} /> {req.dates}</span>}
                       </div>
@@ -200,7 +200,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
 
             {/* Success message */}
             {sentOk && (
-              <div className="flex items-center gap-2 py-2 px-4 bg-green-50 rounded-xl text-xs font-bold text-green-700">
+              <div className="flex items-center gap-2 py-2 px-4 bg-white rounded-xl text-xs font-bold text-green-700">
                 <CheckCircle2 size={13} /> Mensaje enviado.
               </div>
             )}
@@ -220,7 +220,7 @@ function RequestCard({ req, isPending = false }: { req: ContactRequest; isPendin
             {/* Follow-up compose */}
             {showFollowUp && (
               <div className="space-y-3 pt-2 border-t border-gray-100">
-                <p className="text-xs font-black text-gray-500 uppercase tracking-widest">Mensaje de seguimiento</p>
+                <p className="text-xs font-bold text-gray-500">Mensaje de seguimiento</p>
                 <textarea
                   value={followUpMsg}
                   onChange={e => setFollowUpMsg(e.target.value)}
@@ -266,7 +266,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
     <div className="space-y-6">
       {/* Pending */}
       <section>
-        <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
+        <h2 className="text-xs font-bold text-gray-500 mb-3 flex items-center gap-2">
           <Mail size={13} /> Pendientes ({pendingRequests.length})
         </h2>
         <div className="space-y-3">
@@ -277,7 +277,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
               <div className="bg-gray-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
                 <Mail size={28} className="text-gray-200" />
               </div>
-              <p className="text-navy font-bold text-sm">Bandeja vacía</p>
+              <p className="text-fm-navy font-bold text-sm">Bandeja vacía</p>
               <p className="text-gray-500 text-xs font-medium">No has recibido ninguna solicitud nueva.</p>
             </div>
           )}
@@ -287,7 +287,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
       {/* Replied */}
       {repliedRequests.length > 0 && (
         <section>
-          <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
+          <h2 className="text-xs font-bold text-gray-500 mb-3 flex items-center gap-2">
             <CheckCircle2 size={13} /> Respondidas ({repliedRequests.length})
           </h2>
           <div className="space-y-3">
@@ -299,7 +299,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
       {/* Archived */}
       {archivedRequests.length > 0 && (
         <section>
-          <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
+          <h2 className="text-xs font-bold text-gray-500 mb-3 flex items-center gap-2">
             <Archive size={13} /> Archivadas ({archivedRequests.length})
           </h2>
           <div className="space-y-3 opacity-50">
@@ -307,7 +307,7 @@ export function RequestsClient({ pendingRequests, repliedRequests, archivedReque
               <div key={req.id} className="bg-white rounded-2xl border border-gray-100 p-5 flex items-center gap-4">
                 <div className="bg-gray-100 p-2.5 rounded-xl flex-shrink-0"><Archive size={18} className="text-gray-300" /></div>
                 <div>
-                  <h4 className="text-sm font-bold text-navy">{req.institution?.name}</h4>
+                  <h4 className="text-sm font-bold text-fm-navy">{req.institution?.name}</h4>
                   <p className="text-xs text-gray-500 mt-0.5">Archivada · {formatDateTZ(req.created_at)}</p>
                 </div>
               </div>

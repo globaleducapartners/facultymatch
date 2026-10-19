@@ -16,7 +16,7 @@ const AVAIL_LABELS: Record<string, { label: string; color: string; bg: string }>
   occasional:    { label: "Asignaturas puntuales", color: "#7C3AED", bg: "#F5F3FF" },
   weekends:      { label: "Fines de semana",       color: "#D97706", bg: "#FFFBEB" },
   online_only:   { label: "Solo online",           color: "#1B4FD8", bg: "#EFF6FF" },
-  limited:       { label: "En 6 meses",            color: "#6B7280", bg: "#F3F4F6" },
+  limited:       { label: "En 6 meses",            color: "#5B6B85", bg: "#F3F4F6" },
   invite_only:   { label: "Por invitación",        color: "#0D2240", bg: "#EEF4FF" },
 };
 
@@ -84,9 +84,7 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
       >
         {/* Pro badge */}
         {educator.is_pro && (
-          <span className="absolute top-3 right-3 z-10 bg-amber-50 text-amber-600 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md">
-            Pro
-          </span>
+          <span className="absolute right-3 top-3 z-10 text-[11px] font-semibold text-white/90">Pro</span>
         )}
 
         {/* Cover + Avatar */}
@@ -98,15 +96,15 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
               style={{ backgroundImage: `url(${educator.banner_url})` }}
             />
           ) : (
-            <div className="h-16 bg-gradient-to-br from-[#0D2240] to-[#1B4FD8]" />
+            <div className="h-16 bg-fm-navy" />
           )}
           {/* Avatar */}
           <div className="absolute left-1/2 -translate-x-1/2 -bottom-8">
-            <div className="w-16 h-16 rounded-full border-[3px] border-white overflow-hidden shadow-lg bg-[#0D2240] flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full border-[3px] border-white overflow-hidden shadow-sm bg-[#0D2240] flex items-center justify-center">
               {educator.avatar_url ? (
                 <Image src={educator.avatar_url} alt={educator.full_name} width={64} height={64} className="object-cover w-full h-full" />
               ) : (
-                <span className="text-white text-base font-black">{initials}</span>
+                <span className="text-white text-base font-bold">{initials}</span>
               )}
             </div>
           </div>
@@ -116,23 +114,23 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
         <div className="pt-10 px-4 pb-4 flex flex-col gap-2 flex-1 text-center">
           {/* Name */}
           <div className="flex items-center justify-center gap-1.5 flex-wrap">
-            <h3 className="text-sm font-black text-[#0C1018] leading-tight group-hover:text-[#1B4FD8] transition-colors">
+            <h3 className="text-sm font-bold text-[#0C1018] leading-tight group-hover:text-[#1B4FD8] transition-colors">
               {educator.full_name}
             </h3>
             {educator.is_phd && (
-              <span className="text-[9px] font-black text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded-full border border-purple-200">PhD</span>
+              <span className="text-[11px] font-semibold text-[#5B6B85]">PhD</span>
             )}
             {isVerified && <CheckCircle2 size={12} className="text-[#1B4FD8] flex-shrink-0" />}
           </div>
 
           {/* Headline */}
-          <p className="text-xs text-[#6B7280] font-medium line-clamp-2 leading-snug">
+          <p className="text-xs text-[#5B6B85] font-medium line-clamp-2 leading-snug">
             {educator.headline || "Docente académico"}
           </p>
 
           {/* Location */}
           {locationStr && (
-            <div className="flex items-center justify-center gap-1 text-[#9CA3AF]">
+            <div className="flex items-center justify-center gap-1 text-[#5E6F8E]">
               <MapPin size={10} />
               <span className="text-[11px] font-medium truncate">{locationStr}</span>
             </div>
@@ -140,64 +138,39 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
 
           {/* Current institution */}
           {educator.current_institution && (
-            <div className="flex items-center justify-center gap-1 text-[#9CA3AF]">
+            <div className="flex items-center justify-center gap-1 text-[#5E6F8E]">
               <Building2 size={10} />
               <span className="text-[11px] font-medium truncate">{educator.current_institution}</span>
             </div>
           )}
 
-          {/* Availability */}
+          {/* Disponibilidad */}
           {avail && (
-            <div className="flex justify-center">
-              <span
-                className="text-[10px] font-black px-2.5 py-1 rounded-full"
-                style={{ color: avail.color, background: avail.bg }}
-              >
-                {avail.label}
-              </span>
-            </div>
+            <p className="flex items-center justify-center gap-1.5 text-xs font-semibold text-fm-ink">
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: avail.color }} aria-hidden />
+              {avail.label}
+            </p>
           )}
 
-          {/* Main area + years */}
-          <div className="flex items-center justify-center flex-wrap gap-1 mt-1">
-            {mainArea && (
-              <span className="text-[10px] font-bold text-[#1B4FD8] bg-[#EFF6FF] px-2 py-0.5 rounded-lg truncate max-w-[120px]">
-                {mainArea}
-              </span>
-            )}
-            {educator.experience_years > 0 && (
-              <span className="text-[10px] font-bold text-[#6B7280] bg-[#F2F6FC] border border-[#D8E2EF] px-2 py-0.5 rounded-lg flex items-center gap-1">
-                <Briefcase size={8} />
-                {educator.experience_years}a
-              </span>
-            )}
-            {educator.aneca_accreditation && (
-              <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                <Award size={8} />
-                ANECA
-              </span>
-            )}
-            {degreesCount > 0 && (
-              <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                <GraduationCap size={8} />
-                {degreesCount} tít.
-              </span>
-            )}
-          </div>
-
-          {/* Document count indicator */}
-          {Array.isArray(educator.faculty_documents) && educator.faculty_documents.length > 0 && (
-            <div className="flex justify-center">
-              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                <FileText size={8} />
-                {educator.faculty_documents.length} doc{educator.faculty_documents.length > 1 ? "s" : ""}.
-              </span>
-            </div>
-          )}
+          {/* Área, experiencia y acreditaciones en una línea */}
+          {(() => {
+            const bits = [
+              mainArea,
+              educator.experience_years > 0 ? `${educator.experience_years} años` : null,
+              educator.aneca_accreditation ? "ANECA" : null,
+              degreesCount > 0 ? `${degreesCount} ${degreesCount === 1 ? "título" : "títulos"}` : null,
+              Array.isArray(educator.faculty_documents) && educator.faculty_documents.length > 0
+                ? `${educator.faculty_documents.length} ${educator.faculty_documents.length === 1 ? "documento" : "documentos"}`
+                : null,
+            ].filter(Boolean);
+            return bits.length > 0 ? (
+              <p className="text-xs leading-snug text-[#5B6B85]">{bits.join(" · ")}</p>
+            ) : null;
+          })()}
 
           {/* Language */}
           {mainLanguage && (
-            <div className="flex items-center justify-center gap-1 text-[#9CA3AF]">
+            <div className="flex items-center justify-center gap-1 text-[#5E6F8E]">
               <Globe size={10} />
               <span className="text-[11px] font-medium">{mainLanguage}</span>
             </div>
@@ -216,10 +189,10 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
                   else handleToggleFavorite(e);
                 }}
                 className={`flex-shrink-0 w-9 h-9 rounded-xl border flex items-center justify-center transition-all ${
-                  isFavorite
-                    ? "text-amber-500 bg-amber-50 border-amber-100"
-                    : "text-[#9CA3AF] border-[#D8E2EF] hover:text-amber-500 hover:bg-amber-50"
-                }`}
+ isFavorite
+ ? "text-amber-500 bg-amber-50 border-amber-100"
+ : "text-[#5E6F8E] border-[#D8E2EF] hover:text-amber-500 hover:bg-amber-50"
+ }`}
               >
                 <Star size={14} className={isFavorite ? "fill-current" : ""} />
               </button>
@@ -242,7 +215,7 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
                   e.stopPropagation();
                   onCardClick?.();
                 }}
-                className="flex-1 bg-[#F2F6FC] text-[#6B7280] text-xs font-bold h-9 rounded-xl flex items-center justify-center gap-1.5 border border-[#D8E2EF] hover:bg-gray-200 transition-colors"
+                className="flex-1 bg-[#F2F6FC] text-[#5B6B85] text-xs font-bold h-9 rounded-xl flex items-center justify-center gap-1.5 border border-[#D8E2EF] hover:bg-gray-200 transition-colors"
               >
                 <Lock size={12} /> Ver perfil
               </button>
@@ -250,7 +223,7 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
               <Link
                 href="/app/institution/billing"
                 onClick={(e) => e.stopPropagation()}
-                className="flex-1 bg-[#F2F6FC] text-[#6B7280] text-xs font-bold h-9 rounded-xl flex items-center justify-center gap-1.5 border border-[#D8E2EF]"
+                className="flex-1 bg-[#F2F6FC] text-[#5B6B85] text-xs font-bold h-9 rounded-xl flex items-center justify-center gap-1.5 border border-[#D8E2EF]"
               >
                 <Lock size={12} /> Ver más
               </Link>
@@ -281,7 +254,7 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
             <Image src={educator.avatar_url} alt={educator.full_name} fill sizes="96px" className="object-cover" />
           ) : (
             <div className="bg-fm-blue/10 text-fm-blue w-full h-full flex items-center justify-center">
-              <span className="text-2xl font-black">{initials}</span>
+              <span className="text-2xl font-extrabold">{initials}</span>
             </div>
           )}
         </div>
@@ -290,27 +263,27 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <h3 className="text-xl font-bold text-navy group-hover:text-fm-blue transition-colors">
+                <h3 className="text-xl font-bold text-fm-navy group-hover:text-fm-blue transition-colors">
                   {educator.full_name}
                 </h3>
                 {isVerified && (
-                  <Badge className="bg-blue-50 text-fm-blue border-none text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
+                  <Badge className="bg-white text-fm-blue border-none text-[10px] font-bold flex items-center gap-1">
                     <CheckCircle2 size={10} /> Verificado
                   </Badge>
                 )}
                 {educator.aneca_accreditation && (
-                  <Badge className="bg-orange-50 text-orange-600 border-none text-[10px] font-black uppercase tracking-widest flex items-center gap-1">
+                  <Badge className="bg-white text-orange-600 border-none text-[10px] font-bold flex items-center gap-1">
                     <Award size={10} /> {educator.aneca_accreditation}
                   </Badge>
                 )}
               </div>
               <p className="text-sm font-bold text-gray-600 mt-1">{educator.headline}</p>
               <div className="flex flex-wrap items-center gap-4 mt-3">
-                <span className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                <span className="flex items-center gap-1.5 text-xs font-bold text-gray-400">
                   <MapPin size={14} className="text-gray-300" />
                   {educator.country || "España"}
                 </span>
-                <span className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                <span className="flex items-center gap-1.5 text-xs font-bold text-gray-400">
                   <Globe size={14} className="text-gray-300" />
                   {(Array.isArray(educator.languages) ? educator.languages : [])
                     .map((l: any) => (typeof l === "string" ? l : l.lang ?? l.language ?? ""))
@@ -323,13 +296,13 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
               <Button
                 variant="ghost"
                 onClick={handleToggleFavorite}
-                className={`p-2 h-10 w-10 rounded-xl transition-all ${isFavorite ? "text-energy-orange bg-orange-50" : "text-gray-300 hover:text-energy-orange hover:bg-orange-50"}`}
+                className={`p-2 h-10 w-10 rounded-xl transition-all ${isFavorite ? "text-fm-blue bg-orange-50" : "text-gray-300 hover:text-fm-blue hover:bg-orange-50"}`}
               >
                 <Star size={20} className={isFavorite ? "fill-current" : ""} />
               </Button>
               <Button
                 onClick={() => setIsContactModalOpen(true)}
-                className="bg-energy-orange hover:bg-orange-600 text-white font-bold rounded-xl h-10 px-6 shadow-lg shadow-orange-100"
+                className="bg-fm-blue hover:bg-orange-600 text-white font-bold rounded-xl h-10 px-6 shadow-sm"
               >
                 Contactar
               </Button>

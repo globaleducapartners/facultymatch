@@ -93,7 +93,7 @@ export function PrintProfileClient({
       <div className="print-root" style={{ background: "#fff", borderRadius: 12, border: "1px solid #D8E2EF", overflow: "hidden", fontFamily: "'Inter', system-ui, sans-serif" }}>
 
         {/* ── Header band ── */}
-        <div style={{ background: "linear-gradient(135deg, #0D2240 0%, #1B4FD8 55%, #4F7FE8 100%)", padding: "32px 40px 24px", display: "flex", gap: 24, alignItems: "flex-end" }}>
+        <div style={{ background: "#0D2240", padding: "32px 40px 24px", display: "flex", gap: 24, alignItems: "flex-end" }}>
           {/* Avatar */}
           <div style={{ width: 80, height: 80, borderRadius: "50%", border: "3px solid rgba(255,255,255,0.6)", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
             {profile?.avatar_url
@@ -105,14 +105,14 @@ export function PrintProfileClient({
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
               <h1 style={{ margin: 0, fontSize: 26, fontWeight: 900, color: "#fff", letterSpacing: "-0.04em" }}>{name}</h1>
-              {isPhd && <span style={{ fontSize: 11, fontWeight: 800, background: "#E9A030", color: "#fff", padding: "2px 8px", borderRadius: 20, letterSpacing: "0.05em" }}>PhD</span>}
+              {isPhd && <span style={{ fontSize: 11, fontWeight: 800, background: "#E9A030", color: "#fff", padding: "2px 8px", borderRadius: 20, }}>PhD</span>}
               {aneca && <span style={{ fontSize: 11, fontWeight: 700, background: "rgba(255,255,255,0.2)", color: "#fff", padding: "2px 8px", borderRadius: 20 }}>ANECA</span>}
             </div>
             {headline && <p style={{ margin: "6px 0 0", fontSize: 15, color: "rgba(255,255,255,0.85)", fontWeight: 500 }}>{headline}</p>}
             <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
-              {location && <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", display: "flex", alignItems: "center", gap: 4 }}>📍 {location}</span>}
-              {avail && <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>🕐 {avail}</span>}
-              {currentInst && <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>🏛 {currentInst}</span>}
+              {location && <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", display: "flex", alignItems: "center", gap: 4 }}> {location}</span>}
+              {avail && <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}> {avail}</span>}
+              {currentInst && <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}> {currentInst}</span>}
             </div>
           </div>
           {/* FM badge top-right */}
@@ -183,10 +183,10 @@ export function PrintProfileClient({
 
             {/* Contact */}
             <Section title="Contacto">
-              {userEmail && <ContactItem icon="✉" text={userEmail} />}
-              {phone && <ContactItem icon="📞" text={phone} />}
-              {linkedin && <ContactItem icon="🔗" text={linkedin.replace("https://", "")} />}
-              {website && <ContactItem icon="🌐" text={website.replace("https://", "")} />}
+              {userEmail && <ContactItem icon="" text={userEmail} />}
+              {phone && <ContactItem icon="" text={phone} />}
+              {linkedin && <ContactItem icon="" text={linkedin.replace("https://", "")} />}
+              {website && <ContactItem icon="" text={website.replace("https://", "")} />}
             </Section>
 
             {/* Idiomas */}
@@ -233,7 +233,7 @@ export function PrintProfileClient({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 22 }}>
-      <h3 style={{ margin: "0 0 10px", fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "#1B4FD8", borderBottom: "1px solid #E2E8F0", paddingBottom: 4 }}>
+      <h3 style={{ margin: "0 0 10px", fontSize: 10, fontWeight: 800, color: "#1B4FD8", borderBottom: "1px solid #E2E8F0", paddingBottom: 4 }}>
         {title}
       </h3>
       {children}

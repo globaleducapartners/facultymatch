@@ -55,9 +55,9 @@ export default async function FavoritesPage() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 duration-500">
       <div>
-        <h1 className="text-3xl font-bold text-navy">Mis favoritos</h1>
+        <h1 className="text-3xl font-bold text-fm-navy">Mis favoritos</h1>
         <p className="text-gray-500 font-medium">Docentes guardados para futuros programas.</p>
       </div>
 
@@ -73,11 +73,11 @@ export default async function FavoritesPage() {
           ))}
         </div>
       ) : (
-        <div className="bg-white p-20 rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center text-center">
-          <div className="bg-orange-50 p-6 rounded-full text-energy-orange mb-6">
+        <div className="bg-white p-20 rounded-2xl border border-gray-200 flex flex-col items-center text-center">
+          <div className="bg-white p-6 rounded-full text-fm-blue mb-6">
             <Star size={48} />
           </div>
-          <h3 className="text-xl font-bold text-navy mb-2">Aún no tienes favoritos</h3>
+          <h3 className="text-xl font-bold text-fm-navy mb-2">Aún no tienes favoritos</h3>
           <p className="text-gray-500 max-w-xs mx-auto font-medium">
             Explora el directorio y guarda los perfiles que mejor encajen con tu institución.
           </p>

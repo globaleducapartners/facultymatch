@@ -256,11 +256,11 @@ export function InstitutionSearchPage({
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-6 duration-500">
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-navy">
+          <h1 className="text-3xl font-bold text-fm-navy">
             {isReadOnly ? "Directorio de docentes" : "Buscar docentes"}
           </h1>
           <p className="text-gray-500 font-medium">
@@ -273,13 +273,13 @@ export function InstitutionSearchPage({
           <div className="flex items-center gap-3 flex-wrap">
             <Badge
               variant="outline"
-              className={`font-bold px-4 py-1.5 rounded-full ${isPro ? "bg-blue-50 text-fm-blue border-blue-100" : "bg-gray-50 text-gray-500 border-gray-200"}`}
+              className={`font-bold px-4 py-1.5 rounded-md ${isPro ? "bg-blue-50 text-fm-blue border-blue-100" : "bg-gray-50 text-gray-500 border-gray-200"}`}
             >
               {isPro ? "Plan Professional" : "Plan Essential"}
             </Badge>
             <Button variant="outline" asChild className="rounded-full border-gray-200 font-bold">
               <Link href="/app/institution/favorites" className="flex items-center gap-2">
-                <Star size={16} className="text-energy-orange fill-energy-orange" />
+                <Star size={16} className="text-fm-blue fill-energy-orange" />
                 Favoritos
               </Link>
             </Button>
@@ -292,13 +292,13 @@ export function InstitutionSearchPage({
 
       {/* ── Read-only banner (faculty mode) ── */}
       {isReadOnly && (
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-white border border-fm-border rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0">
               <Search size={16} className="text-blue-600" />
             </div>
             <div>
-              <p className="font-black text-blue-900 text-sm">Modo exploración · solo lectura</p>
+              <p className="font-bold text-blue-900 text-sm">Modo exploración · solo lectura</p>
               <p className="text-blue-700 text-sm font-medium mt-0.5">
                 {isAlreadyInstitution
                   ? "Tienes un perfil de institución. Cambia al modo institución para contactar docentes."
@@ -311,7 +311,7 @@ export function InstitutionSearchPage({
               <input type="hidden" name="mode" value="institution" />
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
+                className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
               >
                 <Zap size={14} /> Cambiar a modo institución
               </button>
@@ -319,7 +319,7 @@ export function InstitutionSearchPage({
           ) : (
             <Link
               href="/app/become-institution"
-              className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
+              className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
             >
               <Zap size={14} /> Registrar institución
             </Link>
@@ -329,13 +329,13 @@ export function InstitutionSearchPage({
 
       {/* ── Search limit banner ── */}
       {!isReadOnly && searchLimitReached && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-white border border-fm-border rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0">
               <Lock size={16} className="text-amber-600" />
             </div>
             <div>
-              <p className="font-black text-amber-900 text-sm">Has alcanzado el límite de {searchMonthlyLimit} búsquedas mensuales</p>
+              <p className="font-bold text-amber-900 text-sm">Has alcanzado el límite de {searchMonthlyLimit} búsquedas mensuales</p>
               <p className="text-amber-700 text-sm font-medium mt-0.5">
                 Activa el Plan Professional para búsquedas ilimitadas.
               </p>
@@ -343,7 +343,7 @@ export function InstitutionSearchPage({
           </div>
           <Link
             href="/app/institution/billing"
-            className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
+            className="inline-flex items-center gap-2 bg-[#1d4ed8] hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap flex-shrink-0"
           >
             <Zap size={14} /> Activar Plan Professional
           </Link>
@@ -416,12 +416,12 @@ export function InstitutionSearchPage({
               type="button"
               onClick={() => setShowMoreFilters((v) => !v)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all whitespace-nowrap ${
-                hasActiveMoreFilters
-                  ? "bg-blue-50 text-fm-blue border-blue-100"
-                  : showMoreFilters
-                  ? "bg-gray-100 text-navy border-gray-200"
-                  : "bg-gray-50 text-gray-500 border-gray-100 hover:bg-gray-100 hover:text-navy"
-              }`}
+ hasActiveMoreFilters
+ ? "bg-blue-50 text-fm-blue border-blue-100"
+ : showMoreFilters
+ ? "bg-gray-100 text-fm-navy border-gray-200"
+ : "bg-gray-50 text-gray-500 border-gray-100 hover:bg-gray-100 hover:text-fm-navy"
+ }`}
             >
               <Filter size={14} />
               Más filtros
@@ -435,7 +435,7 @@ export function InstitutionSearchPage({
             {/* Submit */}
             <Button
               type="submit"
-              className="bg-fm-blue hover:bg-blue-700 text-white font-bold h-10 px-6 rounded-xl shadow-sm shadow-blue-100 whitespace-nowrap"
+              className="bg-fm-blue hover:bg-blue-700 text-white font-bold h-10 px-6 rounded-xl shadow-sm whitespace-nowrap"
             >
               Buscar
             </Button>
@@ -443,9 +443,9 @@ export function InstitutionSearchPage({
 
           {/* Expanded more filters */}
           {showMoreFilters && (
-            <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 animate-in slide-in-from-top-2 duration-200">
+            <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 duration-200">
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-fm-faint block mb-1.5">
+                <label className="text-[10px] font-bold text-fm-faint block mb-1.5">
                   Subárea
                 </label>
                 <select
@@ -461,7 +461,7 @@ export function InstitutionSearchPage({
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-fm-faint block mb-1.5">
+                <label className="text-[10px] font-bold text-fm-faint block mb-1.5">
                   Idioma
                 </label>
                 <select
@@ -478,7 +478,7 @@ export function InstitutionSearchPage({
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-fm-faint block mb-1.5">
+                <label className="text-[10px] font-bold text-fm-faint block mb-1.5">
                   País
                 </label>
                 <select
@@ -496,7 +496,7 @@ export function InstitutionSearchPage({
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-black uppercase tracking-widest text-fm-faint block mb-1.5">
+                <label className="text-[10px] font-bold text-fm-faint block mb-1.5">
                   ANECA
                 </label>
                 <select
@@ -520,7 +520,7 @@ export function InstitutionSearchPage({
                     defaultChecked={searchParams.phd === "true"}
                     className="rounded border-gray-300 text-fm-blue focus:ring-fm-blue w-4 h-4"
                   />
-                  <span className="text-sm font-bold text-fm-muted group-hover:text-navy transition-colors">
+                  <span className="text-sm font-bold text-fm-muted group-hover:text-fm-navy transition-colors">
                     Solo PhD / Doctores
                   </span>
                 </label>
@@ -536,7 +536,7 @@ export function InstitutionSearchPage({
               <Link
                 key={`${key}-${value}`}
                 href={buildUrlWithout(searchParams, key, value, basePath)}
-                className="inline-flex items-center gap-1.5 bg-blue-50 text-fm-blue text-xs font-bold px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors"
+                className="inline-flex items-center gap-1.5 bg-white text-fm-blue text-xs font-bold px-3 py-1.5 rounded-md hover:bg-blue-100 transition-colors"
               >
                 {label}
                 <X size={11} />
@@ -544,7 +544,7 @@ export function InstitutionSearchPage({
             ))}
             <Link
               href={basePath}
-              className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-full hover:bg-gray-200 transition-colors"
+              className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-md hover:bg-gray-200 transition-colors"
             >
               Limpiar filtros
             </Link>
@@ -565,8 +565,8 @@ export function InstitutionSearchPage({
             <div
               key={educator.id}
               className={`rounded-2xl transition-all ${
-                selectedId === educator.id ? "ring-2 ring-[#1B4FD8] shadow-md" : ""
-              }`}
+ selectedId === educator.id ? "ring-2 ring-[#1B4FD8] shadow-md" : ""
+ }`}
             >
               <EducatorCard
                 educator={educator}
@@ -582,11 +582,11 @@ export function InstitutionSearchPage({
           ))}
         </div>
       ) : (
-        <div className="bg-white p-20 rounded-[2.5rem] border border-dashed border-gray-200 flex flex-col items-center text-center">
+        <div className="bg-white p-20 rounded-2xl border border-gray-200 flex flex-col items-center text-center">
           <div className="bg-gray-50 p-6 rounded-full text-gray-200 mb-6">
             <Search size={48} />
           </div>
-          <h3 className="text-xl font-bold text-navy mb-2">No se han encontrado docentes</h3>
+          <h3 className="text-xl font-bold text-fm-navy mb-2">No se han encontrado docentes</h3>
           <p className="text-gray-500 max-w-xs mx-auto font-medium">Prueba a ajustar los filtros de búsqueda.</p>
         </div>
       )}
@@ -627,7 +627,7 @@ export function InstitutionSearchPage({
                     />
                   ) : (
                     <div className="w-full h-full bg-fm-blue/10 flex items-center justify-center">
-                      <span className="text-xl font-black text-fm-blue">
+                      <span className="text-xl font-extrabold text-fm-blue">
                         {selectedEducator.full_name?.substring(0, 2).toUpperCase()}
                       </span>
                     </div>
@@ -635,9 +635,9 @@ export function InstitutionSearchPage({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-lg font-bold text-navy leading-tight">{selectedEducator.full_name}</h3>
+                    <h3 className="text-lg font-bold text-fm-navy leading-tight">{selectedEducator.full_name}</h3>
                     {selectedEducator.verified && selectedEducator.verified !== "none" && (
-                      <Badge className="bg-blue-50 text-fm-blue border-none text-[10px] font-black uppercase tracking-widest flex items-center gap-1 flex-shrink-0">
+                      <Badge className="bg-white text-fm-blue border-none text-[10px] font-bold flex items-center gap-1 flex-shrink-0">
                         <CheckCircle2 size={10} /> Verificado
                       </Badge>
                     )}
@@ -655,7 +655,7 @@ export function InstitutionSearchPage({
                   <div className="w-20 h-20 rounded-2xl bg-gray-100 flex items-center justify-center mb-6">
                     <Lock size={36} className="text-fm-faint" />
                   </div>
-                  <h3 className="text-lg font-black text-navy mb-2">
+                  <h3 className="text-lg font-extrabold text-fm-navy mb-2">
                     Perfiles bloqueados
                   </h3>
                   <p className="text-sm text-gray-500 leading-relaxed max-w-xs mx-auto mb-8">
@@ -703,7 +703,7 @@ export function InstitutionSearchPage({
                       ) : canContact ? (
                         <Button
                           onClick={() => setIsContactModalOpen(true)}
-                          className="flex-1 bg-energy-orange hover:bg-orange-600 text-white font-bold h-11 rounded-xl shadow-lg shadow-orange-100"
+                          className="flex-1 bg-fm-blue hover:bg-orange-600 text-white font-bold h-11 rounded-xl shadow-sm"
                         >
                           <Mail size={16} className="mr-2" /> Enviar propuesta
                         </Button>
@@ -721,10 +721,10 @@ export function InstitutionSearchPage({
                           size="icon"
                           onClick={(e) => handleToggleFavorite(e, selectedEducator.id)}
                           className={`h-11 w-11 rounded-xl flex-shrink-0 transition-all ${
-                            favorites.includes(selectedEducator.id)
-                              ? "text-energy-orange bg-orange-50 border-orange-100"
-                              : "text-fm-faint border-gray-200 hover:text-energy-orange hover:bg-orange-50"
-                          }`}
+ favorites.includes(selectedEducator.id)
+ ? "text-fm-blue bg-orange-50 border-orange-100"
+ : "text-fm-faint border-gray-200 hover:text-fm-blue hover:bg-orange-50"
+ }`}
                         >
                           <Star
                             size={18}
@@ -747,7 +747,7 @@ export function InstitutionSearchPage({
 
                   {/* Basic info */}
                   <div className="space-y-3">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">
+                    <h4 className="text-[10px] font-bold text-fm-faint">
                       Información básica
                     </h4>
                     <div className="grid grid-cols-2 gap-3">
@@ -790,7 +790,7 @@ export function InstitutionSearchPage({
                   {/* Bio */}
                   {selectedEducator.bio && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">Biografía</h4>
+                      <h4 className="text-[10px] font-bold text-fm-faint">Biografía</h4>
                       <p className="text-sm text-fm-muted leading-relaxed whitespace-pre-line">
                         {selectedEducator.bio}
                       </p>
@@ -800,7 +800,7 @@ export function InstitutionSearchPage({
                   {/* Specialties */}
                   {(selectedEducator.expertise?.length > 0 || selectedEducator.faculty_areas?.length > 0) && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">
+                      <h4 className="text-[10px] font-bold text-fm-faint">
                         Especialidades
                       </h4>
                       <div className="flex flex-wrap gap-2">
@@ -840,7 +840,7 @@ export function InstitutionSearchPage({
                   {/* Degrees (up to 3) */}
                   {Array.isArray(selectedEducator.degrees) && selectedEducator.degrees.length > 0 && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">Formación</h4>
+                      <h4 className="text-[10px] font-bold text-fm-faint">Formación</h4>
                       <div className="space-y-2">
                         {selectedEducator.degrees.slice(0, 3).map((deg: any, i: number) => (
                           <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
@@ -848,7 +848,7 @@ export function InstitutionSearchPage({
                               <GraduationCap size={14} />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-xs font-bold text-navy truncate">
+                              <p className="text-xs font-bold text-fm-navy truncate">
                                 {deg.type || deg.title || deg.degree || "Titulación"}
                               </p>
                               {deg.field && (
@@ -872,13 +872,13 @@ export function InstitutionSearchPage({
                   {/* Website/LinkedIn */}
                   {(selectedEducator.website || selectedEducator.linkedin_url) && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">Enlaces</h4>
+                      <h4 className="text-[10px] font-bold text-fm-faint">Enlaces</h4>
                       <div className="flex flex-wrap gap-2">
                         {selectedEducator.website && (
                           <a
                             href={selectedEducator.website}
                             target="_blank" rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 text-xs font-bold text-fm-blue bg-blue-50 px-3 py-1.5 rounded-xl hover:bg-blue-100 transition-colors"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-fm-blue bg-white px-3 py-1.5 rounded-xl hover:bg-blue-100 transition-colors"
                           >
                             <Globe size={12} />
                             Web
@@ -902,7 +902,7 @@ export function InstitutionSearchPage({
                   {/* ── Documents ── */}
                   {(loadingDocs || facultyDocs.length > 0) && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">Documentos</h4>
+                      <h4 className="text-[10px] font-bold text-fm-faint">Documentos</h4>
                       {loadingDocs ? (
                         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                           <div className="w-5 h-5 rounded-full border-2 border-fm-blue border-t-transparent animate-spin" />
@@ -921,8 +921,8 @@ export function InstitutionSearchPage({
                                 <FileText size={14} />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs font-bold text-navy truncate">{doc.name || doc.file_name || "Documento"}</p>
-                                <p className="text-[10px] font-semibold text-slate-400 uppercase">{doc.doc_type || "PDF"}</p>
+                                <p className="text-xs font-bold text-fm-navy truncate">{doc.name || doc.file_name || "Documento"}</p>
+                                <p className="text-[10px] font-semibold text-slate-400">{doc.doc_type || "PDF"}</p>
                               </div>
                               <ExternalLink size={12} className="text-slate-300 group-hover:text-fm-blue" />
                             </a>
@@ -935,14 +935,14 @@ export function InstitutionSearchPage({
                   {/* ── Contact info (Pro only) ── */}
                   {isPro && (selectedEducator.contact_email || selectedEducator.contact_whatsapp || selectedEducator.phone || selectedEducator.contact_linkedin) && (
                     <div className="space-y-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-fm-faint">Contacto directo</h4>
+                      <h4 className="text-[10px] font-bold text-fm-faint">Contacto directo</h4>
                       <div className="space-y-2">
                         {selectedEducator.contact_email && (
                           <a href={`mailto:${selectedEducator.contact_email}`} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-blue-50/50 transition-all group">
                             <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-fm-blue">
                               <AtSign size={14} />
                             </div>
-                            <span className="text-xs font-semibold text-navy truncate flex-1">{selectedEducator.contact_email}</span>
+                            <span className="text-xs font-semibold text-fm-navy truncate flex-1">{selectedEducator.contact_email}</span>
                           </a>
                         )}
                         {selectedEducator.contact_whatsapp && (
@@ -950,7 +950,7 @@ export function InstitutionSearchPage({
                             <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-green-600">
                               <MessageCircle size={14} />
                             </div>
-                            <span className="text-xs font-semibold text-navy truncate flex-1">{selectedEducator.contact_whatsapp}</span>
+                            <span className="text-xs font-semibold text-fm-navy truncate flex-1">{selectedEducator.contact_whatsapp}</span>
                           </a>
                         )}
                         {selectedEducator.phone && (
@@ -958,7 +958,7 @@ export function InstitutionSearchPage({
                             <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-fm-blue">
                               <Phone size={14} />
                             </div>
-                            <span className="text-xs font-semibold text-navy truncate flex-1">{selectedEducator.phone}</span>
+                            <span className="text-xs font-semibold text-fm-navy truncate flex-1">{selectedEducator.phone}</span>
                           </a>
                         )}
                         {selectedEducator.contact_linkedin && (
@@ -966,7 +966,7 @@ export function InstitutionSearchPage({
                             <div className="p-1.5 bg-white rounded-lg text-slate-400 border border-gray-100 group-hover:text-[#0A66C2]">
                               <ExternalLink size={14} />
                             </div>
-                            <span className="text-xs font-semibold text-navy truncate flex-1">LinkedIn</span>
+                            <span className="text-xs font-semibold text-fm-navy truncate flex-1">LinkedIn</span>
                           </a>
                         )}
                       </div>
@@ -989,7 +989,7 @@ export function InstitutionSearchPage({
               <div className="p-5 border-t border-gray-100 flex-shrink-0 bg-gray-50/50 flex items-center justify-between">
                 <Link
                   href={`/app/faculty/${selectedEducator.id}`}
-                  className="inline-flex items-center gap-2 text-sm font-bold text-fm-blue hover:text-navy transition-colors"
+                  className="inline-flex items-center gap-2 text-sm font-bold text-fm-blue hover:text-fm-navy transition-colors"
                   onClick={closeDrawer}
                 >
                   <ExternalLink size={14} />

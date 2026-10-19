@@ -225,7 +225,7 @@ export function BecomeInstitutionClient({
           background: "rgba(27,79,216,0.08)", border: "1px solid rgba(27,79,216,0.2)",
           borderRadius: 20, padding: "4px 12px", marginBottom: 12,
         }}>
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: D.blue }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: D.blue }}>
             Paso {step} de 2
           </span>
         </div>
@@ -286,7 +286,7 @@ export function BecomeInstitutionClient({
                   </span>
                 )}
                 {selectedFromList && (
-                  <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#059669" }}>✓</span>
+                  <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 13, color: "#059669" }}></span>
                 )}
               </div>
 
@@ -409,7 +409,7 @@ export function BecomeInstitutionClient({
               display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
             }}>
               <div>
-                <p style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.08em", color: D.faint, margin: "0 0 2px" }}>
+                <p style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: D.faint, margin: "0 0 2px" }}>
                   Institución
                 </p>
                 <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: D.ink, margin: 0 }}>{instName}</p>
@@ -452,7 +452,7 @@ export function BecomeInstitutionClient({
                   background: D.warnBg, border: `1px solid ${D.warnBr}`,
                   borderRadius: 8, padding: "10px 14px", marginTop: 8,
                 }}>
-                  <span style={{ fontSize: 15, flexShrink: 0 }}>⚠️</span>
+                  <span style={{ fontSize: 15, flexShrink: 0 }}></span>
                   <p style={{ fontFamily: SANS, fontSize: 12, color: D.warn, margin: 0, lineHeight: 1.5 }}>
                     Este parece un email personal. Te recomendamos usar el email corporativo de tu institución para más credibilidad.
                   </p>

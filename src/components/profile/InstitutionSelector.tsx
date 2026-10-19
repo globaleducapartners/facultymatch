@@ -107,7 +107,7 @@ export function InstitutionSelector({ name, initialValue = "", placeholder = "Bu
 
       {/* Dropdown */}
       {showDropdown && (
-        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-100 rounded-2xl shadow-xl overflow-hidden">
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
           {loading && (
             <div className="px-4 py-3 text-sm text-gray-400 font-medium">Buscando…</div>
           )}
@@ -119,11 +119,11 @@ export function InstitutionSelector({ name, initialValue = "", placeholder = "Bu
               onClick={() => handleSelect(inst)}
               className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors text-left"
             >
-              <div className="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-                <Building2 size={14} className="text-talentia-blue" />
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0">
+                <Building2 size={14} className="text-fm-blue" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-bold text-navy truncate">{inst.name}</p>
+                <p className="text-sm font-bold text-fm-navy truncate">{inst.name}</p>
                 {inst.country && (
                   <p className="text-xs text-gray-400 font-medium">{inst.country}</p>
                 )}
@@ -137,11 +137,11 @@ export function InstitutionSelector({ name, initialValue = "", placeholder = "Bu
               onClick={() => setShowDropdown(false)}
               className="w-full flex items-center gap-3 px-4 py-3 hover:bg-orange-50 transition-colors text-left border-t border-gray-50"
             >
-              <div className="w-8 h-8 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
-                <Plus size={14} className="text-energy-orange" />
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0">
+                <Plus size={14} className="text-fm-blue" />
               </div>
               <div>
-                <p className="text-sm font-bold text-navy">Usar &ldquo;{query}&rdquo;</p>
+                <p className="text-sm font-bold text-fm-navy">Usar &ldquo;{query}&rdquo;</p>
                 <p className="text-xs text-gray-400 font-medium">No encontrada — se guardará tal cual</p>
               </div>
             </button>

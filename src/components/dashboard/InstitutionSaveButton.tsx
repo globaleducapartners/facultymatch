@@ -27,7 +27,7 @@ export function InstitutionSaveButton() {
     <button
       type="submit"
       disabled={pending}
-      className="flex items-center gap-2 font-bold h-12 px-10 rounded-xl transition-all shadow-lg text-white text-sm"
+      className="flex items-center gap-2 font-bold h-12 px-10 rounded-xl transition-all shadow-sm text-white text-sm"
       style={{
         background: saved ? "#059669" : pending ? "#6B7280" : "#1B4FD8",
         boxShadow: saved ? "0 4px 12px rgba(5,150,105,0.25)" : pending ? "none" : "0 4px 16px rgba(27,79,216,0.25)",

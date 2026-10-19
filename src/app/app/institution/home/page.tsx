@@ -1,12 +1,7 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
-import {
-  Search, Star, Mail, ArrowRight, TrendingUp, Users,
-  Building2, Clock, AlertTriangle, CheckCircle2, Zap,
-  BarChart3,
-} from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { formatDateTZ } from "@/lib/utils";
 
 export default async function InstitutionHomePage() {
@@ -71,340 +66,209 @@ export default async function InstitutionHomePage() {
   const profileFields = [institution.name, (institution as any).type, institution.country, institution.description, institution.website];
   const profileCompletion = Math.round(profileFields.filter(Boolean).length / profileFields.length * 100);
 
-  return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+  const cardCls = "rounded-xl border border-fm-border bg-white";
+  const figures = [
+    { label: "Contactos totales", value: totalContacts ?? 0, href: "/app/institution/contacts" },
+    { label: "Contactos este mes", value: monthlyContacts ?? 0, href: "/app/institution/contacts" },
+    { label: "Favoritos", value: favoritesCount ?? 0, href: "/app/institution/favorites" },
+    {
+      label: searchMonthlyLimit === null ? "Búsquedas ilimitadas" : "Búsquedas este mes",
+      value: searchMonthlyLimit === null ? "∞" : `${searchesUsed}/${searchMonthlyLimit}`,
+      href: "/app/institution/search",
+    },
+  ];
+  const checklist = [
+    { label: "Nombre", done: !!institution.name },
+    { label: "Tipo de institución", done: !!(institution as any).type },
+    { label: "País y ciudad", done: !!institution.country },
+    { label: "Descripción", done: !!institution.description },
+    { label: "Web oficial", done: !!institution.website },
+  ];
 
-      {/* ── Hero ── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0D2240] via-[#1B4FD8] to-[#2563EB] p-8 text-white">
-        <div className="absolute top-0 right-0 w-64 h-64 opacity-10 pointer-events-none">
-          <svg viewBox="0 0 200 200" className="w-full h-full">
-            {Array.from({ length: 8 }).map((_, r) =>
-              Array.from({ length: 8 }).map((_, c) => (
-                <circle key={`${r}-${c}`} cx={c * 28 + 14} cy={r * 28 + 14} r="3" fill="white" />
-              ))
-            )}
-          </svg>
+  return (
+    <div className="space-y-6 pb-20 lg:pb-0">
+
+      {/* ── Cabecera ── */}
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-[1.75rem] font-extrabold tracking-[-0.035em] text-fm-ink">
+            {institution.name || "Mi institución"}
+          </h1>
+          <p className="mt-1 text-[#5B6B85]">
+            {[institution.city, institution.country].filter(Boolean).join(", ") || "Completa tu perfil para aparecer mejor"}
+          </p>
         </div>
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div>
-            <p className="text-blue-200 text-xs font-black uppercase tracking-widest mb-1">Panel de institución</p>
-            <h1 className="text-2xl font-black tracking-tight leading-tight">
-              {institution.name || "Mi Institución"}
-            </h1>
-            <p className="text-blue-100 text-sm font-medium mt-1">
-              {[institution.city, institution.country].filter(Boolean).join(", ") || "Completa tu perfil para aparecer mejor"}
-            </p>
-          </div>
-          <Link
-            href="/app/institution/search"
-            className="inline-flex items-center gap-2 bg-white text-[#1B4FD8] font-black px-5 py-2.5 rounded-xl text-sm hover:bg-blue-50 transition-colors whitespace-nowrap flex-shrink-0"
-          >
-            <Search size={15} /> Buscar docentes
-          </Link>
-        </div>
+        <Link
+          href="/app/institution/search"
+          className="inline-flex h-11 items-center justify-center rounded-[10px] bg-fm-blue px-6 text-sm font-bold text-white transition-all duration-150 hover:opacity-90 active:scale-[0.97]"
+        >
+          Buscar docentes
+        </Link>
       </div>
 
-      {/* ── Status banners ── */}
+      {/* ── Estado de la cuenta ── */}
       {isPending && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
-          <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-            <Clock size={15} className="text-amber-600" />
-          </div>
-          <div>
-            <p className="text-sm font-black text-amber-800">Cuenta en revisión</p>
-            <p className="text-xs text-amber-600 font-medium mt-0.5">
-              Nuestro equipo revisará tu cuenta en 24-48 horas hábiles. Mientras tanto puedes completar tu perfil.
-            </p>
-          </div>
+        <div className={`${cardCls} p-5`}>
+          <p className="flex items-center gap-2.5 text-[15px] font-semibold text-fm-ink">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500" aria-hidden />
+            Cuenta en revisión
+          </p>
+          <p className="mt-1.5 text-sm text-[#5B6B85]">
+            Nuestro equipo revisará tu cuenta en 24-48 horas hábiles. Mientras tanto puedes completar tu perfil.
+          </p>
         </div>
       )}
       {isBlocked && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
-          <div className="w-8 h-8 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
-            <AlertTriangle size={15} className="text-red-600" />
-          </div>
-          <div>
-            <p className="text-sm font-black text-red-800">Cuenta suspendida</p>
-            <p className="text-xs text-red-600 font-medium mt-0.5">
-              Contacta con soporte para más información: support@facultymatch.app
-            </p>
-          </div>
+        <div className={`${cardCls} p-5`}>
+          <p className="flex items-center gap-2.5 text-[15px] font-semibold text-fm-ink">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-red-600" aria-hidden />
+            Cuenta suspendida
+          </p>
+          <p className="mt-1.5 text-sm text-[#5B6B85]">Contacta con soporte para más información: support@facultymatch.app</p>
         </div>
       )}
 
-      {/* ── Stats row ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {[
-          { icon: Mail, label: "Contactos totales", value: totalContacts ?? 0, color: "text-fm-blue", bg: "bg-blue-50", href: "/app/institution/contacts" },
-          { icon: TrendingUp, label: "Contactos este mes", value: monthlyContacts ?? 0, color: "text-green-600", bg: "bg-green-50", href: "/app/institution/contacts" },
-          { icon: Star, label: "Favoritos", value: favoritesCount ?? 0, color: "text-energy-orange", bg: "bg-orange-50", href: "/app/institution/favorites" },
-          {
-            icon: Search,
-            label: searchMonthlyLimit === null ? "Búsquedas ilimitadas" : `Búsquedas este mes`,
-            value: searchMonthlyLimit === null ? "∞" : `${searchesUsed}/${searchMonthlyLimit}`,
-            color: searchMonthlyLimit === null ? "text-purple-600" : (searchesUsed >= searchMonthlyLimit ? "text-red-500" : "text-purple-600"),
-            bg: searchMonthlyLimit === null ? "bg-purple-50" : (searchesUsed >= searchMonthlyLimit ? "bg-red-50" : "bg-purple-50"),
-            href: "/app/institution/search",
-          },
-        ].map((stat) => (
+      {/* ── Cifras ── */}
+      <div className={`${cardCls} grid grid-cols-2 sm:grid-cols-4`}>
+        {figures.map((stat, i) => (
           <Link
             key={stat.label}
             href={stat.href}
-            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-3 hover:shadow-md hover:border-gray-200 transition-all"
+            className={`px-6 py-5 transition-colors hover:bg-fm-surface ${i > 0 ? "sm:border-l sm:border-fm-border" : ""} ${i % 2 === 1 ? "border-l border-fm-border sm:border-l" : ""} ${i > 1 ? "border-t border-fm-border sm:border-t-0" : ""}`}
           >
-            <div className={`w-9 h-9 ${stat.bg} rounded-xl flex items-center justify-center`}>
-              <stat.icon size={16} className={stat.color} />
-            </div>
-            <div>
-              <p className="text-2xl font-black text-navy">{stat.value}</p>
-              <p className="text-[11px] font-bold text-fm-faint uppercase tracking-widest leading-tight mt-0.5">{stat.label}</p>
-            </div>
+            <p className="text-[1.6rem] font-extrabold leading-none tracking-[-0.03em] text-fm-ink tabular-nums">{stat.value}</p>
+            <p className="mt-2 text-sm text-[#5B6B85]">{stat.label}</p>
           </Link>
         ))}
       </div>
 
-      {/* ── Upgrade banner (mobile only, freemium) ── */}
-      {!isPro && (
-        <Link
-          href="/app/institution/billing"
-          className="lg:hidden flex items-center justify-between gap-3 bg-fm-blue text-white rounded-2xl px-5 py-4 shadow-lg shadow-blue-200 hover:shadow-xl transition-all"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Zap size={16} className="text-white" />
-            </div>
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-widest text-white/80">Mejora tu plan</p>
-              <p className="text-sm font-black leading-tight">Más búsquedas, más contactos, sin límites</p>
-            </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.7fr_1fr]">
+
+        {/* ── Contactos recientes ── */}
+        <div className={`${cardCls} min-w-0 self-start`}>
+          <div className="flex items-center justify-between px-6 pb-2 pt-5">
+            <h2 className="text-base font-bold tracking-[-0.02em] text-fm-ink">Contactos recientes</h2>
+            <Link href="/app/institution/contacts" className="text-sm font-bold text-fm-blue hover:underline">Ver todos</Link>
           </div>
-          <span className="text-xs font-black bg-white/20 px-3 py-1.5 rounded-xl whitespace-nowrap flex-shrink-0">
-            99€/mes →
-          </span>
-        </Link>
-      )}
+          {recentContacts && recentContacts.length > 0 ? (
+            <ul>
+              {recentContacts.map((contact: any) => {
+                const fp = contact.faculty;
+                const userObj = Array.isArray(fp?.user) ? fp?.user[0] : fp?.user;
+                const name = userObj?.full_name || "Docente";
 
-      {/* ── Main grid ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                // Último mensaje del hilo, para el "último seguimiento"
+                let lastMsgText = contact.message;
+                let lastMsgSender = "Tú";
+                let lastMsgDate = contact.created_at;
 
-        {/* ── Left: recent contacts + search CTA ── */}
-        <div className="lg:col-span-2 space-y-6">
+                const rawFollowUps = contact.follow_ups;
+                if (Array.isArray(rawFollowUps) && rawFollowUps.length > 0) {
+                  const lastFu = rawFollowUps[rawFollowUps.length - 1];
+                  lastMsgText = lastFu.message;
+                  lastMsgSender = lastFu.sender === "institution" ? "Tú" : name;
+                  lastMsgDate = lastFu.created_at || contact.created_at;
+                } else if (contact.reply_message) {
+                  lastMsgText = contact.reply_message;
+                  lastMsgSender = name;
+                  lastMsgDate = contact.replied_at || contact.created_at;
+                }
 
-          {/* Search CTA */}
-          <Link href="/app/institution/search" className="group block">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-navy to-[#1B4FD8] p-5 flex items-center justify-between gap-4 hover:shadow-lg hover:shadow-blue-200 active:scale-[0.99] transition-all">
-              <div className="absolute right-0 top-0 w-48 h-full opacity-10 pointer-events-none" style={{ background: "radial-gradient(circle at 80% 50%, #fff 0%, transparent 70%)" }} />
-              <div className="relative flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                  <Search size={18} className="text-white" />
-                </div>
-                <div>
-                  <p className="text-white/70 text-[11px] font-black uppercase tracking-widest">Directorio de docentes</p>
-                  <h3 className="text-white font-black">Buscar profesorado para tus programas</h3>
-                </div>
-              </div>
-              <span className="relative flex items-center gap-2 bg-white text-[#1B4FD8] font-black px-4 py-2 rounded-xl text-sm group-hover:bg-blue-50 transition-colors flex-shrink-0">
-                Buscar <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-              </span>
-            </div>
-          </Link>
+                const isReplied = contact.status === "replied";
+                const isSent = contact.status === "sent" || contact.status === "pending";
 
-          {/* Recent contacts */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-black text-navy">Contactos recientes</h2>
-              <Link href="/app/institution/contacts" className="text-xs font-black text-fm-blue hover:underline flex items-center gap-1">
-                Ver todos <ArrowRight size={11} />
-              </Link>
-            </div>
-            {recentContacts && recentContacts.length > 0 ? (
-              <div className="space-y-3">
-                {recentContacts.map((contact: any) => {
-                  const fp = contact.faculty;
-                  const userObj = Array.isArray(fp?.user) ? fp?.user[0] : fp?.user;
-                  const name = userObj?.full_name || "Docente";
-                  const initials = name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase();
-
-                  // Calculate last message text & sender for "último seguimiento"
-                  let lastMsgText = contact.message;
-                  let lastMsgSender = "Tú";
-                  let lastMsgDate = contact.created_at;
-
-                  const rawFollowUps = contact.follow_ups;
-                  if (Array.isArray(rawFollowUps) && rawFollowUps.length > 0) {
-                    const lastFu = rawFollowUps[rawFollowUps.length - 1];
-                    lastMsgText = lastFu.message;
-                    lastMsgSender = lastFu.sender === "institution" ? "Tú" : name;
-                    lastMsgDate = lastFu.created_at || contact.created_at;
-                  } else if (contact.reply_message) {
-                    lastMsgText = contact.reply_message;
-                    lastMsgSender = name;
-                    lastMsgDate = contact.replied_at || contact.created_at;
-                  }
-
-                  const isReplied = contact.status === "replied";
-                  const isSent = contact.status === "sent" || contact.status === "pending";
-
-                  return (
-                    <div key={contact.id} className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-colors border border-gray-50/50">
-                      {userObj?.avatar_url ? (
-                        <img src={userObj.avatar_url} alt={name} className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-fm-blue font-black text-sm flex-shrink-0">
-                          {initials}
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <p className="font-black text-navy text-sm truncate">{name}</p>
-                          <Badge className={`border-none text-[11px] font-black uppercase tracking-wider px-1.5 py-0.5 ${
-                            isReplied ? "bg-green-50 text-green-600" :
-                            isSent ? "bg-blue-50 text-fm-blue" :
-                            "bg-gray-100 text-gray-500"
-                          }`}>
-                            {isReplied ? "Respondida" : isSent ? "Enviada" : "Archivada"}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-gray-500 font-medium truncate mt-0.5">
-                          <strong className="font-bold text-fm-muted">{lastMsgSender}:</strong> {lastMsgText}
-                        </p>
-                      </div>
-                      <span className="text-[11px] text-fm-faint font-bold whitespace-nowrap self-start mt-1">
+                return (
+                  <li key={contact.id} className="border-t border-fm-border px-6 py-3.5">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="truncate text-sm font-bold text-fm-ink">{name}</p>
+                      <span className="flex shrink-0 items-center gap-2 text-xs text-[#5E6F8E]">
+                        <span className={`font-semibold ${isReplied ? "text-fm-ink" : isSent ? "text-fm-blue" : ""}`}>
+                          {isReplied ? "Respondida" : isSent ? "Enviada" : "Archivada"}
+                        </span>
                         {formatDateTZ(lastMsgDate)}
                       </span>
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-10 border border-dashed border-gray-200 rounded-2xl">
-                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Mail size={20} className="text-fm-blue" />
-                </div>
-                <p className="font-bold text-navy text-sm">Aún no has contactado docentes</p>
-                <p className="text-fm-faint text-xs mt-1 max-w-xs mx-auto">
-                  Busca en el directorio y envía propuestas a los profesores que encajen con tus programas.
-                </p>
-                <Link
-                  href="/app/institution/search"
-                  className="inline-flex items-center gap-2 bg-fm-blue text-white font-black px-5 py-2.5 rounded-xl text-xs mt-4 hover:bg-navy transition-colors"
-                >
-                  <Search size={13} /> Explorar directorio
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Quick links grid */}
-          <div className="grid grid-cols-1 min-[480px]:grid-cols-3 gap-4">
-            {[
-              { icon: Star,     label: "Favoritos",  sub: `${favoritesCount ?? 0} guardados`, href: "/app/institution/favorites", color: "text-energy-orange", bg: "bg-orange-50" },
-              { icon: Mail,     label: "Contactos",   sub: `${totalContacts ?? 0} enviados`,   href: "/app/institution/contacts",  color: "text-fm-blue", bg: "bg-blue-50" },
-              { icon: Building2,label: "Mi perfil",   sub: `${profileCompletion}% completo`,   href: "/app/institution",           color: "text-green-600",     bg: "bg-green-50" },
-            ].map((item) => (
+                    <p className="mt-0.5 truncate text-[13px] text-[#5E6F8E]">
+                      <span className="font-semibold text-[#5B6B85]">{lastMsgSender}:</span> {lastMsgText}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <div className="border-t border-fm-border px-6 py-8">
+              <p className="text-sm font-bold text-fm-ink">Aún no has contactado docentes</p>
+              <p className="mt-1 max-w-[46ch] text-sm text-[#5B6B85]">
+                Busca en el directorio y envía propuestas a los profesores que encajen con tus programas.
+              </p>
               <Link
-                key={item.href}
-                href={item.href}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col gap-2 hover:shadow-md hover:border-gray-200 transition-all group"
+                href="/app/institution/search"
+                className="mt-4 inline-flex h-11 items-center justify-center rounded-[10px] border border-fm-border bg-white px-6 text-sm font-semibold text-fm-navy transition-colors hover:border-fm-blue"
               >
-                <div className={`w-9 h-9 ${item.bg} rounded-xl flex items-center justify-center`}>
-                  <item.icon size={16} className={item.color} />
-                </div>
-                <p className="font-black text-navy text-sm group-hover:text-fm-blue transition-colors">{item.label}</p>
-                <p className="text-[11px] text-fm-faint font-bold">{item.sub}</p>
+                Explorar directorio
               </Link>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
 
-        {/* ── Right sidebar ── */}
-        <div className="space-y-6">
+        {/* ── Lateral ── */}
+        <div className="min-w-0 space-y-6">
 
-          {/* Profile completion */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-4">
+          <div className={`${cardCls} p-5`}>
             <div className="flex items-center justify-between">
-              <h3 className="font-black text-navy text-sm">Perfil de institución</h3>
-              <Badge className={`font-black text-[11px] px-2.5 py-1 rounded-full border-none ${profileCompletion >= 80 ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
-                {profileCompletion}%
-              </Badge>
+              <h3 className="text-base font-bold tracking-[-0.02em] text-fm-ink">Perfil de institución</h3>
+              <span className="text-sm font-extrabold tabular-nums text-fm-ink">{profileCompletion}%</span>
             </div>
-            <div className="space-y-1.5">
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all ${profileCompletion >= 80 ? "bg-green-500" : "bg-fm-blue"}`}
-                  style={{ width: `${profileCompletion}%` }}
-                />
-              </div>
-              {profileCompletion < 100 && (
-                <p className="text-xs text-fm-faint font-medium">
-                  Completa tu perfil para mejorar tu visibilidad.
-                </p>
-              )}
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#E6ECF7]" role="img" aria-label={`Perfil completado al ${profileCompletion}%`}>
+              <div className="h-full rounded-full bg-fm-blue transition-[width] duration-500" style={{ width: `${profileCompletion}%` }} />
             </div>
-            {/* Checklist items */}
-            <div className="space-y-2">
-              {[
-                { label: "Nombre", done: !!institution.name },
-                { label: "Tipo de institución", done: !!(institution as any).type },
-                { label: "País y ciudad", done: !!institution.country },
-                { label: "Descripción", done: !!institution.description },
-                { label: "Web oficial", done: !!institution.website },
-              ].map((item) => (
-                <div key={item.label} className={`flex items-center gap-2.5 text-xs font-bold ${item.done ? "text-fm-muted" : "text-gray-300"}`}>
-                  {item.done
-                    ? <CheckCircle2 size={13} className="text-green-500 flex-shrink-0" />
-                    : <div className="w-3.5 h-3.5 rounded-full border-2 border-dashed border-gray-200 flex-shrink-0" />}
+            <ul className="mt-4 space-y-2 text-sm">
+              {checklist.map((item) => (
+                <li key={item.label} className={`flex items-center gap-2.5 ${item.done ? "text-[#5B6B85]" : "font-semibold text-fm-ink"}`}>
+                  {item.done ? (
+                    <CheckCircle2 size={15} className="shrink-0 text-fm-blue" />
+                  ) : (
+                    <span className="h-[15px] w-[15px] shrink-0 rounded-full border border-[#B9C6E0]" aria-hidden />
+                  )}
                   {item.label}
-                </div>
+                </li>
               ))}
-            </div>
-            <Link
-              href="/app/institution"
-              className="inline-flex items-center gap-2 w-full justify-center bg-gray-50 hover:bg-gray-100 text-navy font-black py-2.5 rounded-xl text-xs transition-colors border border-gray-100"
-            >
-              Editar perfil <ArrowRight size={11} />
+            </ul>
+            <Link href="/app/institution" className="mt-4 inline-block text-sm font-bold text-fm-blue hover:underline">
+              Editar perfil
             </Link>
           </div>
 
-          {/* Plan card */}
           {isPro ? (
-            <div className="bg-gradient-to-br from-navy to-[#1a3a6b] text-white rounded-3xl p-5 space-y-3">
-              <div className="flex items-center gap-2">
-                <BarChart3 size={14} className="text-[#9DB8FF]" />
-                <span className="text-[11px] font-black uppercase tracking-widest text-[#9DB8FF]">Plan Professional</span>
-              </div>
-              <p className="text-xs font-medium text-white/80 leading-relaxed">
+            <div className="rounded-xl bg-fm-navy p-5 text-white">
+              <h3 className="text-base font-bold tracking-[-0.02em]">Plan Professional</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/75">
                 Búsquedas ilimitadas, contactos ilimitados y acceso completo al directorio.
               </p>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={13} className="text-green-400" />
-                <span className="text-xs font-bold text-white/80">Activo</span>
-              </div>
+              <p className="mt-3 text-sm font-semibold text-white/90">Activo</p>
             </div>
           ) : (
-            <div className="bg-white rounded-3xl border-2 border-dashed border-fm-blue/30 p-5 space-y-3 text-center">
-              <div className="flex items-center justify-center gap-2 text-fm-blue">
-                <Zap size={14} />
-                <span className="text-[11px] font-black uppercase tracking-widest">Plan Professional</span>
-              </div>
-              <p className="text-xs font-medium text-fm-muted leading-relaxed">
+            <div className={`${cardCls} p-5`}>
+              <h3 className="text-base font-bold tracking-[-0.02em] text-fm-ink">Plan Professional</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#5B6B85]">
                 Búsquedas y contactos ilimitados. Encuentra el profesorado ideal para todos tus programas.
               </p>
-              <div className="text-lg font-black text-navy">99€ <span className="text-xs text-fm-faint font-bold">/ mes</span></div>
+              <p className="mt-3 text-[1.4rem] font-extrabold tracking-[-0.03em] text-fm-ink">
+                99 € <span className="text-sm font-medium text-[#5B6B85]">/ mes</span>
+              </p>
               <Link
                 href="/app/institution/billing"
-                className="inline-flex items-center gap-2 w-full justify-center bg-fm-blue hover:opacity-90 text-white font-black py-2.5 px-4 rounded-xl text-xs transition-colors"
+                className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-[10px] bg-fm-blue text-sm font-bold text-white transition-all duration-150 hover:opacity-90 active:scale-[0.97]"
               >
-                <Zap size={12} /> Activar Plan Professional
+                Activar plan Professional
               </Link>
               {searchesUsed >= 5 && (
-                <p className="text-[11px] text-red-500 font-bold">
+                <p className="mt-3 text-[13px] font-semibold text-red-600">
                   Has alcanzado el límite de búsquedas gratuitas este mes.
                 </p>
               )}
             </div>
           )}
-
         </div>
       </div>
     </div>

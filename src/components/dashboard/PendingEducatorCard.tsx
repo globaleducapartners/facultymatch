@@ -25,7 +25,7 @@ export function PendingEducatorCard({ pending }: PendingEducatorCardProps) {
   const stateLabel = STATE_LABEL[pending.estado_perfil] || "Pendiente de verificación";
 
   return (
-    <div className="bg-gray-50 rounded-2xl border border-dashed border-gray-200 overflow-hidden h-full flex flex-col select-none">
+    <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden h-full flex flex-col select-none">
       {/* Cover + avatar placeholder */}
       <div className="relative">
         <div className="h-16 bg-gray-200" />
@@ -37,7 +37,7 @@ export function PendingEducatorCard({ pending }: PendingEducatorCardProps) {
       </div>
 
       <div className="pt-10 px-4 pb-4 flex flex-col gap-2 flex-1 text-center">
-        <h3 className="text-sm font-black text-gray-400">Perfil pendiente</h3>
+        <h3 className="text-sm font-bold text-gray-400">Perfil pendiente</h3>
 
         {/* Barras "borrosas" en vez de texto real — no hay bio que mostrar */}
         <div className="flex flex-col items-center gap-1.5 py-1">
@@ -63,7 +63,7 @@ export function PendingEducatorCard({ pending }: PendingEducatorCardProps) {
         <div className="flex-1" />
 
         <div className="mt-1">
-          <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 bg-amber-50 border border-amber-100 px-2.5 py-1 rounded-full inline-block">
+          <span className="text-[10px] font-bold text-amber-600 bg-white border border-fm-border px-2.5 py-1 rounded-md inline-block">
             {stateLabel}
           </span>
         </div>

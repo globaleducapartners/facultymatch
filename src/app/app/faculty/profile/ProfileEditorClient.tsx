@@ -60,7 +60,6 @@ const inp: React.CSSProperties = {
 
 const lbl: React.CSSProperties = {
   fontFamily: SANS, fontSize: 11, fontWeight: 700,
-  letterSpacing: "0.1em", textTransform: "uppercase" as const,
   color: D.faint, display: "block", marginBottom: 6,
 };
 
@@ -266,7 +265,7 @@ export function ProfileEditorClient({
               height: 168,
               background: bannerUrl
                 ? "transparent"
-                : `linear-gradient(135deg, ${D.navy} 0%, ${D.blue} 55%, #4F7FE8 100%)`,
+                : D.navy,
               position: "relative",
               overflow: "hidden",
             }}>

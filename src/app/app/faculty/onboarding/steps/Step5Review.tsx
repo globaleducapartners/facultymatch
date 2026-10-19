@@ -9,8 +9,8 @@ const D = {
   gold:    "#E9A030",
   white:   "#FFFFFF",
   ink:     "#0C1018",
-  muted:   "#6B7280",
-  faint:   "#9CA3AF",
+  muted:   "#5B6B85",
+  faint:   "#5E6F8E",
   border:  "#D8E2EF",
   surf:    "#F2F6FC",
   green:   "#059669",
@@ -141,7 +141,7 @@ export function Step5Review({ data }: Props) {
           : null
         } />
         {data.careerType === "combinado" && (
-          <div style={{ marginBottom: 8, padding: 8, background: "#EFF6FF", borderRadius: 8, fontSize: 12, color: D.blue, fontWeight: 600 }}>
+          <div style={{ marginBottom: 8, padding: 8, background: "#FFFFFF", borderRadius: 8, fontSize: 12, color: D.blue, fontWeight: 600 }}>
             Perfil combinado, incluye ambas trayectorias
           </div>
         )}
@@ -207,7 +207,7 @@ export function Step5Review({ data }: Props) {
                 <span key={i} style={{
                   fontSize: 12, color: D.ink, fontWeight: 600,
                   background: D.white, border: `1px solid ${D.border}`,
-                  padding: "3px 10px", borderRadius: 999,
+                  padding: "3px 10px", borderRadius: 8,
                 }}>
                   {typeof l === "string" ? l : `${l.lang || l.language || l.name}${l.level ? ` · ${l.level}` : ""}`}
                 </span>

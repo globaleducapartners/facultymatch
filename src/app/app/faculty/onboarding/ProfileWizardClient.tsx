@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { ArrowLeft, ArrowRight, Save, CheckCircle2, X, Sparkles, ListChecks, Shield } from "lucide-react";
+import { ArrowLeft, ArrowRight, Save, CheckCircle2 } from "lucide-react";
+import { OnboardingShell } from "./OnboardingShell";
 import { Step1BasicInfo } from "./steps/Step1BasicInfo";
 import { Step2CareerType } from "./steps/Step2CareerType";
 import { Step3Specialty } from "./steps/Step3Specialty";
@@ -17,11 +18,11 @@ const D = {
   blue:    "#1B4FD8",
   navy:    "#0D2240",
   gold:    "#E9A030",
-  surf:    "#F2F6FC",
+  surf:    "#F4F7FC",
   white:   "#FFFFFF",
-  ink:     "#0C1018",
-  muted:   "#6B7280",
-  faint:   "#9CA3AF",
+  ink:     "#080F1E",
+  muted:   "#5B6B85",
+  faint:   "#5E6F8E",
   border:  "#D8E2EF",
   green:   "#059669",
   greenBg: "#F0FDF4",
@@ -252,143 +253,90 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
 
   if (showCvIntro) {
     return (
-      <div style={{ fontFamily: SANS, maxWidth: 780, margin: "24px auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <h1 style={{ fontSize: 26, fontWeight: 900, color: D.ink, letterSpacing: "-0.03em", margin: 0 }}>
+      <OnboardingShell labels={STEP_LABELS} current={-1}>
+        <div style={{ fontFamily: SANS }}>
+          <h1 style={{ fontSize: 28, fontWeight: 800, color: D.ink, letterSpacing: "-0.035em", margin: 0 }}>
             Crea tu perfil
           </h1>
-          <p style={{ fontSize: 14, color: D.muted, margin: "8px 0 0" }}>
-            Elige cómo quieres empezar, puedes cambiar de opción en cualquier momento.
+          <p style={{ fontSize: 15, color: D.muted, margin: "6px 0 28px" }}>
+            Elige cómo quieres empezar. Puedes cambiar de opción en cualquier momento.
           </p>
-        </div>
 
-        {introMode === "ai" ? (
-          <div style={{
-            background: D.white, border: `1px solid ${D.border}`, borderRadius: 20,
-            padding: 32, boxShadow: "0 1px 3px rgba(13,34,64,0.06)",
-          }}>
-            <CvImportStep
-              userId={user.id}
-              onConfirm={handleCvImportConfirm}
-              onBack={() => setIntroMode("choice")}
-            />
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {/* Card destacada: IA */}
-              <button
-                onClick={() => setIntroMode("ai")}
-                style={{
-                  position: "relative", textAlign: "left", cursor: "pointer",
-                  fontFamily: SANS, padding: 28, borderRadius: 20,
-                  background: "linear-gradient(180deg, #EEF3FF 0%, #FFFFFF 65%)",
-                  border: `2px solid ${D.blue}`,
-                  boxShadow: "0 4px 16px rgba(27,79,216,0.12)",
-                  display: "flex", flexDirection: "column", gap: 14,
-                  transition: "transform 0.15s, box-shadow 0.15s",
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(27,79,216,0.18)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(27,79,216,0.12)"; }}
-              >
-                <span style={{
-                  position: "absolute", top: 18, right: 18,
-                  fontFamily: SANS, fontSize: 10, fontWeight: 800, color: "#fff",
-                  background: D.gold, padding: "4px 10px", borderRadius: 999,
-                  letterSpacing: "0.04em", textTransform: "uppercase",
-                }}>
-                  Recomendado
-                </span>
-                <div style={{
-                  width: 48, height: 48, borderRadius: 14, background: D.blue,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: "0 4px 10px rgba(27,79,216,0.35)",
-                }}>
-                  <Sparkles size={22} color="#fff" />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: 17, fontWeight: 800, color: D.ink, margin: "0 0 6px" }}>
+          {introMode === "ai" ? (
+            <div style={{ background: D.white, border: `1px solid ${D.border}`, borderRadius: 12, padding: 28 }}>
+              <CvImportStep
+                userId={user.id}
+                onConfirm={handleCvImportConfirm}
+                onBack={() => setIntroMode("choice")}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, background: D.white, border: `1.5px solid ${D.blue}`, borderRadius: 12, padding: 24 }}>
+                  <h3 style={{ fontSize: 17, fontWeight: 700, color: D.ink, margin: 0, letterSpacing: "-0.02em" }}>
                     Crea tu perfil con IA en 1 minuto
                   </h3>
-                  <p style={{ fontSize: 13, color: D.muted, lineHeight: 1.5, margin: 0 }}>
+                  <p style={{ fontSize: 14, color: D.muted, lineHeight: 1.6, margin: 0 }}>
                     Sube tu CV (o el PDF de tu LinkedIn) y te preparamos un borrador de perfil
                     listo para revisar antes de publicarlo.
                   </p>
+                  <button
+                    onClick={() => setIntroMode("ai")}
+                    style={{
+                      marginTop: "auto", alignSelf: "flex-start", fontFamily: SANS, fontSize: 14, fontWeight: 700,
+                      color: "#fff", background: D.blue, border: "none", borderRadius: 10, padding: "11px 22px", cursor: "pointer",
+                    }}
+                  >
+                    Subir mi CV
+                  </button>
                 </div>
-                <span style={{
-                  marginTop: "auto", fontSize: 14, fontWeight: 700, color: D.blue,
-                  display: "flex", alignItems: "center", gap: 6,
-                }}>
-                  Subir mi CV <ArrowRight size={15} />
-                </span>
-              </button>
 
-              {/* Card secundaria: formulario manual */}
-              <button
-                onClick={() => setShowCvIntro(false)}
-                style={{
-                  textAlign: "left", cursor: "pointer",
-                  fontFamily: SANS, padding: 28, borderRadius: 20,
-                  background: D.white, border: `1px solid ${D.border}`,
-                  display: "flex", flexDirection: "column", gap: 14,
-                  transition: "transform 0.15s, box-shadow 0.15s",
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 4px 14px rgba(13,34,64,0.08)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
-              >
-                <div style={{
-                  width: 48, height: 48, borderRadius: 14, background: D.surf,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <ListChecks size={22} color={D.navy} />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: 17, fontWeight: 800, color: D.ink, margin: "0 0 6px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, background: D.white, border: `1px solid ${D.border}`, borderRadius: 12, padding: 24 }}>
+                  <h3 style={{ fontSize: 17, fontWeight: 700, color: D.ink, margin: 0, letterSpacing: "-0.02em" }}>
                     Rellenar el formulario paso a paso
                   </h3>
-                  <p style={{ fontSize: 13, color: D.muted, lineHeight: 1.5, margin: 0 }}>
+                  <p style={{ fontSize: 14, color: D.muted, lineHeight: 1.6, margin: 0 }}>
                     Un asistente guiado de 5 pasos. Tú decides y escribes cada campo de tu perfil.
                   </p>
+                  <button
+                    onClick={() => setShowCvIntro(false)}
+                    style={{
+                      marginTop: "auto", alignSelf: "flex-start", fontFamily: SANS, fontSize: 14, fontWeight: 600,
+                      color: D.navy, background: D.white, border: `1.5px solid ${D.border}`, borderRadius: 10, padding: "10px 22px", cursor: "pointer",
+                    }}
+                  >
+                    Empezar formulario
+                  </button>
                 </div>
-                <span style={{
-                  marginTop: "auto", fontSize: 14, fontWeight: 700, color: D.navy,
-                  display: "flex", alignItems: "center", gap: 6,
-                }}>
-                  Empezar formulario <ArrowRight size={15} />
-                </span>
-              </button>
-            </div>
+              </div>
 
-            <p style={{
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-              fontSize: 12, color: D.faint, margin: "20px 0 0",
-            }}>
-              <Shield size={13} /> Tu CV solo se usa para rellenar tu perfil y se borra en cuanto termina la lectura.
-            </p>
-
-            <div style={{ textAlign: "center", marginTop: 20 }}>
+              <p style={{ fontSize: 13, color: D.faint, margin: "20px 0 0" }}>
+                Tu CV solo se usa para rellenar tu perfil y se borra en cuanto termina la lectura.
+              </p>
               <a
                 href="/app/faculty"
-                style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: D.muted, textDecoration: "none" }}
+                style={{ display: "inline-block", marginTop: 14, fontFamily: SANS, fontSize: 13, fontWeight: 600, color: D.muted, textDecoration: "none" }}
               >
                 Saltar por ahora
               </a>
-            </div>
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
+      </OnboardingShell>
     );
   }
 
   if (published) {
     return (
-      <div style={{ fontFamily: SANS, maxWidth: 520, margin: "60px auto", textAlign: "center" }}>
+      <OnboardingShell labels={STEP_LABELS} current={STEP_LABELS.length}>
+      <div style={{ fontFamily: SANS, maxWidth: 520, margin: "40px 0" }}>
         <div style={{
-          width: 72, height: 72, borderRadius: "50%", background: D.greenBg,
+          width: 56, height: 56, borderRadius: 12, background: D.greenBg,
           display: "flex", alignItems: "center", justifyContent: "center",
-          margin: "0 auto 24px",
+          margin: "0 0 24px",
         }}>
-          <CheckCircle2 size={36} color={D.green} />
+          <CheckCircle2 size={28} color={D.green} />
         </div>
         <h1 style={{ fontSize: 24, fontWeight: 900, color: D.ink, margin: "0 0 8px" }}>
           ¡Perfil publicado!
@@ -407,19 +355,18 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
           Ir a mi perfil
         </a>
       </div>
+      </OnboardingShell>
     );
   }
 
   return (
-    <div style={{ fontFamily: SANS, maxWidth: 720, margin: "0 auto" }}>
+    <OnboardingShell labels={STEP_LABELS} current={Math.min(step, 4)}>
+    <div style={{ fontFamily: SANS }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: D.ink, letterSpacing: "-0.03em", margin: 0 }}>
-            Crear tu perfil
-          </h1>
-          <p style={{ fontSize: 13, color: D.muted, margin: "4px 0 0" }}>
-            Paso {Math.min(step + 1, 5)} de 5 · {STEP_LABELS[Math.min(step, 4)]}
+          <p style={{ fontSize: 14, fontWeight: 600, color: D.muted, margin: 0 }}>
+            Paso {Math.min(step + 1, 5)} de 5
           </p>
         </div>
         <button
@@ -436,31 +383,10 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
         </button>
       </div>
 
-      {/* Step indicator */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 32 }}>
-        {STEP_LABELS.map((label, i) => {
-          const clampedStep = Math.min(step, 4);
-          const isActive = i === clampedStep;
-          const isDone = i < clampedStep;
-          return (
-            <div
-              key={i}
-              style={{
-                flex: 1, height: 4, borderRadius: 2,
-                background: isDone ? D.blue : isActive ? D.blue : D.border,
-                opacity: isActive ? 1 : 0.5,
-                transition: "all 0.3s",
-              }}
-              title={label}
-            />
-          );
-        })}
-      </div>
-
       {/* Step content */}
       <div style={{
         background: D.white, border: `1px solid ${D.border}`,
-        borderRadius: 16, padding: 32,
+        borderRadius: 12, padding: 28,
       }}>
         {step === 0 && <Step1BasicInfo data={data} updateData={updateData} user={user} avatarUrl={profile?.avatar_url || facultyProfile?.avatar_url} />}
         {step === 1 && <Step2CareerType data={data} updateData={updateData} user={user} facultyProfile={facultyProfile} />}
@@ -528,5 +454,6 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
         </div>
       )}
     </div>
+    </OnboardingShell>
   );
 }

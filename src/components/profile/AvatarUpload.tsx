@@ -274,7 +274,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, name }: AvatarUploadPro
         />
         <div style={{
           width: 96, height: 96, borderRadius: "50%",
-          background: preview ? "transparent" : "linear-gradient(135deg, #1B4FD8, #0D2240)",
+          background: preview ? "transparent" : "#0D2240",
           border: "4px solid #fff",
           boxShadow: "0 4px 16px rgba(7,19,38,0.15)",
           display: "flex", alignItems: "center", justifyContent: "center",
