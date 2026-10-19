@@ -16,6 +16,12 @@ import { ProfileViewTracker } from "@/components/profile/ProfileViewTracker";
 // Caché de 60 s; se invalida al momento al cambiar visibilidad o verificación.
 export const revalidate = 60;
 
+// Sin perfiles pregenerados: cada ficha se genera la primera vez que alguien
+// la pide y queda en caché hasta que caduca o se invalida.
+export async function generateStaticParams() {
+  return [];
+}
+
 const BASE = "https://www.facultymatch.app";
 
 const AVAIL_LABELS: Record<string, { label: string; color: string; bg: string }> = {
