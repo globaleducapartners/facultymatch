@@ -1,7 +1,7 @@
 "use client";
 // src/app/LandingClient.tsx — FacultyMatch v3: sistema Tailwind + tokens de marca
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Footer } from "@/components/layout/Footer";
@@ -32,22 +32,6 @@ const AREAS = [
   "Sostenibilidad y ESG", "Derecho de los negocios", "Transformación digital",
   "Educación online",
 ];
-
-function useInView(threshold = 0.15) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setInView(true); obs.disconnect(); } },
-      { threshold }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [threshold]);
-  return { ref, inView };
-}
 
 // ─── NAV ───────────────────────────────────────────────────────────────────
 function Nav() {
@@ -313,8 +297,8 @@ function Ticker() {
   );
 }
 
-// ─── HOW IT WORKS ──────────────────────────────────────────────────────────
-function HowItWorks() {
+// ─── CÓMO FUNCIONA: pasos con numerales ────────────────────────────────────
+function Steps() {
   const steps = [
     {
       title: "Publica en 10 minutos",
@@ -331,283 +315,173 @@ function HowItWorks() {
   ];
 
   return (
-    <section className="bg-white px-6 py-16 md:px-8 md:py-[88px]">
-      <div className="mx-auto grid max-w-[1120px] items-center gap-10 md:grid-cols-[5fr_7fr] md:gap-16">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl md:aspect-[5/6]">
-          <Image
-            src="/images/como-funciona-pizarra.jpg"
-            alt="Docente escribiendo en una pizarra durante una sesión de clase"
-            fill
-            sizes="(min-width: 768px) 440px, 100vw"
-            className="object-cover object-[30%_20%]"
-          />
-        </div>
-
-        <div>
-          <h2 className="mb-3.5 text-[1.7rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.7rem,3.4vw,2.5rem)]">
+    <section className="bg-white px-6 pb-14 pt-16 md:px-8 md:pb-16 md:pt-[104px]">
+      <div className="mx-auto max-w-[1180px]">
+        <div className="mx-auto mb-12 max-w-[640px] text-center md:mb-16">
+          <h2 className="mb-3.5 text-balance text-[1.7rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.7rem,3.4vw,2.5rem)]">
             De la experiencia al aula.
           </h2>
-          <p className="mb-8 text-[15.5px] text-[#5B6B85]">Sin intermediarios. Sin comisiones por contratación.</p>
+          <p className="text-base text-[#5B6B85]">Sin intermediarios. Sin comisiones por contratación.</p>
+        </div>
 
-          <ol className="divide-y divide-fm-border border-y border-fm-border">
-            {steps.map((step, i) => (
-              <li key={i} className="flex gap-5 py-6">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-fm-navy text-[13px] font-bold text-white [font-variant-numeric:tabular-nums]">
+        <ol className="grid gap-10 md:grid-cols-3 md:gap-14">
+          {steps.map((s, i) => (
+            <li key={s.title}>
+              <div className="flex items-center gap-[18px]">
+                <span className="text-[76px] font-extrabold leading-[0.85] tracking-[-0.05em] text-fm-blue [font-variant-numeric:tabular-nums] md:text-[104px]">
                   {i + 1}
                 </span>
-                <div>
-                  <h3 className="mb-1.5 text-[17px] font-bold tracking-[-0.02em] text-fm-ink">{step.title}</h3>
-                  <p className="max-w-[46ch] text-[14.5px] leading-[1.7] text-[#5B6B85]">{step.body}</p>
-                </div>
+                {i < steps.length - 1 && (
+                  <span aria-hidden className="hidden h-0 flex-1 border-t-2 border-dotted border-[#9DB8FF] md:block" />
+                )}
+              </div>
+              <h3 className="mb-2 mt-5 text-xl font-bold tracking-[-0.02em] text-fm-ink">{s.title}</h3>
+              <p className="max-w-[34ch] text-[15px] leading-[1.7] text-[#5B6B85]">{s.body}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+// ─── FILAS ALTERNAS: texto + panel pastel con el producto ──────────────────
+function CheckIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#1B4FD8" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden className="shrink-0">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
+function Row({
+  flip, title, body, bullets, href, cta, children,
+}: {
+  flip?: boolean; title: string; body: string; bullets?: string[]; href: string; cta: string; children: React.ReactNode;
+}) {
+  return (
+    <div className="grid items-center gap-8 md:grid-cols-2 md:gap-20">
+      <div>
+        <h2 className="mb-4 text-balance text-[1.6rem] font-extrabold leading-[1.12] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.6rem,3vw,2.3rem)]">
+          {title}
+        </h2>
+        <p className="max-w-[46ch] text-base leading-[1.7] text-[#5B6B85]">{body}</p>
+        {bullets && (
+          <ul className="mt-6 grid gap-3">
+            {bullets.map((b) => (
+              <li key={b} className="flex gap-3 text-[15px] font-medium text-fm-ink">
+                <span className="mt-[3px]"><CheckIcon /></span>
+                {b}
               </li>
             ))}
-          </ol>
-        </div>
+          </ul>
+        )}
+        <Link href={href} className="mt-7 inline-block text-sm font-bold text-fm-blue hover:underline">
+          {cta}
+        </Link>
       </div>
-    </section>
+      <div className={`min-w-0 rounded-[20px] bg-[#DCE8FB] p-4 sm:p-8 ${flip ? "md:order-first" : ""}`}>{children}</div>
+    </div>
   );
 }
 
-// ─── PRODUCT TRIO ──────────────────────────────────────────────────────────
-function ProductTrio() {
+function RowsSection() {
   return (
-    <section className="bg-fm-surface px-6 py-16 md:px-8 md:py-[88px]">
-      <div className="mx-auto max-w-[1120px]">
-        <div className="mx-auto mb-12 max-w-[560px] text-center md:mb-16">
-          <h2 className="mb-3.5 text-[1.7rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.7rem,3.4vw,2.5rem)]">
-            Así se ve por dentro.
-          </h2>
-          <p className="text-[15.5px] text-[#5B6B85]">Del CV al perfil verificado, tal como lo verás dentro de FacultyMatch.</p>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-3">
-          {/* Paso 1: subir CV */}
-          <div className="flex flex-col overflow-hidden rounded-3xl border border-fm-border bg-white shadow-sm">
-            <div className="relative overflow-hidden bg-[#12161f]">
-              <div className="flex gap-1.5 bg-[#1B1F27] px-3.5 py-2.5">
-                <span className="h-2 w-2 rounded-full bg-[#FF5F57]" />
-                <span className="h-2 w-2 rounded-full bg-[#FFBD2E]" />
-                <span className="h-2 w-2 rounded-full bg-[#28C840]" />
-              </div>
-              <div className="flex min-h-[190px] flex-col justify-center gap-2.5 p-5">
-                <div className="rounded-xl border-[1.5px] border-dashed border-white/25 px-4 py-5 text-center [animation:fm-dz-flash_6s_ease-in-out_infinite]">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5" className="mx-auto mb-2.5 h-[34px] w-[34px]">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" />
-                  </svg>
-                  <div className="text-xs font-semibold text-white/75">Arrastra tu CV aquí</div>
-                  <div className="mt-1 font-mono text-[10.5px] text-white/60">PDF o Word · máx. 10MB</div>
-                </div>
-                <div
-                  className="absolute h-[26px] w-[26px] -translate-x-1/2 -translate-y-1/2 [animation:fm-drag-file_6s_ease-in-out_infinite] motion-reduce:hidden"
-                  style={{ filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.4))" }}
-                >
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="2" width="13" height="17" rx="2" fill="#fff" />
-                    <path d="M6 6h7M6 9.5h7M6 13h4" stroke="#0D2240" strokeWidth="1.1" strokeLinecap="round" />
-                    <path d="M14 14l7 3-3.2 1-1 3.2z" fill="#FF6A1A" stroke="#0D2240" strokeWidth="0.8" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-            <div className="p-5 pt-4">
-              <div className="mb-2 font-mono text-[11px] font-bold text-fm-blue">PASO 1</div>
-              <h3 className="mb-2 text-[15.5px] font-bold text-fm-ink">Sube tu CV</h3>
-              <p className="text-[13px] leading-[1.65] text-[#5B6B85]">O pega el texto directamente. Nada que no tengas ya escrito en algún sitio.</p>
-            </div>
-          </div>
-
-          {/* Paso 2: IA */}
-          <div className="flex flex-col overflow-hidden rounded-3xl border border-fm-border bg-white shadow-sm">
-            <div className="overflow-hidden bg-[#12161f]">
-              <div className="flex gap-1.5 bg-[#1B1F27] px-3.5 py-2.5">
-                <span className="h-2 w-2 rounded-full bg-[#FF5F57]" />
-                <span className="h-2 w-2 rounded-full bg-[#FFBD2E]" />
-                <span className="h-2 w-2 rounded-full bg-[#28C840]" />
-              </div>
-              <div className="flex min-h-[190px] flex-col justify-center gap-2.5 p-5">
-                {[["70%", "ALTA", true], ["50%", "ALTA", true], ["60%", "MEDIA", false]].map(([w, label, high], i) => (
-                  <div key={i} className="flex items-center justify-between rounded-lg bg-white/5 px-2.5 py-2">
-                    <div className="h-2 rounded-full bg-white/15" style={{ width: w as string }} />
-                    <span
-                      className="rounded-full px-2 py-0.5 font-mono text-[9.5px] font-bold"
-                      style={high ? { background: "rgba(233,160,48,0.18)", color: "#E9A030" } : { background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.55)" }}
-                    >
-                      {label as string}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="p-5 pt-4">
-              <div className="mb-2 font-mono text-[11px] font-bold text-fm-blue">PASO 2</div>
-              <h3 className="mb-2 text-[15.5px] font-bold text-fm-ink">La IA prepara tu borrador</h3>
-              <p className="text-[13px] leading-[1.65] text-[#5B6B85]">Una IA extrae tus datos y marca su confianza en cada campo. Tú revisas antes de publicar: nada se guarda sin tu ok.</p>
-            </div>
-          </div>
-
-          {/* Paso 3: verificación */}
-          <div className="flex flex-col overflow-hidden rounded-3xl border border-fm-border bg-white shadow-sm">
-            <div className="overflow-hidden bg-[#12161f]">
-              <div className="flex gap-1.5 bg-[#1B1F27] px-3.5 py-2.5">
-                <span className="h-2 w-2 rounded-full bg-[#FF5F57]" />
-                <span className="h-2 w-2 rounded-full bg-[#FFBD2E]" />
-                <span className="h-2 w-2 rounded-full bg-[#28C840]" />
-              </div>
-              <div className="flex min-h-[190px] flex-col items-center justify-center gap-2.5 p-5">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-fm-gold">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#E9A030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
-                    <path d="M20 6L9 17l-5-5" />
-                  </svg>
-                </div>
-                <div className="font-mono text-[11px] uppercase tracking-[0.08em] text-fm-gold/90">
-                  Verificado · revisado a mano
-                </div>
-              </div>
-            </div>
-            <div className="p-5 pt-4">
-              <div className="mb-2 font-mono text-[11px] font-bold text-fm-blue">PASO 3</div>
-              <h3 className="mb-2 text-[15.5px] font-bold text-fm-ink">Revisión de nuestro equipo</h3>
-              <p className="text-[13px] leading-[1.65] text-[#5B6B85]">Un revisor de nuestro equipo confirma cada perfil a mano antes de publicarlo. La IA propone, las personas deciden.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── SPLIT: DOCENTES ──────────────────────────────────────────────────────
-function SplitDocentes() {
-  const { ref, inView } = useInView(0.1);
-
-  return (
-    <section className="overflow-hidden bg-white">
-      <div ref={ref} className="mx-auto grid max-w-[1120px] md:grid-cols-2 md:min-h-[520px]">
-        <div className="relative order-first h-[260px] overflow-hidden rounded-2xl md:order-2 md:h-auto md:rounded-none">
-          <Image
-            src="/images/docentes-pizarra.jpg"
-            alt="Docente señalando una pizarra mientras explica en clase"
-            fill
-            sizes="(min-width: 768px) 560px, 100vw"
-            className="object-cover object-[28%_30%]"
-          />
-        </div>
-
-        <div
-          className="order-2 flex flex-col justify-center px-6 pt-9 transition-transform duration-700 md:order-1 md:px-8 md:py-16 md:pl-8"
-          style={{ transform: inView ? "translateX(0)" : "translateX(-10px)" }}
+    <section className="bg-fm-surface px-6 py-16 md:px-8 md:py-[104px]">
+      <div className="mx-auto grid max-w-[1180px] gap-[72px] md:gap-28">
+        <Row
+          title="Lo que sabes hacer tiene demanda en las aulas."
+          body="Médicos, investigadores, directivos y profesionales con experiencia real. Te hacemos visible ante quien busca justo lo que tú sabes."
+          bullets={[
+            "Perfil verificado y estructurado por área de conocimiento",
+            "Las instituciones vienen a ti, sin prospectar",
+            "Control total de tu visibilidad y privacidad",
+          ]}
+          href="/faculty"
+          cta="Ver cómo funciona para docentes →"
         >
-          <h2 className="mb-[18px] text-[1.6rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.6rem,2.8vw,2.2rem)]">
-            Lo que sabes hacer <b className="font-extrabold text-fm-blue">tiene demanda en las aulas.</b>
-          </h2>
-          <p className="mb-6 text-[14.5px] leading-[1.8] text-[#5B6B85]">
-            Años en medicina, consultoría, investigación o dirección tienen demanda real en másteres
-            y educación ejecutiva. Te hacemos visible ante quien busca justo lo que tú sabes.
-          </p>
-          <div className="mb-7 flex flex-col gap-2.5">
-            {[
-              "Perfil verificado y estructurado por área de conocimiento",
-              "Las instituciones vienen a ti, sin prospectar",
-              "Control total de tu visibilidad y privacidad",
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-2.5">
-                <span className="mt-px flex h-[19px] w-[19px] shrink-0 items-center justify-center rounded-md bg-fm-blue/10">
-                  <svg viewBox="0 0 12 12" fill="none" className="h-2.5 w-2.5">
-                    <path d="M2 6l3 3 5-5" stroke="#1B4FD8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-                <span className="text-[13.5px] leading-[1.55] text-[#43526B]">{item}</span>
-              </div>
-            ))}
+          <div className="relative">
+            <div className="relative aspect-[4/3.1] overflow-hidden rounded-[14px]">
+              <Image
+                src="/images/docentes-pizarra.jpg"
+                alt="Docente señalando una pizarra mientras explica en clase"
+                fill
+                sizes="(min-width: 768px) 520px, 100vw"
+                className="object-cover object-[30%_25%]"
+              />
+            </div>
+            <div className="absolute bottom-3.5 left-3.5 w-[170px] rounded-[10px] border border-[#E1E7F5] bg-white p-2.5 shadow-[0_18px_36px_-14px_rgba(13,34,64,0.45)] sm:w-[200px]">
+              <span className="absolute right-2.5 top-2.5 rounded-[5px] bg-fm-gold/15 px-1.5 py-0.5 font-mono text-[11px] font-bold uppercase tracking-[0.03em] text-[#B77A1B]">Verificado</span>
+              <div className="mb-1.5 flex h-[26px] w-[26px] items-center justify-center rounded-full bg-fm-navy text-[11px] font-extrabold text-white">JP</div>
+              <div className="text-[11px] font-bold text-fm-navy">Javier Plitt Stevens</div>
+              <div className="mb-2 text-[11px] leading-tight text-[#5E6F8E]">Derecho mercantil · Madrid</div>
+              <div className="h-1 overflow-hidden rounded-full bg-[#EEF1F8]"><i className="block h-full w-[94%] rounded-full bg-fm-blue" /></div>
+            </div>
           </div>
-          <Link href="/faculty" className="self-start">
-            <button className="rounded-[10px] bg-fm-navy px-7 py-[13px] text-sm font-bold text-white transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
-              Ver cómo funciona para docentes →
-            </button>
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-}
+        </Row>
 
-// ─── SPLIT: INSTITUCIONES (embudo de filtrado) ─────────────────────────────
-function SplitInstituciones() {
-  const { ref, inView } = useInView(0.1);
-  const rows: [string, number, boolean][] = [
-    ["Todo el directorio", 100, false],
-    ["+ Área: Salud", 80, false],
-    ["+ Idioma de impartición: inglés", 54, false],
-    ["+ Disponibilidad inmediata", 30, true],
-  ];
-
-  return (
-    <section className="overflow-hidden bg-fm-surface">
-      <div ref={ref} className="mx-auto grid max-w-[1120px] md:grid-cols-2 md:min-h-[520px]">
-        <div
-          className="order-2 flex flex-col justify-center px-6 pb-9 pt-0 transition-transform duration-700 md:order-1 md:py-16 md:pl-16 md:pr-8"
-          style={{ transform: inView ? "translateX(0)" : "translateX(-10px)" }}
+        <Row
+          flip
+          title="El docente que buscas está dando clase, no buscando trabajo."
+          body="Los mejores perfiles están en activo: dirigiendo hospitales, liderando equipos, investigando. FacultyMatch los hace accesibles, verificados y directos."
+          bullets={[
+            "Área de conocimiento, acreditación ANECA e idioma de impartición",
+            "Modalidad, disponibilidad real y tipo de perfil",
+          ]}
+          href="/institutions"
+          cta="Acceder al directorio →"
         >
-          <span className="mb-4 block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#B4791E]">
-            Para instituciones educativas
-          </span>
-          <h2 className="mb-[18px] text-[1.6rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.6rem,2.8vw,2.2rem)]">
-            El docente que buscas <b className="font-extrabold text-fm-blue">está dando clase, no buscando trabajo.</b>
-          </h2>
-          <p className="mb-6 text-[14.5px] leading-[1.8] text-[#5B6B85]">
-            Los mejores perfiles están en activo: dirigiendo hospitales, liderando equipos, investigando.
-            FacultyMatch los hace accesibles, verificados y directos.
-          </p>
-          <div className="mb-7 grid grid-cols-2 gap-2.5">
-            {["Área de conocimiento", "Acreditación ANECA", "Idioma de impartición", "Modalidad", "Disponibilidad real", "Tipo de perfil"].map((f, i) => (
-              <div key={i} className="flex items-center gap-1.5 rounded-lg border border-fm-border bg-fm-surface px-3.5 py-2.5 text-[13px] font-semibold text-fm-navy">
-                <span className="h-[5px] w-[5px] shrink-0 rounded-full bg-fm-blue" />
-                {f}
-              </div>
-            ))}
-          </div>
-          <Link href="/institutions" className="self-start">
-            <button className="rounded-[10px] bg-fm-blue px-7 py-[13px] text-sm font-bold text-white transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
-              Acceder al directorio →
-            </button>
-          </Link>
-        </div>
-
-        <div className="order-1 flex items-center justify-center bg-gradient-to-br from-fm-navy to-fm-dark px-8 py-10 md:order-2">
-          <div className="w-full max-w-[340px]">
-            <span className="mb-4 block font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-white/50">
-              Cómo filtran las instituciones
-            </span>
-            {rows.map(([label, pct, highlight], i) => (
-              <div
-                key={i}
-                className="mb-2.5 flex w-full items-center gap-2.5 rounded-lg px-3.5 py-2.5 text-xs font-semibold text-white md:w-[var(--bar-pct)]"
-                style={{
-                  ["--bar-pct" as string]: `${pct}%`,
-                  background: highlight ? "linear-gradient(90deg,#FF6A1A,#FF8A45)" : "linear-gradient(90deg,#1B4FD8,#3E6BF0)",
-                }}
-              >
-                <span>{label}</span>
-              </div>
-            ))}
-            <div className="mt-4 flex items-center gap-2.5 text-[12.5px] font-semibold leading-[1.4] text-white/90">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-fm-gold">
-                <svg viewBox="0 0 12 12" fill="none" className="h-[11px] w-[11px]">
-                  <path d="M2 6l3 3 5-5" stroke="#0D2240" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
+          <div className="rounded-[14px] bg-white p-6 shadow-[0_14px_34px_-16px_rgba(13,34,64,0.25)]">
+            <h3 className="mb-4 text-sm font-bold text-fm-navy">Cómo filtran las instituciones</h3>
+            <div className="grid gap-2.5">
+              {([
+                ["Todo el directorio", 100, false],
+                ["+ Área: Salud", 80, false],
+                ["+ Idioma de impartición: inglés", 54, false],
+                ["+ Disponibilidad inmediata", 30, true],
+              ] as [string, number, boolean][]).map(([label, w, last]) => (
+                <div key={label} className="grid gap-1.5">
+                  <span className="text-[13px] font-medium text-fm-navy">{label}</span>
+                  <i className={`block h-2.5 rounded ${last ? "bg-fm-blue" : "bg-[#C9D8F5]"}`} style={{ width: `${w}%` }} />
+                </div>
+              ))}
+            </div>
+            <div className="mt-[18px] flex items-start gap-2.5 border-t border-[#E1E7F5] pt-4 text-sm font-semibold text-fm-navy">
+              <span className="mt-0.5"><CheckIcon size={18} /></span>
               El perfil exacto que necesitas, verificado y en activo.
             </div>
           </div>
-        </div>
+        </Row>
+
+        <Row
+          title="Tú controlas quién ve tu perfil."
+          body="Puedes bloquear instituciones específicas por nombre, incluido tu empleador actual. Tu perfil es visible únicamente para quien tú decidas."
+          href="/signup"
+          cta="Gestionar mi privacidad →"
+        >
+          <div className="rounded-[14px] bg-white p-6 shadow-[0_14px_34px_-16px_rgba(13,34,64,0.25)]">
+            <div className="flex items-center gap-3 border-b border-[#E1E7F5] pb-3.5 text-sm text-fm-navy">
+              <span className="flex h-[18px] w-[18px] items-center justify-center rounded bg-fm-blue">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5" /></svg>
+              </span>
+              Visible en el directorio
+            </div>
+            <h3 className="mb-2 mt-[18px] text-[13px] font-bold text-fm-navy">Instituciones bloqueadas</h3>
+            {["Universidad de ejemplo", "Escuela de negocios demo"].map((n) => (
+              <div key={n} className="mb-2 flex items-center justify-between rounded-lg border border-[#E1E7F5] bg-[#FBFCFE] px-3 py-[9px] text-[13px] text-fm-navy">
+                <span>{n}</span><span className="text-[#5E6F8E]">Quitar</span>
+              </div>
+            ))}
+            <span className="text-[13px] font-bold text-fm-blue">+ Bloquear otra institución</span>
+          </div>
+        </Row>
       </div>
     </section>
   );
 }
 
-// ─── SECTOR METRICS ────────────────────────────────────────────────────────
-function SectorMetrics() {
-  const { ref, inView } = useInView(0.1);
+// ─── FRANJA OSCURA: cifras del sector ──────────────────────────────────────
+function SectorBand() {
   const metrics = [
     { value: "91", label: "universidades", detail: "50 públicas y 41 privadas" },
     { value: "50+", label: "escuelas de negocio", detail: "Activas en todo el país" },
@@ -616,89 +490,27 @@ function SectorMetrics() {
   ];
 
   return (
-    <section className="bg-fm-surface px-6 py-16 md:px-8 md:py-[88px]">
-      <div className="mx-auto max-w-[1120px]">
-        <div className="mx-auto mb-12 max-w-[600px] text-center md:mb-16">
-          <h2 className="text-[1.7rem] font-extrabold leading-[1.15] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.7rem,3.4vw,2.5rem)]">
-            Miles de másteres nuevos cada curso. No hay suficiente claustro con experiencia real.
-          </h2>
-        </div>
+    <section className="relative overflow-hidden bg-fm-navy px-6 py-16 md:px-8 md:py-24">
+      <span aria-hidden className="absolute hidden sm:block -left-12 top-12 h-[190px] w-[190px] rounded-full border-[3px] border-white/35" />
+      <span aria-hidden className="absolute hidden sm:block -bottom-[70px] left-8 h-[190px] w-[190px] rounded-full bg-[#FF6A1A]" />
+      <span aria-hidden className="absolute hidden sm:block -right-8 -top-10 h-[150px] w-[150px] rounded-full border-[3px] border-white/35" />
+      <span aria-hidden className="absolute hidden sm:block -bottom-[60px] right-14 h-[150px] w-[150px] rounded-full bg-[#9DB8FF]" />
 
-        <div ref={ref} className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {metrics.map((m, i) => (
-            <div
-              key={i}
-              className="rounded-3xl border border-fm-border bg-white p-6 text-center shadow-sm transition-transform duration-500"
-              style={{ transitionDelay: `${i * 0.1}s`, transform: inView ? "translateY(0)" : "translateY(12px)" }}
-            >
-              <div className="font-mono text-[1.7rem] font-bold text-fm-navy [font-variant-numeric:tabular-nums] md:text-[clamp(1.7rem,3vw,2.2rem)]">
+      <div className="relative mx-auto max-w-[900px] rounded-[20px] bg-[#EEF2F9] px-5 py-10 text-center md:px-12 md:py-14">
+        <h2 className="mx-auto max-w-[22ch] text-balance text-[1.5rem] font-extrabold leading-[1.12] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.5rem,2.8vw,2.1rem)]">
+          Miles de másteres nuevos cada curso. No hay suficiente claustro con experiencia real.
+        </h2>
+        <p className="mt-3.5 text-base text-[#5B6B85]">Empezamos por España y el mundo de habla hispana.</p>
+        <div className="mt-9 grid grid-cols-2 gap-4 text-left md:grid-cols-4">
+          {metrics.map((m) => (
+            <div key={m.label} className="rounded-xl border border-[#E1E7F5] bg-white p-5">
+              <div className="text-[1.7rem] font-extrabold leading-none tracking-[-0.04em] text-fm-blue [font-variant-numeric:tabular-nums] md:text-[2rem]">
                 {m.value}
               </div>
-              <div className="mt-1.5 text-[13px] font-bold text-fm-ink">{m.label}</div>
-              <div className="text-[11.5px] text-[#5E6F8E]">{m.detail}</div>
+              <div className="mt-2.5 text-sm font-bold text-fm-navy">{m.label}</div>
+              <div className="mt-0.5 text-[13px] text-[#5E6F8E]">{m.detail}</div>
             </div>
           ))}
-        </div>
-        <p className="mx-auto mt-8 max-w-[440px] text-center text-[12.5px] text-[#5E6F8E]">
-          Empezamos por España y el mundo de habla hispana.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-// ─── PRIVACY ───────────────────────────────────────────────────────────────
-function Privacy() {
-  return (
-    <section className="overflow-hidden bg-white px-6 py-16 md:px-8 md:py-[88px]">
-      <div className="mx-auto flex max-w-[620px] flex-col items-center text-center">
-        <div className="mb-5 flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-fm-blue/[0.08]">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B4FD8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
-        </div>
-        <h2 className="mb-[18px] text-[1.5rem] font-extrabold leading-[1.1] tracking-[-0.035em] text-fm-ink md:text-[clamp(1.5rem,2.6vw,2.1rem)]">
-          Tú controlas quién ve tu perfil.
-        </h2>
-        <p className="mb-7 text-sm leading-[1.8] text-[#5B6B85]">
-          Puedes bloquear instituciones específicas por nombre, incluido tu empleador actual.
-          Tu perfil es visible únicamente para quien tú decidas.
-        </p>
-        <Link href="/signup">
-          <button className="rounded-[10px] border-[1.5px] border-fm-navy px-6 py-3 text-sm font-semibold text-fm-navy transition-transform duration-150 ease-out active:scale-[0.97]">
-            Gestionar mi privacidad
-          </button>
-        </Link>
-      </div>
-
-      {/* Tarjeta flotante y descentrada — a propósito distinta de la columna
-          50/50 que ya usan las dos secciones "Para docentes/instituciones"
-          de más arriba, para no repetir un tercer split idéntico. */}
-      <div className="mx-auto mt-12 max-w-[1120px] md:mt-[-8px]">
-        <div className="w-full max-w-[320px] rounded-2xl border border-white/10 bg-gradient-to-br from-fm-navy to-fm-dark p-6 shadow-[0_30px_60px_-24px_rgba(13,34,64,0.35)] md:ml-auto md:mr-[6%] md:-rotate-2">
-          <div className="mb-[22px] flex items-center justify-between text-[13px] font-semibold text-white">
-            <span>Visible en el directorio</span>
-            <span className="relative h-[22px] w-[38px] shrink-0 rounded-full bg-fm-blue">
-              <span className="absolute left-[18px] top-0.5 h-[18px] w-[18px] rounded-full bg-white" />
-            </span>
-          </div>
-          <div className="mb-3 font-mono text-[10.5px] uppercase tracking-[0.08em] text-white/60">
-            Instituciones bloqueadas
-          </div>
-          {[68, 52].map((w, i) => (
-            <div key={i} className="mb-2 flex items-center justify-between gap-2.5 rounded-lg bg-white/5 px-3 py-2.5">
-              <div className="h-[9px] rounded-md bg-white/15" style={{ width: `${w}%` }} />
-              <span className="shrink-0 rounded-full bg-fm-signal/15 px-2 font-mono text-[9.5px] font-bold text-[#FF9B8A]">
-                Bloqueada
-              </span>
-            </div>
-          ))}
-          <button
-            type="button"
-            className="mt-2 w-full rounded-lg border border-dashed border-white/25 py-2 text-[11.5px] text-white/50"
-          >
-            + Bloquear otra institución
-          </button>
         </div>
       </div>
     </section>
@@ -710,9 +522,6 @@ function CtaFinal() {
   return (
     <section className="bg-gradient-to-br from-fm-navy to-fm-blue px-6 py-[72px] text-center md:px-8 md:py-20">
       <div className="mx-auto max-w-[680px]">
-        <span className="mb-[18px] block font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-white/70">
-          Únete a la red
-        </span>
         <h2 className="mb-[18px] text-[1.75rem] font-black leading-[1.08] tracking-[-0.04em] text-white md:text-[clamp(1.75rem,3.5vw,3rem)]">
           Únete a la red de talento para la educación superior.
         </h2>
@@ -749,12 +558,9 @@ export default function LandingClient() {
       <Hero />
       <TrustStrip />
       <Ticker />
-      <HowItWorks />
-      <ProductTrio />
-      <SplitDocentes />
-      <SplitInstituciones />
-      <SectorMetrics />
-      <Privacy />
+      <Steps />
+      <RowsSection />
+      <SectorBand />
       <CtaFinal />
       <Footer />
     </div>

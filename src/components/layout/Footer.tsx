@@ -44,13 +44,6 @@ export function Footer() {
           grid-template-columns: 2.2fr 1fr 1fr;
           gap: 40px;
         }
-        .fm-footer-trust {
-          display: flex;
-          align-items: center;
-          gap: 24px;
-          flex-wrap: wrap;
-          justify-content: center;
-        }
         @media (max-width: 900px) {
           .fm-footer-grid {
             grid-template-columns: 1fr 1fr !important;
@@ -62,33 +55,18 @@ export function Footer() {
             grid-template-columns: 1fr !important;
             gap: 28px !important;
           }
-          .fm-footer-trust {
-            gap: 12px !important;
-          }
         }
       `}</style>
       <div style={{ maxWidth: 1120, margin: "0 auto" }}>
 
         {/* Trust line */}
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 48 }}>
-          <div className="fm-footer-trust" style={{
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: 999, padding: "10px 20px",
-          }}>
-            {["Verificado", "Sin comisiones", "Sin intermediarios"].map((label, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                {i > 0 && <div style={{ width: 1, height: 14, background: "rgba(255,255,255,0.1)" }} />}
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: D.gold }} />
-                  <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.5)", letterSpacing: "0.02em" }}>
-                    {label}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <p style={{
+          textAlign: "center", marginBottom: 48,
+          fontFamily: SANS, fontSize: 12, fontWeight: 600, letterSpacing: "0.02em",
+          color: "rgba(255,255,255,0.5)",
+        }}>
+          Verificado · Sin comisiones · Sin intermediarios
+        </p>
 
         {/* Top row */}
         <div className="fm-footer-grid" style={{
