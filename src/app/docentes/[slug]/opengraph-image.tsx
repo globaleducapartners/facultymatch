@@ -119,6 +119,11 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         <div style={{ fontSize: 26, color: "rgba(255,255,255,0.55)", display: "flex" }}>facultymatch.app</div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      // Corta duración: la tarjeta lleva nombre y titular, así que si el perfil
+      // pasa a privado no debe seguir sirviéndose durante meses desde la caché.
+      headers: { "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=600" },
+    }
   );
 }
