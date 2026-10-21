@@ -231,3 +231,77 @@ export const getActivationEmail = (name: string, activationLink: string) => base
   <p class="small">Si el botón no funciona, copia este enlace en tu navegador:</p>
   <p class="link-text">${activationLink}</p>
 `);
+
+// ── Correo a la comunidad: agradecimiento + Invita y Gana ────────────────────
+// Se envía de forma individual (nombre y enlace personal de cada docente) con
+// scripts/send-community-email.ts. Maquetación con tablas y estilos en línea
+// para que se vea igual en Gmail, Outlook y móviles.
+const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+export function firstNameOf(fullName: string | null | undefined): string {
+  const words = (fullName || "")
+    .replace(/\b(dr|dra|prof|profa|d|da|doctor|doctora|mg|mgtr|lic|coach|ma|mª)\.?(?=\s)/gi, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+  const first = words[0] || "";
+  if (!first) return "";
+  return first.charAt(0).toLocaleUpperCase("es") + first.slice(1).toLocaleLowerCase("es");
+}
+
+export const COMMUNITY_EMAIL_SUBJECT = (name: string) =>
+  name ? `${name}, gracias por confiar en FacultyMatch` : "Gracias por confiar en FacultyMatch";
+
+export function getCommunityInviteEmail(opts: { name: string; referralLink: string; verified: boolean }) {
+  const { name, referralLink, verified } = opts;
+  const site = "https://www.facultymatch.app";
+  const p = "margin:0 0 18px;font-size:16px;line-height:1.7;color:#334155;";
+  const shareText = `Estoy en FacultyMatch, un directorio de docentes y expertos verificados para universidades y escuelas de negocio. Crea tu perfil gratis aquí: ${referralLink}`;
+  const whatsapp = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+  const mailto = `mailto:?subject=${encodeURIComponent("Te recomiendo FacultyMatch")}&body=${encodeURIComponent(shareText)}`;
+
+  const profileBlock = verified
+    ? ""
+    : `<p style="${p}">Un detalle: tu perfil todavía no está verificado. Entra, completa lo que falte y lo revisamos. Un perfil verificado da confianza a quien recibe tu invitación y es el que las instituciones encuentran.</p>
+       <p style="margin:0 0 26px;"><a href="${site}/app/faculty" style="color:#1B4FD8;font-weight:700;text-decoration:none;">Completar mi perfil &rarr;</a></p>`;
+
+  return `<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(COMMUNITY_EMAIL_SUBJECT(name))}</title></head>
+<body style="margin:0;padding:0;background:#EEF2F9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Tu enlace personal y cómo conseguir 1 año de plan Professional entre todos.</div>
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#EEF2F9;padding:32px 12px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;">
+  <tr><td style="background:#0D2240;padding:26px 40px;text-align:center;">
+    <img src="${site}/icon-192.png" width="28" height="28" alt="" style="vertical-align:middle;border-radius:6px;margin-right:8px;">
+    <span style="color:#ffffff;font-size:22px;font-weight:800;letter-spacing:-0.5px;vertical-align:middle;">facultymatch</span>
+  </td></tr>
+  <tr><td style="padding:40px 40px 12px;">
+    <h1 style="margin:0 0 22px;font-size:26px;line-height:1.2;font-weight:800;letter-spacing:-0.03em;color:#0D2240;">${name ? `Hola, ${esc(name)}` : "Hola"}</h1>
+    <p style="${p}">Te escribo para darte las gracias. Cuando creaste tu perfil en FacultyMatch confiaste en una idea que todavía estamos construyendo: que las instituciones encuentren al profesorado por lo que sabe y no por el CV que dejó en un portal de empleo.</p>
+    <p style="${p}">Un directorio vale lo que valen sus perfiles. Cuantos más seamos, mejor lo haremos: más opciones para las instituciones, más visibilidad para cada docente y más valor para el tuyo.</p>
+    <p style="${p}"><strong style="color:#0D2240;">Por eso te propongo algo concreto.</strong> En tu cuenta, en la sección <em>Invita y Gana</em>, tienes tu enlace personal. Cuando 10 colegas se registren con él y verifiquen su perfil, te regalamos <strong style="color:#0D2240;">1 año del plan Professional</strong>, sin coste. Y si invitas por email desde esa misma sección, tu colega recibe además un código de invitación con un mes de Professional gratis.</p>
+    ${profileBlock}
+  </td></tr>
+  <tr><td style="padding:0 40px 8px;">
+    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#EEF2F9;border-radius:12px;">
+      <tr><td style="padding:22px 24px;">
+        <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#5E6F8E;">Tu enlace personal</p>
+        <p style="margin:0 0 16px;font-size:14px;line-height:1.5;word-break:break-all;"><a href="${referralLink}" style="color:#1B4FD8;text-decoration:none;">${referralLink}</a></p>
+        <a href="${site}/app/faculty/referrals" style="display:inline-block;background:#1B4FD8;color:#ffffff;padding:13px 26px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;">Ver mis invitaciones</a>
+      </td></tr>
+    </table>
+  </td></tr>
+  <tr><td style="padding:22px 40px 8px;">
+    <p style="margin:0 0 10px;font-size:15px;line-height:1.6;color:#334155;">¿Quieres enviarlo ya? Elige cómo:</p>
+    <p style="margin:0 0 26px;font-size:15px;"><a href="${whatsapp}" style="color:#1B4FD8;font-weight:700;text-decoration:none;">Compartir por WhatsApp</a> &nbsp;·&nbsp; <a href="${mailto}" style="color:#1B4FD8;font-weight:700;text-decoration:none;">Compartir por email</a></p>
+    <p style="${p}">Y si tienes ideas, dudas o algo que echas de menos, responde a este correo. Lo leo yo.</p>
+    <p style="margin:0 0 34px;font-size:16px;line-height:1.6;color:#334155;">Gracias de nuevo por estar.<br><strong style="color:#0D2240;">Miguel</strong><br><span style="color:#5E6F8E;font-size:14px;">FacultyMatch</span></p>
+  </td></tr>
+  <tr><td style="background:#F8FAFC;border-top:1px solid #E2E8F0;padding:22px 40px;text-align:center;">
+    <p style="margin:0;font-size:12px;color:#94a3b8;line-height:1.6;">Recibes este mensaje porque tienes una cuenta en FacultyMatch (Grupo Global Educa SL).<br>Si prefieres no recibir más mensajes como este, responde con la palabra &laquo;baja&raquo; y lo gestionamos.</p>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>`;
+}

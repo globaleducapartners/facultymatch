@@ -414,7 +414,7 @@ export default async function EducatorDashboard() {
             <div className={`${cardCls} p-5`}>
               <h3 className="text-base font-bold tracking-[-0.02em] text-fm-ink">Invita y Gana</h3>
               <p className="mt-2 text-sm leading-relaxed text-[#5B6B85]">
-                Invita compañeros a FacultyMatch y desbloquea meses gratis de Plan Professional.
+                Cuando 10 colegas verifiquen su perfil con tu enlace, te regalamos 1 año del plan Professional.
               </p>
               <div className="mt-3 flex justify-between text-sm">
                 <span className="text-[#5B6B85]">Invitaciones exitosas</span>

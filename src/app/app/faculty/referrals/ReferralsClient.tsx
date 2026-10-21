@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatDateTZ } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import {
   Gift,
   Copy,
@@ -29,9 +28,9 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATUS_CLASS: Record<string, string> = {
-  pending: "bg-amber-50 text-amber-700 border-amber-200",
-  registered: "bg-blue-50 text-fm-blue border-blue-200",
-  successful: "bg-green-50 text-green-700 border-green-200",
+  pending: "text-amber-700",
+  registered: "text-fm-blue",
+  successful: "text-green-700",
 };
 
 interface Props {
@@ -43,6 +42,7 @@ interface Props {
 export default function ReferralsClient({ userId, referrals, stats }: Props) {
   const router = useRouter();
   const referralLink = `${SITE}/signup?ref=${userId}`;
+  const shareText = "Estoy en FacultyMatch, un directorio de docentes y expertos verificados para universidades y escuelas de negocio. Crea tu perfil gratis:";
 
   const [copied, setCopied] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -99,11 +99,11 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
             <Gift size={20} className="text-fm-blue" />
           </div>
           <h1 className="text-3xl font-extrabold text-fm-navy tracking-tight">
-            Invita a colegas y gana 1 año Premium
+            Invita a colegas y gana 1 año de Professional
           </h1>
         </div>
         <p className="text-gray-500 font-medium mt-2 ml-13">
-          Por cada 10 colegas que completen su perfil, te regalamos un año de acceso profesional.
+          Cuando 10 colegas se registren con tu enlace y verifiquen su perfil, te regalamos un año del plan Professional.
         </p>
       </div>
 
@@ -121,7 +121,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
             </CardHeader>
             <CardContent className="pt-5 space-y-4">
               <p className="text-sm text-gray-600 font-medium">
-                Comparte este enlace con tus colegas docentes. Cuando se registren y completen su perfil, contará para tu progreso.
+                Comparte este enlace con tus colegas docentes. Cuando se registren y su perfil quede verificado, contará para tu progreso.
               </p>
               <div className="flex gap-2">
                 <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono text-gray-600 overflow-hidden text-ellipsis whitespace-nowrap min-w-0">
@@ -142,6 +142,17 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                   )}
                 </Button>
               </div>
+              <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-fm-blue">
+                <a href={`https://wa.me/?text=${encodeURIComponent(`${shareText} ${referralLink}`)}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  Compartir por WhatsApp
+                </a>
+                <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralLink)}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  Compartir en LinkedIn
+                </a>
+                <a href={`mailto:?subject=${encodeURIComponent("Te recomiendo FacultyMatch")}&body=${encodeURIComponent(`${shareText} ${referralLink}`)}`} className="hover:underline">
+                  Compartir por email
+                </a>
+              </div>
             </CardContent>
           </Card>
 
@@ -155,7 +166,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
             </CardHeader>
             <CardContent className="pt-5 space-y-4">
               <p className="text-sm text-gray-600 font-medium">
-                Envía una invitación directa. Tu colega recibirá un email con enlace de registro.
+                Envía una invitación directa. Tu colega recibirá un email con tu enlace y un código con un mes de Professional gratis.
               </p>
               <form onSubmit={sendInvite} className="flex gap-2">
                 <input
@@ -180,7 +191,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
               </form>
               {!canSendMore && (
                 <p className="text-xs text-amber-600 font-medium bg-white border border-fm-border rounded-xl px-3 py-2">
-                  Has alcanzado el límite de 20 invitaciones por email.
+                  Has alcanzado el límite de 20 invitaciones por email. Tu enlace personal sigue funcionando sin límite.
                 </p>
               )}
               {sendError && (
@@ -218,7 +229,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                   </div>
                   <p className="font-extrabold text-fm-navy">Aún no has enviado ninguna invitación</p>
                   <p className="text-sm text-gray-500 font-medium mt-1 max-w-xs mx-auto">
-                    Comparte tu enlace o envía un email a tus colegas para empezar a ganar acceso Premium.
+                    Comparte tu enlace o envía un email a tus colegas para empezar a ganar tu año de Professional.
                   </p>
                 </div>
               ) : (
@@ -234,13 +245,9 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                       <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
                         {formatDateTZ(ref.created_at)}
                       </span>
-                      <Badge
-                        className={`text-[11px] font-bold border px-2.5 py-1 rounded-md ${
- STATUS_CLASS[ref.status] || "bg-gray-50 text-gray-500 border-gray-200"
- }`}
-                      >
+                      <span className={`text-xs font-bold ${STATUS_CLASS[ref.status] || "text-gray-500"}`}>
                         {STATUS_LABEL[ref.status] || ref.status}
-                      </Badge>
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -266,13 +273,13 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                     <span className="text-xs font-bold text-yellow-300">¡Meta alcanzada!</span>
                   </div>
                   <p className="text-lg font-extrabold text-white leading-tight">
-                    ¡Has ganado tu año Premium! Está activo en tu cuenta.
+                    ¡Has ganado tu año de Professional! Está activo en tu cuenta.
                   </p>
                   <div className="h-3 bg-white/20 rounded-full overflow-hidden">
                     <div className="h-full bg-yellow-300 rounded-full w-full" />
                   </div>
                   <p className="text-sm font-medium text-white/80">
-                    10 de 10 colegas han completado su perfil.
+                    10 de 10 colegas han verificado su perfil.
                   </p>
                 </>
               ) : (
@@ -293,7 +300,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                     />
                   </div>
                   <p className="text-sm font-medium text-gray-600 text-center">
-                    <strong className="text-fm-navy">{stats.successful_referrals}</strong> de 10 colegas han completado su perfil.
+                    <strong className="text-fm-navy">{stats.successful_referrals}</strong> de 10 colegas han verificado su perfil.
                     {stats.successful_referrals < 10 && (
                       <> Te faltan <strong className="text-fm-blue">{10 - stats.successful_referrals}</strong> más.</>
                     )}
@@ -316,7 +323,7 @@ export default function ReferralsClient({ userId, referrals, stats }: Props) {
                 { n: "1", text: "Comparte tu enlace o envía invitaciones por email." },
                 { n: "2", text: "Tu colega se registra y completa su perfil." },
                 { n: "3", text: "Cuando se verifique, suma a tu contador." },
-                { n: "4", text: "Al llegar a 10, recibes 1 año Premium gratis." },
+                { n: "4", text: "Al llegar a 10, recibes 1 año de Professional gratis." },
               ].map(step => (
                 <div key={step.n} className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-full bg-fm-blue text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
