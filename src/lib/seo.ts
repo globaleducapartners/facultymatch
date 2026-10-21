@@ -12,6 +12,12 @@ export const organizationJsonLd = {
   logo: `${SITE_URL}/apple-touch-icon.png`,
   description:
     "Directorio de docentes, investigadores y expertos verificados para universidades y escuelas de negocio. Las instituciones buscan por área de conocimiento y contactan directamente.",
+  // Cuentas oficiales (las mismas que el pie de la web). Instagram se añade
+  // cuando exista, con NEXT_PUBLIC_INSTAGRAM_URL en Vercel.
+  sameAs: [
+    "https://www.linkedin.com/company/facultymatch",
+    ...(process.env.NEXT_PUBLIC_INSTAGRAM_URL ? [process.env.NEXT_PUBLIC_INSTAGRAM_URL] : []),
+  ],
   email: "support@facultymatch.app",
   telephone: "+34616684214",
   address: {

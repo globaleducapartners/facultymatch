@@ -34,6 +34,7 @@ export default async function FacultyDirectoryPage({
     logPrefix: "[faculty/directory]",
     // Un perfil en "Solo instituciones" no debe verlo otro docente.
     publicOnly: true,
+    lockedPrivateCards: true,
   });
 
   return (

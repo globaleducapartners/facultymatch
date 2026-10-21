@@ -48,8 +48,30 @@ export interface FacultySearchOptions {
   skip?: boolean;
   /** true para quien no es institución (p. ej. docentes viendo a colegas): solo perfiles con visibilidad pública; "Solo instituciones" no se les muestra. */
   publicOnly?: boolean;
+  /** true en el directorio entre docentes: además de los perfiles públicos devuelve, como tarjetas anónimas, los verificados con visibilidad "Solo instituciones" (sin texto libre de búsqueda: así no se puede confirmar que una persona concreta está en la plataforma). */
+  lockedPrivateCards?: boolean;
+  /** true solo para instituciones con plan que ve datos de contacto (teléfono, WhatsApp…): si no, esos campos nunca salen del servidor. */
+  includeContact?: boolean;
   /** Prefijo para los console.error, para saber desde qué pantalla vino el fallo. */
   logPrefix?: string;
+}
+
+// Claves que nunca deben salir del servidor hacia el navegador (referidos,
+// verificación interna, preferencias). El teléfono y los contactos solo se
+// entregan con includeContact (instituciones con plan que los muestra).
+const PRIVATE_KEYS = [
+  "profile_token", "referral_stats", "referred_by", "referral_code_redeemed", "referral_reward_counted",
+  "referral_reward_granted_at", "verification_notes", "verificado_por", "orcid_import_data", "visibility_source",
+  "notify_new_offers", "notify_messages", "notify_weekly_digest", "blocked_institutions", "preferred_institutions",
+  "hide_from_current_institution", "preferred_contact_method",
+];
+const CONTACT_KEYS = ["phone", "contact_email", "contact_whatsapp", "contact_linkedin"];
+
+export function stripPrivateFields<T extends Record<string, any>>(row: T, includeContact = false): T {
+  const out: Record<string, any> = { ...row };
+  for (const k of PRIVATE_KEYS) delete out[k];
+  if (!includeContact) for (const k of CONTACT_KEYS) delete out[k];
+  return out as T;
 }
 
 export interface FacultySearchResult {
@@ -103,16 +125,29 @@ export async function searchFacultyProfiles(
       })()
     : Promise.resolve({ data: null as null | { id: string }[] });
 
-  // Text search: use admin to bypass RLS on user_profiles
-  const namePreQuery = query
+  // ── Búsqueda de texto completo (migración 20261022000001) ────────────────
+  // Todas las palabras, sin tildes, en cualquier campo del perfil, con orden
+  // por relevancia. Si la función aún no existe en la base de datos, se cae
+  // con seguridad a la búsqueda anterior (ILIKE) de más abajo.
+  let fullTextRank: Map<string, number> | null = null;
+  if (query) {
+    const { data: ftData, error: ftError } = await admin.rpc("search_faculty", { p_query: query, p_limit: 100 });
+    if (!ftError && Array.isArray(ftData)) {
+      fullTextRank = new Map(ftData.map((r: any) => [r.faculty_id as string, Number(r.rank) || 0]));
+    } else if (ftError) {
+      console.error(`${logPrefix} search_faculty failed (migration not applied yet?):`, ftError);
+    }
+  }
+  const legacyText = !!query && !fullTextRank;
+
+  // Búsqueda anterior: nombre en user_profiles (admin para saltar RLS)
+  const namePreQuery = legacyText
     ? admin.from("user_profiles").select("id").ilike("full_name", `%${query}%`)
     : Promise.resolve({ data: null as null | { id: string }[] });
 
-  // degrees (jsonb) / subjects (text[]) can't be searched via PostgREST's ilike
-  // filter — see search_faculty_by_degrees_subjects migration. Fails open: if
-  // that migration hasn't been applied yet, this just returns an error here
-  // and search keeps working without the extra degree-title matches.
-  const degreesTextQuery = query
+  // degrees (jsonb) / subjects (text[]) no admiten ilike por PostgREST; la
+  // función search_faculty_by_degrees_subjects (migración 20260802000001) sí.
+  const degreesTextQuery = legacyText
     ? admin.rpc("search_faculty_by_degrees_subjects", { p_query: query })
     : Promise.resolve({ data: null as null | { faculty_id: string }[], error: null as any });
 
@@ -132,7 +167,7 @@ export async function searchFacultyProfiles(
     allExpertiseQuery,
     degreesTextQuery,
   ]);
-  if (degreesMatchError && query) {
+  if (degreesMatchError && legacyText) {
     console.error(`${logPrefix} search_faculty_by_degrees_subjects failed (migration not applied yet?):`, degreesMatchError);
   }
 
@@ -147,10 +182,12 @@ export async function searchFacultyProfiles(
   // ── Shared filter application — usada tanto para los resultados
   // verificados como para las tarjetas "pendiente" de abajo, así ambas
   // respetan exactamente los mismos criterios de búsqueda/filtro.
-  function applySearchFilters(q: any) {
-    let query_ = opts.publicOnly
-      ? q.eq("visibility", "public")
-      : q.or("visibility.eq.public,visibility.eq.private,visibility.is.null");
+  function applySearchFilters(q: any, only?: "private") {
+    let query_ = only === "private"
+      ? q.eq("visibility", "private")
+      : opts.publicOnly
+        ? q.eq("visibility", "public")
+        : q.or("visibility.eq.public,visibility.eq.private,visibility.is.null");
 
     if (blockedFacultyIds.size > 0) {
       query_ = query_.not("id", "in", `(${[...blockedFacultyIds].join(",")})`);
@@ -159,7 +196,10 @@ export async function searchFacultyProfiles(
     // Broad text search: headline + bio + current_institution + full_name +
     // degrees/subjects (via pre-queried IDs — degrees es jsonb y subjects
     // text[], ninguno acepta ilike directamente).
-    if (query) {
+    if (fullTextRank) {
+      const ids = [...fullTextRank.keys()];
+      query_ = query_.in("id", ids.length > 0 ? ids : ["00000000-0000-0000-0000-000000000000"]);
+    } else if (query) {
       const orParts = [
         `headline.ilike.%${escapeOrValue(query)}%`,
         `bio.ilike.%${escapeOrValue(query)}%`,
@@ -224,7 +264,9 @@ export async function searchFacultyProfiles(
       .select(`*, user:user_profiles(full_name, avatar_url, plan, subscription_status), expertise:faculty_expertise(*)`)
       .eq("estado_perfil", "verificado")
   );
-  const { data: educators, error: educatorsError } = await educatorQuery.range(0, 49);
+  // Con búsqueda de texto se traen todos los candidatos (≤100) para ordenarlos
+  // por relevancia aquí; sin ella, la primera página de 50.
+  const { data: educators, error: educatorsError } = await educatorQuery.range(0, fullTextRank ? 99 : 49);
   if (educatorsError) {
     console.error(`${logPrefix} educatorQuery failed:`, educatorsError);
   }
@@ -254,6 +296,30 @@ export async function searchFacultyProfiles(
       country: p.country || p.location || null,
     };
   });
+
+  // ── Tarjetas de perfiles privados (solo directorio entre docentes) ────────
+  // Verificados que eligieron "Solo instituciones": se muestra que existen,
+  // con área y país como mucho, nunca nombre, foto ni texto. Sin búsqueda de
+  // texto libre, para no poder confirmar si una persona concreta está aquí.
+  if (opts.lockedPrivateCards && !query) {
+    const { data: privateRows, error: privateError } = await applySearchFilters(
+      admin
+        .from("faculty_profiles")
+        .select("id, country, location, expertise:faculty_expertise(area)")
+        .eq("estado_perfil", "verificado"),
+      "private"
+    ).range(0, 23);
+    if (privateError) console.error(`${logPrefix} privateQuery failed:`, privateError);
+    for (const p of privateRows || []) {
+      const expertise = Array.isArray((p as any).expertise) ? (p as any).expertise[0] : (p as any).expertise;
+      transformedPending.push({
+        id: (p as any).id,
+        estado_perfil: "privado",
+        area: expertise?.area || null,
+        country: (p as any).country || (p as any).location || null,
+      });
+    }
+  }
 
   // ── Batch fetch faculty documents + expertise flags for these educators ──
   const educatorIds = (educators || []).map((ed: any) => ed.id);
@@ -299,8 +365,11 @@ export async function searchFacultyProfiles(
         completenessInputFromRows(ed, userObj, hasExpertiseIds.has(ed.id))
       ).score;
 
+      const safe = stripPrivateFields(ed, opts.includeContact);
+
       return {
-        ...ed,
+        ...safe,
+        _relevance: fullTextRank?.get(ed.id) ?? 0,
         full_name: userObj?.full_name || ed.full_name || "Docente",
         avatar_url: userObj?.avatar_url || null,
         country: ed.country || ed.location || null,
@@ -312,11 +381,14 @@ export async function searchFacultyProfiles(
       };
     })
     .sort((a: any, b: any) => {
+      // Con búsqueda de texto manda la relevancia; el plan y la completitud
+      // desempatan.
+      if (fullTextRank && b._relevance !== a._relevance) return b._relevance - a._relevance;
       if (a.is_pro && !b.is_pro) return -1;
       if (!a.is_pro && b.is_pro) return 1;
       if (b._completeness !== a._completeness) return b._completeness - a._completeness;
       return (a.full_name || "").localeCompare(b.full_name || "");
     });
 
-  return { transformedEducators, transformedPending };
+  return { transformedEducators: transformedEducators.slice(0, 50), transformedPending };
 }

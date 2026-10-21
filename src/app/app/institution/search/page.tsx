@@ -141,6 +141,7 @@ export default async function InstitutionSearchRoute({
   const { transformedEducators, transformedPending } = await searchFacultyProfiles(admin, filters, {
     blockedFacultyIds,
     skip: searchLimitReached,
+    includeContact: isPro,
     logPrefix: "[institution/search]",
   });
 

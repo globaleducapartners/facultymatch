@@ -314,25 +314,22 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
           </p>
 
           <div className="flex flex-wrap gap-2 pt-2">
-            {educator.expertise?.length > 0
-              ? educator.expertise.slice(0, 3).map((exp: any) => {
-                  const areaLabel = typeof exp.area === "string" ? exp.area : (exp.area?.name ?? "");
-                  const subareaLabel = typeof exp.subarea === "string" ? exp.subarea : (exp.subarea?.name ?? "");
-                  const label = [areaLabel, subareaLabel].filter(Boolean).join(": ");
-                  return label ? (
-                    <Badge key={exp.id ?? label} variant="secondary" className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-xs font-bold border-none max-w-[200px] truncate">
-                      {label}
-                    </Badge>
-                  ) : null;
-                })
-              : educator.faculty_areas?.slice(0, 3).map((area: any) => {
-                  const label = typeof area === "string" ? area : (area?.name ?? "");
-                  return label ? (
-                    <Badge key={label} variant="secondary" className="bg-gray-50 text-gray-600 px-3 py-1 rounded-lg text-xs font-bold border-none max-w-[200px] truncate">
-                      {label}
-                    </Badge>
-                  ) : null;
-                })}
+            {(() => {
+              // Etiqueta corta: la subárea si existe (más específica), si no el área.
+              const labels: string[] =
+                educator.expertise?.length > 0
+                  ? educator.expertise.map((exp: any) => {
+                      const area = typeof exp.area === "string" ? exp.area : (exp.area?.name ?? "");
+                      const sub = typeof exp.subarea === "string" ? exp.subarea : (exp.subarea?.name ?? "");
+                      return sub || area;
+                    })
+                  : (educator.faculty_areas || []).map((a: any) => (typeof a === "string" ? a : (a?.name ?? "")));
+              return [...new Set(labels.filter(Boolean))].slice(0, 3).map((label) => (
+                <span key={label} className="rounded-lg border border-fm-border bg-fm-surface px-3 py-1 text-xs font-bold text-fm-ink">
+                  {label}
+                </span>
+              ));
+            })()}
           </div>
         </div>
       </div>

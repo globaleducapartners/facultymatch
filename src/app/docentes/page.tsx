@@ -36,6 +36,14 @@ export default async function DocentesIndexPage() {
     .eq("estado_perfil", "verificado")
     .not("profile_slug", "is", "null");
 
+  // Solo el número de perfiles verificados que han elegido privacidad: nunca sus datos.
+  const { count: privateCount } = await admin
+    .from("faculty_profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("visibility", "private")
+    .eq("is_active", true)
+    .eq("estado_perfil", "verificado");
+
   const ids = ((data || []) as { id: string }[]).map((r) => r.id);
   const { data: names } = ids.length
     ? await admin.from("user_profiles").select("id, full_name").in("id", ids)
@@ -103,6 +111,12 @@ export default async function DocentesIndexPage() {
               </li>
             ))}
           </ul>
+        )}
+        {!!privateCount && (
+          <p className="mt-12 border-t border-fm-border pt-6 text-sm leading-[1.7] text-[#5B6B85]">
+            Además, {privateCount} {privateCount === 1 ? "docente verificado ha preferido" : "docentes verificados han preferido"} conservar su
+            privacidad. Solo las cuentas de institución pueden acceder a {privateCount === 1 ? "su perfil" : "sus perfiles"}.
+          </p>
         )}
       </main>
     </div>

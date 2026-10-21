@@ -117,10 +117,10 @@ export const IMAGES = {
     author: "Mikhail Nilov", source: "Pexels", license: "Licencia Pexels", url: pexels(8297424),
   },
   recursos: {
-    src: "/images/experta-esquema-pizarra-feedback.jpg", width: 1600, height: 1067,
-    alt: "Experta dibujando un esquema en una pizarra, recursos y guías para docentes e instituciones",
+    src: "/images/guia-docente-planificacion-oficina.jpg", width: 1600, height: 1067,
+    alt: "Docente consultando una guía de planificación en una oficina, recursos para docentes e instituciones",
     title: "Recursos para docentes e instituciones",
-    author: "ThisisEngineering", source: "Pexels", license: "Licencia Pexels", url: pexels(3861970),
+    author: "Julio Lopez", source: "Unsplash", license: "Licencia Unsplash", url: unsplash("MXFE74HZjnQ"),
   },
   jornada: {
     src: "/images/jornada-formacion-profesionales.jpg", width: 1600, height: 1057,

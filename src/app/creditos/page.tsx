@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Créditos de las imágenes | FacultyMatch",
   description:
     "Autoría y licencia de las fotografías que ilustran FacultyMatch, el directorio de docentes y expertos verificados para educación.",
-  alternates: { canonical: "/creditos" },
+  robots: { index: false, follow: false },
 };
 
 export default function CreditosPage() {

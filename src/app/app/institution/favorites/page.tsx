@@ -1,3 +1,4 @@
+import { stripPrivateFields } from "@/lib/faculty-search";
 import { createAdminClient, getCurrentUser } from "@/lib/supabase-server";
 import { redirect } from "next/navigation";
 import { EducatorCard } from "@/components/dashboard/EducatorCard";
@@ -46,7 +47,7 @@ export default async function FavoritesPage() {
     educators = (profiles || []).map((fp: any) => {
       const u = userMap[fp.id];
       return {
-        ...fp,
+        ...stripPrivateFields(fp),
         full_name: u?.full_name || fp.full_name || "Docente",
         avatar_url: u?.avatar_url || fp.avatar_url || null,
       };

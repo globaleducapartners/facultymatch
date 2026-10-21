@@ -302,7 +302,7 @@ export function InstitutionSearchPage({
               <p className="text-blue-700 text-sm font-medium mt-0.5">
                 {isAlreadyInstitution
                   ? "Tienes un perfil de institución. Cambia al modo institución para contactar docentes."
-                  : "Puedes ver todos los perfiles, pero necesitas una cuenta de institución para contactar docentes."}
+                  : "Puedes ver los perfiles públicos, pero necesitas una cuenta de institución para contactar docentes."}
               </p>
             </div>
           </div>
@@ -593,14 +593,28 @@ export function InstitutionSearchPage({
 
       {/* ── Pending teaser cards — docentes reales que aún no están verificados,
           no contactables. Respeta los mismos filtros que la búsqueda principal. ── */}
-      {pendingEducators.length > 0 && (
+      {pendingEducators.some((p) => p.estado_perfil === "privado") && (
+        <div className="space-y-3 pt-2">
+          <p className="flex items-center gap-1.5 text-sm font-bold text-fm-faint">
+            <Lock size={13} className="text-gray-300" />
+            {pendingEducators.filter((p) => p.estado_perfil === "privado").length} perfiles verificados con la privacidad activada: solo las cuentas de institución pueden acceder a ellos
+          </p>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {pendingEducators.filter((p) => p.estado_perfil === "privado").map((p) => (
+              <PendingEducatorCard key={p.id} pending={p} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {pendingEducators.some((p) => p.estado_perfil !== "privado") && (
         <div className="space-y-3 pt-2">
           <p className="text-sm font-bold text-fm-faint flex items-center gap-1.5">
             <Lock size={13} className="text-gray-300" />
-            +{pendingEducators.length} {pendingEducators.length === 1 ? "docente más" : "docentes más"} completando su verificación
+            +{pendingEducators.filter((p) => p.estado_perfil !== "privado").length} {pendingEducators.filter((p) => p.estado_perfil !== "privado").length === 1 ? "docente más" : "docentes más"} completando su verificación
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {pendingEducators.map((p) => (
+            {pendingEducators.filter((p) => p.estado_perfil !== "privado").map((p) => (
               <PendingEducatorCard key={p.id} pending={p} />
             ))}
           </div>

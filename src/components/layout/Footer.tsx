@@ -156,7 +156,6 @@ export function Footer() {
                 { label: "Para docentes",      href: "/faculty" },
                 { label: "Para instituciones", href: "/institutions" },
                 { label: "Precios",            href: "/faculty#precios" },
-                { label: "Docentes verificados", href: "/docentes" },
                 { label: "Recursos",           href: "/resources" },
               ].map((l) => (
                 <Link key={l.href} href={l.href} style={{
@@ -183,7 +182,6 @@ export function Footer() {
                 { label: "Aviso legal",            href: "/legal" },
                 { label: "Política de privacidad", href: "/privacy" },
                 { label: "Términos de uso",        href: "/terms" },
-                { label: "Créditos de imágenes",   href: "/creditos" },
               ].map((l) => (
                 <Link key={l.href} href={l.href} style={{
                   fontFamily: SANS, fontSize: 13, color: D.text,
