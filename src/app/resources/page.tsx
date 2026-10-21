@@ -71,54 +71,47 @@ export default function ResourcesPage() {
     <div className="bg-fm-surface font-sans">
       <Navbar />
 
-      {/* ── HERO ── */}
-      
-      <section className="relative overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(720px 440px at 18% 4%, rgba(27,79,216,0.3), transparent 60%), linear-gradient(160deg, #0B1B33 0%, #071326 72%)",
-          }}
-        />
-        <div className="relative z-[2] mx-auto grid w-full max-w-[1100px] items-center gap-10 px-5 py-16 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-10 md:py-0 md:min-h-[520px]">
-          <div className="text-center md:text-left">
+      {/* ── HERO ── (misma estructura que /institutions) */}
+      <section className="relative overflow-hidden bg-[#071326] md:flex md:min-h-[520px] md:items-center">
+        <div className="relative h-[260px] md:absolute md:inset-y-0 md:right-0 md:h-auto md:w-[55%]">
+          <Image
+            src={IMAGES.recursos.src}
+            alt={IMAGES.recursos.alt}
+            title={IMAGES.recursos.title}
+            fill
+            priority
+            sizes="(min-width: 768px) 56vw, 100vw"
+            className="object-cover object-[50%_40%]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#071326] md:bg-gradient-to-r md:from-[#071326] md:via-[#071326]/40 md:to-transparent" />
+        </div>
 
-            <h1 className="mb-5 text-balance text-[34px] font-extrabold leading-[1.08] tracking-[-0.03em] text-white md:text-[clamp(34px,4vw,50px)]">
+        <div className="relative z-[2] mx-auto w-full max-w-[1180px] px-6 py-12 md:px-8 md:py-16">
+          <div className="max-w-[520px]">
+            <span className="mb-4 inline-flex items-center border-l-2 border-[#FF6A1A] py-0.5 pl-3 font-mono text-[11px] font-bold uppercase tracking-[0.09em] text-[#9DB8FF]">
+              Guías y análisis
+            </span>
+            <h1 className="mb-4 text-balance text-[2rem] font-black leading-[1.08] tracking-[-0.035em] text-white md:text-[clamp(2.1rem,3.4vw,2.9rem)]">
               Recursos para docentes e instituciones.
             </h1>
-
-            <p className="mx-auto mb-9 max-w-[480px] text-base leading-[1.75] text-white/70 md:mx-0">
+            <p className="mb-7 max-w-[480px] text-base leading-[1.7] text-white/70">
               Guías, estándares y análisis para elevar los criterios de selección
               de talento académico en la educación superior.
             </p>
-
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center md:justify-start">
+            <div className="flex flex-wrap gap-3">
               <Link
                 href="/signup"
-                className="rounded-[10px] bg-white px-8 py-3.5 text-center text-sm font-bold tracking-[-0.01em] text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
+                className="rounded-[10px] bg-white px-7 py-[13px] text-[14px] font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]"
               >
                 Publicar mi perfil
               </Link>
               <Link
                 href="/signup?intent=institution"
-                className="rounded-[10px] border border-white/30 px-8 py-3.5 text-center text-sm text-white/80 transition-transform duration-150 ease-out active:scale-[0.97]"
+                className="rounded-[10px] border-[1.5px] border-white/35 px-6 py-[13px] text-[14px] font-semibold text-white/90 transition-transform duration-150 ease-out active:scale-[0.97]"
               >
                 Buscar docentes
               </Link>
             </div>
-          </div>
-
-          <div className="relative mx-auto aspect-[3/2] w-full max-w-[440px] overflow-hidden rounded-2xl border border-white/10 md:mx-0 md:max-w-none">
-            <Image
-              src={IMAGES.recursos.src}
-              alt={IMAGES.recursos.alt}
-              title={IMAGES.recursos.title}
-              fill
-              sizes="(min-width: 768px) 45vw, 90vw"
-              className="object-cover"
-              priority
-            />
           </div>
         </div>
       </section>

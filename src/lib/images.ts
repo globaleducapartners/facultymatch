@@ -32,11 +32,11 @@ export const IMAGES = {
     title: "Lo que sabes hacer tiene demanda en las aulas",
     author: "Cristian Rojas", source: "Pexels", license: "Licencia Pexels", url: pexels(10041253),
   },
-  tallerFormacion: {
-    src: "/images/taller-formacion-profesorado-participantes.jpg", width: 1800, height: 1200,
-    alt: "Taller de formación en una escuela de negocios con participantes levantando la mano",
-    title: "Encuentra profesorado para tus programas",
-    author: "Bertelli Fotografia", source: "Pexels", license: "Licencia Pexels", url: pexels(18999256),
+  heroInstituciones: {
+    src: "/images/directora-programa-presenta-equipo-sala.jpg", width: 1800, height: 1012,
+    alt: "Responsable de programa presentando ante su equipo en una sala acristalada, instituciones que buscan profesorado verificado",
+    title: "Instituciones que buscan docentes y expertos verificados",
+    author: "Vitaly Gariev", source: "Unsplash", license: "Licencia Unsplash", url: unsplash("SvYifX5HkeQ"),
   },
   equipoReunion: {
     src: "/images/equipo-direccion-academica-reunion.jpg", width: 1500, height: 1001,

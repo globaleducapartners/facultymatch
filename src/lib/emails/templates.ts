@@ -100,8 +100,7 @@ export const getFacultyConfirmEmail = (name: string, confirmLink: string) => bas
 
 const SITE_URL = "https://www.facultymatch.app";
 const LINKEDIN_URL = "https://www.linkedin.com/company/facultymatch";
-// Vacío = no se muestra el botón. Rellenar cuando exista la cuenta oficial.
-const INSTAGRAM_URL = "";
+const INSTAGRAM_URL = "https://www.instagram.com/facultymatch.app/";
 
 const socialButton = (href: string, label: string) =>
   `<a href="${href}" style="display:inline-block;margin:4px 4px;padding:10px 18px;border:1px solid #D8E2EF;border-radius:10px;color:${COLORS.navy};font-size:13px;font-weight:700;text-decoration:none;background:#fff;">${label}</a>`;

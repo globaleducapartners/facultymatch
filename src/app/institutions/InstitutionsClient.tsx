@@ -124,13 +124,13 @@ export default function InstitutionsClient() {
         {/* Foto a sangre (derecha en escritorio, arriba en móvil) */}
         <div className="relative h-[260px] md:absolute md:inset-y-0 md:right-0 md:h-auto md:w-[55%]">
           <Image
-            src={IMAGES.tallerFormacion.src}
-            alt={IMAGES.tallerFormacion.alt}
-            title={IMAGES.tallerFormacion.title}
+            src={IMAGES.heroInstituciones.src}
+            alt={IMAGES.heroInstituciones.alt}
+            title={IMAGES.heroInstituciones.title}
             fill
             priority
             sizes="(min-width: 768px) 56vw, 100vw"
-            className="object-cover object-[40%_40%]"
+            className="object-cover object-[80%_35%]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#071326] md:bg-gradient-to-r md:from-[#071326] md:via-[#071326]/40 md:to-transparent" />
         </div>

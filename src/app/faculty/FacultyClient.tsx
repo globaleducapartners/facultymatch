@@ -213,7 +213,7 @@ export default function FacultyClient() {
               Visible en el directorio
             </div>
             <h3 className="mb-2 mt-[18px] text-[13px] font-bold text-fm-navy">Instituciones bloqueadas</h3>
-            {["Universidad de ejemplo", "Escuela de negocios demo"].map((n) => (
+            {["Universidad Complutense de Madrid", "ENAE Business School"].map((n) => (
               <div key={n} className="mb-2 flex items-center justify-between rounded-lg border border-[#E1E7F5] bg-[#FBFCFE] px-3 py-[9px] text-[13px] text-fm-navy">
                 <span>{n}</span><span className="text-[#5E6F8E]">Quitar</span>
               </div>
