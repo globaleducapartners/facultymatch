@@ -2,6 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/terms" },
   title: "Términos y Condiciones | FacultyMatch",
   description: "Términos y condiciones de uso de la plataforma FacultyMatch.",
 };

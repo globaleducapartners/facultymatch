@@ -156,6 +156,7 @@ export function Footer() {
                 { label: "Para docentes",      href: "/faculty" },
                 { label: "Para instituciones", href: "/institutions" },
                 { label: "Precios",            href: "/faculty#precios" },
+                { label: "Docentes verificados", href: "/docentes" },
                 { label: "Recursos",           href: "/resources" },
               ].map((l) => (
                 <Link key={l.href} href={l.href} style={{

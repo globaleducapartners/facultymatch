@@ -7,6 +7,15 @@ import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Row, SectionRows, SectionSteps } from "@/components/sections/skeleton";
 import { IMAGES } from "@/lib/images";
+import { Faq } from "@/components/sections/Faq";
+
+const FACULTY_FAQ = [
+  { q: "¿Qué es FacultyMatch?", a: "FacultyMatch es un directorio de docentes, investigadores y expertos con perfil verificado. Las universidades y escuelas de negocio buscan por área de conocimiento y contactan directamente con quien encaja, sin intermediarios." },
+  { q: "¿Qué perfiles pueden registrarse?", a: "Docentes universitarios, investigadores y profesionales con experiencia que quieren dar clase o colaborar con instituciones: médicos, abogados, directivos, ingenieros, comunicadores y más." },
+  { q: "¿Tiene coste crear mi perfil?", a: "No. El plan Basic es gratuito para siempre y FacultyMatch no cobra comisiones por las colaboraciones que acuerdes con una institución." },
+  { q: "¿Cómo se verifica mi perfil?", a: "Cuando publicas tu perfil, el equipo de FacultyMatch revisa tu titulación, tu trayectoria y tus perfiles académicos. Si todo es correcto, recibes el distintivo Verificado, una página pública con tu enlace y un PDF verificable. Si cambias datos sensibles, como titulaciones o institución actual, se vuelve a revisar." },
+  { q: "¿Quién puede ver mi perfil?", a: "Tú decides. Puedes mantenerlo privado o hacerlo público para que aparezca en el directorio y en buscadores, y puedes bloquear instituciones concretas. Estas opciones de privacidad están disponibles en todos los planes, incluido el gratuito." },
+];
 
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -317,6 +326,8 @@ export default function FacultyClient() {
           </div>
         </div>
       </section>
+
+      <Faq title="Preguntas frecuentes de docentes" items={FACULTY_FAQ} />
 
       {/* ── CTA FINAL ── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-fm-navy to-fm-blue">

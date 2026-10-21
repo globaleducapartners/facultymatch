@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { createAdminClient } from "@/lib/supabase-server";
+import { ARTICLES } from "@/lib/articles";
 
 const BASE = "https://www.facultymatch.app";
 
@@ -22,14 +23,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  // Fechas reales de última modificación (no "ahora" en cada rastreo).
+  const SITE_UPDATED = new Date("2026-10-21");
+  const LEGAL_UPDATED = new Date("2026-03-22");
+  const newest = (ds: (Date | undefined)[]) => ds.filter(Boolean).sort((a, b) => b!.getTime() - a!.getTime())[0];
+
+  const articleUrls: MetadataRoute.Sitemap = ARTICLES.map((a) => ({
+    url: `${BASE}/resources/${a.slug}`,
+    lastModified: new Date(a.modified),
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+  const directoryUpdated =
+    newest((profiles || []).map((p) => (p.updated_at ? new Date(p.updated_at) : undefined))) || SITE_UPDATED;
+
   return [
-    { url: BASE,                             lastModified: new Date(), changeFrequency: "daily",   priority: 1.0 },
-    { url: `${BASE}/faculty`,                lastModified: new Date(), changeFrequency: "weekly",  priority: 0.9 },
-    { url: `${BASE}/institutions`,           lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${BASE}/resources`,              lastModified: new Date(), changeFrequency: "weekly",  priority: 0.6 },
-    { url: `${BASE}/legal`,                  lastModified: new Date(), changeFrequency: "yearly",  priority: 0.3 },
-    { url: `${BASE}/privacy`,                lastModified: new Date(), changeFrequency: "yearly",  priority: 0.3 },
-    { url: `${BASE}/terms`,                  lastModified: new Date(), changeFrequency: "yearly",  priority: 0.3 },
+    { url: BASE,                   lastModified: SITE_UPDATED, changeFrequency: "weekly",  priority: 1.0 },
+    { url: `${BASE}/faculty`,      lastModified: SITE_UPDATED, changeFrequency: "weekly",  priority: 0.9 },
+    { url: `${BASE}/institutions`, lastModified: SITE_UPDATED, changeFrequency: "weekly",  priority: 0.9 },
+    { url: `${BASE}/docentes`,     lastModified: directoryUpdated, changeFrequency: "daily", priority: 0.9 },
+    { url: `${BASE}/resources`,    lastModified: SITE_UPDATED, changeFrequency: "weekly",  priority: 0.7 },
+    ...articleUrls,
+    { url: `${BASE}/help`,         lastModified: SITE_UPDATED, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${BASE}/creditos`,     lastModified: SITE_UPDATED, changeFrequency: "yearly",  priority: 0.2 },
+    { url: `${BASE}/legal`,        lastModified: LEGAL_UPDATED, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE}/privacy`,      lastModified: LEGAL_UPDATED, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE}/terms`,        lastModified: LEGAL_UPDATED, changeFrequency: "yearly", priority: 0.3 },
     ...docentesUrls,
   ];
 }

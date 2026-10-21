@@ -2,6 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/legal" },
   title: "Aviso Legal | FacultyMatch",
   description: "Aviso legal y condiciones de uso de FacultyMatch, plataforma de Grupo Global Educa SL.",
 };

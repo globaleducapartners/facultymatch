@@ -2,9 +2,48 @@ import { MetadataRoute } from "next";
 
 const BASE = "https://www.facultymatch.app";
 
+// Buscadores y asistentes de IA (búsqueda y consulta en directo) con las mismas
+// reglas que el resto: pueden leer lo público y nunca lo privado.
+const AI_AGENTS = [
+  "OAI-SearchBot", "ChatGPT-User", "GPTBot",
+  "Claude-SearchBot", "Claude-User", "ClaudeBot",
+  "PerplexityBot", "Perplexity-User",
+  "Google-Extended", "Applebot-Extended",
+  "Bingbot", "Googlebot",
+];
+
 export default function robots(): MetadataRoute.Robots {
+  const allow = [
+    "/",
+    "/faculty",
+    "/docentes",
+    "/institutions",
+    "/resources",
+    "/creditos",
+    "/legal",
+    "/privacy",
+    "/terms",
+    "/help",
+    "/directory",
+  ];
+  const disallow = [
+    "/login",
+    "/reset-password",
+    "/update-password",
+    "/auth/",
+    "/onboarding/",
+    "/apply/",
+    "/dashboard/",
+    "/app/",
+    "/admin-login",
+    "/admin/",
+    "/control/",
+    "/checkout",
+    "/api/",
+  ];
   return {
     rules: [
+      { userAgent: AI_AGENTS, allow, disallow },
       {
         userAgent: "*",
         // Only allow public content pages to be indexed

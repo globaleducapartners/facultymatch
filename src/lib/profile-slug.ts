@@ -64,6 +64,7 @@ export async function revalidatePublicProfile(
       .eq("user_id", facultyId)
       .maybeSingle();
     if (data?.profile_slug) revalidatePath(`/docentes/${data.profile_slug}`);
+    revalidatePath("/docentes");
   } catch (e) {
     console.warn("[revalidatePublicProfile] failed:", e);
   }

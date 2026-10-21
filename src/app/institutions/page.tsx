@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import InstitutionsClient from "./InstitutionsClient";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/institutions" },
   title: "Para instituciones educativas | FacultyMatch",
   description:
     "Directorio de docentes, investigadores y expertos para instituciones educativas. Búsqueda por área, idioma y disponibilidad. Contacto directo. Sin comisiones.",

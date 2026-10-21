@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import LandingClient from "./LandingClient";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/" },
   title: "FacultyMatch | Directorio de talento para la educación superior",
   description:
     "El directorio de docentes, investigadores y expertos para instituciones educativas. Perfiles revisados. Contacto directo. Sin intermediarios.",

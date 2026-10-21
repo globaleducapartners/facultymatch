@@ -7,6 +7,15 @@ import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Row, SectionRows, SectionSteps } from "@/components/sections/skeleton";
 import { IMAGES } from "@/lib/images";
+import { Faq } from "@/components/sections/Faq";
+
+const INSTITUTION_FAQ = [
+  { q: "¿Qué es FacultyMatch para instituciones?", a: "Un directorio de docentes, investigadores y expertos verificados para universidades y escuelas de negocio. Buscas por área de conocimiento, revisas el perfil y contactas directamente con el docente." },
+  { q: "¿Cómo sé que los perfiles son fiables?", a: "Cada perfil con el distintivo Verificado ha sido revisado por el equipo de FacultyMatch: titulación, trayectoria y perfiles académicos. Si el docente cambia datos sensibles, el perfil se vuelve a revisar." },
+  { q: "¿Cuesta algo contactar con un docente?", a: "No hay comisiones si contratas. El contacto es directo entre la institución y el docente, sin intermediarios." },
+  { q: "¿Tiene coste registrarse?", a: "El registro es gratuito e incluye 5 búsquedas y 5 contactos al mes. El plan Professional, 99 € al mes, añade búsquedas y contactos ilimitados, filtros avanzados, favoritos sin límite y hasta 3 usuarios." },
+  { q: "¿Qué privacidad tienen los docentes?", a: "Cada docente decide si su perfil es público o privado y puede bloquear instituciones concretas. FacultyMatch solo muestra la información que el docente ha elegido publicar." },
+];
 
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -334,6 +343,8 @@ export default function InstitutionsClient() {
           </p>
         </div>
       </section>
+
+      <Faq title="Preguntas frecuentes de instituciones" items={INSTITUTION_FAQ} />
 
       {/* ── CTA FINAL ── */}
       <section className="bg-gradient-to-br from-fm-dark to-fm-navy">

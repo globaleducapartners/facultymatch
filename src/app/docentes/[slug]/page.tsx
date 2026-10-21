@@ -46,7 +46,7 @@ export async function generateMetadata({
 
   const { data: faculty } = await admin
     .from("faculty_profiles")
-    .select("id, headline, current_institution")
+    .select("id, headline, current_institution, city, country, faculty_areas, expertise:faculty_expertise(area)")
     .eq("profile_slug", slug)
     .eq("visibility", "public")
     .eq("is_active", true)
@@ -68,22 +68,32 @@ export async function generateMetadata({
     .maybeSingle();
 
   const name = up?.full_name || "Docente";
-  const description = faculty?.headline
-    ? `${faculty.headline}${faculty?.current_institution ? ` · ${faculty.current_institution}` : ""}`
-    : `Perfil académico de ${name} en FacultyMatch`;
+  // El titular a veces es solo un tratamiento ("Dra."); solo se usa si dice algo.
+  const headline = faculty.headline && faculty.headline.trim().length > 8 ? faculty.headline.trim() : "";
+  const areaList: string[] = Array.isArray(faculty.faculty_areas) ? faculty.faculty_areas : [];
+  const expertiseAreas: string[] = Array.isArray(faculty.expertise) ? faculty.expertise.map((e: any) => e.area).filter(Boolean) : [];
+  const mainArea = expertiseAreas[0] || areaList[0] || "";
+  const where = [faculty.city, faculty.country].filter(Boolean).join(", ");
+  const title = mainArea
+    ? `${name}, ${mainArea}: docente verificado | FacultyMatch`
+    : `${name}: docente verificado | FacultyMatch`;
+  const description = [
+    `${name}${headline ? `, ${headline}` : ""}${faculty.current_institution ? ` (${faculty.current_institution})` : ""}.`,
+    `Perfil docente verificado por FacultyMatch${mainArea ? ` en ${mainArea}` : ""}${where ? ` · ${where}` : ""}.`,
+  ].join(" ").slice(0, 300);
 
   return {
-    title: `${name} | FacultyMatch`,
+    title,
     description,
     openGraph: {
-      title: `${name} | FacultyMatch`,
+      title,
       description,
       type: "profile",
       url: `${BASE}/docentes/${slug}`,
     },
     twitter: {
       card: "summary_large_image",
-      title: `${name} | FacultyMatch`,
+      title,
       description,
     },
     alternates: { canonical: `${BASE}/docentes/${slug}` },
@@ -194,23 +204,36 @@ export default async function PublicFacultyProfilePage({
   const hasAneca = !!faculty.aneca_accreditation;
 
   // JSON-LD structured data
-  const jsonLd = {
-    "@context": "https://schema.org",
+  const sameAs = [
+    faculty.orcid_id ? `https://orcid.org/${faculty.orcid_id}` : null,
+    faculty.google_scholar_id ? `https://scholar.google.com/citations?user=${faculty.google_scholar_id}` : null,
+    faculty.linkedin_url || null,
+    faculty.website || null,
+  ].filter(Boolean) as string[];
+  const knowsAbout = Array.from(new Set([
+    ...(hasExpertise ? faculty.expertise.map((e: any) => e.area) : []),
+    ...(hasFacultyAreas ? faculty.faculty_areas : []),
+  ].filter(Boolean)));
+  const person = {
     "@type": "Person",
+    "@id": `${BASE}/docentes/${slug}#persona`,
     name: fullName,
     ...(faculty.headline ? { jobTitle: faculty.headline } : {}),
-    ...(faculty.current_institution ? {
-      affiliation: {
-        "@type": "Organization",
-        name: faculty.current_institution,
-      },
-    } : {}),
+    ...(avatarUrl ? { image: avatarUrl } : {}),
+    ...(faculty.bio ? { description: String(faculty.bio).slice(0, 500) } : {}),
+    ...(faculty.current_institution ? { worksFor: { "@type": "Organization", name: faculty.current_institution } } : {}),
+    ...(knowsAbout.length ? { knowsAbout } : {}),
+    ...(hasLanguages ? { knowsLanguage: faculty.languages.map((l: any) => (typeof l === "string" ? l : l.lang || l.language || l.name)).filter(Boolean) } : {}),
     ...(locationStr ? { address: { "@type": "PostalAddress", addressLocality: locationStr } } : {}),
     url: `${BASE}/docentes/${slug}`,
-    ...(faculty.google_scholar_id ? { sameAs: `https://scholar.google.com/citations?user=${faculty.google_scholar_id}` } : {}),
-    ...(faculty.orcid_id ? { sameAs: `https://orcid.org/${faculty.orcid_id}` } : {}),
-    ...(faculty.linkedin_url ? { sameAs: faculty.linkedin_url } : {}),
-    ...(faculty.website ? { sameAs: faculty.website } : {}),
+    ...(sameAs.length ? { sameAs } : {}),
+  };
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    url: `${BASE}/docentes/${slug}`,
+    isPartOf: { "@id": `${BASE}/#website` },
+    mainEntity: person,
   };
 
   return (

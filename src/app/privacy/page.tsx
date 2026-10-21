@@ -2,6 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/privacy" },
   title: "Política de Privacidad | FacultyMatch",
   description: "Política de privacidad y protección de datos de FacultyMatch, conforme al RGPD.",
 };

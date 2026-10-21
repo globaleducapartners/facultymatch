@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Mail, HelpCircle, ChevronRight } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
+
+export const metadata: Metadata = {
+  title: "Centro de ayuda | FacultyMatch",
+  description:
+    "Respuestas sobre cómo completar tu perfil docente, el proceso de verificación, la privacidad y el contacto con instituciones en FacultyMatch.",
+  alternates: { canonical: "/help" },
+};
 
 export default function HelpPage() {
   return (

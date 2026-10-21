@@ -7,6 +7,7 @@ import { DarkBand, Row, SectionRows } from "@/components/sections/skeleton";
 import { IMAGES, type ImageKey } from "@/lib/images";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/resources" },
   title: "Recursos para docentes e instituciones | FacultyMatch",
   description:
     "Guías, estándares y mejores prácticas para el reclutamiento docente y el desarrollo de carrera académica en educación superior.",
