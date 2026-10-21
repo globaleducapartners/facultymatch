@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { NewsletterForm } from "./NewsletterForm";
 import { DarkBand, Row, SectionRows } from "@/components/sections/skeleton";
+import { IMAGES, type ImageKey } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Recursos para docentes e instituciones | FacultyMatch",
@@ -13,13 +14,14 @@ export const metadata: Metadata = {
     "recursos académicos, guías docentes, reclutamiento universitario, estándares académicos, educación superior",
 };
 
-const RESOURCES = [
+const RESOURCES: { tag: string; title: string; desc: string; readTime: string; href: string; image: ImageKey }[] = [
   {
     tag: "Instituciones",
     title: "Cómo construir un claustro docente de alto impacto",
     desc: "Guía práctica para instituciones sobre selección, diversificación y fidelización de talento académico. Equilibra perfiles investigadores con expertos profesionales.",
     readTime: "8 min",
     href: "/resources/claustro-docente",
+    image: "universidad",
   },
   {
     tag: "Calidad",
@@ -27,6 +29,7 @@ const RESOURCES = [
     desc: "Conoce los criterios y el proceso de auditoría que aplicamos para validar credenciales académicas, títulos de doctorado y experiencia profesional verificada.",
     readTime: "5 min",
     href: "/resources/estandares-verificacion",
+    image: "laboratorio",
   },
   {
     tag: "Tendencias",
@@ -34,6 +37,7 @@ const RESOURCES = [
     desc: "Análisis de las tendencias pedagógicas en entornos virtuales y cómo los docentes expertos pueden posicionarse en el mercado de microcredenciales internacionales.",
     readTime: "12 min",
     href: "/resources/docencia-online-microcredenciales",
+    image: "online",
   },
   {
     tag: "Docentes",
@@ -41,6 +45,7 @@ const RESOURCES = [
     desc: "Mejores prácticas para destacar tu trayectoria académica. Cómo estructurar áreas de conocimiento y generar confianza en las instituciones.",
     readTime: "6 min",
     href: "/resources/optimiza-perfil-docente",
+    image: "notas",
   },
   {
     tag: "Estructura",
@@ -48,6 +53,7 @@ const RESOURCES = [
     desc: "Cómo clasificamos las disciplinas y sub-áreas siguiendo estándares internacionales. Una herramienta clave para el matching preciso entre oferta y demanda.",
     readTime: "10 min",
     href: "/resources/taxonomia-academica",
+    image: "taxonomia",
   },
   {
     tag: "Gestión",
@@ -55,6 +61,7 @@ const RESOURCES = [
     desc: "Plan de acción para directores académicos: desde la identificación de necesidades hasta la firma de la colaboración docente.",
     readTime: "15 min",
     href: "/resources/reclutamiento-90-dias",
+    image: "reclutamiento",
   },
 ];
 
@@ -103,8 +110,9 @@ export default function ResourcesPage() {
 
           <div className="relative mx-auto aspect-[3/2] w-full max-w-[440px] overflow-hidden rounded-2xl border border-white/10 md:mx-0 md:max-w-none">
             <Image
-              src="/images/resources-pizarra.jpg"
-              alt="Profesora escribiendo un esquema en una pizarra"
+              src={IMAGES.recursos.src}
+              alt={IMAGES.recursos.alt}
+              title={IMAGES.recursos.title}
               fill
               sizes="(min-width: 768px) 45vw, 90vw"
               className="object-cover"
@@ -129,7 +137,18 @@ export default function ResourcesPage() {
           <div className="grid gap-5 md:grid-cols-3">
             {RESOURCES.map((r, i) => (
               <Link key={i} href={r.href} className="no-underline">
-                <article className="flex h-full cursor-pointer flex-col rounded-2xl border border-[#E1E7F5] bg-white p-6 transition-shadow hover:shadow-lg">
+                <article className="flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#E1E7F5] bg-white transition-shadow hover:shadow-sm">
+                  <div className="relative aspect-[16/9] w-full">
+                    <Image
+                      src={IMAGES[r.image].src}
+                      alt={IMAGES[r.image].alt}
+                      title={IMAGES[r.image].title}
+                      fill
+                      sizes="(min-width: 768px) 360px, 100vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col p-6">
                   <p className="mb-3 font-mono text-xs font-semibold text-[#5E6F8E]">
                     {r.tag} · {r.readTime} de lectura
                   </p>
@@ -138,6 +157,7 @@ export default function ResourcesPage() {
                   </h3>
                   <p className="mb-5 flex-1 text-sm leading-[1.7] text-[#5B6B85]">{r.desc}</p>
                   <div className="text-sm font-bold text-fm-blue">Leer artículo →</div>
+                  </div>
                 </article>
               </Link>
             ))}
@@ -173,8 +193,9 @@ export default function ResourcesPage() {
         >
           <div className="relative aspect-[4/3.1] overflow-hidden rounded-[14px]">
             <Image
-              src="/images/resources-event-photo.jpg"
-              alt="Profesionales asistiendo a una jornada de formación"
+              src={IMAGES.jornada.src}
+              alt={IMAGES.jornada.alt}
+              title={IMAGES.jornada.title}
               fill
               sizes="(min-width: 768px) 520px, 100vw"
               className="object-cover"
@@ -193,7 +214,7 @@ export default function ResourcesPage() {
             href="https://alicanteplaza.es/alicanteplaza/empresas/asi-es-facultymatch-el-linkedin-de-docentes-impulsada-por-un-noveldense-para-universidades-y-escuelas-de-negocio"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-lg font-black tracking-[-0.02em] text-fm-ink transition-colors hover:text-fm-blue"
+            className="inline-flex items-center gap-2 text-lg font-extrabold tracking-[-0.02em] text-fm-ink transition-colors hover:text-fm-blue"
           >
             Alicante Plaza
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="opacity-50">

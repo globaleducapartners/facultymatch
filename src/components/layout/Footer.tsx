@@ -182,6 +182,7 @@ export function Footer() {
                 { label: "Aviso legal",            href: "/legal" },
                 { label: "Política de privacidad", href: "/privacy" },
                 { label: "Términos de uso",        href: "/terms" },
+                { label: "Créditos de imágenes",   href: "/creditos" },
               ].map((l) => (
                 <Link key={l.href} href={l.href} style={{
                   fontFamily: SANS, fontSize: 13, color: D.text,

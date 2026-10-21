@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Row, SectionRows, SectionSteps } from "@/components/sections/skeleton";
+import { IMAGES } from "@/lib/images";
 
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -83,56 +84,56 @@ export default function FacultyClient() {
       <Navbar />
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden py-20 md:py-0 md:min-h-[580px] md:flex md:items-center">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(700px 420px at 15% 0%, rgba(27,79,216,0.28), transparent 60%), linear-gradient(160deg, #0B1B33 0%, #071326 70%)",
-          }}
-        />
-        <div className="relative z-[2] mx-auto grid w-full max-w-[1120px] items-center gap-10 px-6 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-8">
-          <div className="text-center md:text-left">
-            <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-[#6D93F5] py-0.5 pl-3">
-              <span className="font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-white/80">
-                Para docentes y expertos profesionales
-              </span>
-            </div>
-
-            <h1 className="fm-animate-up fm-animate-up-delay-1 mb-5 text-[34px] font-black leading-[1.1] tracking-[-0.04em] text-white md:text-[clamp(32px,3.4vw,44px)]">
-              Lo que la IA no puede sustituir es tu experiencia.
+      <section className="bg-white px-6 pb-14 pt-16 md:px-8 md:pb-20 md:pt-[88px]">
+        <div className="mx-auto grid max-w-[1180px] items-center gap-12 md:grid-cols-[0.9fr_1.1fr] md:gap-14">
+          <div>
+            <span className="mb-4 inline-flex items-center border-l-2 border-[#FF6A1A] py-0.5 pl-3 font-mono text-[11px] font-bold uppercase tracking-[0.09em] text-fm-blue">
+              Para docentes y expertos profesionales
+            </span>
+            <h1 className="mb-4 text-[2rem] font-black leading-[1.08] tracking-[-0.035em] text-fm-ink md:text-[clamp(2.1rem,3.4vw,2.9rem)]">
+              Lo que la IA no puede sustituir es <span className="text-fm-blue">tu experiencia.</span>
             </h1>
-
-            <p className="fm-animate-up fm-animate-up-delay-2 mb-10 max-w-[480px] text-[15px] leading-[1.75] text-white/60 md:text-[17px] mx-auto md:mx-0">
+            <p className="mb-7 max-w-[480px] text-base leading-[1.7] text-[#5B6B85]">
               Médicos, investigadores, directivos, abogados, comunicadores.
               FacultyMatch los conecta con universidades y escuelas de negocio
               que buscan exactamente lo que ellos saben.
             </p>
-
-            <div className="fm-animate-up fm-animate-up-delay-3 flex flex-wrap justify-center gap-3 md:justify-start">
+            <div className="flex flex-wrap gap-3">
               <Link href="/signup">
-                <button className="rounded-[10px] bg-white px-8 py-3.5 text-[15px] font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
-                  Publicar mi perfil
+                <button className="rounded-[10px] bg-fm-blue px-7 py-[13px] text-[14px] font-bold text-white shadow-[0_10px_24px_-8px_rgba(27,79,216,0.5)] transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
+                  Publicar mi perfil →
                 </button>
               </Link>
               <Link href="/login">
-                <button className="rounded-[10px] border border-white/30 px-8 py-3.5 text-[15px] text-white/80 transition-transform duration-150 ease-out active:scale-[0.97]">
+                <button className="rounded-[10px] border-[1.5px] border-fm-border px-6 py-[13px] text-[14px] font-semibold text-fm-navy transition-transform duration-150 ease-out active:scale-[0.97]">
                   Ya tengo cuenta
                 </button>
               </Link>
             </div>
           </div>
 
-          <div className="fm-animate-up fm-animate-up-delay-2 relative mx-auto w-full max-w-[440px] md:mx-0 md:max-w-none">
-            <div className="relative aspect-[3/2] overflow-hidden rounded-2xl border border-white/10">
+          <div className="relative mx-auto mb-7 w-full max-w-[460px] md:mx-0 md:mb-8 md:max-w-none">
+            <div className="relative aspect-[5/5.4] overflow-hidden rounded-2xl border border-fm-border">
               <Image
-                src="/images/faculty-hero-photo.jpg"
-                alt="Docente experta explicando en una pizarra"
+                src={IMAGES.docenteTableta.src}
+                alt={IMAGES.docenteTableta.alt}
+                title={IMAGES.docenteTableta.title}
                 fill
-                sizes="(min-width: 768px) 45vw, 90vw"
-                className="object-cover"
                 priority
+                sizes="(min-width: 768px) 560px, 92vw"
+                className="object-cover object-[50%_20%]"
               />
+            </div>
+            <div className="absolute -bottom-7 left-3 w-[84%] rounded-2xl border border-[#E1E7F5] bg-white p-3.5 shadow-[0_28px_52px_-24px_rgba(13,34,64,0.45)] md:-left-7 md:w-[300px]">
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-fm-navy text-[11px] font-extrabold text-white">DR</div>
+                <div className="min-w-0">
+                  <div className="text-[12.5px] font-bold text-fm-navy">Doctora en Marketing digital</div>
+                  <div className="text-[11.5px] leading-tight text-[#5E6F8E]">Docente universitaria · Valencia</div>
+                </div>
+                <span className="ml-auto shrink-0 rounded-[5px] bg-fm-gold/15 px-1.5 py-0.5 font-mono text-[11px] font-bold uppercase tracking-[0.03em] text-[#B77A1B]">Verificado</span>
+              </div>
+              <div className="mt-2.5 h-1 overflow-hidden rounded-full bg-[#EEF1F8]"><i className="block h-full w-[92%] rounded-full bg-fm-blue" /></div>
             </div>
           </div>
         </div>
@@ -147,18 +148,33 @@ export default function FacultyClient() {
           body="Si sabes algo que vale la pena enseñar, estás en el lugar correcto. El aula te necesita precisamente porque has estado en la práctica."
         >
           <div className="grid gap-2.5">
-            {PROFILES.map((p) => (
-              <div key={p.label} className="rounded-[10px] border border-[#E1E7F5] bg-white p-3.5">
-                <div className="mb-2 text-sm font-bold text-fm-navy">{p.label}</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {p.examples.map((e) => (
-                    <span key={e} className="rounded-md border border-[#E1E7F5] bg-fm-surface px-2 py-[3px] text-xs text-[#5B6B85]">
-                      {e}
-                    </span>
-                  ))}
+            {PROFILES.map((p, i) => {
+              const photo = [IMAGES.investigador, IMAGES.medico, IMAGES.formadora][i];
+              return (
+                <div key={p.label} className="flex items-start gap-3.5 rounded-[10px] border border-[#E1E7F5] bg-white p-3.5">
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg">
+                    <Image
+                      src={photo.src}
+                      alt={photo.alt}
+                      title={photo.title}
+                      fill
+                      sizes="56px"
+                      className={`object-cover ${i === 2 ? "object-[35%_30%]" : "object-[50%_25%]"}`}
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="mb-2 text-sm font-bold text-fm-navy">{p.label}</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {p.examples.map((e) => (
+                        <span key={e} className="rounded-md border border-[#E1E7F5] bg-fm-surface px-2 py-[3px] text-xs text-[#5B6B85]">
+                          {e}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Row>
 
@@ -169,7 +185,18 @@ export default function FacultyClient() {
           href="/signup"
           cta="Publicar con privacidad →"
         >
-          <div className="rounded-[14px] bg-white p-6 shadow-[0_14px_34px_-16px_rgba(13,34,64,0.25)]">
+          <div>
+            <div className="relative aspect-[16/9] overflow-hidden rounded-[14px]">
+              <Image
+                src={IMAGES.confianza.src}
+                alt={IMAGES.confianza.alt}
+                title={IMAGES.confianza.title}
+                fill
+                sizes="(min-width: 768px) 520px, 100vw"
+                className="object-cover object-[50%_30%]"
+              />
+            </div>
+          <div className="relative mx-3 -mt-12 rounded-[14px] bg-white p-5 shadow-[0_18px_36px_-14px_rgba(13,34,64,0.35)] sm:mx-5">
             <div className="flex items-center gap-3 border-b border-[#E1E7F5] pb-3.5 text-sm text-fm-navy">
               <span className="flex h-[18px] w-[18px] items-center justify-center rounded bg-fm-blue">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M20 6 9 17l-5-5" /></svg>
@@ -184,6 +211,7 @@ export default function FacultyClient() {
             ))}
             <span className="text-[13px] font-bold text-fm-blue">+ Bloquear otra institución</span>
           </div>
+          </div>
         </Row>
 
         <Row
@@ -196,11 +224,12 @@ export default function FacultyClient() {
         >
           <div className="relative aspect-[4/3.1] overflow-hidden rounded-[14px]">
             <Image
-              src="/images/faculty-benefits.jpg"
-              alt="Persona trabajando con un portátil en una sesión de trabajo"
+              src={IMAGES.presentacion.src}
+              alt={IMAGES.presentacion.alt}
+              title={IMAGES.presentacion.title}
               fill
               sizes="(min-width: 768px) 520px, 100vw"
-              className="object-cover object-top"
+              className="object-cover object-[45%_30%]"
             />
           </div>
         </Row>

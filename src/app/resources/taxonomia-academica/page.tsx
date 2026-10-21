@@ -1,41 +1,25 @@
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
-import { ArrowLeft, Clock, CheckCircle2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
+import { ArticleHeader } from "@/components/resources/ArticleHeader";
+import { articleMetadata } from "@/lib/articles";
 
-export const metadata: Metadata = {
-  title: "Taxonomía Académica Global | FacultyMatch",
-  description: "Cómo clasificamos las disciplinas y sub-áreas siguiendo los estándares internacionales para un matching preciso.",
-};
+export const metadata: Metadata = articleMetadata("taxonomia-academica");
 
 export default function BlogPostTaxonomia() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <Navbar />
       <main className="max-w-3xl mx-auto px-6 py-16">
-        <Link href="/resources" className="inline-flex items-center gap-2 text-fm-blue font-bold text-sm mb-8 hover:gap-3 transition-all">
-          <ArrowLeft size={16} /> Volver a Recursos
-        </Link>
-
-        <div className="space-y-4 mb-10">
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-black uppercase tracking-widest text-fm-blue bg-blue-50 px-3 py-1 rounded-full">Estructura</span>
-            <span className="flex items-center gap-1 text-[10px] font-bold text-gray-400"><Clock size={12} /> 10 min lectura</span>
-          </div>
-          <h1 className="text-4xl lg:text-5xl font-black text-navy leading-tight">
-            Taxonomía Académica Global: cómo clasificamos el conocimiento
-          </h1>
-          <p className="text-xl text-gray-500 font-medium leading-relaxed">
-            Descubre cómo clasificamos las disciplinas y sub-áreas siguiendo los estándares internacionales. Una herramienta clave para el matching preciso entre oferta y demanda académica.
-          </p>
-        </div>
+        <ArticleHeader slug="taxonomia-academica" />
 
         <div className="prose prose-lg max-w-none space-y-8 text-gray-700">
           <p className="text-lg font-medium leading-relaxed">
             Uno de los mayores desafíos en el matching de talento académico es la falta de un lenguaje común. Un docente puede describirse como "experto en finanzas", pero ese término abarca realidades muy distintas: finanzas corporativas, finanzas conductuales, mercados de capitales, finanzas sostenibles, etc. Sin una taxonomía precisa, el matching es impreciso y genera frustración tanto en docentes como en instituciones.
           </p>
 
-          <h2 className="text-2xl font-black text-navy mt-10">Nuestra referencia: la clasificación UNESCO ISCED</h2>
+          <h2 className="text-2xl font-extrabold text-fm-ink mt-10">Nuestra referencia: la clasificación UNESCO ISCED</h2>
           <p>
             FacultyMatch utiliza como base la <strong>Clasificación Internacional Normalizada de la Educación (CINE / ISCED)</strong> desarrollada por la UNESCO, complementada con las acreditaciones propias de las agencias de calidad universitaria (ANECA y las agencias autonómicas en España, y equivalentes en otros países).
           </p>
@@ -43,7 +27,7 @@ export default function BlogPostTaxonomia() {
             Esta clasificación organiza el conocimiento en grandes áreas, sub-áreas y temas, permitiendo una búsqueda tanto amplia como muy específica.
           </p>
 
-          <h2 className="text-2xl font-black text-navy mt-10">Las 10 grandes áreas</h2>
+          <h2 className="text-2xl font-extrabold text-fm-ink mt-10">Las 10 grandes áreas</h2>
           <ul className="space-y-3">
             {[
               { area: "Educación", subs: "Formación de docentes, Educación superior, Pedagogía y didáctica, Tecnología educativa" },
@@ -58,19 +42,19 @@ export default function BlogPostTaxonomia() {
               { area: "Servicios", subs: "Turismo y hotelería, Deporte, Seguridad, Transporte y logística" }
             ].map((item, i) => (
               <li key={i} className="flex flex-col gap-1 bg-white rounded-xl p-4 border border-gray-100">
-                <span className="font-bold text-navy">{item.area}</span>
+                <span className="font-bold text-fm-ink">{item.area}</span>
                 <span className="text-sm text-gray-500">{item.subs}</span>
               </li>
             ))}
           </ul>
 
-          <h2 className="text-2xl font-black text-navy mt-10">El impacto en el matching</h2>
+          <h2 className="text-2xl font-extrabold text-fm-ink mt-10">El impacto en el matching</h2>
           <p>
             Gracias a esta taxonomía estructurada, cuando una institución busca "un docente de Finanzas para el módulo de valoración de startups del programa MBA", el sistema puede identificar docentes que han declarado especialización en "Finanzas Corporativas" + "Emprendimiento" + "Valoración de Empresas", filtrando los resultados de forma mucho más precisa que una búsqueda por palabras clave genéricas.
           </p>
 
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mt-10">
-            <p className="font-bold text-navy text-lg mb-2">¿Quieres que tu perfil aparezca en las búsquedas correctas?</p>
+            <p className="font-bold text-fm-ink text-lg mb-2">¿Quieres que tu perfil aparezca en las búsquedas correctas?</p>
             <p className="text-gray-600 mb-4">Al crear tu perfil en FacultyMatch, te ayudamos a clasificar tu experiencia en nuestra taxonomía para que las instituciones adecuadas te encuentren.</p>
             <Link href="/signup" className="inline-flex items-center gap-2 bg-fm-blue text-white font-bold px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors">
               Crear mi perfil <ArrowLeft size={16} className="rotate-180" />

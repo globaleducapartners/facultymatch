@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Row, SectionRows, SectionSteps } from "@/components/sections/skeleton";
+import { IMAGES } from "@/lib/images";
 
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -110,57 +111,59 @@ export default function InstitutionsClient() {
       <Navbar />
 
       {/* ── HERO ── */}
-      <section className="relative overflow-hidden py-20 md:py-0 md:min-h-[580px] md:flex md:items-center">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(700px 420px at 85% 0%, rgba(255,106,26,0.16), transparent 55%), radial-gradient(760px 460px at 12% 8%, rgba(27,79,216,0.3), transparent 60%), linear-gradient(160deg, #0B1B33 0%, #071326 70%)",
-          }}
-        />
-        <div className="relative z-[2] mx-auto grid w-full max-w-[1120px] items-center gap-10 px-6 md:grid-cols-[1.05fr_0.95fr] md:gap-14 md:px-8">
-          <div className="text-center md:text-left">
-            <div className="fm-animate-up mb-7 inline-flex items-center border-l-2 border-[#6D93F5] py-0.5 pl-3">
-              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/80">
-                Para universidades y escuelas de negocio
-              </span>
-            </div>
+      <section className="relative overflow-hidden bg-[#071326] md:flex md:min-h-[560px] md:items-center">
+        {/* Foto a sangre (derecha en escritorio, arriba en móvil) */}
+        <div className="relative h-[260px] md:absolute md:inset-y-0 md:right-0 md:h-auto md:w-[55%]">
+          <Image
+            src={IMAGES.tallerFormacion.src}
+            alt={IMAGES.tallerFormacion.alt}
+            title={IMAGES.tallerFormacion.title}
+            fill
+            priority
+            sizes="(min-width: 768px) 56vw, 100vw"
+            className="object-cover object-[40%_40%]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#071326] md:bg-gradient-to-r md:from-[#071326] md:via-[#071326]/40 md:to-transparent" />
+        </div>
 
-            <h1 className="fm-animate-up fm-animate-up-delay-1 mb-5 text-[32px] font-black leading-[1.1] tracking-[-0.04em] text-white md:text-[clamp(30px,3.4vw,42px)]">
+        <div className="relative z-[2] mx-auto w-full max-w-[1180px] px-6 py-12 md:px-8 md:py-16">
+          <div className="max-w-[520px]">
+            <span className="mb-4 inline-flex items-center border-l-2 border-[#FF6A1A] py-0.5 pl-3 font-mono text-[11px] font-bold uppercase tracking-[0.09em] text-[#9DB8FF]">
+              Para universidades y escuelas de negocio
+            </span>
+            <h1 className="mb-4 text-[2rem] font-black leading-[1.08] tracking-[-0.035em] text-white md:text-[clamp(2.1rem,3.4vw,2.9rem)]">
               El directorio que ningún portal de empleo puede tener.
             </h1>
-
-            <p className="fm-animate-up fm-animate-up-delay-2 mb-10 max-w-[480px] text-[15px] leading-[1.75] text-white/60 md:text-[17px] mx-auto md:mx-0">
+            <p className="mb-7 max-w-[480px] text-base leading-[1.7] text-white/70">
               Médicos, investigadores y directivos que nunca publican su CV
               en portales de empleo. Aquí están disponibles, verificados y
               con contacto directo.
             </p>
-
-            <div className="fm-animate-up fm-animate-up-delay-3 flex flex-wrap justify-center gap-3 md:justify-start">
+            <div className="flex flex-wrap gap-3">
               <Link href="/signup?intent=institution">
-                <button className="rounded-[10px] bg-white px-8 py-3.5 text-[15px] font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
+                <button className="rounded-[10px] bg-white px-7 py-[13px] text-[14px] font-bold text-fm-ink transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.97]">
                   Acceder al directorio
                 </button>
               </Link>
               <Link href="/login">
-                <button className="rounded-[10px] border border-white/30 px-8 py-3.5 text-[15px] text-white/80 transition-transform duration-150 ease-out active:scale-[0.97]">
+                <button className="rounded-[10px] border-[1.5px] border-white/35 px-6 py-[13px] text-[14px] font-semibold text-white/90 transition-transform duration-150 ease-out active:scale-[0.97]">
                   Ya tengo cuenta
                 </button>
               </Link>
             </div>
           </div>
 
-          <div className="fm-animate-up fm-animate-up-delay-2 relative mx-auto w-full max-w-[440px] md:mx-0 md:max-w-none">
-            <div className="relative aspect-[3/2] overflow-hidden rounded-2xl border border-white/10">
-              <Image
-                src="/images/institutions-oficina.jpg"
-                alt="Profesional escribiendo en una pizarra en una oficina con vistas a la ciudad"
-                fill
-                sizes="(min-width: 768px) 45vw, 90vw"
-                className="object-cover"
-                priority
-              />
+          {/* Tarjeta de producto sobre la foto */}
+          <div className="mt-8 w-full max-w-[300px] rounded-2xl border border-[#E1E7F5] bg-white p-3.5 shadow-[0_28px_52px_-24px_rgba(0,0,0,0.6)] md:absolute md:bottom-9 md:right-8 md:mt-0">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-fm-blue text-[11px] font-extrabold text-white">EN</div>
+              <div className="min-w-0">
+                <div className="text-[12.5px] font-bold text-fm-navy">Enfermería · Gestión sanitaria</div>
+                <div className="text-[11.5px] leading-tight text-[#5E6F8E]">Docente en activo · ES · EN</div>
+              </div>
+              <span className="ml-auto shrink-0 rounded-[5px] bg-fm-gold/15 px-1.5 py-0.5 font-mono text-[11px] font-bold uppercase tracking-[0.03em] text-[#B77A1B]">Verificado</span>
             </div>
+            <div className="mt-2.5 h-1 overflow-hidden rounded-full bg-[#EEF1F8]"><i className="block h-full w-[88%] rounded-full bg-fm-blue" /></div>
           </div>
         </div>
       </section>
@@ -178,7 +181,18 @@ export default function InstitutionsClient() {
             "Idioma, modalidad y disponibilidad",
           ]}
         >
-          <div className="rounded-[14px] bg-white p-5 shadow-[0_14px_34px_-16px_rgba(13,34,64,0.25)]">
+          <div>
+            <div className="relative aspect-[16/8] overflow-hidden rounded-[14px]">
+              <Image
+                src={IMAGES.comisionSeleccion.src}
+                alt={IMAGES.comisionSeleccion.alt}
+                title={IMAGES.comisionSeleccion.title}
+                fill
+                sizes="(min-width: 768px) 520px, 100vw"
+                className="object-cover object-[50%_35%]"
+              />
+            </div>
+          <div className="relative mx-3 -mt-10 rounded-[14px] bg-white p-5 shadow-[0_18px_36px_-14px_rgba(13,34,64,0.35)] sm:mx-5">
             <h3 className="mb-3.5 text-sm font-bold text-fm-navy">Así se ve un perfil verificado</h3>
             <div className="grid gap-2.5">
               {SAMPLE_PROFILES.slice(0, 3).map((p) => (
@@ -203,6 +217,7 @@ export default function InstitutionsClient() {
                 </div>
               ))}
             </div>
+          </div>
           </div>
         </Row>
 

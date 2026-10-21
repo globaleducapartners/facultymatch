@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Footer } from "@/components/layout/Footer";
 import { CheckIcon, DarkBand, Row, SectionRows, SectionSteps } from "@/components/sections/skeleton";
+import { IMAGES } from "@/lib/images";
 
 // ─── Mark: birrete con el punto naranja ───────────────────────────────────
 function Mark({ size = 32 }: { size?: number }) {
@@ -184,6 +185,8 @@ function Hero() {
           <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-fm-border bg-gradient-to-br from-fm-navy to-fm-dark">
             <video
               autoPlay muted loop playsInline preload="auto"
+              aria-label="Docentes y expertos en el aula, vídeo de presentación de FacultyMatch"
+              title="FacultyMatch, directorio de docentes y expertos verificados"
               poster="/images/faculty-video-poster.jpg"
               className="absolute inset-0 h-full w-full object-cover motion-reduce:hidden"
             >
@@ -332,8 +335,9 @@ function RowsSection() {
           <div className="relative">
             <div className="relative aspect-[4/3.1] overflow-hidden rounded-[14px]">
               <Image
-                src="/images/docentes-pizarra.jpg"
-                alt="Docente señalando una pizarra mientras explica en clase"
+                src={IMAGES.docentePizarra.src}
+                alt={IMAGES.docentePizarra.alt}
+                title={IMAGES.docentePizarra.title}
                 fill
                 sizes="(min-width: 768px) 520px, 100vw"
                 className="object-cover object-[30%_25%]"
@@ -360,7 +364,18 @@ function RowsSection() {
           href="/institutions"
           cta="Acceder al directorio →"
         >
-          <div className="rounded-[14px] bg-white p-6 shadow-[0_14px_34px_-16px_rgba(13,34,64,0.25)]">
+          <div>
+            <div className="relative aspect-[16/9] overflow-hidden rounded-[14px]">
+              <Image
+                src={IMAGES.equipoReunion.src}
+                alt={IMAGES.equipoReunion.alt}
+                title={IMAGES.equipoReunion.title}
+                fill
+                sizes="(min-width: 768px) 520px, 100vw"
+                className="object-cover object-[50%_40%]"
+              />
+            </div>
+          <div className="relative mx-3 -mt-12 rounded-[14px] bg-white p-5 shadow-[0_18px_36px_-14px_rgba(13,34,64,0.35)] sm:mx-5">
             <h3 className="mb-4 text-sm font-bold text-fm-navy">Cómo filtran las instituciones</h3>
             <div className="grid gap-2.5">
               {([
@@ -379,6 +394,7 @@ function RowsSection() {
               <span className="mt-0.5"><CheckIcon size={18} /></span>
               El perfil exacto que necesitas, verificado y en activo.
             </div>
+          </div>
           </div>
         </Row>
 
