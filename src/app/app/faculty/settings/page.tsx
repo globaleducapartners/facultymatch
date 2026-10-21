@@ -188,18 +188,18 @@ export default async function SettingsPage() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Sparkles size={18} className="text-fm-blue" />
-                  <h4 className="text-base font-bold text-fm-navy">Pasa al Plan Profesional</h4>
+                  <h4 className="text-base font-bold text-fm-navy">Pasa al plan Professional</h4>
                 </div>
                 <p className="text-xs text-gray-500 font-medium">
-                  Desbloquea funciones avanzadas de privacidad y visibilidad.
+                  La privacidad y los bloqueos ya son tuyos en el plan gratuito. Professional añade visibilidad.
                 </p>
               </div>
               <ul className="space-y-2">
                 {[
-                  "Ocultar perfil de tu institución actual",
-                  "Gestión avanzada de privacidad",
-                  "Invitaciones privadas ilimitadas",
-                  "Soporte prioritario",
+                  "Posicionamiento prioritario en búsquedas",
+                  "Estadísticas avanzadas de visitas a tu perfil",
+                  "Visibilidad preferente ante instituciones objetivo",
+                  "Soporte por email prioritario",
                 ].map((f) => (
                   <li key={f} className="flex items-center gap-2 text-xs text-gray-600 font-medium">
                     <div className="w-1.5 h-1.5 rounded-full bg-fm-blue shrink-0" />

@@ -46,6 +46,8 @@ export interface FacultySearchOptions {
   blockedFacultyIds?: Set<string>;
   /** true cuando el límite mensual de búsquedas ya se agotó — no ejecuta ninguna consulta real. */
   skip?: boolean;
+  /** true para quien no es institución (p. ej. docentes viendo a colegas): solo perfiles con visibilidad pública; "Solo instituciones" no se les muestra. */
+  publicOnly?: boolean;
   /** Prefijo para los console.error, para saber desde qué pantalla vino el fallo. */
   logPrefix?: string;
 }
@@ -146,7 +148,9 @@ export async function searchFacultyProfiles(
   // verificados como para las tarjetas "pendiente" de abajo, así ambas
   // respetan exactamente los mismos criterios de búsqueda/filtro.
   function applySearchFilters(q: any) {
-    let query_ = q.or("visibility.eq.public,visibility.eq.private,visibility.is.null");
+    let query_ = opts.publicOnly
+      ? q.eq("visibility", "public")
+      : q.or("visibility.eq.public,visibility.eq.private,visibility.is.null");
 
     if (blockedFacultyIds.size > 0) {
       query_ = query_.not("id", "in", `(${[...blockedFacultyIds].join(",")})`);

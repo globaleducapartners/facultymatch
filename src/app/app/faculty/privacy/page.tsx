@@ -368,7 +368,7 @@ export default async function PrivacyPage({
                     ].map((opt) => (
                       <div key={opt.id} className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:border-blue-100 transition-all cursor-pointer">
                         <RadioGroupItem value={opt.value} id={opt.id} className="mt-1" />
-                        <Label htmlFor={opt.id} className="flex-1 cursor-pointer">
+                        <Label htmlFor={opt.id} className="flex-1 cursor-pointer flex-col items-start gap-0 leading-normal">
                           <span className="font-bold text-fm-navy block mb-0.5">{opt.label}</span>
                           <p className="text-sm text-gray-500 font-medium leading-relaxed">{opt.desc}</p>
                         </Label>
@@ -415,13 +415,11 @@ export default async function PrivacyPage({
                       className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50/50 hover:bg-white hover:border-blue-100 transition-all cursor-pointer"
                     >
                       <RadioGroupItem value={opt.value} id={opt.id} className="mt-1" />
-                      <Label htmlFor={opt.id} className="flex-1 cursor-pointer">
+                      <Label htmlFor={opt.id} className="flex-1 cursor-pointer flex-col items-start gap-0 leading-normal">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-bold text-fm-navy">{opt.label}</span>
                           {opt.badge && (
-                            <Badge className="bg-fm-blue text-white text-[11px] font-bold border-none">
-                              {opt.badge}
-                            </Badge>
+                            <span className="text-xs font-bold text-fm-blue">· {opt.badge}</span>
                           )}
                         </div>
                         <p className="text-sm text-gray-500 font-medium leading-relaxed">

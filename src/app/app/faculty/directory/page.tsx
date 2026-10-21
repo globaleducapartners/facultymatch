@@ -32,6 +32,8 @@ export default async function FacultyDirectoryPage({
   // "pendiente de verificación" que ya se ven desde el lado institución.
   const { transformedEducators, transformedPending } = await searchFacultyProfiles(admin, filters, {
     logPrefix: "[faculty/directory]",
+    // Un perfil en "Solo instituciones" no debe verlo otro docente.
+    publicOnly: true,
   });
 
   return (
