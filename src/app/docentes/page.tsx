@@ -36,7 +36,7 @@ export default async function DocentesIndexPage() {
     .eq("estado_perfil", "verificado")
     .not("profile_slug", "is", "null");
 
-  const ids = (data || []).map((r: any) => r.id);
+  const ids = ((data || []) as { id: string }[]).map((r) => r.id);
   const { data: names } = ids.length
     ? await admin.from("user_profiles").select("id, full_name").in("id", ids)
     : { data: [] as { id: string; full_name: string | null }[] };
