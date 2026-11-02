@@ -36,14 +36,17 @@ function useInView(threshold = 0.15) {
 const FACULTY_STEPS = [
   {
     title: "Publica en 10 minutos",
+    visual: "publish" as const,
     body: "Sube tu CV o rellénalo tú mismo. Un experto de nuestro equipo revisa y aprueba cada perfil antes de publicarlo.",
   },
   {
     title: "Llegas a quien te busca",
+    visual: "search" as const,
     body: "Las instituciones filtran por área, idioma y disponibilidad real. Apareces cuando alguien necesita justo lo que ofreces.",
   },
   {
     title: "Tú decides el sí",
+    visual: "decide" as const,
     body: "La institución contacta directamente. Tú pones las condiciones, el ritmo y el precio. Tú aceptas o rechazas.",
   },
 ];

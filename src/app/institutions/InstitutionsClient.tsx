@@ -77,14 +77,17 @@ const SAMPLE_PROFILES = [
 const INST_STEPS = [
   {
     title: "Registra tu institución",
+    visual: "register" as const,
     body: "Acceso al directorio completo desde el primer día. Sin proceso de aprobación previo. En cinco minutos estás dentro.",
   },
   {
     title: "Busca con filtros reales",
+    visual: "filters" as const,
     body: "Por área de conocimiento, acreditación, idioma y disponibilidad. Los resultados son exactamente lo que necesitas para tu programa.",
   },
   {
     title: "Contacta directamente",
+    visual: "contact" as const,
     body: "Envía una solicitud al docente. Él decide si responde. Sin intermediarios ni comisiones por contratación. Negociáis directamente.",
   },
 ];
