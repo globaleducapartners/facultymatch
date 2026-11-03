@@ -7,7 +7,8 @@ import dynamic from "next/dynamic";
 
 // El modal de ORCID (600+ líneas) solo se abre a petición: se descarga entonces.
 const OrcidImportModal = dynamic(() => import("./OrcidImportModal").then((m) => m.OrcidImportModal), { ssr: false });
-import { saveOrcidImport } from "./actions";
+import { saveOrcidImport, applyCvSuggestions } from "./actions";
+const CvImproveModal = dynamic(() => import("./CvImproveModal").then((m) => m.CvImproveModal), { ssr: false });
 import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 
 function useIsMobile() {
@@ -200,7 +201,13 @@ export function ProfileEditorClient({
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [bannerPickerOpen, setBannerPickerOpen] = useState(false);
   const [orcidImportOpen, setOrcidImportOpen] = useState(false);
+  const [cvImproveOpen, setCvImproveOpen] = useState(false);
   const isMob = useIsMobile();
+
+  // Enlace directo desde la notificación: /app/faculty/profile?ia=1
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("ia") === "1") setCvImproveOpen(true);
+  }, []);
 
   // Auto-open section based on tab query param
   useEffect(() => {
@@ -280,6 +287,19 @@ export function ProfileEditorClient({
                 />
               )}
               <div style={{ position: "absolute", zIndex: 2, display: "flex", gap: 8, top: 14, right: 14 }}>
+                <button
+                  onClick={() => setCvImproveOpen(true)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    background: D.blue,
+                    border: "1px solid rgba(255,255,255,0.35)",
+                    borderRadius: 8, padding: "6px 13px",
+                    color: "#fff", fontFamily: SANS, fontSize: 12, fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  Mejorar con IA
+                </button>
                 <button
                   onClick={() => setBannerPickerOpen(true)}
                   style={{
@@ -1197,6 +1217,29 @@ export function ProfileEditorClient({
             />
           </div>
         </div>
+      )}
+
+      {cvImproveOpen && (
+        <CvImproveModal
+          userId={user.id}
+          verified={facultyProfile?.estado_perfil === "verificado"}
+          current={{
+            headline: facultyProfile?.headline || "",
+            bio: facultyProfile?.bio || "",
+            country: facultyProfile?.country || "",
+            yearsExperience: facultyProfile?.years_experience || 0,
+            currentPosition: facultyProfile?.current_position || "",
+            researchPublications: facultyProfile?.research_publications || "",
+            currentInstitution: facultyProfile?.current_institution || "",
+            institutionsTaught: Array.isArray(facultyProfile?.institutions_taught) ? facultyProfile.institutions_taught : [],
+            academicLevel: facultyProfile?.academic_level || "",
+            isPhd: !!facultyProfile?.is_phd,
+            degrees: Array.isArray(facultyProfile?.degrees) ? facultyProfile.degrees : [],
+            languages: Array.isArray(facultyProfile?.languages) ? facultyProfile.languages : [],
+          }}
+          onClose={() => setCvImproveOpen(false)}
+          onApply={applyCvSuggestions}
+        />
       )}
 
       {/* ORCID Import Modal */}

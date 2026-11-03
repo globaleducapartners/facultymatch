@@ -39,9 +39,13 @@ interface Props {
   onConfirm: (prefill: CvWizardPrefill) => void;
   /** Volver a la pantalla de elección (no entra al formulario directamente) */
   onBack: () => void;
+  /** Textos de la pantalla de lectura cuando se usa fuera del asistente. */
+  reviewNote?: string;
+  confirmLabel?: string;
+  backLabel?: string;
 }
 
-export function CvImportStep({ userId, onConfirm, onBack }: Props) {
+export function CvImportStep({ userId, onConfirm, onBack, reviewNote, confirmLabel, backLabel }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pastedText, setPastedText] = useState("");
@@ -141,7 +145,7 @@ export function CvImportStep({ userId, onConfirm, onBack }: Props) {
               Esto es lo que hemos leído de tu CV
             </h2>
             <p style={{ fontFamily: SANS, fontSize: 12, color: D.muted, margin: "2px 0 0" }}>
-              Revísalo. Podrás editar cada campo en el formulario. Nada se guarda todavía.
+              {reviewNote || "Revísalo. Podrás editar cada campo en el formulario. Nada se guarda todavía."}
             </p>
           </div>
         </div>
@@ -217,7 +221,7 @@ export function CvImportStep({ userId, onConfirm, onBack }: Props) {
               display: "flex", alignItems: "center", gap: 6, marginLeft: "auto",
             }}
           >
-            Usar estos datos <ArrowRight size={15} />
+            {confirmLabel || "Usar estos datos"} <ArrowRight size={15} />
           </button>
         </div>
       </div>
@@ -295,7 +299,7 @@ export function CvImportStep({ userId, onConfirm, onBack }: Props) {
           display: "flex", alignItems: "center", gap: 5, alignSelf: "flex-start",
         }}
       >
-        <ArrowLeft size={13} /> Elegir otra opción
+        <ArrowLeft size={13} /> {backLabel || "Elegir otra opción"}
       </button>
 
       <label style={{ position: "relative", display: "block", cursor: "pointer" }}>
