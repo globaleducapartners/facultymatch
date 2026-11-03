@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   if (!adminProfile || (adminProfile.role !== "admin" && adminProfile.role !== "super_admin"))
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { subject, body, segment, test, style } = await request.json();
+  const { subject, body, segment, test, style, testTo } = await request.json();
   if (!subject?.trim() || !body?.trim()) {
     return NextResponse.json({ error: "Subject and body are required" }, { status: 400 });
   }
@@ -128,17 +128,19 @@ export async function POST(request: Request) {
 
   // ── Prueba: solo al propio administrador, con datos de ejemplo ──────────────
   if (test) {
+    // Destino de la prueba: la dirección indicada en el panel; si no, la del propio admin.
+    const to = typeof testTo === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testTo.trim()) ? testTo.trim() : user.email!;
     const { data: me } = await admin.from("user_profiles").select("full_name").eq("id", user.id).maybeSingle();
     const link = `https://www.facultymatch.app/signup?ref=${user.id}`;
     try {
       await resend.emails.send({
         from: FROM,
-        to: [user.email!],
+        to: [to],
         reply_to: "support@facultymatch.app",
         subject: `[PRUEBA] ${fill(subject, firstNameOf(me?.full_name), link)}`,
         html: buildHtml(fill(body, firstNameOf(me?.full_name), link)),
       });
-      return NextResponse.json({ success: true, sent: 1, errors: 0, total: 1, testTo: user.email });
+      return NextResponse.json({ success: true, sent: 1, errors: 0, total: 1, testTo: to });
     } catch {
       return NextResponse.json({ error: "No se pudo enviar la prueba" }, { status: 500 });
     }

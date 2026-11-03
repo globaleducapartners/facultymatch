@@ -10,6 +10,7 @@ const SEGMENTS = [
 ];
 
 export default function MailingPage() {
+  const [testEmail, setTestEmail] = useState("");
   const [style, setStyle] = useState<"carta" | "corporativo">("carta");
   const [segment, setSegment] = useState("faculty");
   const [subject, setSubject] = useState("");
@@ -25,7 +26,7 @@ export default function MailingPage() {
       const res = await fetch("/api/admin/send-broadcast", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject, body, segment, style, test: true }),
+        body: JSON.stringify({ subject, body, segment, style, test: true, testTo: testEmail }),
       });
       const data = await res.json();
       setResult(data.error ? data : { sent: 1, errors: 0, total: 1, test: data.testTo });
@@ -163,11 +164,18 @@ export default function MailingPage() {
           <Send size={16} />
           {loading ? "Enviando..." : `Enviar a ${SEGMENTS.find(s => s.value === segment)?.label}`}
         </button>
+        <input
+          type="email"
+          value={testEmail}
+          onChange={(e) => setTestEmail(e.target.value)}
+          placeholder="Tu correo para la prueba"
+          className="ml-3 w-64 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-talentia-blue"
+        />
         <button
           type="button"
           onClick={handleTest}
-          disabled={loading || !subject.trim() || !body.trim()}
-          className="ml-3 rounded-xl border border-gray-200 px-6 py-3 font-bold text-navy transition-colors hover:border-talentia-blue disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading || !subject.trim() || !body.trim() || !testEmail.includes("@")}
+          className="ml-2 rounded-xl border border-gray-200 px-6 py-3 font-bold text-navy transition-colors hover:border-talentia-blue disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Enviarme una prueba
         </button>
