@@ -148,6 +148,9 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
 
   const handleCvImportConfirm = useCallback((prefill: CvWizardPrefill) => {
     updateData(prefill as Partial<WizardData>);
+    // Vuelve al primer paso para revisar todo el borrador, también cuando
+    // se entra a la IA a mitad del formulario.
+    setStep(0);
     setShowCvIntro(false);
   }, [updateData]);
 
@@ -372,6 +375,17 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
             Paso {Math.min(step + 1, 5)} de 5
           </p>
         </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <button
+          onClick={() => { setIntroMode("ai"); setShowCvIntro(true); }}
+          style={{
+            fontFamily: SANS, fontSize: 12, fontWeight: 700, color: D.blue,
+            background: D.white, border: `1px solid ${D.border}`, borderRadius: 8,
+            padding: "8px 14px", cursor: "pointer",
+          }}
+        >
+          Rellenar con IA desde mi CV
+        </button>
         <button
           onClick={handleSaveAndExit}
           disabled={saving}
@@ -384,6 +398,7 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
         >
           <Save size={13} /> {saving ? "Guardando…" : "Guardar y salir"}
         </button>
+        </div>
       </div>
 
       {/* Step content */}
