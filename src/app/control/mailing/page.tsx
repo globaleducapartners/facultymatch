@@ -10,6 +10,7 @@ const SEGMENTS = [
 ];
 
 export default function MailingPage() {
+  const [style, setStyle] = useState<"carta" | "corporativo">("carta");
   const [segment, setSegment] = useState("faculty");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
@@ -24,7 +25,7 @@ export default function MailingPage() {
       const res = await fetch("/api/admin/send-broadcast", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject, body, segment, test: true }),
+        body: JSON.stringify({ subject, body, segment, style, test: true }),
       });
       const data = await res.json();
       setResult(data.error ? data : { sent: 1, errors: 0, total: 1, test: data.testTo });
@@ -45,7 +46,7 @@ export default function MailingPage() {
       const res = await fetch("/api/admin/send-broadcast", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject, body, segment }),
+        body: JSON.stringify({ subject, body, segment, style }),
       });
       const data = await res.json();
       setResult(data);
@@ -132,11 +133,24 @@ export default function MailingPage() {
           />
         </div>
 
+        {/* Estilo */}
+        <div className="space-y-2">
+          <label className="text-xs font-black uppercase tracking-widest text-gray-400">Estilo del correo</label>
+          <div className="flex flex-wrap gap-3">
+            {([["carta", "Carta sobria", "Sin botón ni bandas de color, tipografía con serifa. Para mensajes personales."], ["corporativo", "Corporativo", "Cabecera azul y botón «Acceder a mi cuenta»."]] as const).map(([v, t, d]) => (
+              <button key={v} type="button" onClick={() => setStyle(v)} className={`max-w-[280px] rounded-2xl border-2 p-3 text-left transition-all ${style === v ? "border-talentia-blue bg-blue-50" : "border-gray-100 bg-white hover:border-gray-200"}`}>
+                <p className="text-sm font-black text-navy">{t}</p>
+                <p className="mt-0.5 text-[11px] font-medium leading-tight text-gray-500">{d}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Preview hint */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
           <Mail size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-amber-700 font-medium">
-            El email se enviará con la plantilla corporativa de FacultyMatch desde <strong>noreply@facultymatch.app</strong>.
+            El email se enviará con el estilo elegido desde <strong>noreply@facultymatch.app</strong>.
             El remitente es de sólo lectura: las respuestas van a <strong>support@facultymatch.app</strong>.
           </p>
         </div>

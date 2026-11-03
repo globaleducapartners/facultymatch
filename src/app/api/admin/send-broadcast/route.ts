@@ -2,6 +2,7 @@ import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { firstNameOf } from "@/lib/emails/templates";
+import { buildLetterHtml } from "@/lib/emails/letter";
 
 // Un envío personalizado va de uno en uno (unos 0,5 s por correo).
 export const maxDuration = 60;
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
   if (!adminProfile || (adminProfile.role !== "admin" && adminProfile.role !== "super_admin"))
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { subject, body, segment, test } = await request.json();
+  const { subject, body, segment, test, style } = await request.json();
   if (!subject?.trim() || !body?.trim()) {
     return NextResponse.json({ error: "Subject and body are required" }, { status: 400 });
   }
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
       .replace(/\{\{\s*enlace\s*\}\}/gi, link)
       .replace(/^\s+/, "");
 
-  const buildHtml = (text: string) => `<!DOCTYPE html>
+  const buildCorporateHtml = (text: string) => `<!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${escapeHtml(subject)}</title>
 </head>
@@ -121,6 +122,9 @@ export async function POST(request: Request) {
 </table>
 </td></tr></table>
 </body></html>`;
+
+  // Estilo del correo: "carta" (sobrio, sin botón) o corporativo (por defecto).
+  const buildHtml = (text: string) => (style === "carta" ? buildLetterHtml(subject, text) : buildCorporateHtml(text));
 
   // ── Prueba: solo al propio administrador, con datos de ejemplo ──────────────
   if (test) {
