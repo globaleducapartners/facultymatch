@@ -1,6 +1,10 @@
 import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { firstNameOf } from "@/lib/emails/templates";
+
+// Un envío personalizado va de uno en uno (unos 0,5 s por correo).
+export const maxDuration = 60;
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM_EMAIL || "FacultyMatch <noreply@facultymatch.app>";
@@ -15,7 +19,7 @@ export async function POST(request: Request) {
   if (!adminProfile || (adminProfile.role !== "admin" && adminProfile.role !== "super_admin"))
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { subject, body, segment } = await request.json();
+  const { subject, body, segment, test } = await request.json();
   if (!subject?.trim() || !body?.trim()) {
     return NextResponse.json({ error: "Subject and body are required" }, { status: 400 });
   }
@@ -63,14 +67,30 @@ export async function POST(request: Request) {
 
   // Deduplicate
   emails = [...new Set(emails)].filter(Boolean);
+  // Cuentas de prueba internas: nunca reciben envíos masivos.
+  emails = emails.filter((e) => !/prueba|@facultymatch\.app$/i.test(e));
 
-  if (emails.length === 0) {
+  if (emails.length === 0 && !test) {
     return NextResponse.json({ error: "No recipients found" }, { status: 400 });
   }
 
-  const htmlBody = `<!DOCTYPE html>
+  // Etiquetas personalizables: {{nombre}} (nombre de pila) y {{enlace}} (enlace personal
+  // de invitación de cada docente). Si el texto no las usa, el envío es el de siempre.
+  const personalised = /\{\{\s*(nombre|enlace)\s*\}\}/i.test(`${subject} ${body}`);
+  const escapeHtml = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const renderBody = (t: string) =>
+    escapeHtml(t)
+      .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color:#1B4FD8;">$1</a>')
+      .replace(/\n/g, "<br/>");
+  const fill = (t: string, name: string, link: string) =>
+    t
+      .replace(/\s*\{\{\s*nombre\s*\}\}/gi, name ? ` ${name}` : "")
+      .replace(/\{\{\s*enlace\s*\}\}/gi, link)
+      .replace(/^\s+/, "");
+
+  const buildHtml = (text: string) => `<!DOCTYPE html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${subject}</title>
+<title>${escapeHtml(subject)}</title>
 </head>
 <body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:48px 16px;">
@@ -85,7 +105,7 @@ export async function POST(request: Request) {
   <tr><td style="background:linear-gradient(90deg,#1B4FD8,#1d4ed8);height:3px;"></td></tr>
   <!-- Body -->
   <tr><td style="background:#ffffff;padding:48px 40px;">
-    <div style="color:#1e293b;font-size:15px;line-height:1.8;">${body.replace(/\n/g, "<br/>")}</div>
+    <div style="color:#1e293b;font-size:15px;line-height:1.8;">${renderBody(text)}</div>
     <div style="margin-top:32px;padding-top:24px;border-top:1px solid #f1f5f9;">
       <a href="https://www.facultymatch.app/app" style="display:inline-block;background:#1B4FD8;color:#ffffff;padding:14px 28px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;">
         Acceder a mi cuenta →
@@ -101,6 +121,64 @@ export async function POST(request: Request) {
 </table>
 </td></tr></table>
 </body></html>`;
+
+  // ── Prueba: solo al propio administrador, con datos de ejemplo ──────────────
+  if (test) {
+    const { data: me } = await admin.from("user_profiles").select("full_name").eq("id", user.id).maybeSingle();
+    const link = `https://www.facultymatch.app/signup?ref=${user.id}`;
+    try {
+      await resend.emails.send({
+        from: FROM,
+        to: [user.email!],
+        reply_to: "support@facultymatch.app",
+        subject: `[PRUEBA] ${fill(subject, firstNameOf(me?.full_name), link)}`,
+        html: buildHtml(fill(body, firstNameOf(me?.full_name), link)),
+      });
+      return NextResponse.json({ success: true, sent: 1, errors: 0, total: 1, testTo: user.email });
+    } catch {
+      return NextResponse.json({ error: "No se pudo enviar la prueba" }, { status: 500 });
+    }
+  }
+
+  // ── Envío personalizado: uno a uno, con nombre y enlace propios ───────────
+  if (personalised) {
+    const ids = Object.values(emailToId);
+    const { data: profs } = await admin.from("user_profiles").select("id, full_name").in("id", ids);
+    const nameById = new Map((profs || []).map((p: any) => [p.id, p.full_name as string | null]));
+    let okCount = 0;
+    let failCount = 0;
+    const sentEmails: string[] = [];
+    for (const email of emails) {
+      const uid = emailToId[email];
+      const name = firstNameOf(uid ? nameById.get(uid) : "");
+      const link = uid ? `https://www.facultymatch.app/signup?ref=${uid}` : "https://www.facultymatch.app";
+      try {
+        await resend.emails.send({
+          from: FROM,
+          to: [email],
+          reply_to: "support@facultymatch.app",
+          subject: fill(subject, name, link),
+          html: buildHtml(fill(body, name, link)),
+        });
+        okCount++;
+        sentEmails.push(email);
+      } catch {
+        failCount++;
+      }
+      await new Promise((r) => setTimeout(r, 500));
+    }
+    const entries = sentEmails.map((email) => ({
+      recipient_id: emailToId[email] || null,
+      recipient_email: email,
+      template: "broadcast",
+      subject,
+      metadata: { admin_id: user.id, segment: segment || null, personalised: true },
+    }));
+    for (let i = 0; i < entries.length; i += 100) {
+      try { await admin.from("email_logs").insert(entries.slice(i, i + 100)); } catch {}
+    }
+    return NextResponse.json({ success: true, sent: okCount, errors: failCount, total: emails.length });
+  }
 
   // Resend supports up to 50 recipients per call — batch if needed
   const BATCH_SIZE = 50;
@@ -118,7 +196,7 @@ export async function POST(request: Request) {
         bcc: batch,
         reply_to: "support@facultymatch.app",
         subject,
-        html: htmlBody,
+        html: buildHtml(body),
       });
       sent += batch.length;
     } catch {

@@ -14,7 +14,25 @@ export default function MailingPage() {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ sent?: number; errors?: number; total?: number; error?: string } | null>(null);
+  const [result, setResult] = useState<{ sent?: number; errors?: number; total?: number; error?: string; test?: string } | null>(null);
+
+  const handleTest = async () => {
+    if (!subject.trim() || !body.trim()) return;
+    setLoading(true);
+    setResult(null);
+    try {
+      const res = await fetch("/api/admin/send-broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subject, body, segment, test: true }),
+      });
+      const data = await res.json();
+      setResult(data.error ? data : { sent: 1, errors: 0, total: 1, test: data.testTo });
+    } catch {
+      setResult({ error: "Error de red. Inténtalo de nuevo." });
+    }
+    setLoading(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +70,10 @@ export default function MailingPage() {
             : <CheckCircle2 size={18} className="text-green-600 flex-shrink-0 mt-0.5" />}
           <div>
             <p className={`text-sm font-black ${result.error ? "text-red-800" : "text-green-800"}`}>
-              {result.error ? "Error" : "Email enviado"}
+              {result.error ? "Error" : result.test ? "Prueba enviada" : "Email enviado"}
             </p>
             <p className={`text-xs font-medium mt-0.5 ${result.error ? "text-red-600" : "text-green-600"}`}>
-              {result.error || `${result.sent} enviados · ${result.errors ?? 0} errores · ${result.total} destinatarios totales`}
+              {result.error || (result.test ? `Prueba enviada a ${result.test}. Revisa tu bandeja de entrada.` : `${result.sent} enviados · ${result.errors ?? 0} errores · ${result.total} destinatarios totales`)}
             </p>
           </div>
         </div>
@@ -103,7 +121,7 @@ export default function MailingPage() {
         {/* Body */}
         <div className="space-y-2">
           <label className="text-xs font-black uppercase tracking-widest text-gray-400">Cuerpo del email</label>
-          <p className="text-xs text-gray-400 font-medium">Texto plano. Los saltos de línea se convierten en párrafos.</p>
+          <p className="text-xs text-gray-400 font-medium">Texto plano. Los saltos de línea se convierten en párrafos. Para personalizar escribe <strong>{"{{nombre}}"}</strong> (nombre de pila de cada docente) y <strong>{"{{enlace}}"}</strong> (su enlace personal de invitación): cada persona recibe su propio correo.</p>
           <textarea
             value={body}
             onChange={e => setBody(e.target.value)}
@@ -126,10 +144,18 @@ export default function MailingPage() {
         <button
           type="submit"
           disabled={loading || !subject.trim() || !body.trim()}
-          className="flex items-center gap-2 bg-talentia-blue hover:bg-navy text-white font-black px-6 py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 bg-talentia-blue hover:bg-navy text-white font-black px-6 py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Send size={16} />
           {loading ? "Enviando..." : `Enviar a ${SEGMENTS.find(s => s.value === segment)?.label}`}
+        </button>
+        <button
+          type="button"
+          onClick={handleTest}
+          disabled={loading || !subject.trim() || !body.trim()}
+          className="ml-3 rounded-xl border border-gray-200 px-6 py-3 font-bold text-navy transition-colors hover:border-talentia-blue disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Enviarme una prueba
         </button>
       </form>
     </div>
