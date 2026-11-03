@@ -45,6 +45,36 @@ export default function NotificationsPage() {
     }
   }
 
+  // ── Aviso solo en la plataforma (campana) ──
+  const [inSegment, setInSegment] = useState<"improvable" | "all_faculty">("improvable");
+  const [inSubject, setInSubject] = useState("Mejora tu perfil en un minuto con IA");
+  const [inBody, setInBody] = useState("Sube tu CV y te proponemos cómo completar tu perfil: rellenamos lo que te falta y tú decides qué cambiar. No se borra nada de lo que ya has escrito.");
+  const [inLink, setInLink] = useState("/app/faculty/profile?ia=1");
+  const [inLoading, setInLoading] = useState(false);
+  const [inResult, setInResult] = useState<{ ok: boolean; message: string } | null>(null);
+
+  async function sendInApp() {
+    setInLoading(true);
+    setInResult(null);
+    try {
+      const base = { segment: inSegment, subject: inSubject, body: inBody, link: inLink, type: "cv_ai_improve" };
+      const pre = await fetch("/api/admin/send-inapp", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...base, dryRun: true }) }).then((r) => r.json());
+      if (!pre.success) { setInResult({ ok: false, message: pre.error || "Error" }); return; }
+      if (pre.count === 0) { setInResult({ ok: true, message: "Nadie pendiente: todos los docentes de este segmento ya recibieron este aviso." }); return; }
+      if (!confirm(`Se creará el aviso en la plataforma para ${pre.count} docentes (sin correo).\n\n${inSubject}`)) return;
+      const res = await fetch("/api/admin/send-inapp", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(base) }).then((r) => r.json());
+      if (res.success) {
+        setInResult({ ok: true, message: `Aviso creado para ${res.sent} docentes.${res.linkSkipped ? " Se ha enviado SIN botón porque falta aplicar la migración del enlace." : ""}` });
+      } else {
+        setInResult({ ok: false, message: res.error || "Error al crear los avisos" });
+      }
+    } catch {
+      setInResult({ ok: false, message: "Error de conexión" });
+    } finally {
+      setInLoading(false);
+    }
+  }
+
   async function handleSend() {
     if (!subject.trim()) return;
     setLoading(true);
@@ -110,6 +140,31 @@ export default function NotificationsPage() {
             Historial
           </Link>
         </div>
+      </div>
+
+      {/* Aviso solo en la plataforma */}
+      <div className="rounded-2xl border border-gray-100 bg-white p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Bell size={16} className="text-talentia-blue" />
+          <h2 className="text-sm font-black text-navy">Aviso en la plataforma (sin correo)</h2>
+        </div>
+        <p className="text-xs text-gray-500 font-medium">
+          Aparece en la campana y en el inicio de cada docente. Cada docente lo recibe una sola vez.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {([["improvable", "Con margen de mejora (perfil por debajo del 100%)"], ["all_faculty", "Todos los docentes"]] as const).map(([v, l]) => (
+            <button key={v} type="button" onClick={() => setInSegment(v)} className={`px-4 py-2 rounded-xl text-xs font-black transition-colors ${inSegment === v ? "bg-navy text-white" : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50"}`}>{l}</button>
+          ))}
+        </div>
+        <input value={inSubject} onChange={(e) => setInSubject(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 text-sm font-medium outline-none focus:ring-2 focus:ring-talentia-blue" placeholder="Título" />
+        <textarea value={inBody} onChange={(e) => setInBody(e.target.value)} rows={3} className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 text-sm font-medium outline-none focus:ring-2 focus:ring-talentia-blue resize-none" placeholder="Texto" />
+        <input value={inLink} onChange={(e) => setInLink(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50 text-sm font-mono outline-none focus:ring-2 focus:ring-talentia-blue" placeholder="Enlace interno, p. ej. /app/faculty/profile?ia=1" />
+        {inResult && (
+          <p className={`text-xs font-bold ${inResult.ok ? "text-green-700" : "text-red-600"}`}>{inResult.message}</p>
+        )}
+        <button onClick={sendInApp} disabled={inLoading || !inSubject.trim() || !inBody.trim()} className="inline-flex items-center gap-2 bg-navy text-white text-xs font-black px-5 py-3 rounded-xl disabled:opacity-50">
+          {inLoading ? <Loader2 size={14} className="animate-spin" /> : <Bell size={14} />} Crear aviso en la plataforma
+        </button>
       </div>
 
       {/* Mode selector */}

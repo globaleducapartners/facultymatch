@@ -46,6 +46,7 @@ interface Notification {
   title: string;
   body: string;
   created_at: string;
+  link?: string | null;
 }
 
 export function Topbar({ user, profile }: TopbarProps) {
@@ -76,6 +77,12 @@ export function Topbar({ user, profile }: TopbarProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Carga al montar: así el punto rojo de la campana se ve sin tener que abrirla.
+  useEffect(() => {
+    if (profile?.role === "faculty" || effectiveMode === "faculty") fetchNotifications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const fetchNotifications = async () => {
     if (notifLoaded) return;
     setLoadingNotifs(true);
@@ -90,7 +97,7 @@ export function Topbar({ user, profile }: TopbarProps) {
       // ── 1. Admin notifications (in-app notifications from /control) ──
       const { data: adminNotifs } = await supabase
         .from("admin_notifications")
-        .select("id, subject, body, sent_at")
+        .select("*")
         .eq("faculty_id", user.id)
         .is("read_at", null)
         .order("sent_at", { ascending: false })
@@ -104,6 +111,7 @@ export function Topbar({ user, profile }: TopbarProps) {
             title: n.subject,
             body: n.body || "",
             created_at: n.sent_at,
+            link: (n as any).link ?? null,
           });
         }
       }
@@ -288,6 +296,8 @@ export function Topbar({ user, profile }: TopbarProps) {
                       <div
                         key={n.id}
                         className="px-4 py-3 hover:bg-gray-50 transition-colors"
+                        onClick={n.link && n.link.startsWith("/app/") ? () => { setShowNotifications(false); window.location.href = n.link!; } : undefined}
+                        style={n.link ? { cursor: "pointer" } : undefined}
                       >
                         <div className="flex items-start gap-3">
                           <div

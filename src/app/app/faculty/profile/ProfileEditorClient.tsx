@@ -8,7 +8,19 @@ import dynamic from "next/dynamic";
 // El modal de ORCID (600+ líneas) solo se abre a petición: se descarga entonces.
 const OrcidImportModal = dynamic(() => import("./OrcidImportModal").then((m) => m.OrcidImportModal), { ssr: false });
 import { saveOrcidImport, applyCvSuggestions } from "./actions";
-const CvImproveModal = dynamic(() => import("./CvImproveModal").then((m) => m.CvImproveModal), { ssr: false });
+// Mientras se descarga, el recuadro ya está en pantalla: nunca se ve un hueco vacío.
+function CvModalLoading() {
+  return (
+    <div role="dialog" aria-label="Mejorar mi perfil con IA" style={{ position: "fixed", inset: 0, zIndex: 80, background: "rgba(7,19,38,0.55)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "5vh 16px" }}>
+      <div style={{ width: "100%", maxWidth: 640, background: "#fff", borderRadius: 16, padding: 28, fontFamily: "'Inter', system-ui, sans-serif" }}>
+        <h2 style={{ fontSize: 19, fontWeight: 800, color: "#0C1018", letterSpacing: "-0.03em", margin: "0 0 20px" }}>Mejorar mi perfil con IA</h2>
+        <p style={{ fontSize: 14, color: "#5B6B85", margin: "0 0 16px" }}>Preparando…</p>
+        <div style={{ height: 120, borderRadius: 12, background: "#F2F6FC" }} />
+      </div>
+    </div>
+  );
+}
+const CvImproveModal = dynamic(() => import("./CvImproveModal").then((m) => m.CvImproveModal), { ssr: false, loading: () => <CvModalLoading /> });
 import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
 
 function useIsMobile() {
@@ -91,6 +103,7 @@ interface Props {
   saved: boolean;
   error?: boolean;
   tab?: string;
+  openIa?: boolean;
   saveBasicInfo: (fd: FormData) => Promise<void>;
   saveExperience: (fd: FormData) => Promise<void>;
   saveFormacion: (fd: FormData) => Promise<void>;
@@ -194,19 +207,22 @@ function SaveButton({ label = "Guardar cambios" }: { label?: string }) {
 
 // ─── Main component ────────────────────────────────────────────────────────────
 export function ProfileEditorClient({
-  user, userMeta, profile, facultyProfile, hasExpertise = false, documents, viewCount, saved, error, tab,
+  user, userMeta, profile, facultyProfile, hasExpertise = false, documents, viewCount, saved, error, tab, openIa = false,
   saveBasicInfo, saveExperience, saveFormacion, saveLanguages,
   saveResearch, saveLinks, updateContactPreferences,
 }: Props) {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [bannerPickerOpen, setBannerPickerOpen] = useState(false);
   const [orcidImportOpen, setOrcidImportOpen] = useState(false);
-  const [cvImproveOpen, setCvImproveOpen] = useState(false);
+  const [cvImproveOpen, setCvImproveOpen] = useState(openIa);
   const isMob = useIsMobile();
 
-  // Enlace directo desde la notificación: /app/faculty/profile?ia=1
+  // Descarga en segundo plano el modal de la IA y el lector de CV (ya cargados,
+  // el botón abre al instante). Con ?ia=1 el modal ya nace abierto desde el servidor.
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("ia") === "1") setCvImproveOpen(true);
+    const warm = () => { import("./CvImproveModal"); import("../onboarding/CvImportStep"); };
+    const w = window as any;
+    if (w.requestIdleCallback) w.requestIdleCallback(warm); else setTimeout(warm, 800);
   }, []);
 
   // Auto-open section based on tab query param

@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import DismissNotificationButton from "@/components/profile/DismissNotificationButton";
+import AiImproveCard from "@/components/profile/AiImproveCard";
 import { formatDateTZ, formatDateTimeTZ } from "@/lib/utils";
 
 // ─── Resource articles ────────────────────────────────────────────────────────
@@ -208,10 +209,18 @@ export default async function EducatorDashboard() {
             <p className="text-sm font-bold text-fm-ink">{notif.subject}</p>
             {notif.body && <p className="mt-0.5 text-sm text-[#5B6B85]">{notif.body}</p>}
             <p className="mt-1 text-xs text-[#5E6F8E]">{formatDateTimeTZ(notif.sent_at)}</p>
+            {notif.link && typeof notif.link === "string" && notif.link.startsWith("/app/") && (
+              <Link href={notif.link} className="mt-3 inline-block rounded-[10px] bg-fm-blue px-4 py-2 text-sm font-bold text-white transition-opacity hover:opacity-90">
+                Abrir
+              </Link>
+            )}
           </div>
           <DismissNotificationButton notificationId={notif.id} />
         </div>
       ))}
+
+      {/* ── Mejora tu perfil con IA (completitud < 70 %) ── */}
+      {progress < 70 && !(adminNotifications || []).some((n: any) => n.type === "cv_ai_improve") && <AiImproveCard progress={progress} />}
 
       {/* ── Importar de ORCID ── */}
       {!facultyProfile?.orcid_import_data && (

@@ -9,7 +9,10 @@ import {
   type CurrentProfileSnapshot, type CvSuggestion, type CvSuggestionPayload,
 } from "@/lib/cv-profile-diff";
 
-const CvImportStep = dynamic(() => import("../onboarding/CvImportStep").then((m) => m.CvImportStep), { ssr: false });
+const CvImportStep = dynamic(() => import("../onboarding/CvImportStep").then((m) => m.CvImportStep), {
+  ssr: false,
+  loading: () => <div style={{ height: 190, borderRadius: 12, background: "#F2F6FC" }} />,
+});
 
 const SANS = `'Inter', system-ui, -apple-system, sans-serif`;
 const D = {

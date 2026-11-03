@@ -9,9 +9,9 @@ import { refreshFacultyCompleteness } from "@/lib/faculty-completeness";
 export default async function ProfilePage({
   searchParams,
 }: {
-  searchParams: Promise<{ saved?: string; error?: string; tab?: string }>;
+  searchParams: Promise<{ saved?: string; error?: string; tab?: string; ia?: string }>;
 }) {
-  const { saved, error: saveError, tab } = await searchParams;
+  const { saved, error: saveError, tab, ia } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -306,6 +306,7 @@ export default async function ProfilePage({
       saved={saved === "1"}
       error={saveError === "1"}
       tab={tab}
+      openIa={ia === "1"}
       saveBasicInfo={saveBasicInfo}
       saveExperience={saveExperience}
       saveFormacion={saveFormacion}
