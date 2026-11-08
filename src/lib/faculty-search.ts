@@ -284,9 +284,11 @@ export async function searchFacultyProfiles(
       query_ = query_.filter("languages", "cs", JSON.stringify([{ lang: language }]));
     }
 
-    // Modality → modalities array column (stored as ["Online","Presencial","Híbrida"])
+    // Modality → columna modalities (jsonb, p. ej. ["Online","Presencial","Híbrida"]).
+    // Con .contains() PostgREST la trataba como array de texto ({Online}), que no
+    // es JSON válido: la consulta fallaba y el filtro devolvía siempre 0 resultados.
     if (modality) {
-      query_ = query_.contains("modalities", [modality]);
+      query_ = query_.filter("modalities", "cs", JSON.stringify([modality]));
     }
 
     // Availability — mismos códigos que AVAIL_LABELS en EducatorCard/docentes/[slug]

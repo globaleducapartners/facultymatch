@@ -108,7 +108,7 @@ export default function PrivacyPage() {
             <li><strong>Cualquier persona</strong>, únicamente si eliges una visibilidad pública y tu perfil está verificado (se publica una ficha con tu nombre y trayectoria).</li>
             <li>
               <strong>Proveedores que tratan datos por nuestra cuenta (encargados del tratamiento):</strong> Supabase (base de datos, autenticación y almacenamiento de archivos), Vercel (alojamiento de la web), Resend (envío de correos),
-              Stripe (pagos), Anthropic (inteligencia artificial, solo si usas la función de CV) y, con tu consentimiento, Google (Analytics y Tag Manager). Tenemos con ellos los acuerdos de tratamiento de datos que exige el RGPD.
+              Stripe (pagos), Anthropic (inteligencia artificial, solo si usas la función de CV) y, con tu consentimiento, Google (Analytics y Tag Manager). Tratan los datos siguiendo nuestras instrucciones y con las garantías del artículo 28 del RGPD, mediante los acuerdos de encargo de tratamiento que incorporan a sus condiciones de servicio.
             </li>
             <li>
               <strong>Meta Platforms Ireland Limited</strong>, si aceptas las cookies de publicidad: el píxel de Meta le permite medir la eficacia de nuestras campañas. Meta actúa como corresponsable de esa medición conforme a sus condiciones.

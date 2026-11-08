@@ -82,7 +82,7 @@ export default function TermsPage() {
           <ul>
             <li><strong>Docentes:</strong> el registro y el perfil básico son gratuitos. El plan <strong>Professional Docente</strong> cuesta 29 € al año e incluye posicionamiento prioritario, estadísticas de visitas y soporte prioritario.</li>
             <li><strong>Instituciones:</strong> el plan gratuito incluye 5 búsquedas y 5 contactos al mes. El plan <strong>Professional Institución</strong> cuesta 99 € al mes e incluye búsquedas y contactos ilimitados, filtros avanzados, favoritos sin límite, hasta tres usuarios y soporte prioritario.</li>
-            <li>Los precios de los planes para Docentes incluyen el IVA aplicable. Los de Instituciones se indican sin IVA, que se añadirá cuando corresponda. El importe total se muestra antes de pagar.</li>
+            <li>Facturamos desde España, por lo que a todos los planes se les aplica el IVA vigente (actualmente el 21 %). <strong>Los precios indicados incluyen el IVA</strong>, y el importe que se cobra es el que se muestra antes de pagar.</li>
             <li>El pago se realiza con tarjeta a través de Stripe. Las suscripciones <strong>se renuevan automáticamente</strong> cada periodo (mensual o anual) hasta que las canceles.</li>
             <li>Si un pago falla, podremos suspender los beneficios del plan hasta regularizarlo; tu cuenta pasa al plan gratuito.</li>
             <li>Podemos modificar los precios o los planes con un aviso de al menos 30 días. Si no estás de acuerdo, puedes cancelar antes de que se apliquen; el cambio no afecta al periodo ya pagado.</li>
