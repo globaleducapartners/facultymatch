@@ -112,8 +112,8 @@ export default function CookiesPage() {
 
           <h2 className="text-2xl font-black text-navy">2. Responsable</h2>
           <ul>
-            <li><strong>Identidad:</strong> Grupo Global Educa SL</li>
-            <li><strong>Dirección:</strong> Avenida Constitución, 4, 30008 Murcia, España</li>
+            <li><strong>Identidad:</strong> Grupo Global Educa, S.L. (CIF B19907047)</li>
+            <li><strong>Dirección:</strong> Avenida de la Constitución, 4, 30008 Murcia, España</li>
             <li><strong>Email:</strong> info@globaleducapartners.com</li>
           </ul>
 

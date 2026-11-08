@@ -49,7 +49,7 @@ export function CookieConsent() {
           <div className="space-y-1">
             <p className="font-bold text-navy text-sm">Tu privacidad y las cookies</p>
             <p className="text-xs text-gray-500 font-medium leading-relaxed">
-              En FacultyMatch (Grupo Global Educa SL) usamos cookies técnicas, necesarias para que la plataforma funcione.
+              En FacultyMatch (Grupo Global Educa, S.L.) usamos cookies técnicas, necesarias para que la plataforma funcione.
               Si aceptas, activaremos también cookies de análisis (Google Analytics, a través de Google Tag Manager) y de
               publicidad (píxel de Meta, para medir nuestras campañas en Facebook e Instagram), con transferencia de datos
               a EE. UU., y la medición del origen de las visitas. Puedes rechazarlas sin perder ninguna función y cambiar tu

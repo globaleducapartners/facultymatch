@@ -6,6 +6,7 @@ import { CookieConsent } from "@/components/layout/CookieConsent";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { AcquisitionTracker } from "@/components/AcquisitionTracker";
 import Script from "next/script";
+import { Suspense } from "react";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 const inter = Inter({
@@ -75,7 +76,10 @@ export default function RootLayout({
           </div>
           <ConditionalFooter />
           <CookieConsent />
-          <GoogleAnalytics />
+          {/* Suspense: GoogleAnalytics lee los parámetros de la URL (useSearchParams). */}
+          <Suspense fallback={null}>
+            <GoogleAnalytics />
+          </Suspense>
           <AcquisitionTracker />
 
       </body>

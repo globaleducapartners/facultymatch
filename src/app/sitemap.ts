@@ -27,6 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const SITE_UPDATED = new Date("2026-10-21");
   const LEGAL_UPDATED = new Date("2026-03-22");
   const COOKIES_UPDATED = new Date("2026-11-08");
+  const LEGAL_NOTICE_UPDATED = new Date("2026-11-08");
   const newest = (ds: (Date | undefined)[]) => ds.filter(Boolean).sort((a, b) => b!.getTime() - a!.getTime())[0];
 
   const articleUrls: MetadataRoute.Sitemap = ARTICLES.map((a) => ({
@@ -46,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/resources`,    lastModified: SITE_UPDATED, changeFrequency: "weekly",  priority: 0.7 },
     ...articleUrls,
     { url: `${BASE}/help`,         lastModified: SITE_UPDATED, changeFrequency: "monthly", priority: 0.4 },
-    { url: `${BASE}/legal`,        lastModified: LEGAL_UPDATED, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE}/legal`,        lastModified: LEGAL_NOTICE_UPDATED, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/privacy`,      lastModified: LEGAL_UPDATED, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/terms`,        lastModified: LEGAL_UPDATED, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/cookies`,      lastModified: COOKIES_UPDATED, changeFrequency: "yearly", priority: 0.3 },
