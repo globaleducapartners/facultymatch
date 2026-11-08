@@ -5,6 +5,7 @@ import { ensureProfileSlug } from "@/lib/profile-slug";
 import { ProfileEditorClient } from "./ProfileEditorClient";
 import { checkReVerification } from "@/lib/re-verification";
 import { refreshFacultyCompleteness } from "@/lib/faculty-completeness";
+import { refreshFacultyGeo } from "@/lib/geo";
 
 export default async function ProfilePage({
   searchParams,
@@ -86,6 +87,7 @@ export default async function ProfilePage({
     // Re-verification: full_name is a sensitive field
     await checkReVerification(user.id, ["full_name"]);
 
+    await refreshFacultyGeo(admin, user.id);
     await refreshFacultyCompleteness(admin, user.id);
     revalidatePath("/app/faculty/profile");
     revalidatePath("/app/faculty");

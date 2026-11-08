@@ -4,6 +4,7 @@ import { createClient, createAdminClient } from "@/lib/supabase-server";
 import { revalidatePath } from "next/cache";
 import { notifyAdminProfileNeedsReview } from "@/lib/admin-alerts";
 import { refreshFacultyCompleteness } from "@/lib/faculty-completeness";
+import { refreshFacultyGeo } from "@/lib/geo";
 
 interface WizardData {
   onboarding_step: number;
@@ -154,6 +155,11 @@ export async function saveWizardStep(data: WizardData) {
   if (error) {
     console.error("[saveWizardStep]", error);
     throw new Error("Error al guardar: " + error.message);
+  }
+
+  // Búsqueda geográfica: ubicar la(s) ciudad(es) del docente (no bloquea el guardado).
+  if (data.city !== undefined || data.country !== undefined) {
+    await refreshFacultyGeo(admin, user.id);
   }
 
   revalidatePath("/app/faculty/onboarding");

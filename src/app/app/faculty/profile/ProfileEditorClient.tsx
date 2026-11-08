@@ -505,6 +505,9 @@ export function ProfileEditorClient({
                     <Field label="Ciudad">
                       <input name="city" style={inp} placeholder="Madrid"
                         defaultValue={facultyProfile?.city || userMeta?.city} />
+                      <p style={{ fontSize: 12, color: D.muted, margin: "6px 0 0" }}>
+                        Las instituciones te encuentran por cercanía. Si das clase en varias ciudades, sepáralas con «y» (hasta 3).
+                      </p>
                     </Field>
                   </div>
                   <Field label="Sobre mí">

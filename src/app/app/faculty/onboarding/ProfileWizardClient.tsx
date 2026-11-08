@@ -246,7 +246,7 @@ export function ProfileWizardClient({ user, userMeta, profile, facultyProfile }:
 
   const canProceed = useCallback(() => {
     if (step === 0) {
-      return data.fullName.trim().length > 0;
+      return data.fullName.trim().length > 0 && data.country.trim().length > 0 && data.city.trim().length > 0;
     }
     if (step === 1) {
       return data.careerType !== null;

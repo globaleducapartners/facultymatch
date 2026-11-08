@@ -98,24 +98,29 @@ export function Step1BasicInfo({ data, updateData, user, avatarUrl }: Props) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label style={lbl}>País</label>
+          <label style={lbl}>País *</label>
           <select
             style={selectStyle}
             value={data.country}
             onChange={(e) => updateData({ country: e.target.value })}
+            required
           >
             <option value="">Selecciona tu país...</option>
             {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
         <div>
-          <label style={lbl}>Ciudad</label>
+          <label style={lbl}>Ciudad *</label>
           <input
             style={inp}
             placeholder="Madrid"
             value={data.city}
             onChange={(e) => updateData({ city: e.target.value })}
+            required
           />
+          <p style={{ fontFamily: SANS, fontSize: 12, color: D.muted, margin: "6px 0 0" }}>
+            Las instituciones te encuentran por cercanía. Si das clase en varias ciudades, sepáralas con «y» (hasta 3).
+          </p>
         </div>
       </div>
 

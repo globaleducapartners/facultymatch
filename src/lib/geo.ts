@@ -93,6 +93,41 @@ export async function resolvePlace(
   };
 }
 
+/** Quita del texto de ciudad los trozos que son el propio país ("Palma, España" → "Palma"). */
+export function cleanCityForGeo(city: string | null | undefined, countryCode: string | null): string {
+  const parts = (city ?? "").split(/\s*,\s*/).filter((p) => p && (!countryCode || countryCodeFromName(p) !== countryCode));
+  return parts.join(", ").trim();
+}
+
+// Cliente con rpc() y from() (el de servidor del proyecto o el de los scripts).
+type DbClient = RpcClient & { from: (table: string) => any };
+
+/**
+ * Recalcula las ciudades (hasta 3) y coordenadas de un docente a partir de la
+ * ciudad y el país que tiene guardados ("Valencia y Murcia" → ambas). Se llama
+ * DESPUÉS de guardar. Nunca lanza: si falla (p. ej. la migración aún no está
+ * aplicada) solo se registra, y guardar el perfil no se ve afectado.
+ */
+export async function refreshFacultyGeo(client: DbClient, facultyId: string): Promise<number> {
+  try {
+    const { data: fp } = await client.from("faculty_profiles").select("city, country").eq("id", facultyId).maybeSingle();
+    const countryCode = countryCodeFromName(fp?.country);
+    const { data, error } = await client.rpc("geo_set_faculty_places", {
+      p_faculty_id: facultyId,
+      p_city: cleanCityForGeo(fp?.city, countryCode),
+      p_country_code: countryCode,
+    });
+    if (error) {
+      console.error("[geo] geo_set_faculty_places:", error.message ?? error);
+      return 0;
+    }
+    return Number(data) || 0;
+  } catch (e) {
+    console.error("[geo] refreshFacultyGeo:", e);
+    return 0;
+  }
+}
+
 // ── Carga de GeoNames (scripts/load-geonames.ts) ─────────────────────────────
 
 export interface GeoNamesRow {

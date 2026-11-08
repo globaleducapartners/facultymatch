@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { checkReVerification } from "@/lib/re-verification";
 import { revalidatePublicProfile } from "@/lib/profile-slug";
 import { refreshFacultyCompleteness } from "@/lib/faculty-completeness";
+import { refreshFacultyGeo } from "@/lib/geo";
 import type { CvSuggestionPayload } from "@/lib/cv-profile-diff";
 
 interface OrcidSavePayload {
@@ -199,6 +200,7 @@ export async function applyCvSuggestions(payload: CvSuggestionPayload) {
   }
 
   await checkReVerification(user.id, columns);
+  if (country) await refreshFacultyGeo(createAdminClient(), user.id);
   await refreshFacultyCompleteness(createAdminClient(), user.id);
   await revalidatePublicProfile(createAdminClient(), user.id);
 
