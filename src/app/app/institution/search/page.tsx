@@ -59,12 +59,19 @@ export default async function InstitutionSearchRoute({
   const currentMonth = new Date().toISOString().slice(0, 7);
 
   if (searchMonthlyLimit !== null && hasSearchParams) {
-    const { data: allowed } = await admin.rpc("increment_search_usage", {
+    const { data: allowed, error: usageError } = await admin.rpc("increment_search_usage", {
       p_institution_id: institution.id,
       p_month: currentMonth,
       p_monthly_limit: searchMonthlyLimit,
     });
-    if (!allowed) searchLimitReached = true;
+    // Un fallo del contador NO es «límite alcanzado»: antes, un error de la función
+    // dejaba a todas las instituciones gratuitas sin resultados y con el aviso de
+    // límite. Ahora se registra y se deja buscar.
+    if (usageError) {
+      console.error("[institution/search] increment_search_usage falló:", usageError.message);
+    } else if (!allowed) {
+      searchLimitReached = true;
+    }
   }
 
   const [year, monthNum] = currentMonth.split("-").map(Number);
