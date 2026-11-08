@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient, createAdminClient } from "@/lib/supabase-server";
+import { LEGAL_VERSION } from "@/lib/legal";
 import { sendWelcomeEmail, sendActivationEmail } from "@/lib/emails/service";
 import { generateToken, getTokenExpiry } from "@/lib/activation-token";
 import { redirect } from "next/navigation";
@@ -65,7 +66,7 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
       terms_accepted_at: new Date().toISOString(),
       privacy_accepted_at: new Date().toISOString(),
       marketing_opt_in: marketingOptIn,
-      consent_version: "v1",
+      consent_version: LEGAL_VERSION,
     }, { onConflict: "id" });
     if (ssoProfileError) {
       console.error("[SignUp][SSO] Error upserting user_profiles:", ssoProfileError);
@@ -166,7 +167,7 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
         terms_accepted: true,
         privacy_accepted: true,
         marketing_opt_in: marketingOptIn,
-        consent_version: "v1",
+        consent_version: LEGAL_VERSION,
       },
     });
 
@@ -195,7 +196,7 @@ export async function signUp(formData: FormData, isSSO: boolean = false) {
       terms_accepted_at: new Date().toISOString(),
       privacy_accepted_at: new Date().toISOString(),
       marketing_opt_in: marketingOptIn,
-      consent_version: "v1",
+      consent_version: LEGAL_VERSION,
     }, { onConflict: "id" });
     if (userProfileError) {
       console.error("[SignUp] Error upserting user_profiles:", userProfileError);

@@ -25,7 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Fechas reales de última modificación (no "ahora" en cada rastreo).
   const SITE_UPDATED = new Date("2026-10-21");
-  const LEGAL_UPDATED = new Date("2026-03-22");
+  const LEGAL_UPDATED = new Date("2026-11-08");
   const COOKIES_UPDATED = new Date("2026-11-08");
   const LEGAL_NOTICE_UPDATED = new Date("2026-11-08");
   const newest = (ds: (Date | undefined)[]) => ds.filter(Boolean).sort((a, b) => b!.getTime() - a!.getTime())[0];
