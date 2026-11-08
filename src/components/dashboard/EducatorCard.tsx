@@ -136,6 +136,11 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
             </div>
           )}
 
+          {/* Distancia aproximada (solo con el filtro "Cerca de") */}
+          {educator._distance_label && (
+            <p className="text-[11px] font-bold text-[#1B4FD8]">{educator._distance_label}</p>
+          )}
+
           {/* Current institution */}
           {educator.current_institution && (
             <div className="flex items-center justify-center gap-1 text-[#5E6F8E]">

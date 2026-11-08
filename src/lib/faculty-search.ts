@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase-server";
 import { escapeOrValue } from "@/lib/postgrest-filter";
 import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
+import { resolvePlace } from "@/lib/geo";
 
 // Lógica de búsqueda/filtrado compartida entre las dos entradas al mismo
 // directorio de docentes: la búsqueda de instituciones
@@ -23,7 +24,14 @@ export interface FacultySearchFilters {
   phd: string;
   aneca: string;
   availability: string;
+  /** Búsqueda por cercanía: ciudad de referencia y radio en km (migraciones 20261108000001/2). */
+  city: string;
+  km: string;
 }
+
+/** Radios que ofrece el buscador (km). */
+export const GEO_RADIUS_OPTIONS = [25, 50, 100, 250] as const;
+const DEFAULT_RADIUS_KM = 50;
 
 export function parseFacultySearchParams(
   params: { [key: string]: string | string[] | undefined }
@@ -38,6 +46,8 @@ export function parseFacultySearchParams(
     phd: (params.phd as string) || "",
     aneca: (params.aneca as string) || "",
     availability: (params.availability as string) || "",
+    city: ((Array.isArray(params.city) ? params.city[0] : params.city) as string) || "",
+    km: ((Array.isArray(params.km) ? params.km[0] : params.km) as string) || "",
   };
 }
 
@@ -52,6 +62,8 @@ export interface FacultySearchOptions {
   lockedPrivateCards?: boolean;
   /** true solo para instituciones con plan que ve datos de contacto (teléfono, WhatsApp…): si no, esos campos nunca salen del servidor. */
   includeContact?: boolean;
+  /** País de quien busca (p. ej. el de la institución): se usa para ubicar la ciudad de "Cerca de" cuando no se elige país. */
+  defaultCountry?: string | null;
   /** Prefijo para los console.error, para saber desde qué pantalla vino el fallo. */
   logPrefix?: string;
 }
@@ -80,6 +92,8 @@ export function stripPrivateFields<T extends Record<string, any>>(row: T, includ
 export interface FacultySearchResult {
   transformedEducators: any[];
   transformedPending: any[];
+  /** Solo con filtro "Cerca de": ciudad de referencia reconocida (ok) o no (not_found). */
+  geo?: { status: "ok" | "not_found"; originName?: string; km: number; city: string };
 }
 
 export async function searchFacultyProfiles(
@@ -182,6 +196,29 @@ export async function searchFacultyProfiles(
   const degreesMatchIds: string[] = (degreesMatchData || []).map((d: any) => d.faculty_id);
   const hasExpertiseIdsAll = new Set((allExpertiseData || []).map((e: any) => e.faculty_id));
 
+  // ── Cercanía ("Cerca de [ciudad] a X km") ────────────────────────────────
+  // La ciudad de referencia se ubica en geo_places y la función faculty_ids_near
+  // devuelve los docentes con alguna ciudad dentro del radio (con la más
+  // cercana). Si no se reconoce la ciudad no se muestran resultados ficticios.
+  let geoNear: Map<string, number> | null = null;
+  let geoInfo: FacultySearchResult["geo"];
+  const geoCity = filters.city.trim();
+  if (geoCity) {
+    const km = Math.min(500, Math.max(5, Number(filters.km) || DEFAULT_RADIUS_KM));
+    const origin = await resolvePlace(admin, geoCity, country || opts.defaultCountry, { anyCountry: true });
+    if (!origin) {
+      geoInfo = { status: "not_found", km, city: geoCity };
+      geoNear = new Map();
+    } else {
+      const { data: nearData, error: nearError } = await admin.rpc("faculty_ids_near", {
+        p_lat: origin.latitude, p_lng: origin.longitude, p_km: km,
+      });
+      if (nearError) console.error(`${logPrefix} faculty_ids_near failed (migration not applied yet?):`, nearError);
+      geoNear = new Map((nearData || []).map((r: any) => [r.faculty_id as string, Number(r.km)]));
+      geoInfo = { status: "ok", originName: origin.name, km, city: geoCity };
+    }
+  }
+
   // ── Shared filter application — usada tanto para los resultados
   // verificados como para las tarjetas "pendiente" de abajo, así ambas
   // respetan exactamente los mismos criterios de búsqueda/filtro.
@@ -217,6 +254,11 @@ export async function searchFacultyProfiles(
 
     if (country) {
       query_ = query_.ilike("location", `%${country}%`);
+    }
+
+    if (geoNear) {
+      const ids = [...geoNear.keys()];
+      query_ = query_.in("id", ids.length > 0 ? ids : ["00000000-0000-0000-0000-000000000000"]);
     }
 
     // Area / subarea — areaMatchIds ya combina el match exacto de
@@ -257,7 +299,7 @@ export async function searchFacultyProfiles(
   }
 
   if (opts.skip) {
-    return { transformedEducators: [], transformedPending: [] };
+    return { transformedEducators: [], transformedPending: [], geo: geoInfo };
   }
 
   // ── Main query: verified profiles ─────────────────────────────────────────
@@ -370,8 +412,18 @@ export async function searchFacultyProfiles(
 
       const safe = stripPrivateFields(ed, opts.includeContact);
 
+      // Distancia aproximada (del centro de la ciudad de referencia a la ciudad
+      // más cercana del docente), redondeada de 5 en 5 km: nunca una dirección.
+      const exactKm = geoNear?.get(ed.id);
+      const roundedKm = exactKm === undefined ? null : Math.round(exactKm / 5) * 5;
+      const distanceLabel = roundedKm === null || !geoInfo?.originName
+        ? null
+        : roundedKm === 0 ? `En ${geoInfo.originName}` : `A ~${roundedKm} km de ${geoInfo.originName}`;
+
       return {
         ...safe,
+        _distance_km: exactKm ?? null,
+        _distance_label: distanceLabel,
         _relevance: fullTextRank?.get(ed.id) ?? 0,
         full_name: userObj?.full_name || ed.full_name || "Docente",
         avatar_url: userObj?.avatar_url || null,
@@ -387,11 +439,16 @@ export async function searchFacultyProfiles(
       // Con búsqueda de texto manda la relevancia; el plan y la completitud
       // desempatan.
       if (fullTextRank && b._relevance !== a._relevance) return b._relevance - a._relevance;
+      // Sin texto pero con "Cerca de": primero los más cercanos (la misma ciudad
+      // empata a 0 km y ahí desempatan el plan y la completitud).
+      if (geoNear && a._distance_km !== b._distance_km) return (a._distance_km ?? Infinity) - (b._distance_km ?? Infinity);
       if (a.is_pro && !b.is_pro) return -1;
       if (!a.is_pro && b.is_pro) return 1;
       if (b._completeness !== a._completeness) return b._completeness - a._completeness;
       return (a.full_name || "").localeCompare(b.full_name || "");
     });
 
-  return { transformedEducators: transformedEducators.slice(0, 50), transformedPending };
+  // La distancia exacta solo sirve para ordenar: al navegador llega la etiqueta redondeada.
+  const educatorsOut = transformedEducators.slice(0, 50).map(({ _distance_km, ...rest }: any) => rest);
+  return { transformedEducators: educatorsOut, transformedPending, geo: geoInfo };
 }

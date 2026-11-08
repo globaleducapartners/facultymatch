@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { extractDomainFromWebsite, extractDomainFromEmail } from "@/lib/domain";
 import { sendInstitutionProfileUpdatedEmail } from "@/lib/emails/service";
+import { refreshInstitutionGeo } from "@/lib/geo";
 import {
   Building2, Globe, MapPin, Phone, Mail, Users, Calendar,
   Link as LinkIcon, Save, ShieldCheck, Download,
@@ -65,6 +66,7 @@ export default async function InstitutionDashboardPage({
       .select()
       .single();
     institution = newInst;
+    if (newInst) await refreshInstitutionGeo(admin, user.id);
   }
 
   async function updateInstitution(formData: FormData) {
@@ -143,6 +145,9 @@ export default async function InstitutionDashboardPage({
         status: "active",
       });
     }
+
+    // Búsqueda geográfica: ubicar la ciudad de la institución (no bloquea el guardado).
+    await refreshInstitutionGeo(adminClient, user.id);
 
     // Email notification
     if (user.email) {

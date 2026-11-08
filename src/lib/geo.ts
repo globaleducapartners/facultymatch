@@ -72,14 +72,17 @@ export function countryCodeFromName(name: string | null | undefined): string | n
 export async function resolvePlace(
   client: RpcClient,
   city: string | null | undefined,
-  country: string | null | undefined
+  country: string | null | undefined,
+  options: { anyCountry?: boolean } = {}
 ): Promise<ResolvedPlace | null> {
   const cityText = (city ?? "").trim();
   if (!cityText) return null;
 
   // Sin país no se adivina: "Valencia" sola sería la de Venezuela (más poblada).
+  // Solo las búsquedas de quien consulta (anyCountry) admiten no indicar país;
+  // un país escrito pero no reconocido sigue sin adivinarse.
   const countryCode = countryCodeFromName(country);
-  if (!countryCode) return null;
+  if (!countryCode && !(options.anyCountry && !(country ?? "").trim())) return null;
 
   const { data, error } = await client.rpc("geo_resolve", { p_name: cityText, p_country_code: countryCode });
   if (error || !Array.isArray(data) || data.length === 0) return null;
@@ -125,6 +128,30 @@ export async function refreshFacultyGeo(client: DbClient, facultyId: string): Pr
   } catch (e) {
     console.error("[geo] refreshFacultyGeo:", e);
     return 0;
+  }
+}
+
+/**
+ * Recalcula las coordenadas de una institución a partir de su ciudad y país.
+ * Igual que refreshFacultyGeo: se llama DESPUÉS de guardar y nunca lanza.
+ */
+export async function refreshInstitutionGeo(client: DbClient, userId: string): Promise<void> {
+  try {
+    const { data: inst } = await client.from("institutions").select("id, city, country").eq("user_id", userId).maybeSingle();
+    if (!inst) return;
+    const place = await resolvePlace(client, cleanCityForGeo(inst.city, countryCodeFromName(inst.country)), inst.country);
+    const { error } = await client
+      .from("institutions")
+      .update({
+        latitude: place?.latitude ?? null,
+        longitude: place?.longitude ?? null,
+        geo_place_id: place?.placeId ?? null,
+        geo_updated_at: new Date().toISOString(),
+      })
+      .eq("id", inst.id);
+    if (error) console.error("[geo] institutions update:", error.message ?? error);
+  } catch (e) {
+    console.error("[geo] refreshInstitutionGeo:", e);
   }
 }
 

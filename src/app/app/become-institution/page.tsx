@@ -2,6 +2,7 @@ import { createClient, createAdminClient, getCurrentUser } from "@/lib/supabase-
 import { redirect } from "next/navigation";
 import { BecomeInstitutionClient } from "./BecomeInstitutionClient";
 import { extractDomainFromWebsite, extractDomainFromEmail } from "@/lib/domain";
+import { refreshInstitutionGeo } from "@/lib/geo";
 
 export default async function BecomeInstitutionPage() {
   const supabase = await createClient();
@@ -80,6 +81,9 @@ export default async function BecomeInstitutionPage() {
     }, { onConflict: "user_id" });
 
     if (instError) return { error: instError.message };
+
+    // Búsqueda geográfica: ubicar la ciudad de la institución (no bloquea el guardado).
+    await refreshInstitutionGeo(admin, user.id);
 
     // Grant dual-mode access: keep role as "faculty", enable institution mode
     const { error: profileError } = await admin

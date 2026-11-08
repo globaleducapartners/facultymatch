@@ -19,7 +19,7 @@ export default async function InstitutionSearchRoute({
 
   const { data: institution } = await supabase
     .from("institutions")
-    .select("id, name, type, country, location, website, description, created_at, status")
+    .select("id, name, type, country, city, location, website, description, created_at, status")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -48,7 +48,7 @@ export default async function InstitutionSearchRoute({
 
   const hasSearchParams = !!(
     params.query || params.area || params.subarea || params.country ||
-    params.language || params.phd || params.modality || params.aneca
+    params.language || params.phd || params.modality || params.aneca || params.city
   );
 
   // Search limit enforcement — the RPC itself does the check-and-increment
@@ -138,10 +138,11 @@ export default async function InstitutionSearchRoute({
   // quota is exhausted, so an over-limit institution never actually receives
   // real results (previously this ran unconditionally and only the usage
   // counter stopped incrementing — the "limit" was cosmetic).
-  const { transformedEducators, transformedPending } = await searchFacultyProfiles(admin, filters, {
+  const { transformedEducators, transformedPending, geo } = await searchFacultyProfiles(admin, filters, {
     blockedFacultyIds,
     skip: searchLimitReached,
     includeContact: isPro,
+    defaultCountry: institution.country,
     logPrefix: "[institution/search]",
   });
 
@@ -161,6 +162,8 @@ export default async function InstitutionSearchRoute({
         searchMonthlyLimit={searchMonthlyLimit ?? 5}
         searchLimitReached={searchLimitReached}
         monthlyContactsUsed={monthlyContactsUsed ?? 0}
+        geo={geo}
+        homeCity={(institution as any).city || null}
       />
     </>
   );

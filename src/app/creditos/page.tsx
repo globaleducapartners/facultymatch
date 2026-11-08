@@ -46,6 +46,18 @@ export default function CreditosPage() {
             </li>
           ))}
         </ul>
+        <h2 className="mb-2 mt-16 text-xl font-extrabold tracking-[-0.03em] text-fm-ink">Datos geográficos</h2>
+        <p className="max-w-[60ch] text-[15px] leading-[1.7] text-[#5B6B85]">
+          La búsqueda por cercanía usa la base de datos de ciudades de{" "}
+          <a href="https://www.geonames.org" target="_blank" rel="noopener noreferrer" className="font-semibold text-fm-blue hover:underline">
+            GeoNames
+          </a>
+          , bajo licencia{" "}
+          <a href="https://creativecommons.org/licenses/by/4.0/deed.es" target="_blank" rel="noopener noreferrer" className="font-semibold text-fm-blue hover:underline">
+            Creative Commons Atribución 4.0
+          </a>
+          . Las ubicaciones son siempre las del centro de la ciudad, nunca una dirección.
+        </p>
         <p className="mt-14 text-sm text-[#5B6B85]">
           ¿Eres autor/a de alguna imagen y quieres que modifiquemos el crédito? Escribe a{" "}
           <a href="mailto:support@facultymatch.app" className="font-semibold text-fm-blue hover:underline">

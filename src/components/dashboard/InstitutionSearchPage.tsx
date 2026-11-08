@@ -62,11 +62,15 @@ interface InstitutionSearchPageProps {
   isAlreadyInstitution?: boolean;
   /** Base URL for search form and filter chip links */
   searchPath?: string;
+  /** Resultado del filtro "Cerca de": ciudad reconocida o no. */
+  geo?: { status: "ok" | "not_found"; originName?: string; km: number; city: string };
+  /** Ciudad de la institución (para el botón "Usar mi sede"). */
+  homeCity?: string | null;
 }
 
 // ─── Filter chip helpers ──────────────────────────────────────────────────────
 
-const FILTER_KEYS = ["query", "area", "subarea", "language", "country", "aneca", "phd", "modality", "availability"] as const;
+const FILTER_KEYS = ["query", "area", "subarea", "language", "country", "aneca", "phd", "modality", "availability", "city"] as const;
 
 const FILTER_LABELS: Record<string, string> = {
   query: "Búsqueda",
@@ -78,6 +82,7 @@ const FILTER_LABELS: Record<string, string> = {
   phd: "Solo PhD",
   modality: "Modalidad",
   availability: "Disponibilidad",
+  city: "Cerca de",
 };
 
 // Mismos códigos y textos que AVAIL_LABELS en EducatorCard.tsx / docentes/[slug] —
@@ -110,6 +115,8 @@ function buildUrlWithout(params: Record<string, any>, removeKey: string, removeV
     if (Array.isArray(v)) v.forEach((val) => p.append(k, val));
     else p.append(k, v as string);
   });
+  // El radio solo tiene sentido mientras siga la ciudad de referencia.
+  if (removeKey !== "city" && params.city && params.km) p.append("km", Array.isArray(params.km) ? params.km[0] : params.km);
   const str = p.toString();
   return `${base}${str ? `?${str}` : ""}`;
 }
@@ -130,11 +137,15 @@ export function InstitutionSearchPage({
   isReadOnly = false,
   isAlreadyInstitution = false,
   searchPath,
+  geo,
+  homeCity,
 }: InstitutionSearchPageProps) {
   const basePath = searchPath ?? (isReadOnly ? "/app/faculty/directory" : "/app/institution/search");
   // Área elegida — controla qué subáreas se ofrecen debajo (cascada). Arranca
   // con lo que ya venga en la URL para que un enlace con ?area=X&subarea=Y
   // muestre las subáreas correctas nada más cargar.
+  // "Cerca de": ciudad editable (el botón "Usar mi sede" la rellena).
+  const [cityInput, setCityInput] = useState<string>((Array.isArray(searchParams.city) ? searchParams.city[0] : searchParams.city) || "");
   const [selectedArea, setSelectedArea] = useState((searchParams.area as string) || "");
   const selectedAreaSubareas = UNESCO_FIELDS.find((f) => f.label === selectedArea)?.subareas || [];
   // Open drawer from URL param on first render
@@ -243,6 +254,12 @@ export function InstitutionSearchPage({
   FILTER_KEYS.forEach((key) => {
     const val = searchParams[key];
     if (!val) return;
+    if (key === "city") {
+      const c = Array.isArray(val) ? val[0] : (val as string);
+      const km = Array.isArray(searchParams.km) ? searchParams.km[0] : searchParams.km;
+      activeChips.push({ key, value: c, label: `Cerca de ${c} · ${km || 50} km` });
+      return;
+    }
     if (Array.isArray(val)) {
       val.forEach((v) => activeChips.push({ key, value: v, label: getChipLabel(key, v) }));
     } else {
@@ -441,6 +458,40 @@ export function InstitutionSearchPage({
             </Button>
           </div>
 
+          {/* Cerca de — búsqueda por cercanía (hasta 3 ciudades por docente) */}
+          <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="relative flex-1 min-w-0 sm:max-w-sm">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-fm-faint pointer-events-none" size={16} />
+              <input
+                name="city"
+                value={cityInput}
+                onChange={(e) => setCityInput(e.target.value)}
+                className="w-full pl-9 pr-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all text-sm font-medium"
+                placeholder="Cerca de… (ciudad)"
+                aria-label="Cerca de (ciudad)"
+              />
+            </div>
+            <select
+              name="km"
+              defaultValue={(Array.isArray(searchParams.km) ? searchParams.km[0] : searchParams.km) || "50"}
+              aria-label="Distancia máxima"
+              className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-44"
+            >
+              {[25, 50, 100, 250].map((k) => (
+                <option key={k} value={k}>A menos de {k} km</option>
+              ))}
+            </select>
+            {homeCity && cityInput.trim().toLowerCase() !== homeCity.trim().toLowerCase() && (
+              <button
+                type="button"
+                onClick={() => setCityInput(homeCity)}
+                className="text-xs font-bold text-fm-blue hover:underline text-left"
+              >
+                Usar mi sede ({homeCity})
+              </button>
+            )}
+          </div>
+
           {/* Expanded more filters */}
           {showMoreFilters && (
             <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 duration-200">
@@ -556,7 +607,13 @@ export function InstitutionSearchPage({
       <p className="text-sm font-bold text-fm-faint">
         {initialEducators.length}{" "}
         {initialEducators.length === 1 ? "docente encontrado" : "docentes encontrados"}
+        {geo?.status === "ok" && ` · a menos de ${geo.km} km de ${geo.originName}, los más cercanos primero`}
       </p>
+      {geo?.status === "not_found" && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+          No hemos reconocido la ciudad «{geo.city}». Revisa la ortografía o prueba con una ciudad grande cercana.
+        </div>
+      )}
 
       {/* ── Cards grid ── */}
       {initialEducators.length > 0 ? (
@@ -587,7 +644,11 @@ export function InstitutionSearchPage({
             <Search size={48} />
           </div>
           <h3 className="text-xl font-bold text-fm-navy mb-2">No se han encontrado docentes</h3>
-          <p className="text-gray-500 max-w-xs mx-auto font-medium">Prueba a ajustar los filtros de búsqueda.</p>
+          <p className="text-gray-500 max-w-xs mx-auto font-medium">
+            {geo?.status === "ok"
+              ? `No hay docentes a menos de ${geo.km} km de ${geo.originName}. Prueba a ampliar la distancia o a quitar algún filtro.`
+              : "Prueba a ajustar los filtros de búsqueda."}
+          </p>
         </div>
       )}
 
