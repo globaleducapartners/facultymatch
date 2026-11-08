@@ -1,5 +1,6 @@
 // src/components/layout/Footer.tsx — FacultyMatch v2
 import Link from "next/link";
+import { CookieSettingsLink } from "./CookieSettingsLink";
 
 const SANS = `var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif`;
 const WHATSAPP = `https://wa.me/34616684214?text=${encodeURIComponent("Hola, me gustaría obtener más información sobre FacultyMatch.")}`;
@@ -195,6 +196,7 @@ export function Footer() {
                 { label: "Aviso legal",            href: "/legal" },
                 { label: "Política de privacidad", href: "/privacy" },
                 { label: "Términos de uso",        href: "/terms" },
+                { label: "Política de cookies",    href: "/cookies" },
               ].map((l) => (
                 <Link key={l.href} href={l.href} style={{
                   fontFamily: SANS, fontSize: 13, color: D.text,
@@ -203,6 +205,7 @@ export function Footer() {
                   {l.label}
                 </Link>
               ))}
+              <CookieSettingsLink style={{ fontFamily: SANS, fontSize: 13, color: D.text }} />
             </div>
           </div>
         </div>

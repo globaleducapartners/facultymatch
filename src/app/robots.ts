@@ -22,6 +22,7 @@ export default function robots(): MetadataRoute.Robots {
     "/legal",
     "/privacy",
     "/terms",
+    "/cookies",
     "/help",
     "/directory",
   ];
@@ -58,6 +59,7 @@ export default function robots(): MetadataRoute.Robots {
           "/legal",
           "/privacy",
           "/terms",
+          "/cookies",
           "/help",
           "/directory",
         ],

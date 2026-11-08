@@ -83,7 +83,7 @@ export default function PrivacyPage() {
 
           <h2 className="text-2xl font-black text-navy">7. Uso de cookies</h2>
           <p>
-            FacultyMatch utiliza cookies propias y de terceros para el funcionamiento técnico de la plataforma, la mejora de la experiencia de usuario y el análisis estadístico del tráfico. Consulta nuestra política de cookies para más información.
+            FacultyMatch utiliza cookies propias y de terceros para el funcionamiento técnico de la plataforma, la mejora de la experiencia de usuario y el análisis estadístico del tráfico. Consulta nuestra <a href="/cookies" className="text-talentia-blue">Política de cookies</a> para más información.
           </p>
         </div>
       </main>

@@ -3,65 +3,81 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { X, Cookie } from "lucide-react";
-import { CONSENT_STORAGE_KEY, CONSENT_CHANGED_EVENT } from "@/lib/consent";
+import { getConsent, saveConsent, OPEN_COOKIE_SETTINGS_EVENT, type ConsentStatus } from "@/lib/consent";
+
+// Aceptar y rechazar tienen exactamente el mismo aspecto y tamaño (la AEPD exige
+// que rechazar sea tan fácil y visible como aceptar).
+const choiceButton =
+  "flex-1 sm:flex-none px-5 py-2.5 text-xs font-bold text-white bg-navy rounded-xl hover:opacity-90 transition-opacity";
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const [current, setCurrent] = useState<ConsentStatus | null>(null);
 
   useEffect(() => {
-    const consent = localStorage.getItem(CONSENT_STORAGE_KEY);
-    if (!consent) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    if (!getConsent()) {
       // Small delay so it doesn't flash on first load
-      const timer = setTimeout(() => setVisible(true), 1000);
-      return () => clearTimeout(timer);
+      timer = setTimeout(() => setVisible(true), 1000);
     }
+    // «Configurar cookies» (pie de página): reabre el aviso para cambiar la decisión.
+    const reopen = () => {
+      setCurrent(getConsent()?.status ?? null);
+      setVisible(true);
+    };
+    window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, reopen);
+    return () => {
+      if (timer) clearTimeout(timer);
+      window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, reopen);
+    };
   }, []);
 
-  const setConsent = (value: "accepted" | "rejected") => {
-    localStorage.setItem(CONSENT_STORAGE_KEY, value);
-    window.dispatchEvent(new Event(CONSENT_CHANGED_EVENT));
+  const choose = (status: ConsentStatus) => {
+    saveConsent(status);
     setVisible(false);
   };
-
-  const accept = () => setConsent("accepted");
-  const reject = () => setConsent("rejected");
 
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 sm:p-6">
+    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 sm:p-6" role="dialog" aria-label="Preferencias de cookies">
       <div className="max-w-4xl mx-auto bg-white border border-gray-200 rounded-2xl shadow-2xl shadow-black/10 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div className="flex items-start gap-4 flex-1">
           <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
             <Cookie size={20} className="text-talentia-blue" />
           </div>
           <div className="space-y-1">
-            <p className="font-bold text-navy text-sm">Usamos cookies</p>
+            <p className="font-bold text-navy text-sm">Tu privacidad y las cookies</p>
             <p className="text-xs text-gray-500 font-medium leading-relaxed">
-              Utilizamos cookies propias y de terceros para mejorar tu experiencia y analizar el tráfico.{" "}
-              <Link href="/privacy" className="text-talentia-blue hover:underline font-bold">
-                Más información
+              En FacultyMatch (Grupo Global Educa SL) usamos cookies técnicas, necesarias para que la plataforma funcione.
+              Si aceptas, activaremos también cookies de análisis (Google Analytics, a través de Google Tag Manager) y de
+              publicidad (píxel de Meta, para medir nuestras campañas en Facebook e Instagram), con transferencia de datos
+              a EE. UU., y la medición del origen de las visitas. Puedes rechazarlas sin perder ninguna función y cambiar tu
+              decisión cuando quieras desde «Configurar cookies», al pie de la web. Más información en la{" "}
+              <Link href="/cookies" className="text-talentia-blue hover:underline font-bold">
+                Política de cookies
               </Link>
+              .
+              {current && (
+                <span className="block mt-1 text-gray-400">
+                  Tu decisión actual: {current === "accepted" ? "cookies de análisis y publicidad aceptadas" : "cookies de análisis y publicidad rechazadas"}.
+                </span>
+              )}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0 w-full sm:w-auto">
-          <button
-            onClick={reject}
-            className="flex-1 sm:flex-none px-4 py-2.5 text-xs font-bold text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
-          >
-            Solo esenciales
+          <button onClick={() => choose("rejected")} className={choiceButton}>
+            Rechazar todas
           </button>
-          <button
-            onClick={accept}
-            className="flex-1 sm:flex-none px-4 py-2.5 text-xs font-bold text-white bg-talentia-blue rounded-xl hover:bg-blue-700 transition-colors"
-          >
+          <button onClick={() => choose("accepted")} className={choiceButton}>
             Aceptar todas
           </button>
           <button
-            onClick={reject}
+            onClick={() => choose("rejected")}
             className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Cerrar"
+            aria-label="Cerrar (equivale a rechazar las cookies opcionales)"
+            title="Cerrar (equivale a rechazar las cookies opcionales)"
           >
             <X size={18} />
           </button>

@@ -14,8 +14,20 @@ export function GoogleAnalytics() {
   const [consented, setConsented] = useState(false);
 
   useEffect(() => {
-    setConsented(hasAnalyticsConsent());
-    const onChange = () => setConsented(hasAnalyticsConsent());
+    let wasConsented = hasAnalyticsConsent();
+    setConsented(wasConsented);
+    const onChange = () => {
+      const now = hasAnalyticsConsent();
+      // Retirada del consentimiento con las etiquetas de Google ya cargadas: no se
+      // pueden descargar de la página, así que se recarga (las cookies ya se borraron
+      // en saveConsent) para que dejen de funcionar de inmediato.
+      if (wasConsented && !now) {
+        window.location.reload();
+        return;
+      }
+      wasConsented = now;
+      setConsented(now);
+    };
     window.addEventListener(CONSENT_CHANGED_EVENT, onChange);
     return () => window.removeEventListener(CONSENT_CHANGED_EVENT, onChange);
   }, []);
