@@ -64,6 +64,9 @@ const PRIVATE_KEYS = [
   "referral_reward_granted_at", "verification_notes", "verificado_por", "orcid_import_data", "visibility_source",
   "notify_new_offers", "notify_messages", "notify_weekly_digest", "blocked_institutions", "preferred_institutions",
   "hide_from_current_institution", "preferred_contact_method",
+  // Coordenadas del centro de la ciudad (migración 20261108000001): se usan solo
+  // en el servidor para calcular distancias; al navegador solo llega "a X km".
+  "latitude", "longitude", "geo_place_id", "geo_updated_at",
 ];
 const CONTACT_KEYS = ["phone", "contact_email", "contact_whatsapp", "contact_linkedin"];
 
