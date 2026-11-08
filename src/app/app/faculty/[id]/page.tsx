@@ -62,7 +62,7 @@ export default async function FacultyProfilePage({
   const admin = createAdminClient();
 
   const [{ data: institution }, { data: viewerProfile }] = await Promise.all([
-    supabase.from("institutions").select("*").eq("user_id", user.id).maybeSingle(),
+    supabase.from("institutions").select("id").eq("user_id", user.id).maybeSingle(),
     supabase.from("user_profiles").select("plan, subscription_status, can_switch_role, active_mode").eq("id", user.id).single(),
   ]);
 

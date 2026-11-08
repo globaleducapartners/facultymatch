@@ -48,7 +48,7 @@ export default async function InstitutionHomePage() {
       .gte("created_at", `${currentMonth}-01`)
       .lt("created_at", nextMonthStr),
     supabase.from("favorites").select("*", { count: "exact", head: true }).eq("institution_id", institution.id),
-    supabase.from("contacts")
+    admin.from("contacts")
       .select("*, faculty:faculty_profiles(id, headline, user:user_profiles(full_name, avatar_url))")
       .eq("institution_id", institution.id)
       .order("created_at", { ascending: false })
