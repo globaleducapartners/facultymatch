@@ -160,6 +160,10 @@ export default function CookiesPage() {
             <a href="https://support.microsoft.com/es-es/microsoft-edge/eliminar-las-cookies-en-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" rel="noopener noreferrer" className="text-talentia-blue">Edge</a>.
             Si bloqueas las cookies técnicas, algunas funciones, como iniciar sesión, dejarán de funcionar.
           </p>
+          <p>
+            Para la publicidad basada en intereses, además de rechazar aquí las cookies, puedes oponerte desde la configuración de anuncios de tu cuenta de Facebook o Instagram y en{" "}
+            <a href="https://www.youronlinechoices.eu" target="_blank" rel="noopener noreferrer" className="text-talentia-blue">youronlinechoices.eu</a>.
+          </p>
 
           <h2 className="text-2xl font-black text-navy">5. Transferencias internacionales</h2>
           <p>
