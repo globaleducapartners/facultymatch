@@ -30,7 +30,7 @@ export default async function FacultyDirectoryPage({
   // — sin blockedFacultyIds (las reglas de bloqueo son cosa de instituciones,
   // no aplican a docentes viendo a sus colegas) y con las mismas tarjetas
   // "pendiente de verificación" que ya se ven desde el lado institución.
-  const { transformedEducators, transformedPending, geo } = await searchFacultyProfiles(admin, filters, {
+  const { transformedEducators, transformedPending, geo, relatedEducators } = await searchFacultyProfiles(admin, filters, {
     logPrefix: "[faculty/directory]",
     // Un perfil en "Solo instituciones" no debe verlo otro docente.
     publicOnly: true,
@@ -50,6 +50,7 @@ export default async function FacultyDirectoryPage({
       monthlyContactsUsed={0}
       isReadOnly
       geo={geo}
+      relatedEducators={relatedEducators}
       isAlreadyInstitution={!!userProfile?.can_switch_role}
     />
   );

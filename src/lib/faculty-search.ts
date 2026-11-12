@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase-server";
 import { escapeOrValue } from "@/lib/postgrest-filter";
 import { calcFacultyCompleteness, completenessInputFromRows } from "@/lib/faculty-completeness";
-import { resolvePlace } from "@/lib/geo";
+import { resolvePlaceByCode, countryCodeFromName } from "@/lib/geo";
 
 // Lógica de búsqueda/filtrado compartida entre las dos entradas al mismo
 // directorio de docentes: la búsqueda de instituciones
@@ -27,6 +27,8 @@ export interface FacultySearchFilters {
   /** Búsqueda por cercanía: ciudad de referencia y radio en km (migraciones 20261108000001/2). */
   city: string;
   km: string;
+  /** "1" = con ciudad, mostrar SOLO a quien está dentro del radio (por defecto se ordena por cercanía y se muestra a todos). */
+  strict: string;
 }
 
 /** Radios que ofrece el buscador (km). */
@@ -48,6 +50,7 @@ export function parseFacultySearchParams(
     availability: (params.availability as string) || "",
     city: ((Array.isArray(params.city) ? params.city[0] : params.city) as string) || "",
     km: ((Array.isArray(params.km) ? params.km[0] : params.km) as string) || "",
+    strict: ((Array.isArray(params.strict) ? params.strict[0] : params.strict) as string) || "",
   };
 }
 
@@ -64,6 +67,10 @@ export interface FacultySearchOptions {
   includeContact?: boolean;
   /** País de quien busca (p. ej. el de la institución): se usa para ubicar la ciudad de "Cerca de" cuando no se elige país. */
   defaultCountry?: string | null;
+  /** Uso interno: no añade los resultados «casi coinciden» (evita llamarse a sí mismo). */
+  noRelax?: boolean;
+  /** Uso interno: omite tarjetas de pendientes y privadas (búsquedas auxiliares). */
+  lite?: boolean;
   /** Prefijo para los console.error, para saber desde qué pantalla vino el fallo. */
   logPrefix?: string;
 }
@@ -93,7 +100,103 @@ export interface FacultySearchResult {
   transformedEducators: any[];
   transformedPending: any[];
   /** Solo con filtro "Cerca de": ciudad de referencia reconocida (ok) o no (not_found). */
-  geo?: { status: "ok" | "not_found"; originName?: string; km: number; city: string };
+  geo?: { status: "ok" | "not_found"; originName?: string; km: number; city: string; strict?: boolean; nearCount?: number };
+  /** Docentes que cumplen todos los filtros menos uno (con «_missing_label»), solo si el cruce deja pocos resultados. */
+  relatedEducators: any[];
+}
+
+// ── Filtros «relajables» y resultados que casi coinciden ──────────────────
+type RelaxKey = "query" | "area" | "country" | "language" | "modality" | "phd" | "aneca" | "availability";
+const RELAX_BELOW = 6; // con menos resultados que esto (y ≥2 filtros) se añaden los que casi coinciden
+const RELAX_MAX = 12;
+
+function activeFilterKeys(f: FacultySearchFilters): RelaxKey[] {
+  const keys: RelaxKey[] = [];
+  if (f.query) keys.push("query");
+  if (f.area || f.subarea) keys.push("area");
+  if (f.country) keys.push("country");
+  if (f.language) keys.push("language");
+  if (f.modality) keys.push("modality");
+  if (f.phd === "true") keys.push("phd");
+  if (f.aneca) keys.push("aneca");
+  if (f.availability) keys.push("availability");
+  return keys;
+}
+
+function withoutFilter(f: FacultySearchFilters, k: RelaxKey): FacultySearchFilters {
+  const c = { ...f };
+  if (k === "area") { c.area = ""; c.subarea = ""; } else c[k] = "";
+  return c;
+}
+
+const RELAX_LABEL: Record<RelaxKey, string> = {
+  query: "el texto", area: "el área", country: "el país", language: "el idioma",
+  modality: "la modalidad", phd: "el doctorado", aneca: "la ANECA", availability: "la disponibilidad",
+};
+const RELAX_NO_DATA: Record<RelaxKey, string> = {
+  query: "", area: "Sin área indicada", country: "Sin país indicado", language: "Sin idiomas indicados",
+  modality: "Sin modalidad indicada", phd: "", aneca: "Sin acreditación ANECA indicada", availability: "Sin disponibilidad indicada",
+};
+
+function missingInfo(e: any, k: RelaxKey): { _missing_label: string; _missing_nodata: boolean } {
+  const hasData: Record<RelaxKey, boolean> = {
+    query: true,
+    area: Array.isArray(e.expertise) && e.expertise.length > 0,
+    country: !!e.country,
+    language: Array.isArray(e.languages) && e.languages.length > 0,
+    modality: Array.isArray(e.modalities) && e.modalities.length > 0,
+    phd: true,
+    aneca: !!e.aneca_accreditation,
+    availability: !!e.availability,
+  };
+  const noData = !hasData[k];
+  return { _missing_nodata: noData, _missing_label: noData ? RELAX_NO_DATA[k] : `No cumple ${RELAX_LABEL[k]}` };
+}
+
+// ── Ubicar la ciudad de «Cerca de» ─────────────────────────────────────────
+// No se asume que la ciudad está en el país de quien busca (una institución de
+// Miami que teclea «Murcia» no busca en EE. UU.): se prueba el país del filtro,
+// después los países donde HAY docentes (de más a menos) y por último el país de
+// la institución y cualquier país.
+let facultyCountriesCache: { at: number; codes: string[] } | null = null;
+
+async function getFacultyCountryCodes(admin: AdminClient): Promise<string[]> {
+  if (facultyCountriesCache && Date.now() - facultyCountriesCache.at < 10 * 60 * 1000) return facultyCountriesCache.codes;
+  const codes: string[] = [];
+  try {
+    const { data: fpl } = await admin.from("faculty_places").select("geo_place_id").limit(5000);
+    const ids = [...new Set((fpl || []).map((r: any) => r.geo_place_id).filter(Boolean))];
+    if (ids.length > 0) {
+      const { data: gp } = await admin.from("geo_places").select("id, country_code").in("id", ids as any[]);
+      const countryOf = new Map((gp || []).map((g: any) => [g.id, String(g.country_code)]));
+      const count = new Map<string, number>();
+      for (const r of fpl || []) {
+        const c = countryOf.get((r as any).geo_place_id);
+        if (c) count.set(c, (count.get(c) ?? 0) + 1);
+      }
+      codes.push(...[...count.entries()].sort((a, b) => b[1] - a[1]).map(([c]) => c));
+    }
+  } catch (e) {
+    console.error("[faculty-search] getFacultyCountryCodes:", e);
+  }
+  facultyCountriesCache = { at: Date.now(), codes };
+  return codes;
+}
+
+async function resolveSearchOrigin(admin: AdminClient, city: string, countryFilter: string, defaultCountry?: string | null) {
+  const order: (string | null)[] = [];
+  const add = (c: string | null) => { if (!order.includes(c)) order.push(c); };
+  const fromFilter = countryFilter ? countryCodeFromName(countryFilter) : null;
+  if (fromFilter) add(fromFilter);
+  for (const c of await getFacultyCountryCodes(admin)) add(c);
+  const fromDefault = defaultCountry ? countryCodeFromName(defaultCountry) : null;
+  if (fromDefault) add(fromDefault);
+  add(null);
+  for (const code of order) {
+    const place = await resolvePlaceByCode(admin, city, code);
+    if (place) return place;
+  }
+  return null;
 }
 
 export async function searchFacultyProfiles(
@@ -197,25 +300,28 @@ export async function searchFacultyProfiles(
   const hasExpertiseIdsAll = new Set((allExpertiseData || []).map((e: any) => e.faculty_id));
 
   // ── Cercanía ("Cerca de [ciudad] a X km") ────────────────────────────────
-  // La ciudad de referencia se ubica en geo_places y la función faculty_ids_near
-  // devuelve los docentes con alguna ciudad dentro del radio (con la más
-  // cercana). Si no se reconoce la ciudad no se muestran resultados ficticios.
-  let geoNear: Map<string, number> | null = null;
+  // Por defecto la cercanía ORDENA, no recorta: salen primero los docentes dentro
+  // del radio (por distancia), después el resto con su distancia y al final los
+  // que no tienen ciudad ubicada. Solo con strict=1 se muestran únicamente los
+  // del radio. Si no se reconoce la ciudad se muestran todos, con un aviso.
+  let geoDist: Map<string, number> | null = null;
+  let geoWithin: Set<string> | null = null;
   let geoInfo: FacultySearchResult["geo"];
   const geoCity = filters.city.trim();
   if (geoCity) {
     const km = Math.min(500, Math.max(5, Number(filters.km) || DEFAULT_RADIUS_KM));
-    const origin = await resolvePlace(admin, geoCity, country || opts.defaultCountry, { anyCountry: true });
+    const origin = await resolveSearchOrigin(admin, geoCity, country, opts.defaultCountry);
     if (!origin) {
       geoInfo = { status: "not_found", km, city: geoCity };
-      geoNear = new Map();
     } else {
+      // 20.000 km = todo el planeta: se necesita la distancia de cada docente, no solo la de los cercanos.
       const { data: nearData, error: nearError } = await admin.rpc("faculty_ids_near", {
-        p_lat: origin.latitude, p_lng: origin.longitude, p_km: km,
+        p_lat: origin.latitude, p_lng: origin.longitude, p_km: 20000,
       });
       if (nearError) console.error(`${logPrefix} faculty_ids_near failed (migration not applied yet?):`, nearError);
-      geoNear = new Map((nearData || []).map((r: any) => [r.faculty_id as string, Number(r.km)]));
-      geoInfo = { status: "ok", originName: origin.name, km, city: geoCity };
+      geoDist = new Map((nearData || []).map((r: any) => [r.faculty_id as string, Number(r.km)]));
+      geoWithin = new Set([...geoDist.entries()].filter(([, d]) => d <= km).map(([id]) => id));
+      geoInfo = { status: "ok", originName: origin.name, km, city: geoCity, strict: filters.strict === "1" };
     }
   }
 
@@ -256,8 +362,8 @@ export async function searchFacultyProfiles(
       query_ = query_.ilike("location", `%${country}%`);
     }
 
-    if (geoNear) {
-      const ids = [...geoNear.keys()];
+    if (geoWithin && filters.strict === "1") {
+      const ids = [...geoWithin];
       query_ = query_.in("id", ids.length > 0 ? ids : ["00000000-0000-0000-0000-000000000000"]);
     }
 
@@ -301,7 +407,7 @@ export async function searchFacultyProfiles(
   }
 
   if (opts.skip) {
-    return { transformedEducators: [], transformedPending: [], geo: geoInfo };
+    return { transformedEducators: [], transformedPending: [], geo: geoInfo, relatedEducators: [] };
   }
 
   // ── Main query: verified profiles ─────────────────────────────────────────
@@ -330,7 +436,7 @@ export async function searchFacultyProfiles(
       .select("id, estado_perfil, country, location, expertise:faculty_expertise(area)")
       .in("estado_perfil", ["pendiente_verificacion", "incompleto", "en_revision"])
   );
-  const { data: pendingEducators, error: pendingError } = await pendingQuery.range(0, 23);
+  const { data: pendingEducators, error: pendingError } = opts.lite ? { data: [] as any[], error: null } : await pendingQuery.range(0, 23);
   if (pendingError) {
     console.error(`${logPrefix} pendingQuery failed:`, pendingError);
   }
@@ -348,7 +454,7 @@ export async function searchFacultyProfiles(
   // Verificados que eligieron "Solo instituciones": se muestra que existen,
   // con área y país como mucho, nunca nombre, foto ni texto. Sin búsqueda de
   // texto libre, para no poder confirmar si una persona concreta está aquí.
-  if (opts.lockedPrivateCards && !query) {
+  if (opts.lockedPrivateCards && !query && !opts.lite) {
     const { data: privateRows, error: privateError } = await applySearchFilters(
       admin
         .from("faculty_profiles")
@@ -416,16 +522,19 @@ export async function searchFacultyProfiles(
 
       // Distancia aproximada (del centro de la ciudad de referencia a la ciudad
       // más cercana del docente), redondeada de 5 en 5 km: nunca una dirección.
-      const exactKm = geoNear?.get(ed.id);
+      const exactKm = geoDist?.get(ed.id);
       const roundedKm = exactKm === undefined ? null : Math.round(exactKm / 5) * 5;
       const distanceLabel = roundedKm === null || !geoInfo?.originName
         ? null
         : roundedKm === 0 ? `En ${geoInfo.originName}` : `A ~${roundedKm} km de ${geoInfo.originName}`;
+      // 0 = dentro del radio, 1 = más lejos, 2 = sin ciudad ubicada
+      const geoGroup = !geoDist ? 0 : exactKm === undefined ? 2 : geoWithin!.has(ed.id) ? 0 : 1;
 
       return {
         ...safe,
         _distance_km: exactKm ?? null,
         _distance_label: distanceLabel,
+        _geo_group: geoGroup,
         _relevance: fullTextRank?.get(ed.id) ?? 0,
         full_name: userObj?.full_name || ed.full_name || "Docente",
         avatar_url: userObj?.avatar_url || null,
@@ -438,12 +547,14 @@ export async function searchFacultyProfiles(
       };
     })
     .sort((a: any, b: any) => {
+      // Con "Cerca de": primero los del radio, luego los más lejanos, al final los sin ciudad.
+      if (geoDist && a._geo_group !== b._geo_group) return a._geo_group - b._geo_group;
       // Con búsqueda de texto manda la relevancia; el plan y la completitud
       // desempatan.
       if (fullTextRank && b._relevance !== a._relevance) return b._relevance - a._relevance;
-      // Sin texto pero con "Cerca de": primero los más cercanos (la misma ciudad
-      // empata a 0 km y ahí desempatan el plan y la completitud).
-      if (geoNear && a._distance_km !== b._distance_km) return (a._distance_km ?? Infinity) - (b._distance_km ?? Infinity);
+      // Con "Cerca de": los más cercanos primero (la misma ciudad empata a 0 km y
+      // ahí desempatan el plan y la completitud).
+      if (geoDist && a._distance_km !== b._distance_km) return (a._distance_km ?? Infinity) - (b._distance_km ?? Infinity);
       if (a.is_pro && !b.is_pro) return -1;
       if (!a.is_pro && b.is_pro) return 1;
       if (b._completeness !== a._completeness) return b._completeness - a._completeness;
@@ -452,5 +563,40 @@ export async function searchFacultyProfiles(
 
   // La distancia exacta solo sirve para ordenar: al navegador llega la etiqueta redondeada.
   const educatorsOut = transformedEducators.slice(0, 50).map(({ _distance_km, ...rest }: any) => rest);
-  return { transformedEducators: educatorsOut, transformedPending, geo: geoInfo };
+
+  // ── «También podrían interesarte»: con un cruce de ≥2 filtros que deja pocos
+  // resultados, se añaden los docentes que cumplen todo MENOS UN criterio
+  // (o que no han indicado ese dato), diciendo cuál. Cada uno falla exactamente
+  // un filtro, porque si cumpliera todos ya estaría en los resultados.
+  let relatedEducators: any[] = [];
+  if (!opts.noRelax && !opts.lite) {
+    const keys = activeFilterKeys(filters);
+    if (keys.length >= 2 && educatorsOut.length < RELAX_BELOW) {
+      const seen = new Set<string>(educatorsOut.map((e: any) => e.id));
+      const runs = await Promise.all(
+        keys.map(async (k) => ({
+          k,
+          r: await searchFacultyProfiles(admin, withoutFilter(filters, k), { ...opts, noRelax: true, lite: true }),
+        }))
+      );
+      for (const { k, r } of runs) {
+        for (const e of r.transformedEducators) {
+          if (seen.has(e.id)) continue;
+          seen.add(e.id);
+          relatedEducators.push({ ...e, ...missingInfo(e, k) });
+        }
+      }
+      // Primero a quien probablemente sí encaja pero no ha rellenado el dato.
+      relatedEducators.sort((a: any, b: any) => Number(b._missing_nodata) - Number(a._missing_nodata));
+      relatedEducators = relatedEducators.slice(0, RELAX_MAX);
+    }
+  }
+
+  const nearCount = geoDist ? educatorsOut.filter((e: any) => e._geo_group === 0).length : undefined;
+  return {
+    transformedEducators: educatorsOut,
+    transformedPending,
+    geo: geoInfo ? { ...geoInfo, nearCount } : geoInfo,
+    relatedEducators,
+  };
 }

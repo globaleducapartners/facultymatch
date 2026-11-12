@@ -63,7 +63,9 @@ interface InstitutionSearchPageProps {
   /** Base URL for search form and filter chip links */
   searchPath?: string;
   /** Resultado del filtro "Cerca de": ciudad reconocida o no. */
-  geo?: { status: "ok" | "not_found"; originName?: string; km: number; city: string };
+  geo?: { status: "ok" | "not_found"; originName?: string; km: number; city: string; strict?: boolean; nearCount?: number };
+  /** Docentes que cumplen todos los filtros menos uno (con «_missing_label»). */
+  relatedEducators?: any[];
   /** Ciudad de la institución (para el botón "Usar mi sede"). */
   homeCity?: string | null;
 }
@@ -117,6 +119,7 @@ function buildUrlWithout(params: Record<string, any>, removeKey: string, removeV
   });
   // El radio solo tiene sentido mientras siga la ciudad de referencia.
   if (removeKey !== "city" && params.city && params.km) p.append("km", Array.isArray(params.km) ? params.km[0] : params.km);
+  if (removeKey !== "city" && params.city && params.strict) p.append("strict", "1");
   const str = p.toString();
   return `${base}${str ? `?${str}` : ""}`;
 }
@@ -139,6 +142,7 @@ export function InstitutionSearchPage({
   searchPath,
   geo,
   homeCity,
+  relatedEducators = [],
 }: InstitutionSearchPageProps) {
   const basePath = searchPath ?? (isReadOnly ? "/app/faculty/directory" : "/app/institution/search");
   // Área elegida — controla qué subáreas se ofrecen debajo (cascada). Arranca
@@ -151,7 +155,7 @@ export function InstitutionSearchPage({
   // Open drawer from URL param on first render
   const [selectedId, setSelectedId] = useState<string | null>(() => {
     const fid = searchParams.faculty as string | undefined;
-    if (fid && initialEducators.find((e) => e.id === fid)) return fid;
+    if (fid && [...initialEducators, ...relatedEducators].find((e) => e.id === fid)) return fid;
     return null;
   });
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -163,7 +167,7 @@ export function InstitutionSearchPage({
 
   const canContact = !isReadOnly && (contactMonthlyLimit === null || usedContacts < contactMonthlyLimit);
 
-  const selectedEducator = initialEducators.find((e) => e.id === selectedId);
+  const selectedEducator = [...initialEducators, ...relatedEducators].find((e) => e.id === selectedId);
 
   // Documents: prefer pre-loaded data from server, fallback to on-demand fetch
   const [facultyDocs, setFacultyDocs] = useState<any[]>([]);
@@ -478,9 +482,19 @@ export function InstitutionSearchPage({
               className="px-4 py-2.5 bg-gray-50 rounded-xl border border-gray-100 focus:bg-white focus:ring-2 focus:ring-fm-blue focus:border-transparent outline-none transition-all text-sm font-medium appearance-none sm:w-44"
             >
               {[25, 50, 100, 250].map((k) => (
-                <option key={k} value={k}>A menos de {k} km</option>
+                <option key={k} value={k}>Radio de {k} km</option>
               ))}
             </select>
+            <label className="flex items-center gap-2 text-xs font-bold text-gray-500 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                name="strict"
+                value="1"
+                defaultChecked={(Array.isArray(searchParams.strict) ? searchParams.strict[0] : searchParams.strict) === "1"}
+                className="rounded border-gray-300"
+              />
+              Solo dentro del radio
+            </label>
             {homeCity && cityInput.trim().toLowerCase() !== homeCity.trim().toLowerCase() && (
               <button
                 type="button"
@@ -607,11 +621,12 @@ export function InstitutionSearchPage({
       <p className="text-sm font-bold text-fm-faint">
         {initialEducators.length}{" "}
         {initialEducators.length === 1 ? "docente encontrado" : "docentes encontrados"}
-        {geo?.status === "ok" && ` · a menos de ${geo.km} km de ${geo.originName}, los más cercanos primero`}
+        {geo?.status === "ok" && !geo.strict && ` · ${geo.nearCount ?? 0} a menos de ${geo.km} km de ${geo.originName}; después, el resto por cercanía`}
+        {geo?.status === "ok" && geo.strict && ` · solo a menos de ${geo.km} km de ${geo.originName}`}
       </p>
       {geo?.status === "not_found" && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
-          No hemos reconocido la ciudad «{geo.city}». Revisa la ortografía o prueba con una ciudad grande cercana.
+          No hemos reconocido la ciudad «{geo.city}», así que mostramos todos los resultados sin ordenarlos por cercanía. Revisa la ortografía o prueba con una ciudad grande cercana.
         </div>
       )}
 
@@ -643,12 +658,47 @@ export function InstitutionSearchPage({
           <div className="bg-gray-50 p-6 rounded-full text-gray-200 mb-6">
             <Search size={48} />
           </div>
-          <h3 className="text-xl font-bold text-fm-navy mb-2">No se han encontrado docentes</h3>
+          <h3 className="text-xl font-bold text-fm-navy mb-2">
+            {relatedEducators.length > 0 ? "Ningún docente cumple todos los filtros" : "No se han encontrado docentes"}
+          </h3>
           <p className="text-gray-500 max-w-xs mx-auto font-medium">
             {geo?.status === "ok"
               ? `No hay docentes a menos de ${geo.km} km de ${geo.originName}. Prueba a ampliar la distancia o a quitar algún filtro.`
-              : "Prueba a ajustar los filtros de búsqueda."}
+              : relatedEducators.length > 0
+                ? "Más abajo tienes a quienes cumplen casi todos, indicando qué les falta."
+                : "Prueba a ajustar los filtros de búsqueda."}
           </p>
+        </div>
+      )}
+
+      {/* ── Casi coinciden: cumplen todo menos un criterio (o no lo han indicado) ── */}
+      {relatedEducators.length > 0 && (
+        <div className="space-y-3 pt-2">
+          <div>
+            <h3 className="text-base font-extrabold text-fm-navy">También podrían interesarte</h3>
+            <p className="text-sm font-medium text-fm-faint">
+              No cumplen todos los filtros, pero les falta un solo criterio o aún no han indicado ese dato. Cada tarjeta dice cuál.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {relatedEducators.map((educator) => (
+              <div
+                key={educator.id}
+                className={`rounded-2xl transition-all ${selectedId === educator.id ? "ring-2 ring-[#1B4FD8] shadow-md" : ""}`}
+              >
+                <EducatorCard
+                  educator={educator}
+                  institutionId={institutionId}
+                  isFavorite={favorites.includes(educator.id)}
+                  canContact={canContact}
+                  compact
+                  onCardClick={() => openEducator(educator.id)}
+                  onContactClick={canContact ? handleDirectContact : undefined}
+                  onFavoriteClick={institutionId ? (e, id) => handleToggleFavorite(e, id) : undefined}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

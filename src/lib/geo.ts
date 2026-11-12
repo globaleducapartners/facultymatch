@@ -96,6 +96,30 @@ export async function resolvePlace(
   };
 }
 
+/**
+ * Igual que resolvePlace pero con el código de país ya conocido (o null = en
+ * cualquier país, la ciudad más poblada). Lo usa el buscador para probar varios
+ * países en orden.
+ */
+export async function resolvePlaceByCode(
+  client: RpcClient,
+  city: string | null | undefined,
+  countryCode: string | null
+): Promise<ResolvedPlace | null> {
+  const cityText = cleanCityForGeo(city, countryCode);
+  if (!cityText) return null;
+  const { data, error } = await client.rpc("geo_resolve", { p_name: cityText, p_country_code: countryCode });
+  if (error || !Array.isArray(data) || data.length === 0) return null;
+  const r = data[0];
+  return {
+    placeId: Number(r.place_id),
+    name: r.place_name,
+    countryCode: String(r.country_code),
+    latitude: Number(r.latitude),
+    longitude: Number(r.longitude),
+  };
+}
+
 /** Quita del texto de ciudad los trozos que son el propio país ("Palma, España" → "Palma"). */
 export function cleanCityForGeo(city: string | null | undefined, countryCode: string | null): string {
   const parts = (city ?? "").split(/\s*,\s*/).filter((p) => p && (!countryCode || countryCodeFromName(p) !== countryCode));

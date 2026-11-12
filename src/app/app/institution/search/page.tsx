@@ -145,7 +145,7 @@ export default async function InstitutionSearchRoute({
   // quota is exhausted, so an over-limit institution never actually receives
   // real results (previously this ran unconditionally and only the usage
   // counter stopped incrementing — the "limit" was cosmetic).
-  const { transformedEducators, transformedPending, geo } = await searchFacultyProfiles(admin, filters, {
+  const { transformedEducators, transformedPending, geo, relatedEducators } = await searchFacultyProfiles(admin, filters, {
     blockedFacultyIds,
     skip: searchLimitReached,
     includeContact: isPro,
@@ -170,6 +170,7 @@ export default async function InstitutionSearchRoute({
         searchLimitReached={searchLimitReached}
         monthlyContactsUsed={monthlyContactsUsed ?? 0}
         geo={geo}
+        relatedEducators={relatedEducators}
         homeCity={(institution as any).city || null}
       />
     </>

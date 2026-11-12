@@ -140,6 +140,10 @@ export function EducatorCard({ educator, institutionId, isFavorite: initialIsFav
           {educator._distance_label && (
             <p className="text-[11px] font-bold text-[#1B4FD8]">{educator._distance_label}</p>
           )}
+          {/* Solo en «También podrían interesarte»: qué criterio no cumple o no ha indicado */}
+          {educator._missing_label && (
+            <p className="text-[11px] font-bold text-amber-700">{educator._missing_label}</p>
+          )}
 
           {/* Current institution */}
           {educator.current_institution && (
