@@ -612,6 +612,22 @@ export function ProfileEditorClient({
                     </div>
                   </div>
                 )}
+                {((facultyProfile?.modalities as string[] | null)?.length ?? 0) > 0 && (
+                  <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${D.border}` }}>
+                    <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: D.muted, marginBottom: 8 }}>
+                      Modalidad de docencia:
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 6 }}>
+                      {((facultyProfile?.modalities || []) as string[]).map((m: string) => (
+                        <span key={m} style={{
+                          fontFamily: SANS, fontSize: 12, color: D.ink,
+                          background: D.surf, border: `1px solid ${D.border}`,
+                          padding: "3px 10px", borderRadius: 999,
+                        }}>{m}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             }
             form={
@@ -652,6 +668,25 @@ export function ProfileEditorClient({
                     </select>
                   </Field>
                 </div>
+                <Field label="Modalidad en la que das clase">
+                  <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 10 }}>
+                    {["Presencial", "Online", "Híbrida"].map((m) => (
+                      <label key={m} style={{
+                        display: "flex", alignItems: "center", gap: 8, cursor: "pointer",
+                        padding: "9px 14px", borderRadius: 10, border: `1px solid ${D.border}`,
+                        background: D.surf, fontFamily: SANS, fontSize: 14, fontWeight: 600, color: D.ink,
+                      }}>
+                        <input type="checkbox" name="modalities" value={m}
+                          style={{ width: 16, height: 16, accentColor: D.blue, cursor: "pointer" }}
+                          defaultChecked={((facultyProfile?.modalities as string[] | null) || []).includes(m)} />
+                        {m}
+                      </label>
+                    ))}
+                  </div>
+                  <div style={{ fontFamily: SANS, fontSize: 12, color: D.muted, marginTop: 6 }}>
+                    Las instituciones filtran por modalidad: si no la indicas, no apareces en esas búsquedas.
+                  </div>
+                </Field>
                 <label style={{
                   display: "flex", alignItems: "center", gap: 14,
                   padding: "14px 16px", borderRadius: 12,
@@ -1176,6 +1211,7 @@ export function ProfileEditorClient({
               !facultyProfile?.headline          && { label: "Añade un titular profesional",  section: "basic"      },
               !facultyProfile?.bio               && { label: "Escribe tu biografía",            section: "basic"      },
               !facultyProfile?.current_institution && { label: "Indica tu institución actual", section: "experience" },
+              !(facultyProfile?.modalities?.length) && { label: "Indica tu modalidad de docencia", section: "experience" },
               !(facultyProfile?.languages?.length) && { label: "Añade los idiomas que hablas", section: "idiomas"    },
               !(facultyProfile?.degrees?.length)   && { label: "Añade tu formación académica", section: "formacion"  },
             ].filter(Boolean).slice(0, 4) as { label: string; section: string }[];

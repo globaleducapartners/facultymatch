@@ -46,7 +46,7 @@ export default function NotificationsPage() {
   }
 
   // ── Aviso solo en la plataforma (campana) ──
-  const [inSegment, setInSegment] = useState<"improvable" | "all_faculty" | "no_city" | "legal">("improvable");
+  const [inSegment, setInSegment] = useState<"improvable" | "all_faculty" | "no_city" | "legal" | "fields">("improvable");
   const [inSubject, setInSubject] = useState("Mejora tu perfil en un minuto con IA");
   const [inBody, setInBody] = useState("Sube tu CV y te proponemos cómo completar tu perfil: rellenamos lo que te falta y tú decides qué cambiar. No se borra nada de lo que ya has escrito.");
   const [inLink, setInLink] = useState("/app/faculty/profile?ia=1");
@@ -58,6 +58,7 @@ export default function NotificationsPage() {
     improvable: { type: "cv_ai_improve", subject: "Mejora tu perfil en un minuto con IA", body: "Sube tu CV y te proponemos cómo completar tu perfil: rellenamos lo que te falta y tú decides qué cambiar. No se borra nada de lo que ya has escrito.", link: "/app/faculty/profile?ia=1" },
     all_faculty: { type: "cv_ai_improve", subject: "Mejora tu perfil en un minuto con IA", body: "Sube tu CV y te proponemos cómo completar tu perfil: rellenamos lo que te falta y tú decides qué cambiar. No se borra nada de lo que ya has escrito.", link: "/app/faculty/profile?ia=1" },
     legal: { type: "legal_update", subject: "Actualizamos los Términos y la Política de Privacidad", body: "Hemos actualizado los Términos y Condiciones, la Política de Privacidad, la Política de Cookies y el Aviso Legal de FacultyMatch para explicarte con más claridad cómo tratamos tus datos, cómo funcionan los planes y cómo ejercer tus derechos. Los nuevos Términos se aplicarán a partir del 24 de noviembre de 2026. Puedes leerlos en facultymatch.app/terms y facultymatch.app/privacy. Si no estás de acuerdo con los cambios, puedes darte de baja desde Ajustes antes de esa fecha, sin coste. Gracias por formar parte de FacultyMatch.", link: "" },
+    fields: { type: "complete_fields", subject: "Completa tu perfil para aparecer en más búsquedas", body: "Las instituciones filtran por modalidad (presencial, online o híbrida), área de especialidad e idiomas. Si falta alguno de estos datos, no apareces en esas búsquedas. Completarlos te lleva un par de minutos desde tu perfil.", link: "/app/faculty/profile?tab=experience" },
     no_city: { type: "complete_city", subject: "Indica tu ciudad para que te encuentren cerca", body: "Las instituciones buscan docentes por cercanía a su campus. Añade tu ciudad (o hasta tres, separadas por «y») y aparecerás en esas búsquedas.", link: "/app/faculty/profile?tab=basic" },
   } as const;
 
@@ -65,7 +66,7 @@ export default function NotificationsPage() {
     setInLoading(true);
     setInResult(null);
     try {
-      const base = { segment: inSegment === "legal" ? "all_faculty" : inSegment, subject: inSubject, body: inBody, link: inLink, type: IN_PRESETS[inSegment].type };
+      const base = { segment: inSegment === "legal" ? "all_faculty" : inSegment === "fields" ? "missing_fields" : inSegment, subject: inSubject, body: inBody, link: inLink, type: IN_PRESETS[inSegment].type };
       const pre = await fetch("/api/admin/send-inapp", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...base, dryRun: true }) }).then((r) => r.json());
       if (!pre.success) { setInResult({ ok: false, message: pre.error || "Error" }); return; }
       if (pre.count === 0) { setInResult({ ok: true, message: "Nadie pendiente: todos los docentes de este segmento ya recibieron este aviso." }); return; }
@@ -160,7 +161,7 @@ export default function NotificationsPage() {
           Aparece en la campana y en el inicio de cada docente. Cada docente lo recibe una sola vez.
         </p>
         <div className="flex flex-wrap gap-2">
-          {([["improvable", "Con margen de mejora (perfil por debajo del 100%)"], ["all_faculty", "Todos los docentes"], ["no_city", "Sin ciudad en el perfil"], ["legal", "Cambio de Términos y Privacidad (todos)"]] as const).map(([v, l]) => (
+          {([["improvable", "Con margen de mejora (perfil por debajo del 100%)"], ["all_faculty", "Todos los docentes"], ["no_city", "Sin ciudad en el perfil"], ["legal", "Cambio de Términos y Privacidad (todos)"], ["fields", "Completar modalidad, área e idiomas (verificados)"]] as const).map(([v, l]) => (
             <button key={v} type="button" onClick={() => { setInSegment(v); setInSubject(IN_PRESETS[v].subject); setInBody(IN_PRESETS[v].body); setInLink(IN_PRESETS[v].link); }} className={`px-4 py-2 rounded-xl text-xs font-black transition-colors ${inSegment === v ? "bg-navy text-white" : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50"}`}>{l}</button>
           ))}
         </div>

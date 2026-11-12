@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 // (docentes que ya terminaron el asistente pero no indicaron ciudad: quienes
 // aún están en el asistente la pedirán allí). Excluye cuentas de prueba y
 // suspendidas, y no repite el mismo aviso (mismo `type`) a quien ya lo recibió.
-const SEGMENTS = ["improvable", "all_faculty", "no_city"] as const;
+const SEGMENTS = ["improvable", "all_faculty", "no_city", "missing_fields"] as const;
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -28,8 +28,12 @@ export async function POST(request: Request) {
   const { data: users } = await admin.from("user_profiles").select("id, email").eq("role", "faculty").limit(2000);
   const { data: fps } = await admin
     .from("faculty_profiles")
-    .select("user_id, estado_perfil, profile_completeness, city, onboarding_status")
+    .select("user_id, estado_perfil, profile_completeness, city, onboarding_status, modalities, languages")
     .limit(2000);
+  // "missing_fields": docentes verificados (o en revisión) a los que les falta modalidad,
+  // área de especialidad o idiomas: sin esos datos no salen en los filtros del buscador.
+  const { data: expRows } = await admin.from("faculty_expertise").select("faculty_id").limit(5000);
+  const hasExpertise = new Set((expRows || []).map((e: any) => e.faculty_id as string));
   const fpById = new Map((fps || []).map((f: any) => [f.user_id, f]));
 
   let ids = (users || [])
@@ -39,6 +43,10 @@ export async function POST(request: Request) {
       const f = fpById.get(u.id);
       if (segment === "all_faculty") return true;
       if (segment === "no_city") return f?.onboarding_status === "completed" && !(f?.city || "").trim();
+      if (segment === "missing_fields") {
+        if (f?.estado_perfil !== "verificado" && f?.estado_perfil !== "en_revision") return false;
+        return !(Array.isArray(f?.modalities) && f.modalities.length > 0) || !(Array.isArray(f?.languages) && f.languages.length > 0) || !hasExpertise.has(u.id);
+      }
       return (f?.profile_completeness ?? 0) < 100;
     })
     .map((u: any) => u.id as string);

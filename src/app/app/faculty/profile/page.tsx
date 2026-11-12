@@ -101,6 +101,8 @@ export default async function ProfilePage({
     const availability = formData.get("availability") as string;
     const isPhd = formData.get("isPhd") === "on";
     const academicLevel = formData.get("academicLevel") as string;
+    // Modalidad en la que da clase (Presencial / Online / Híbrida): los filtros del buscador de las instituciones usan este dato.
+    const modalities = formData.getAll("modalities").map(String).filter((m) => ["Presencial", "Online", "Híbrida"].includes(m));
     const institutionsTaughtRaw = formData.get("institutionsTaught") as string;
     const institutionsTaught = JSON.parse(institutionsTaughtRaw || "[]");
 
@@ -115,6 +117,7 @@ export default async function ProfilePage({
         availability,
         is_phd: isPhd,
         academic_level: academicLevel,
+        modalities,
         institutions_taught: institutionsTaught,
         updated_at: new Date().toISOString(),
       }).eq("id", user.id);
